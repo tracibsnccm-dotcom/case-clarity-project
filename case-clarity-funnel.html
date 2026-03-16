@@ -1,0 +1,1967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Clarity Project — Forensic Care Management Assessment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --gold: #b09837;
+    --gold-light: #c8b050;
+    --gold-pale: #f5f0e0;
+    --black: #0d0d0d;
+    --gray-dark: #2a2a2a;
+    --gray-mid: #666;
+    --gray-light: #999;
+    --gray-border: #e0ddd4;
+    --gray-bg: #f8f7f4;
+    --white: #ffffff;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'EB Garamond', Georgia, serif;
+    --font-ui: 'Jost', sans-serif;
+    --max-width: 860px;
+    --wide-width: 1100px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-body);
+    font-size: 18px;
+    line-height: 1.7;
+    color: var(--black);
+    background: var(--white);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── PAGE SYSTEM ────────────────────────────────────── */
+  .page { display: none; min-height: 100vh; }
+  .page.active { display: block; }
+
+  /* ── HEADER ─────────────────────────────────────────── */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-border);
+    padding: 0 40px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo-mark {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-box {
+    width: 36px;
+    height: 36px;
+    border: 1.5px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-box span {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gold);
+  }
+
+  .logo-text {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gray-dark);
+    line-height: 1.3;
+  }
+
+  .logo-text em {
+    display: block;
+    font-style: normal;
+    color: var(--gray-mid);
+    font-weight: 300;
+    letter-spacing: 0.14em;
+    font-size: 10px;
+  }
+
+  .header-nav {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gray-mid);
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    padding-bottom: 1px;
+  }
+
+  .header-nav:hover {
+    color: var(--gold);
+    border-color: var(--gold);
+  }
+
+  /* ── TYPOGRAPHY SYSTEM ───────────────────────────────── */
+  .section-label {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::after {
+    content: '';
+    display: block;
+    height: 1px;
+    width: 40px;
+    background: var(--gold);
+  }
+
+  h1.display {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 5vw, 58px);
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--black);
+  }
+
+  h2.section-title {
+    font-family: var(--font-display);
+    font-size: clamp(24px, 3vw, 34px);
+    font-weight: 500;
+    line-height: 1.25;
+    color: var(--black);
+    margin-bottom: 24px;
+  }
+
+  h3.card-title {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--black);
+    margin-bottom: 10px;
+  }
+
+  p.body-text {
+    font-family: var(--font-body);
+    font-size: 18px;
+    line-height: 1.75;
+    color: var(--gray-dark);
+    max-width: 620px;
+  }
+
+  p.body-text + p.body-text { margin-top: 16px; }
+
+  /* ── LAYOUT ──────────────────────────────────────────── */
+  .container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .container-wide {
+    max-width: var(--wide-width);
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .section {
+    padding: 80px 0;
+    border-top: 1px solid var(--gray-border);
+  }
+
+  .section:first-of-type { border-top: none; }
+
+  /* ── GOLD RULE ───────────────────────────────────────── */
+  .gold-rule {
+    height: 3px;
+    background: var(--gold);
+    width: 48px;
+    margin: 28px 0;
+  }
+
+  /* ── HERO ────────────────────────────────────────────── */
+  .hero {
+    padding: 96px 0 80px;
+    position: relative;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 40%;
+    height: 100%;
+    background: var(--gray-bg);
+    border-left: 1px solid var(--gray-border);
+    z-index: 0;
+  }
+
+  .hero .container { position: relative; z-index: 1; }
+
+  .hero-kicker {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 28px;
+  }
+
+  .hero-headline {
+    font-family: var(--font-display);
+    font-size: clamp(38px, 5.5vw, 62px);
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    color: var(--black);
+    max-width: 580px;
+    margin-bottom: 28px;
+  }
+
+  .hero-headline span {
+    display: block;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--gold);
+  }
+
+  .hero-subhead {
+    font-family: var(--font-body);
+    font-size: 20px;
+    line-height: 1.6;
+    color: var(--gray-dark);
+    max-width: 520px;
+    margin-bottom: 12px;
+  }
+
+  .hero-credibility {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: var(--gray-light);
+    max-width: 480px;
+    margin-bottom: 40px;
+    font-style: italic;
+  }
+
+  .btn-primary {
+    display: inline-block;
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--white);
+    background: var(--gold);
+    border: 1.5px solid var(--gold);
+    padding: 16px 36px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    text-decoration: none;
+  }
+
+  .btn-primary:hover {
+    background: var(--black);
+    border-color: var(--black);
+    color: var(--white);
+  }
+
+  .btn-secondary {
+    display: inline-block;
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--black);
+    background: transparent;
+    border: 1.5px solid var(--black);
+    padding: 14px 32px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    text-decoration: none;
+  }
+
+  .btn-secondary:hover {
+    background: var(--black);
+    color: var(--white);
+  }
+
+  .btn-caption {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    color: var(--gray-light);
+    margin-top: 14px;
+  }
+
+  /* ── ASSESSMENT BOXES ────────────────────────────────── */
+  .assessment-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin: 40px 0 32px;
+    max-width: 600px;
+  }
+
+  .case-box {
+    border: 1px solid var(--gray-border);
+    padding: 32px 28px;
+    position: relative;
+  }
+
+  .case-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gold);
+  }
+
+  .case-box-label {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 20px;
+  }
+
+  .case-tools {
+    list-style: none;
+    margin-bottom: 20px;
+  }
+
+  .case-tools li {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--gray-dark);
+    padding: 6px 0;
+    border-bottom: 1px solid var(--gray-border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .case-tools li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: var(--gold);
+    flex-shrink: 0;
+  }
+
+  .case-tools li:last-child { border-bottom: none; }
+
+  .case-count {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gray-mid);
+    margin-top: 16px;
+  }
+
+  .total-line {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--black);
+    padding: 16px 0;
+    border-top: 1.5px solid var(--black);
+    border-bottom: 1.5px solid var(--black);
+    max-width: 600px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .total-line span {
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  /* ── TOOL PANELS (collapsible) ───────────────────────── */
+  .tool-panel {
+    border: 1px solid var(--gray-border);
+    border-left: 3px solid transparent;
+    margin-bottom: 2px;
+    background: var(--white);
+    transition: border-left-color 0.2s, background 0.2s;
+  }
+
+  .tool-panel:hover,
+  .tool-panel.open {
+    border-left-color: var(--gold);
+    background: var(--gray-bg);
+  }
+
+  .tool-panel-header {
+    padding: 20px 28px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .tool-panel-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .tool-abbr {
+    font-family: var(--font-ui);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+    min-width: 40px;
+  }
+
+  .tool-panel-name {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--black);
+    line-height: 1.3;
+  }
+
+  .tool-panel-name em {
+    font-style: normal;
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    color: var(--gray-mid);
+    margin-left: 10px;
+  }
+
+  .tool-panel-icon {
+    font-family: var(--font-ui);
+    font-size: 18px;
+    font-weight: 300;
+    color: var(--gold);
+    flex-shrink: 0;
+    transition: transform 0.3s;
+    line-height: 1;
+  }
+
+  .tool-panel.open .tool-panel-icon { transform: rotate(45deg); }
+
+  .tool-panel-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, padding 0.25s;
+    padding: 0 28px;
+  }
+
+  .tool-panel.open .tool-panel-body {
+    max-height: 200px;
+    padding: 0 28px 20px;
+  }
+
+  .tool-description {
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--gray-mid);
+    padding-left: 60px;
+    border-top: 1px solid var(--gray-border);
+    padding-top: 16px;
+  }
+
+  .tools-footnote {
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-style: italic;
+    color: var(--gray-mid);
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--gray-border);
+  }
+
+  /* ── SAMPLE REPORT ───────────────────────────────────── */
+  .report-placeholder {
+    background: var(--gray-bg);
+    border: 1px solid var(--gray-border);
+    border-left: 3px solid var(--gold);
+    min-height: 360px;
+    display: flex;
+    align-items: stretch;
+    margin: 32px 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .report-mock {
+    width: 100%;
+    padding: 36px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .report-mock-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--gray-border);
+    margin-bottom: 0;
+  }
+
+  .report-mock-title {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--black);
+  }
+
+  .report-mock-badge {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--white);
+    background: var(--gold);
+    padding: 6px 14px;
+    white-space: nowrap;
+  }
+
+  .report-section-list {
+    list-style: none;
+    margin: 0;
+  }
+
+  .report-section-item {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--gray-border);
+  }
+
+  .report-section-item:last-child { border-bottom: none; }
+
+  .report-section-num {
+    font-family: var(--font-ui);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    min-width: 20px;
+  }
+
+  .report-section-name {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gray-dark);
+  }
+
+  .report-section-desc {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--gray-light);
+    margin-left: auto;
+    font-style: italic;
+  }
+
+  .report-features {
+    list-style: none;
+    margin: 8px 0 32px;
+  }
+
+  .report-features li {
+    font-family: var(--font-body);
+    font-size: 17px;
+    color: var(--gray-dark);
+    padding: 10px 0;
+    border-bottom: 1px solid var(--gray-border);
+    display: flex;
+    gap: 14px;
+    align-items: baseline;
+  }
+
+  .report-features li::before {
+    content: '—';
+    color: var(--gold);
+    flex-shrink: 0;
+    font-family: var(--font-ui);
+  }
+
+  .report-features li:last-child { border-bottom: none; }
+
+  /* ── PROCESS ──────────────────────────────────────────── */
+  .process-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin-top: 40px;
+  }
+
+  .process-step {
+    background: var(--gray-bg);
+    padding: 36px 32px;
+    border-left: 3px solid transparent;
+    transition: border-left-color 0.2s;
+    position: relative;
+  }
+
+  .process-step:hover { border-left-color: var(--gold); }
+
+  .process-step-number {
+    font-family: var(--font-display);
+    font-size: 48px;
+    font-weight: 400;
+    color: var(--gold);
+    opacity: 0.3;
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+
+  .process-step-title {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--black);
+    margin-bottom: 12px;
+  }
+
+  .process-step-text {
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--gray-mid);
+  }
+
+  .process-step-meta {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--gold);
+    margin-top: 12px;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── FAQ ─────────────────────────────────────────────── */
+  .faq-item {
+    border-bottom: 1px solid var(--gray-border);
+    padding: 0;
+  }
+
+  .faq-question {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--black);
+    padding: 24px 0;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    transition: color 0.2s;
+  }
+
+  .faq-question:hover { color: var(--gold); }
+
+  .faq-icon {
+    font-family: var(--font-ui);
+    font-size: 20px;
+    font-weight: 300;
+    color: var(--gold);
+    flex-shrink: 0;
+    transition: transform 0.3s;
+    line-height: 1;
+  }
+
+  .faq-item.open .faq-icon { transform: rotate(45deg); }
+
+  .faq-answer {
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.75;
+    color: var(--gray-mid);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.3s;
+  }
+
+  .faq-item.open .faq-answer {
+    max-height: 400px;
+    padding-bottom: 24px;
+  }
+
+  /* ── QUALIFICATION SECTION ────────────────────────────── */
+  .qualification-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 40px;
+  }
+
+  .qual-box {
+    border: 1px solid var(--gray-border);
+    padding: 32px 28px;
+    position: relative;
+  }
+
+  .qual-box.is-for::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--gold);
+  }
+
+  .qual-box.is-not {
+    background: var(--gray-bg);
+  }
+
+  .qual-box-label {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .qual-box.is-for .qual-box-label { color: var(--gold); }
+  .qual-box.is-not .qual-box-label { color: var(--gray-light); }
+
+  .qual-list {
+    list-style: none;
+  }
+
+  .qual-list li {
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--gray-dark);
+    padding: 10px 0;
+    border-bottom: 1px solid var(--gray-border);
+    display: flex;
+    gap: 12px;
+    align-items: baseline;
+  }
+
+  .qual-list li:last-child { border-bottom: none; }
+
+  .qual-list li::before {
+    content: '—';
+    font-family: var(--font-ui);
+    flex-shrink: 0;
+  }
+
+  .qual-box.is-for .qual-list li::before { color: var(--gold); }
+  .qual-box.is-not .qual-list li::before { color: var(--gray-light); }
+  .qual-box.is-not .qual-list li { color: var(--gray-mid); }
+
+  /* ── FINAL CTA ────────────────────────────────────────── */
+  .final-cta {
+    background: var(--black);
+    padding: 96px 40px;
+    text-align: center;
+  }
+
+  .final-cta .section-label { justify-content: center; color: var(--gold); }
+  .final-cta .section-label::after { background: var(--gold); }
+
+  .final-cta h2 {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 500;
+    color: var(--white);
+    margin-bottom: 20px;
+  }
+
+  .final-cta p {
+    font-family: var(--font-body);
+    font-size: 18px;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 40px;
+  }
+
+  .final-cta .btn-primary {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--white);
+  }
+
+  .final-cta .btn-primary:hover {
+    background: var(--white);
+    border-color: var(--white);
+    color: var(--black);
+  }
+
+  /* ── FOOTER ───────────────────────────────────────────── */
+  .site-footer {
+    background: var(--white);
+    border-top: 1px solid var(--gray-border);
+    padding: 48px 40px;
+  }
+
+  .footer-inner {
+    max-width: var(--wide-width);
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 32px;
+  }
+
+  .footer-brand {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gray-dark);
+    line-height: 1.8;
+  }
+
+  .footer-brand em {
+    display: block;
+    font-style: normal;
+    font-weight: 300;
+    color: var(--gray-light);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+  }
+
+  .footer-contact {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--gray-mid);
+    line-height: 2;
+    text-align: right;
+  }
+
+  .footer-links {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gray-light);
+    display: flex;
+    gap: 20px;
+    margin-top: 8px;
+    justify-content: flex-end;
+  }
+
+  .footer-links a {
+    color: var(--gray-light);
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--gold); }
+
+  .footer-copy {
+    width: 100%;
+    padding-top: 24px;
+    border-top: 1px solid var(--gray-border);
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    color: var(--gray-light);
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  /* ── PAGE 2 — FORM ────────────────────────────────────── */
+  .form-page {
+    min-height: calc(100vh - 64px);
+    display: flex;
+    align-items: flex-start;
+    padding: 80px 40px;
+  }
+
+  .form-container {
+    max-width: 640px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .form-kicker {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+
+  .form-title {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 500;
+    color: var(--black);
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+
+  .form-subtitle {
+    font-family: var(--font-body);
+    font-size: 17px;
+    color: var(--gray-mid);
+    margin-bottom: 48px;
+    line-height: 1.65;
+  }
+
+  .gold-rule { margin: 0 0 48px; }
+
+  .form-group {
+    margin-bottom: 28px;
+  }
+
+  .form-label {
+    display: block;
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gray-dark);
+    margin-bottom: 10px;
+  }
+
+  .form-label span {
+    color: var(--gold);
+    margin-left: 4px;
+  }
+
+  .form-label em {
+    font-style: normal;
+    font-weight: 300;
+    color: var(--gray-light);
+    letter-spacing: 0.1em;
+    font-size: 9px;
+  }
+
+  .form-input,
+  .form-select {
+    width: 100%;
+    font-family: var(--font-body);
+    font-size: 17px;
+    color: var(--black);
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    border-radius: 0;
+    padding: 14px 16px;
+    outline: none;
+    appearance: none;
+    transition: border-color 0.2s;
+    line-height: 1.5;
+  }
+
+  .form-input:focus,
+  .form-select:focus {
+    border-color: var(--gold);
+  }
+
+  .form-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23b09837' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+    cursor: pointer;
+  }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+  .form-submit-area {
+    margin-top: 40px;
+    padding-top: 32px;
+    border-top: 1px solid var(--gray-border);
+  }
+
+  .form-note {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    color: var(--gray-light);
+    margin-top: 16px;
+    font-style: italic;
+  }
+
+  /* ── PAGE 3 — CONFIRMATION ───────────────────────────── */
+  .confirm-page {
+    min-height: calc(100vh - 64px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 40px;
+  }
+
+  .confirm-container {
+    max-width: 580px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .confirm-icon {
+    width: 56px;
+    height: 56px;
+    border: 1.5px solid var(--gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 32px;
+  }
+
+  .confirm-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .confirm-title {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 500;
+    color: var(--black);
+    margin-bottom: 16px;
+  }
+
+  .confirm-subtitle {
+    font-family: var(--font-body);
+    font-size: 18px;
+    color: var(--gray-mid);
+    margin-bottom: 48px;
+    line-height: 1.65;
+  }
+
+  .next-steps-box {
+    border: 1px solid var(--gray-border);
+    padding: 36px;
+    text-align: left;
+    position: relative;
+    margin-bottom: 40px;
+  }
+
+  .next-steps-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--gold);
+  }
+
+  .next-steps-label {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 24px;
+  }
+
+  .next-steps-list {
+    list-style: none;
+  }
+
+  .next-steps-list li {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--gray-border);
+    font-family: var(--font-body);
+    font-size: 17px;
+    color: var(--gray-dark);
+    line-height: 1.6;
+  }
+
+  .next-steps-list li:last-child { border-bottom: none; }
+
+  .step-num {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--gold);
+    background: var(--gold-pale);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .confirm-contact {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    color: var(--gray-light);
+    margin-top: 32px;
+    font-style: italic;
+  }
+
+  .confirm-contact a {
+    color: var(--gold);
+    text-decoration: none;
+  }
+
+  /* ── UTILITY ─────────────────────────────────────────── */
+  .text-center { text-align: center; }
+  .mt-8 { margin-top: 8px; }
+  .mt-16 { margin-top: 16px; }
+  .mt-24 { margin-top: 24px; }
+  .mt-32 { margin-top: 32px; }
+  .mt-48 { margin-top: 48px; }
+  .mt-64 { margin-top: 64px; }
+
+  @media (max-width: 768px) {
+    .site-header { padding: 0 20px; }
+    .container, .container-wide { padding: 0 20px; }
+    .section { padding: 56px 0; }
+    .hero::before { display: none; }
+    .assessment-grid { grid-template-columns: 1fr; }
+    .tool-card { grid-template-columns: 1fr; gap: 12px; }
+    .process-grid { grid-template-columns: 1fr; }
+    .qualification-grid { grid-template-columns: 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+    .form-page { padding: 48px 20px; }
+    .confirm-page { padding: 48px 20px; }
+    .footer-inner { flex-direction: column; }
+    .footer-contact { text-align: left; }
+    .footer-links { justify-content: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     SHARED HEADER
+═══════════════════════════════════════════════════════ -->
+<header class="site-header">
+  <div class="logo-mark">
+    <div class="logo-box"><span>R</span></div>
+    <div class="logo-text">
+      Reconcile Care Management
+      <em>Forensic Care Management</em>
+    </div>
+  </div>
+  <div class="header-nav" onclick="goToPage('form')">Attorney Login</div>
+</header>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     PAGE 1 — LANDING
+═══════════════════════════════════════════════════════ -->
+<div id="page-landing" class="page active">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="container">
+      <div class="hero-kicker">The Case Clarity Project</div>
+      <h1 class="hero-headline">
+        Six Diagnostic Tools.
+        Two Cases.
+        <span>At No Cost.</span>
+      </h1>
+      <p class="hero-subhead">
+        A complete case intelligence assessment for one current matter and one closed matter.
+      </p>
+      <p class="hero-credibility">
+        Developed by clinical case management professionals to provide objective insight into the factors that drive case outcomes.
+      </p>
+      <div class="gold-rule"></div>
+      <button class="btn-primary" onclick="goToPage('form')">Request Complimentary Assessment</button>
+      <div class="btn-caption">No obligation &nbsp;·&nbsp; 48-hour turnaround &nbsp;·&nbsp; Keep all reports</div>
+      <p style="font-family:var(--font-body); font-size:16px; font-style:italic; color:var(--gray-mid); margin-top:16px; max-width:500px;">Most attorneys complete the full assessment in approximately 90–180 minutes total, typically across multiple sessions.</p>
+    </div>
+  </div>
+
+  <!-- CREDIBILITY STRIP -->
+  <div style="background:var(--gray-bg); border-top:1px solid var(--gray-border); border-bottom:1px solid var(--gray-border); padding:20px 0;">
+    <div class="container">
+      <div style="display:flex; flex-wrap:wrap; gap:32px; align-items:center; justify-content:center;">
+        <div style="font-family:var(--font-ui); font-size:11px; font-weight:400; letter-spacing:0.12em; color:var(--gray-mid); display:flex; align-items:center; gap:10px;">
+          <span style="display:inline-block; width:4px; height:4px; background:var(--gold); flex-shrink:0;"></span>
+          Developed by Registered Nurse Care Managers
+        </div>
+        <div style="font-family:var(--font-ui); font-size:11px; font-weight:400; letter-spacing:0.12em; color:var(--gray-mid); display:flex; align-items:center; gap:10px;">
+          <span style="display:inline-block; width:4px; height:4px; background:var(--gold); flex-shrink:0;"></span>
+          25+ years of complex injury case management
+        </div>
+        <div style="font-family:var(--font-ui); font-size:11px; font-weight:400; letter-spacing:0.12em; color:var(--gray-mid); display:flex; align-items:center; gap:10px;">
+          <span style="display:inline-block; width:4px; height:4px; background:var(--gold); flex-shrink:0;"></span>
+          Forensic clinical analysis used in litigation strategy
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHAT YOU RECEIVE -->
+  <div class="section" style="background:var(--gray-bg);">
+    <div class="container">
+      <div class="section-label">What You Receive</div>
+      <h2 class="section-title">Two cases analyzed.<br>Twelve independent reports.</h2>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:0; border:1px solid var(--gray-border); margin:32px 0 24px;">
+        <div style="padding:24px 20px; border-right:1px solid var(--gray-border);">
+          <div style="font-family:var(--font-ui); font-size:9px; font-weight:600; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); margin-bottom:6px;">Cases</div>
+          <div style="font-family:var(--font-display); font-size:26px; font-weight:500; color:var(--black); line-height:1;">2</div>
+          <div style="font-family:var(--font-ui); font-size:11px; color:var(--gray-mid); margin-top:4px; letter-spacing:0.06em;">Analyzed</div>
+        </div>
+        <div style="padding:24px 20px; border-right:1px solid var(--gray-border);">
+          <div style="font-family:var(--font-ui); font-size:9px; font-weight:600; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); margin-bottom:6px;">Instruments</div>
+          <div style="font-family:var(--font-display); font-size:26px; font-weight:500; color:var(--black); line-height:1;">6</div>
+          <div style="font-family:var(--font-ui); font-size:11px; color:var(--gray-mid); margin-top:4px; letter-spacing:0.06em;">Applied per case</div>
+        </div>
+        <div style="padding:24px 20px; border-right:1px solid var(--gray-border);">
+          <div style="font-family:var(--font-ui); font-size:9px; font-weight:600; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); margin-bottom:6px;">Reports</div>
+          <div style="font-family:var(--font-display); font-size:26px; font-weight:500; color:var(--black); line-height:1;">12</div>
+          <div style="font-family:var(--font-ui); font-size:11px; color:var(--gray-mid); margin-top:4px; letter-spacing:0.06em;">Independent reports</div>
+        </div>
+        <div style="padding:24px 20px;">
+          <div style="font-family:var(--font-ui); font-size:9px; font-weight:600; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); margin-bottom:6px;">Delivery</div>
+          <div style="font-family:var(--font-display); font-size:26px; font-weight:500; color:var(--black); line-height:1;">48h</div>
+          <div style="font-family:var(--font-ui); font-size:11px; color:var(--gray-mid); margin-top:4px; letter-spacing:0.06em;">After submission</div>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:28px;">
+        <div style="border:1px solid var(--gray-border); padding:28px 24px; position:relative;">
+          <div style="position:absolute; top:0; left:0; right:0; height:3px; background:var(--gold);"></div>
+          <div style="font-family:var(--font-ui); font-size:10px; font-weight:600; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); margin-bottom:16px;">Active Case</div>
+          <div style="list-style:none; font-family:var(--font-ui); font-size:12px; font-weight:500; letter-spacing:0.08em; color:var(--gray-dark);">
+            <div style="padding:7px 0; border-bottom:1px solid var(--gray-border); display:flex; align-items:center; gap:8px;"><span style="width:5px;height:5px;background:var(--gold);display:inline-block;flex-shrink:0;"></span>CCI</div>
+            <div style="padding:7px 0; border-bottom:1px solid var(--gray-border); display:flex; align-items:center; gap:8px;"><span style="width:5px;height:5px;background:var(--gold);display:inline-block;flex-shrink:0;"></span>CSA</div>
+            <div style="padding:7px 0; border-bottom:1px solid var(--gray-border); display:flex; align-items:center; gap:8px;"><span style="width:5px;height:5px;background:var(--gold);display:inline-block;flex-shrink:0;"></span>CAF</div>
+            <div style="padding:7px 0; border-bottom:1px solid var(--gray-border); display:flex; align-items:center; gap:8px;"><span style="width:5px;height:5px;background:var(--gold);display:inline-block;flex-shrink:0;"></span>HSI</div>
+            <div style="padding:7px 0; border-bottom:1px solid var(--gray-border); display:flex; align-items:center; gap:8px;"><span style="width:5px;height:5px;background:var(--gold);display:inline-block;flex-shrink:0;"></span>FCI</div>
+            <div style="padding:7px 0; border-bottom:1px solid var(--gray-border); display:flex; align-items:center; gap:8px;"><span style="width:5px;height:5px;background:var(--gold);display:inline-block;flex-shrink:0;"></span>RRF</div>
+            <div style="padding:10px 0 0; font-family:var(--font-ui); font-size:10px; font-weight:600; letter-spacing:0.18em; text-transform:uppercase; color:var(--gray-mid);">→ 6 Reports</div>
+          </div>
+        </div>
+        <div style="border:1px solid var(--gray-border); padding:28px 24px; position:relative;">
+          <div style="position:absolute; top:0; left:0; right:0; height:3px; background:var(--gold);"></div>
+          <div style="font-family:var(--font-ui); font-size:10px; font-weight:600; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); margin-bottom:16px;">Closed Case</div>
+          <div style="list-style:none; font-family:var(--font-ui); font-size:12px; font-weight:500; letter-spacing:0.08em; color:var(--gray-dark);">
+            <div style="padding:7px 0; border-bottom:1px solid var(--gray-border); display:flex; align-items:center; gap:8px;"><span style="width:5px;height:5px;background:var(--gold);display:inline-block;flex-shrink:0;"></span>CCI</div>
+            <div style="padding:7px 0; border-bottom:1px solid var(--gray-border); display:flex; align-items:center; gap:8px;"><span style="width:5px;height:5px;background:var(--gold);display:inline-block;flex-shrink:0;"></span>CSA</div>
+            <div style="padding:7px 0; border-bottom:1px solid var(--gray-border); display:flex; align-items:center; gap:8px;"><span style="width:5px;height:5px;background:var(--gold);display:inline-block;flex-shrink:0;"></span>CAF</div>
+            <div style="padding:7px 0; border-bottom:1px solid var(--gray-border); display:flex; align-items:center; gap:8px;"><span style="width:5px;height:5px;background:var(--gold);display:inline-block;flex-shrink:0;"></span>HSI</div>
+            <div style="padding:7px 0; border-bottom:1px solid var(--gray-border); display:flex; align-items:center; gap:8px;"><span style="width:5px;height:5px;background:var(--gold);display:inline-block;flex-shrink:0;"></span>FCI</div>
+            <div style="padding:7px 0; border-bottom:1px solid var(--gray-border); display:flex; align-items:center; gap:8px;"><span style="width:5px;height:5px;background:var(--gold);display:inline-block;flex-shrink:0;"></span>RRF</div>
+            <div style="padding:10px 0 0; font-family:var(--font-ui); font-size:10px; font-weight:600; letter-spacing:0.18em; text-transform:uppercase; color:var(--gray-mid);">→ 6 Reports</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family:var(--font-ui); font-size:12px; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:var(--black); padding:16px 0; border-top:2px solid var(--black); border-bottom:2px solid var(--black);">
+        Total: 12 Reports &nbsp;·&nbsp; <span style="color:var(--gold);">Complimentary</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- THE ASSESSMENT -->
+  <div class="section">
+    <div class="container">
+      <div class="section-label">The Assessment</div>
+      <h2 class="section-title">Two cases. Twelve reports.<br>A complete picture.</h2>
+      <p class="body-text">We will apply all six forensic tools to two of your cases.</p>
+
+      <div class="assessment-grid">
+        <div class="case-box">
+          <div class="case-box-label">Active Case</div>
+          <ul class="case-tools">
+            <li>CCI</li>
+            <li>CSA</li>
+            <li>CAF</li>
+            <li>HSI</li>
+            <li>FCI</li>
+            <li>RRF</li>
+          </ul>
+          <div class="case-count">6 Reports</div>
+        </div>
+        <div class="case-box">
+          <div class="case-box-label">Closed Case</div>
+          <ul class="case-tools">
+            <li>CCI</li>
+            <li>CSA</li>
+            <li>CAF</li>
+            <li>HSI</li>
+            <li>FCI</li>
+            <li>RRF</li>
+          </ul>
+          <div class="case-count">6 Reports</div>
+        </div>
+      </div>
+
+      <div class="total-line">
+        <span>Total: 12 Comprehensive Reports</span>
+        <span>Complimentary</span>
+      </div>
+
+      <p class="body-text">
+        We recommend selecting one active case where additional insight would be valuable, and one closed case that presented unexpected challenges or outcomes.
+      </p>
+
+      <div class="mt-40" style="margin-top:40px;">
+        <button class="btn-primary" onclick="goToPage('form')">Request Complimentary Assessment</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PURPOSE -->
+  <div class="section" style="background: var(--gray-bg);">
+    <div class="container">
+      <div class="section-label">Purpose of This Offer</div>
+      <h2 class="section-title">Validate the tools<br>against your own experience.</h2>
+      <div class="gold-rule"></div>
+      <p class="body-text">These tools were developed to provide attorneys with objective, data-driven insight into the factors that drive case outcomes.</p>
+      <p class="body-text mt-16">Rather than describing their utility, we invite you to validate them against your own experience.</p>
+      <p class="body-text mt-16">For your active case, the assessment will identify current risks, barriers, and coordination demands.</p>
+      <p class="body-text mt-16">For your closed case, it will reveal what factors may have been overlooked — and what might have been done differently with fuller information.</p>
+      <p class="body-text mt-16">There is no cost, no obligation, and no follow-up unless you choose to continue the conversation.</p>
+    </div>
+  </div>
+
+  <!-- ABOUT THE ASSESSMENT -->
+  <div class="section">
+    <div class="container">
+      <div class="section-label">About the Assessment</div>
+      <h2 class="section-title">Who conducts<br>this assessment.</h2>
+      <div class="gold-rule"></div>
+      <p class="body-text">This assessment is provided by Reconcile Care Management Services, a clinical case management firm specializing in complex injury and disability matters.</p>
+      <p class="body-text mt-16">Our work focuses on forensic care management, helping attorneys understand the medical, functional, and social factors that influence case outcomes.</p>
+      <p class="body-text mt-16">The assessment is conducted by a Board Certified Case Manager (CCM) with nursing credentials and experience supporting personal injury, workers' compensation, and disability litigation.</p>
+      <p class="body-text mt-16">The goal of the Case Clarity Project is simple: to allow attorneys to evaluate the analytical tools directly against their own cases.</p>
+    </div>
+  </div>
+
+  <!-- TOOL SUITE -->
+  <div class="section">
+    <div class="container-wide">
+      <div class="container" style="padding-left:0; padding-right:0;">
+        <div class="section-label">The Forensic Tool Suite</div>
+        <h2 class="section-title">Six instruments.<br>One comprehensive view.</h2>
+        <p class="body-text">The assessment is performed using six forensic instruments. Each tool examines a different dimension of case complexity, treatment alignment, access barriers, life stability, functional capacity, and recovery risk.</p>
+        <p class="body-text mt-16">The Case Clarity Project applies six independent forensic instruments to evaluate structural, clinical, and recovery factors influencing case outcomes. Each instrument produces a separate analytical report.</p>
+        <p class="body-text mt-16" style="font-style:italic; color:var(--gray-light);">Select any instrument below to learn more.</p>
+      </div>
+
+      <div class="mt-32" style="margin-top:32px;">
+
+        <div class="tool-panel">
+          <div class="tool-panel-header" onclick="togglePanel(this)">
+            <div class="tool-panel-left">
+              <span class="tool-abbr">CCI</span>
+              <span class="tool-panel-name">Case Complexity Index</span>
+            </div>
+            <span class="tool-panel-icon">+</span>
+          </div>
+          <div class="tool-panel-body">
+            <div class="tool-description">Evaluates injury severity, life disruption, and care coordination demands throughout the case lifecycle.</div>
+          </div>
+        </div>
+
+        <div class="tool-panel">
+          <div class="tool-panel-header" onclick="togglePanel(this)">
+            <div class="tool-panel-left">
+              <span class="tool-abbr">CSA</span>
+              <span class="tool-panel-name">Clinical Sequencing Auditor</span>
+            </div>
+            <span class="tool-panel-icon">+</span>
+          </div>
+          <div class="tool-panel-body">
+            <div class="tool-description">Assesses alignment with the 7 Rights of Injury Care Management and treatment pathway defensibility.</div>
+          </div>
+        </div>
+
+        <div class="tool-panel">
+          <div class="tool-panel-header" onclick="togglePanel(this)">
+            <div class="tool-panel-left">
+              <span class="tool-abbr">CAF</span>
+              <span class="tool-panel-name">C.A.R.E. Access Friction Score</span>
+            </div>
+            <span class="tool-panel-icon">+</span>
+          </div>
+          <div class="tool-panel-body">
+            <div class="tool-description">Identifies insurance, referral, and provider access barriers that may delay appropriate care.</div>
+          </div>
+        </div>
+
+        <div class="tool-panel">
+          <div class="tool-panel-header" onclick="togglePanel(this)">
+            <div class="tool-panel-left">
+              <span class="tool-abbr">HSI</span>
+              <span class="tool-panel-name">Holistic Stability Index</span>
+            </div>
+            <span class="tool-panel-icon">+</span>
+          </div>
+          <div class="tool-panel-body">
+            <div class="tool-description">Evaluates stability across the 4Ps of Wellness and social determinants of health.</div>
+          </div>
+        </div>
+
+        <div class="tool-panel">
+          <div class="tool-panel-header" onclick="togglePanel(this)">
+            <div class="tool-panel-left">
+              <span class="tool-abbr">FCI</span>
+              <span class="tool-panel-name">Functional Capacity Index</span>
+            </div>
+            <span class="tool-panel-icon">+</span>
+          </div>
+          <div class="tool-panel-body">
+            <div class="tool-description">Assesses capacity to return to work and maintain independence following injury.</div>
+          </div>
+        </div>
+
+        <div class="tool-panel">
+          <div class="tool-panel-header" onclick="togglePanel(this)">
+            <div class="tool-panel-left">
+              <span class="tool-abbr">RRF</span>
+              <span class="tool-panel-name">Recovery Risk Forecaster</span>
+            </div>
+            <span class="tool-panel-icon">+</span>
+          </div>
+          <div class="tool-panel-body">
+            <div class="tool-description">Identifies psychological, behavioral, and situational factors affecting recovery trajectory.</div>
+          </div>
+        </div>
+
+        <p class="tools-footnote">Each tool may be used independently. Together, they provide a comprehensive view of the factors influencing case outcomes.</p>
+
+        <div style="margin-top:36px;">
+          <button class="btn-primary" onclick="goToPage('form')">Request Complimentary Assessment</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAMPLE REPORT -->
+  <div class="section" style="background: var(--gray-bg);">
+    <div class="container">
+      <div class="section-label">Sample Report</div>
+      <h2 class="section-title">Case Complexity Index</h2>
+
+      <div class="report-placeholder">
+        <div class="report-mock">
+          <div class="report-mock-header">
+            <div>
+              <div class="report-mock-title">Case Complexity Index — Assessment Report</div>
+              <div style="font-family: var(--font-ui); font-size:10px; letter-spacing:0.12em; color:var(--gray-light); margin-top:4px; text-transform:uppercase;">Reconcile Care Management Services &nbsp;·&nbsp; Forensic Care Management</div>
+            </div>
+            <div class="report-mock-badge">High Complexity</div>
+          </div>
+          <ul class="report-section-list">
+            <li class="report-section-item">
+              <span class="report-section-num">01</span>
+              <span class="report-section-name">Case Complexity Classification</span>
+              <span class="report-section-desc">Overall classification and supporting rationale</span>
+            </li>
+            <li class="report-section-item">
+              <span class="report-section-num">02</span>
+              <span class="report-section-name">Key Findings</span>
+              <span class="report-section-desc">Primary factors identified during assessment</span>
+            </li>
+            <li class="report-section-item">
+              <span class="report-section-num">03</span>
+              <span class="report-section-name">Care Coordination Requirements</span>
+              <span class="report-section-desc">Coordination demands and resource implications</span>
+            </li>
+            <li class="report-section-item">
+              <span class="report-section-num">04</span>
+              <span class="report-section-name">Strategic Case Implications</span>
+              <span class="report-section-desc">Relevance to case valuation and strategy</span>
+            </li>
+            <li class="report-section-item">
+              <span class="report-section-num">05</span>
+              <span class="report-section-name">Oversight Recommendations</span>
+              <span class="report-section-desc">Guidance on review intervals and monitoring</span>
+            </li>
+            <li class="report-section-item">
+              <span class="report-section-num">06</span>
+              <span class="report-section-name">Reassessment Triggers</span>
+              <span class="report-section-desc">Conditions warranting escalation or re-evaluation</span>
+            </li>
+            <li class="report-section-item">
+              <span class="report-section-num">07</span>
+              <span class="report-section-name">Additional Assessment Recommendations</span>
+              <span class="report-section-desc">Suggested supplemental tools based on findings</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <ul class="report-features">
+        <li>Complexity classification and visual indicator</li>
+        <li>Coordination demands and resource requirements</li>
+        <li>Strategic implications for case valuation</li>
+        <li>Oversight guidance and review intervals</li>
+        <li>Reassessment triggers and escalation indicators</li>
+        <li>Recommendations for additional assessment</li>
+      </ul>
+
+      <button class="btn-secondary">Download Sample Report (PDF)</button>
+    </div>
+  </div>
+
+  <!-- PROCESS -->
+  <div class="section">
+    <div class="container">
+      <div class="section-label">Assessment Process</div>
+      <h2 class="section-title">From selection<br>to delivery in 48 hours.</h2>
+
+      <div class="process-grid">
+        <div class="process-step">
+          <div class="process-step-number">01</div>
+          <div class="process-step-title">Case Selection</div>
+          <div class="process-step-text">You identify one active matter and one closed matter for assessment.</div>
+        </div>
+        <div class="process-step">
+          <div class="process-step-number">02</div>
+          <div class="process-step-title">Information Gathering</div>
+          <div class="process-step-text">Provide basic case information through a secure portal.</div>
+          <div class="process-step-meta">Estimated time: 10–15 minutes per case</div>
+        </div>
+        <div class="process-step">
+          <div class="process-step-number">03</div>
+          <div class="process-step-title">Analysis</div>
+          <div class="process-step-text">We apply all six forensic tools to both cases.</div>
+          <div class="process-step-meta">Turnaround: 48 hours</div>
+        </div>
+        <div class="process-step">
+          <div class="process-step-number">04</div>
+          <div class="process-step-title">Delivery</div>
+          <div class="process-step-text">You receive 12 comprehensive reports via secure link. Reports are yours to keep.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHY TWO CASES -->
+  <div class="section" style="background:var(--gray-bg);">
+    <div class="container">
+      <div class="section-label">Why Two Cases?</div>
+      <h2 class="section-title">Active and closed.<br>Two perspectives, one framework.</h2>
+      <div class="gold-rule"></div>
+      <p class="body-text">The Case Clarity Project evaluates both an active case and a closed case.</p>
+      <p class="body-text mt-16">The active case reveals current structural risks affecting case management and recovery trajectory.</p>
+      <p class="body-text mt-16">The closed case provides retrospective analysis that often reveals structural factors that influenced the final outcome.</p>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="section" style="background: var(--gray-bg);">
+    <div class="container">
+      <div class="section-label">Frequently Asked Questions</div>
+      <h2 class="section-title">Common questions<br>from attorneys.</h2>
+
+      <div class="mt-32" style="margin-top:40px;">
+
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            1. What is the rationale for offering this at no cost?
+            <span class="faq-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            We believe the value of these tools is best demonstrated through direct application to real cases. Rather than describing what the assessment reveals, we invite you to experience it. The complimentary assessment is a demonstration of capability — not a sales tactic.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            2. Which cases are most suitable for assessment?
+            <span class="faq-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            The forensic tool suite was developed specifically for personal injury, workers' compensation, and disability litigation. The tools are most effective for cases involving physical injury, chronic condition, or functional limitation.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            3. What information will I need to provide?
+            <span class="faq-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            Basic case demographics, injury type and date, current treatment status, and relevant medical history. No confidential client records are required at this stage. Specific information gathering occurs through a secure portal after your request is received.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            4. Will I be contacted after receiving the reports?
+            <span class="faq-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            The reports are yours to retain and use as you see fit. There is no obligation to engage further services. If you choose to continue the conversation, we are available to discuss findings or explore ongoing case management support.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            5. Are the tools applicable to both plaintiff and defense work?
+            <span class="faq-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            Standard medical record review documents what occurred. These tools evaluate whether what occurred was clinically appropriate, whether care pathways were defensible, and what barriers or risk factors may have influenced the outcome. They provide a different class of insight — one oriented toward case strategy rather than documentation.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- QUALIFICATION SECTION -->
+  <div class="section">
+    <div class="container">
+      <div class="section-label">Who This Assessment Is For</div>
+      <h2 class="section-title">Determining whether<br>this assessment applies.</h2>
+      <div class="qualification-grid">
+        <div class="qual-box is-for">
+          <div class="qual-box-label">This assessment is best suited for</div>
+          <ul class="qual-list">
+            <li>Attorneys handling personal injury, workers' compensation, or disability matters</li>
+            <li>Cases involving complex medical care, delayed recovery, or unclear treatment progression</li>
+            <li>Firms seeking deeper insight into the factors influencing case outcomes</li>
+          </ul>
+        </div>
+        <div class="qual-box is-not">
+          <div class="qual-box-label">This assessment is not intended for</div>
+          <ul class="qual-list">
+            <li>Routine matters with minimal medical complexity</li>
+            <li>Attorneys seeking only basic record summaries</li>
+            <li>Cases where no additional clinical insight is needed</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINAL CTA -->
+  <div class="final-cta">
+    <div class="section-label">Request Your Assessment</div>
+    <h2>Request Your Complimentary Assessment</h2>
+    <p>Twelve reports. Two cases. No obligation.</p>
+    <button class="btn-primary" onclick="goToPage('form')">Request Assessment</button>
+    <p style="font-family:var(--font-body); font-size:16px; font-style:italic; color:rgba(255,255,255,0.5); margin-top:20px; max-width:480px; margin-left:auto; margin-right:auto; line-height:1.7;">Most assessment requests are reviewed and approved within one business day. If the submitted case meets assessment criteria, access credentials will be issued automatically.</p>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div>
+        <div class="logo-mark" style="margin-bottom:12px;">
+          <div class="logo-box"><span>R</span></div>
+          <div class="logo-text">
+            Reconcile Care Management Services
+            <em>Forensic Care Management</em>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="footer-contact">
+          <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="36424457555f7644555b45465a5a551855595b">[email&#160;protected]</a>
+        </div>
+        <div class="footer-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+        </div>
+        <div class="footer-copy" style="text-align:right; margin-top:8px;">© 2026 All Rights Reserved</div>
+      </div>
+    </div>
+  </footer>
+
+</div>
+<!-- END PAGE 1 -->
+
+
+<!-- ═══════════════════════════════════════════════════════
+     PAGE 2 — REQUEST ASSESSMENT
+═══════════════════════════════════════════════════════ -->
+<div id="page-form" class="page">
+  <div class="form-page">
+    <div class="form-container">
+
+      <div class="form-kicker">The Case Clarity Project</div>
+      <h1 class="form-title">Request Complimentary Assessment</h1>
+      <p class="form-subtitle">
+        Complete the form below to request participation in the Case Clarity Project.
+      </p>
+      <div class="gold-rule"></div>
+
+      <!-- CASE SUITABILITY — before form -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:28px;">
+        <div style="border:1px solid var(--gray-border); border-top:3px solid var(--gold); padding:24px 24px 20px;">
+          <div style="font-family:var(--font-ui); font-size:9px; font-weight:600; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); margin-bottom:14px;">This Assessment Is Most Valuable For</div>
+          <ul style="list-style:none; padding:0; margin:0;">
+            <li style="font-family:var(--font-body); font-size:16px; color:var(--gray-dark); padding:8px 0; border-bottom:1px solid var(--gray-border); display:flex; gap:10px; align-items:baseline;"><span style="color:var(--gold); font-family:var(--font-ui); flex-shrink:0;">—</span>complex injury litigation</li>
+            <li style="font-family:var(--font-body); font-size:16px; color:var(--gray-dark); padding:8px 0; border-bottom:1px solid var(--gray-border); display:flex; gap:10px; align-items:baseline;"><span style="color:var(--gold); font-family:var(--font-ui); flex-shrink:0;">—</span>medical causation disputes</li>
+            <li style="font-family:var(--font-body); font-size:16px; color:var(--gray-dark); padding:8px 0; border-bottom:1px solid var(--gray-border); display:flex; gap:10px; align-items:baseline;"><span style="color:var(--gold); font-family:var(--font-ui); flex-shrink:0;">—</span>treatment sequencing questions</li>
+            <li style="font-family:var(--font-body); font-size:16px; color:var(--gray-dark); padding:8px 0; display:flex; gap:10px; align-items:baseline;"><span style="color:var(--gold); font-family:var(--font-ui); flex-shrink:0;">—</span>recovery trajectory concerns</li>
+          </ul>
+        </div>
+        <div style="border:1px solid var(--gray-border); border-top:3px solid var(--gray-border); padding:24px 24px 20px; background:var(--gray-bg);">
+          <div style="font-family:var(--font-ui); font-size:9px; font-weight:600; letter-spacing:0.22em; text-transform:uppercase; color:var(--gray-light); margin-bottom:14px;">This Assessment Is Not Intended For</div>
+          <ul style="list-style:none; padding:0; margin:0;">
+            <li style="font-family:var(--font-body); font-size:16px; color:var(--gray-mid); padding:8px 0; border-bottom:1px solid var(--gray-border); display:flex; gap:10px; align-items:baseline;"><span style="color:var(--gray-light); font-family:var(--font-ui); flex-shrink:0;">—</span>minor injury matters</li>
+            <li style="font-family:var(--font-body); font-size:16px; color:var(--gray-mid); padding:8px 0; border-bottom:1px solid var(--gray-border); display:flex; gap:10px; align-items:baseline;"><span style="color:var(--gray-light); font-family:var(--font-ui); flex-shrink:0;">—</span>cases without medical documentation</li>
+            <li style="font-family:var(--font-body); font-size:16px; color:var(--gray-mid); padding:8px 0; display:flex; gap:10px; align-items:baseline;"><span style="color:var(--gray-light); font-family:var(--font-ui); flex-shrink:0;">—</span>routine claims with straightforward treatment paths</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- BEFORE REQUESTING ACCESS -->
+      <div style="border:1px solid var(--gray-border); border-left:3px solid var(--gold); padding:32px 28px; margin-bottom:28px; background:var(--white);">
+        <div style="font-family:var(--font-ui); font-size:10px; font-weight:600; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); margin-bottom:16px;">Before Requesting Access</div>
+        <p style="font-family:var(--font-body); font-size:17px; line-height:1.75; color:var(--gray-dark); margin-bottom:16px;">
+          To ensure the assessment provides meaningful results, participating attorneys should be prepared to provide structured case information including:
+        </p>
+        <div style="margin-bottom:20px;">
+          <div style="font-family:var(--font-body); font-size:17px; line-height:1.7; color:var(--gray-dark); padding:8px 0; border-bottom:1px solid var(--gray-border); display:flex; gap:14px;"><span style="color:var(--gold); font-family:var(--font-ui); flex-shrink:0;">—</span>injury type and severity</div>
+          <div style="font-family:var(--font-body); font-size:17px; line-height:1.7; color:var(--gray-dark); padding:8px 0; border-bottom:1px solid var(--gray-border); display:flex; gap:14px;"><span style="color:var(--gold); font-family:var(--font-ui); flex-shrink:0;">—</span>treatment progression</div>
+          <div style="font-family:var(--font-body); font-size:17px; line-height:1.7; color:var(--gray-dark); padding:8px 0; border-bottom:1px solid var(--gray-border); display:flex; gap:14px;"><span style="color:var(--gold); font-family:var(--font-ui); flex-shrink:0;">—</span>provider involvement</div>
+          <div style="font-family:var(--font-body); font-size:17px; line-height:1.7; color:var(--gray-dark); padding:8px 0; border-bottom:1px solid var(--gray-border); display:flex; gap:14px;"><span style="color:var(--gold); font-family:var(--font-ui); flex-shrink:0;">—</span>functional recovery factors</div>
+          <div style="font-family:var(--font-body); font-size:17px; line-height:1.7; color:var(--gray-dark); padding:8px 0; display:flex; gap:14px;"><span style="color:var(--gold); font-family:var(--font-ui); flex-shrink:0;">—</span>barriers affecting care coordination</div>
+        </div>
+        <p style="font-family:var(--font-body); font-size:16px; line-height:1.7; color:var(--gray-mid); margin-bottom:10px;">Most attorneys complete the case information portion of the assessment over multiple sessions during the assessment window.</p>
+        <p style="font-family:var(--font-body); font-size:16px; line-height:1.7; color:var(--gray-mid); margin-bottom:10px;">Each instrument typically requires approximately 10–15 minutes to complete, and the full assessment generally requires approximately 60–90 minutes.</p>
+        <p style="font-family:var(--font-body); font-size:16px; line-height:1.7; color:var(--gray-mid);">Because the tools require thoughtful case evaluation, the portal remains open for 72 hours from first login.</p>
+      </div>
+
+      <!-- PARTICIPATION NOTICE -->
+      <div style="border:1px solid var(--gray-border); border-left:3px solid var(--gold); padding:28px 28px; margin-bottom:40px; background:var(--gray-bg);">
+        <div style="font-family:var(--font-ui); font-size:10px; font-weight:600; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); margin-bottom:16px;">Participation Notice</div>
+        <p style="font-family:var(--font-body); font-size:17px; line-height:1.75; color:var(--gray-dark); margin-bottom:12px;">
+          Participation in the Case Clarity Project is intended for attorneys handling matters involving complex medical treatment, delayed recovery, or uncertain case outcomes.
+        </p>
+        <p style="font-family:var(--font-body); font-size:17px; line-height:1.75; color:var(--gray-dark); margin-bottom:12px;">
+          Participants are asked to identify one active case and one previously closed case when submitting their request.
+        </p>
+        <p style="font-family:var(--font-body); font-size:17px; line-height:1.75; color:var(--black); font-weight:600;">
+          If the submitted cases appear appropriate for the assessment, access credentials for the assessment portal will be provided by email, allowing you to begin the evaluation process.
+        </p>
+        <p style="font-family:var(--font-body); font-size:16px; line-height:1.65; color:var(--gray-mid); margin-top:12px; font-style:italic;">
+          Most requests are reviewed and approved within one business day.
+        </p>
+      </div>
+
+      <!-- CASE SELECTION GUIDANCE -->
+      <div style="border:1px solid var(--gray-border); border-left:3px solid var(--gold); padding:28px 28px; margin-bottom:24px; background:var(--white);">
+        <div style="font-family:var(--font-ui); font-size:10px; font-weight:600; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); margin-bottom:16px;">Case Selection Guidance</div>
+        <p style="font-family:var(--font-body); font-size:17px; line-height:1.75; color:var(--gray-dark); margin-bottom:12px;">
+          To ensure the assessment provides meaningful insight, we recommend selecting:
+        </p>
+        <div style="padding-left:4px; margin-bottom:12px;">
+          <div style="font-family:var(--font-body); font-size:17px; line-height:1.75; color:var(--gray-dark); padding:8px 0; border-bottom:1px solid var(--gray-border); display:flex; gap:14px;">
+            <span style="color:var(--gold); font-family:var(--font-ui); flex-shrink:0;">—</span>
+            one active case where additional clinical or strategic insight would be valuable
+          </div>
+          <div style="font-family:var(--font-body); font-size:17px; line-height:1.75; color:var(--gray-dark); padding:8px 0; display:flex; gap:14px;">
+            <span style="color:var(--gold); font-family:var(--font-ui); flex-shrink:0;">—</span>
+            one previously closed case that presented unexpected challenges or outcomes
+          </div>
+        </div>
+        <p style="font-family:var(--font-body); font-size:16px; line-height:1.7; color:var(--gray-mid);">
+          These cases allow the instruments to evaluate both <strong style="color:var(--gray-dark);">current case dynamics and retrospective case factors</strong>.
+        </p>
+      </div>
+
+      <!-- ASSESSMENT WINDOW DISCLOSURE -->
+      <div style="border:1px solid var(--gray-border); padding:20px 24px; margin-bottom:40px; background:var(--gray-bg);">
+        <div style="font-family:var(--font-ui); font-size:9px; font-weight:600; letter-spacing:0.22em; text-transform:uppercase; color:var(--gray-mid); margin-bottom:10px;">Assessment Window</div>
+        <p style="font-family:var(--font-body); font-size:16px; line-height:1.7; color:var(--gray-mid);">
+          Assessment access is provided for <strong style="color:var(--gray-dark);">72 hours</strong> from first login. All case data, instrument responses, and reports are <strong style="color:var(--gray-dark);">automatically deleted after the access window expires</strong>. Please download any reports you wish to retain before expiration.
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Full Name <span>*</span></label>
+        <input type="text" class="form-input" placeholder="First Last">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Firm Name <span>*</span></label>
+        <input type="text" class="form-input" placeholder="Law Firm Name">
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Email Address <span>*</span></label>
+          <input type="email" class="form-input" placeholder="name@firm.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone <em>(optional)</em></label>
+          <input type="tel" class="form-input" placeholder="(000) 000-0000">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Active Case Type <span>*</span></label>
+        <select class="form-select">
+          <option value="" disabled selected>Select case type</option>
+          <option>Personal Injury — Motor Vehicle</option>
+          <option>Personal Injury — Premises Liability</option>
+          <option>Personal Injury — Product Liability</option>
+          <option>Workers' Compensation</option>
+          <option>Disability Litigation</option>
+          <option>Other Personal Injury</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Closed Case Type <span>*</span></label>
+        <select class="form-select">
+          <option value="" disabled selected>Select case type</option>
+          <option>Personal Injury — Motor Vehicle</option>
+          <option>Personal Injury — Premises Liability</option>
+          <option>Personal Injury — Product Liability</option>
+          <option>Workers' Compensation</option>
+          <option>Disability Litigation</option>
+          <option>Other Personal Injury</option>
+        </select>
+      </div>
+
+      <div class="form-submit-area">
+        <button class="btn-primary" onclick="goToPage('confirm')">Submit Request</button>
+        <p class="form-note">We will respond within one business day.</p>
+        <p class="form-note" style="margin-top:8px;">Assessment portal access remains active for 72 hours from first login.</p>
+      </div>
+
+      <div class="mt-32" style="margin-top:32px; padding-top:24px; border-top:1px solid var(--gray-border);">
+        <span style="font-family:var(--font-ui); font-size:11px; color:var(--gray-light); cursor:pointer; letter-spacing:0.1em; text-transform:uppercase;" onclick="goToPage('landing')">← Return to overview</span>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- END PAGE 2 -->
+
+
+<!-- ═══════════════════════════════════════════════════════
+     PAGE 3 — CONFIRMATION
+═══════════════════════════════════════════════════════ -->
+<div id="page-confirm" class="page">
+  <div class="confirm-page">
+    <div class="confirm-container">
+
+      <div class="confirm-icon">
+        <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 11L9 16L18 6" stroke="#b09837" stroke-width="1.5" stroke-linecap="square"/>
+        </svg>
+      </div>
+
+      <h1 class="confirm-title">Request Received</h1>
+      <p class="confirm-subtitle">
+        Thank you for your interest in the Case Clarity Project.
+      </p>
+
+      <div class="next-steps-box">
+        <div class="next-steps-label">What Happens Next</div>
+        <ul class="next-steps-list">
+          <li>
+            <span class="step-num">1</span>
+            Your request will be reviewed to ensure the submitted cases are appropriate for the assessment.
+          </li>
+          <li>
+            <span class="step-num">2</span>
+            If the cases meet the assessment criteria, you will receive assessment portal access credentials by email.
+          </li>
+          <li>
+            <span class="step-num">3</span>
+            Once access is granted, you will be able to log in and begin the evaluation process. The 72-hour assessment window begins on first login.
+          </li>
+          <li>
+            <span class="step-num">4</span>
+            Most requests are reviewed and approved within one business day.
+          </li>
+        </ul>
+      </div>
+
+      <div style="border:1px solid var(--gray-border); padding:24px 28px; margin-bottom:32px; background:var(--gray-bg); text-align:left;">
+        <div style="font-family:var(--font-ui); font-size:10px; font-weight:600; letter-spacing:0.22em; text-transform:uppercase; color:var(--gray-light); margin-bottom:12px;">Important</div>
+        <p style="font-family:var(--font-body); font-size:16px; line-height:1.7; color:var(--gray-mid);">Please check your inbox and spam or junk folder for further instructions. Portal access credentials will be sent to the email address provided in your request.</p>
+      </div>
+
+      <button class="btn-secondary">Preview a Sample Report</button>
+
+      <p class="confirm-contact">
+        Questions? Contact us at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2d595f4c4e446d5f4e405e5d41414e034e4240">[email&#160;protected]</a>.
+      </p>
+
+      <div class="mt-32" style="margin-top:40px;">
+        <span style="font-family:var(--font-ui); font-size:11px; color:var(--gray-light); cursor:pointer; letter-spacing:0.1em; text-transform:uppercase;" onclick="goToPage('landing')">← Return to overview</span>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- END PAGE 3 -->
+
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  function goToPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  function toggleFaq(el) {
+    const item = el.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('ope
