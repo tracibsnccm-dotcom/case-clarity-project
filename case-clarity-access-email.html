@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Clarity Project — Assessment Portal Access</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 16px;
+    line-height: 1.75;
+    color: #1a1a1a;
+    background: #f5f4f0;
+    padding: 40px 20px;
+  }
+  .email-wrap {
+    max-width: 620px;
+    margin: 0 auto;
+    background: #ffffff;
+    border: 1px solid #dddad0;
+    border-top: 4px solid #b09837;
+  }
+  .email-header {
+    background: #0d0d0d;
+    padding: 28px 40px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .logo-box {
+    width: 36px;
+    height: 36px;
+    border: 1.5px solid #b09837;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-box span {
+    font-family: Georgia, serif;
+    font-size: 16px;
+    font-weight: bold;
+    color: #b09837;
+  }
+  .header-text {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.5;
+  }
+  .header-text strong {
+    display: block;
+    color: #ffffff;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+  }
+  .email-body {
+    padding: 44px 40px;
+  }
+  .subject-line {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #b09837;
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-family: Georgia, serif;
+    font-size: 26px;
+    font-weight: normal;
+    font-style: normal;
+    color: #0d0d0d;
+    line-height: 1.25;
+    margin-bottom: 8px;
+  }
+  .gold-rule {
+    height: 3px;
+    background: #b09837;
+    width: 40px;
+    margin: 20px 0 28px;
+  }
+  p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #2a2a2a;
+    margin-bottom: 18px;
+  }
+  .credentials-box {
+    border: 1px solid #dddad0;
+    border-left: 3px solid #b09837;
+    background: #f8f7f4;
+    padding: 28px 32px;
+    margin: 32px 0;
+  }
+  .cred-label {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: #b09837;
+    margin-bottom: 16px;
+  }
+  .cred-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid #dddad0;
+  }
+  .cred-row:last-child { border-bottom: none; }
+  .cred-key {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #666;
+  }
+  .cred-value {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 15px;
+    font-weight: bold;
+    color: #0d0d0d;
+    letter-spacing: 0.1em;
+  }
+  .cta-block {
+    margin: 32px 0;
+    text-align: center;
+  }
+  .cta-btn {
+    display: inline-block;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: #b09837;
+    border: none;
+    padding: 16px 36px;
+    text-decoration: none;
+  }
+  .data-notice {
+    border: 1px solid #dddad0;
+    background: #fdf7f7;
+    border-left: 3px solid #8b2020;
+    padding: 20px 24px;
+    margin: 28px 0;
+  }
+  .data-notice-title {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #8b2020;
+    margin-bottom: 10px;
+  }
+  .data-notice p {
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 10px;
+  }
+  .data-notice p:last-child { margin-bottom: 0; }
+  .divider {
+    height: 1px;
+    background: #dddad0;
+    margin: 32px 0;
+  }
+  .footer-text {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    color: #999;
+    line-height: 1.7;
+    margin-bottom: 8px;
+  }
+  .footer-text a {
+    color: #b09837;
+    text-decoration: none;
+  }
+  .email-footer {
+    background: #f8f7f4;
+    border-top: 1px solid #dddad0;
+    padding: 20px 40px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    color: #aaa;
+    letter-spacing: 0.06em;
+    line-height: 1.8;
+  }
+
+  /* TEMPLATE VARIABLE HIGHLIGHTS */
+  .var { background: #fff3cd; padding: 0 3px; font-style: normal; }
+</style>
+</head>
+<body>
+
+<div class="email-wrap">
+
+  <!-- HEADER -->
+  <div class="email-header">
+    <div class="logo-box"><span>R</span></div>
+    <div class="header-text">
+      <strong>Reconcile Care Management Services</strong>
+      Forensic Care Management
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="email-body">
+
+    <div class="subject-line">Case Clarity Project — Assessment Portal Access</div>
+    <h1>Assessment Portal<br>Access Granted</h1>
+    <div class="gold-rule"></div>
+
+    <p>Dear <em class="var">[Attorney Name]</em>,</p>
+
+    <p>Your request to participate in the Case Clarity Project has been approved and assessment access has been automatically issued.</p>
+
+    <p>Your assessment credentials are provided below. Please keep this information secure — access is tied to your specific request and is not transferable.</p>
+
+    <!-- CREDENTIALS -->
+    <div class="credentials-box">
+      <div class="cred-label">Your Assessment Credentials</div>
+      <div class="cred-row">
+        <span class="cred-key">Assessment ID</span>
+        <span class="cred-value var">[CCP-XXXXXX]</span>
+      </div>
+      <div class="cred-row">
+        <span class="cred-key">Access PIN</span>
+        <span class="cred-value var">[XXXXXX]</span>
+      </div>
+      <div class="cred-row">
+        <span class="cred-key">Portal Access</span>
+        <span class="cred-value">72 hours from first login</span>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <p style="font-size:16px; color:#2a2a2a; margin-bottom:20px; line-height:1.7;">Your assessment credentials are active and ready to use. Click below to begin the Case Clarity assessment.</p>
+    <div class="cta-block">
+      <a href="#" class="cta-btn">Access the Assessment Portal</a>
+    </div>
+
+    <p style="font-size:14px; color:#666; text-align:center; margin-top:-12px;">
+      <em class="var">[Portal URL: https://your-portal-url.com]</em>
+    </p>
+
+    <p style="font-family:Arial,Helvetica,sans-serif; font-size:13px; font-style:italic; color:#888; text-align:center; margin-top:8px; margin-bottom:0;">Your 72-hour assessment window begins when you first log in, not when this email was sent.</p>
+
+    <!-- ASSESSMENT OVERVIEW -->
+    <div class="divider"></div>
+    <p style="font-family:Arial,sans-serif; font-size:10px; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:#b09837; margin-bottom:14px;">Assessment Overview</p>
+    <div style="border:1px solid #dddad0; border-left:3px solid #b09837; background:#f8f7f4; padding:20px 24px; margin-bottom:0;">
+      <table style="width:100%; border-collapse:collapse;">
+        <tr style="border-bottom:1px solid #e8e5da;">
+          <td style="font-family:Arial,Helvetica,sans-serif; font-size:10px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#999; padding:9px 0; width:40%;">Instruments</td>
+          <td style="font-family:Georgia,serif; font-size:15px; color:#0d0d0d; padding:9px 0;">6 forensic instruments</td>
+        </tr>
+        <tr style="border-bottom:1px solid #e8e5da;">
+          <td style="font-family:Arial,Helvetica,sans-serif; font-size:10px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#999; padding:9px 0;">Per Instrument</td>
+          <td style="font-family:Georgia,serif; font-size:15px; color:#0d0d0d; padding:9px 0;">10–15 minutes</td>
+        </tr>
+        <tr style="border-bottom:1px solid #e8e5da;">
+          <td style="font-family:Arial,Helvetica,sans-serif; font-size:10px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#999; padding:9px 0;">Total Time</td>
+          <td style="font-family:Georgia,serif; font-size:15px; color:#0d0d0d; padding:9px 0;">approximately 90–180 minutes</td>
+        </tr>
+        <tr>
+          <td style="font-family:Arial,Helvetica,sans-serif; font-size:10px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#999; padding:9px 0;">Sessions</td>
+          <td style="font-family:Georgia,serif; font-size:15px; color:#0d0d0d; padding:9px 0;">may be completed across multiple sessions</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- WHAT TO EXPECT -->
+    <div class="divider"></div>
+    <p style="font-family:Arial,sans-serif; font-size:10px; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:#b09837; margin-bottom:12px;">What to Expect</p>
+
+    <p>The assessment portal will prompt you to enter basic case information for your two selected cases. That information is used across all six forensic instruments — you will not be asked to re-enter it within each tool.</p>
+
+    <p>The assessment is designed to be completed over multiple sessions. Most attorneys require approximately 90–180 minutes total. Each instrument takes approximately 10–15 minutes and requires thoughtful consideration of case structure, treatment progression, and recovery factors.</p>
+
+    <p>Reports become available as each instrument set is completed. Once all six instruments are finished, the full comparative analysis is also released.</p>
+
+    <!-- 72-HOUR NOTICE -->
+    <p>Your 72-hour assessment window begins at the time of your first login — not at the time this email was sent. You may log in at your convenience, but please note that the window cannot be paused or extended once started.</p>
+
+    <!-- DATA NOTICE -->
+    <div class="data-notice">
+      <div class="data-notice-title">Temporary Storage &amp; Deletion Notice</div>
+      <p>Case information and generated reports are stored only during the active 72-hour assessment window.</p>
+      <p>All data is permanently deleted when the window expires and cannot be retrieved.</p>
+      <p>Once the assessment window closes, reports and submitted information cannot be retrieved or restored.</p>
+      <p><strong>Please download or print any reports you wish to retain before the access period ends.</strong></p>
+    </div>
+
+    <div class="divider"></div>
+
+    <p>If you have any questions before logging in, or if you encounter any difficulty accessing the portal, contact us at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3a4e485b59537a485957494a56565914595557">[email&#160;protected]</a>.</p>
+
+    <p>We look forward to providing you with the assessment results.</p>
+
+    <p>
+      Traci Johnson BSN RN CCM<br>
+      <span style="color:#999; font-size:14px;">Reconcile Care Management Services<br>Forensic Care Management</span>
+    </p>
+
+  </div>
+
+  <!-- FOOTER -->
+  <!-- FOOTER -->
+  <div class="email-footer">
+    Reconcile Care Management Services &nbsp;·&nbsp; Forensic Care Management<br>
+    <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d4a0a6b5b7bd94a6b7b9a7a4b8b8b7fab7bbb9">[email&#160;protected]</a
