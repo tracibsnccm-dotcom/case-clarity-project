@@ -1366,7 +1366,7 @@
         <div class="recommended-name">Case Complexity Index (CCI)</div>
         <div class="recommended-desc">Most attorneys begin the assessment with the Case Complexity Index. This instrument establishes the structural characteristics of the case and provides the analytical foundation for interpretation of the remaining instruments.</div>
       </div>
-      <button class="instrument-btn" onclick="runInstrument(0)">Start Case Complexity Index</button>
+      <button class="instrument-btn" onclick="launchInstrument('CCI')">Start Case Complexity Index</button>
     </div>
 
     <!-- DUAL CASE COUNTERS + PROGRESS -->
@@ -1712,13 +1712,14 @@ function renderInstruments() {
     const statusClass = inst.status === 'complete' ? 'complete' : inst.status === 'in-progress' ? 'in-progress' : '';
     row.className = 'instrument-row ' + statusClass;
     row.id = 'inst-row-' + i;
+    row.setAttribute('data-instrument', inst.abbr);
 
     const labelMap = { 'not-started': 'Not Started', 'in-progress': 'In Progress', 'complete': 'Complete' };
     const statusLabel = labelMap[inst.status] || 'Not Started';
 
     const btnHTML = inst.status === 'complete'
       ? `<button class="instrument-btn done">Complete</button>`
-      : `<button class="instrument-btn" onclick="runInstrument(${i})">Start Assessment</button>`;
+      : `<button class="instrument-btn" onclick="launchInstrument('${inst.abbr}')">Start Assessment</button>`;
 
     row.innerHTML = `
       <div class="instrument-abbr">${inst.abbr}</div>
@@ -1842,14 +1843,57 @@ function renderReportSection() {
   dlAll.textContent = allDone ? 'Download Complete Assessment' : `Download Available Reports (${completed * 2})`;
   dlAll.style.display = 'block';
 }
+
+function launchInstrument(instrumentKey) {
+  const toolUrls = {
+    CCI: "https://case-complexity-index.vercel.app",
+    CSA: "https://clinical-sequencing-auditor.vercel.app",
+    CAF: "https://care-access-friction.vercel.app",
+    HSI: "https://holistic-stability-index.vercel.app",
+    FCI: "https://functional-capacity-index.vercel.app",
+    RRF: "https://recovery-risk-forecaster.vercel.app"
+  };
+
+  const url = toolUrls[instrumentKey];
+  if (!url) { console.error("Tool URL not defined:", instrumentKey); return; }
+
+  // Mark row as in-progress in state
+  const idx = state.instruments.findIndex(i => i.abbr === instrumentKey);
+  if (idx >= 0 && state.instruments[idx].status === 'not-started') {
+    state.instruments[idx].status = 'in-progress';
+    renderRecommended();
+    renderNextStep();
+    renderInstruments();
+    renderProgress();
+    renderReportSection();
+  }
+
+  window.open(url, "_blank");
+}
+
 function runInstrument(index) {
   const inst = state.instruments[index];
   if (inst.status === 'not-started')      inst.status = 'in-progress';
   else if (inst.status === 'in-progress') inst.status = 'complete';
 
   renderRecommended();
-  renderNextStep
-function runInstrument(index) {
-  const inst = state.instruments[index];
-  if (inst.status === 'not-started')      inst.status = 'in-progress';
-  else if (inst.status === '
+  renderNextStep();
+  renderInstruments();
+  renderProgress();
+  renderReportSection();
+}
+
+function runNextInstrument() {
+  const target = state.instruments.find(i => i.status === 'in-progress')
+              || state.instruments.find(i => i.status !== 'complete');
+  if (target) runInstrument(state.instruments.indexOf(target));
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && document.getElementById('page-login').classList.contains('active')) {
+    handleLogin();
+  }
+});
+</script>
+</body>
+</html>
