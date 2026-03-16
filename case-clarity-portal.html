@@ -1,0 +1,1855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Clarity Project — Assessment Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --gold: #b09837;
+    --gold-pale: #f5f0e0;
+    --black: #0d0d0d;
+    --gray-dark: #2a2a2a;
+    --gray-mid: #666;
+    --gray-light: #999;
+    --gray-border: #e0ddd4;
+    --gray-bg: #f8f7f4;
+    --white: #ffffff;
+    --red: #8b2020;
+    --green: #2a5c2a;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'EB Garamond', Georgia, serif;
+    --font-ui: 'Jost', sans-serif;
+    --max-width: 920px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--black);
+    background: var(--gray-bg);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── PAGE SYSTEM ──────────────────────────────────── */
+  .page { display: none; min-height: 100vh; }
+  .page.active { display: block; }
+
+  /* ── PORTAL HEADER ────────────────────────────────── */
+  .portal-header {
+    background: var(--black);
+    border-bottom: 3px solid var(--gold);
+    padding: 0 40px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .portal-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .portal-logo-box {
+    width: 32px;
+    height: 32px;
+    border: 1.5px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .portal-logo-box span {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gold);
+  }
+
+  .portal-logo-text {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.4;
+  }
+
+  .portal-logo-text strong {
+    display: block;
+    color: var(--white);
+    font-weight: 600;
+  }
+
+  .portal-header-right {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  /* ── TIMER ────────────────────────────────────────── */
+  .timer-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(176,152,55,0.15);
+    border: 1px solid rgba(176,152,55,0.35);
+    padding: 6px 14px;
+  }
+
+  .timer-label {
+    font-family: var(--font-ui);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .timer-value {
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 0.08em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .timer-value.urgent { color: #d4433a; }
+
+  .portal-user {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.06em;
+  }
+
+  /* ── LAYOUT ───────────────────────────────────────── */
+  .portal-body {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 48px 40px 80px;
+  }
+
+  .portal-body.narrow {
+    max-width: 560px;
+  }
+
+  /* ── PAGE TITLES ──────────────────────────────────── */
+  .page-kicker {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+
+  .page-title {
+    font-family: var(--font-display);
+    font-size: clamp(26px, 3.5vw, 36px);
+    font-weight: 500;
+    color: var(--black);
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+
+  .page-subtitle {
+    font-family: var(--font-body);
+    font-size: 17px;
+    color: var(--gray-mid);
+    line-height: 1.7;
+    max-width: 560px;
+    margin-bottom: 36px;
+  }
+
+  .gold-rule {
+    height: 3px;
+    background: var(--gold);
+    width: 40px;
+    margin: 20px 0 32px;
+  }
+
+  /* ── CARDS ────────────────────────────────────────── */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    padding: 32px;
+    margin-bottom: 24px;
+  }
+
+  .card-title {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+
+  /* ── NOTICE BOXES ─────────────────────────────────── */
+  .notice {
+    border: 1px solid var(--gray-border);
+    border-left: 3px solid var(--gold);
+    padding: 20px 24px;
+    background: var(--gray-bg);
+    margin-bottom: 24px;
+  }
+
+  .notice-title {
+    font-family: var(--font-ui);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+
+  .notice p {
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--gray-dark);
+    margin-bottom: 8px;
+  }
+
+  .notice p:last-child { margin-bottom: 0; }
+
+  .notice.warning {
+    border-left-color: var(--red);
+    background: #fdf7f7;
+  }
+
+  .notice.warning .notice-title { color: var(--red); }
+
+  /* ── FORM ELEMENTS ────────────────────────────────── */
+  .form-group { margin-bottom: 24px; }
+
+  .form-label {
+    display: block;
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gray-dark);
+    margin-bottom: 8px;
+  }
+
+  .form-label .optional {
+    font-weight: 300;
+    color: var(--gray-light);
+    letter-spacing: 0.1em;
+    font-size: 9px;
+  }
+
+  .form-input, .form-select {
+    width: 100%;
+    font-family: var(--font-body);
+    font-size: 17px;
+    color: var(--black);
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    border-radius: 0;
+    padding: 12px 14px;
+    outline: none;
+    appearance: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-input:focus, .form-select:focus { border-color: var(--gold); }
+
+  .form-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23b09837' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+  /* ── BUTTONS ──────────────────────────────────────── */
+  .btn-primary {
+    display: inline-block;
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--white);
+    background: var(--gold);
+    border: 1.5px solid var(--gold);
+    padding: 14px 32px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    text-decoration: none;
+  }
+
+  .btn-primary:hover {
+    background: var(--black);
+    border-color: var(--black);
+  }
+
+  .btn-secondary {
+    display: inline-block;
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--black);
+    background: transparent;
+    border: 1.5px solid var(--black);
+    padding: 12px 28px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--black); color: var(--white); }
+
+  .btn-ghost {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* ══════════════════════════════════════════════════
+     PAGE 1 — PORTAL LOGIN
+  ══════════════════════════════════════════════════ */
+  .login-wrap {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+    background: var(--white);
+  }
+
+  .login-header-block {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .login-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 28px;
+  }
+
+  .login-logo-box {
+    width: 44px;
+    height: 44px;
+    border: 1.5px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .login-logo-box span {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--gold);
+  }
+
+  .login-logo-text {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gray-dark);
+    line-height: 1.5;
+    text-align: left;
+  }
+
+  .login-logo-text em {
+    display: block;
+    font-style: normal;
+    font-weight: 300;
+    color: var(--gray-light);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+  }
+
+  .login-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 500;
+    color: var(--black);
+    margin-bottom: 8px;
+  }
+
+  .login-subtitle {
+    font-family: var(--font-body);
+    font-size: 16px;
+    color: var(--gray-mid);
+    line-height: 1.65;
+  }
+
+  .login-card {
+    width: 100%;
+    max-width: 440px;
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    padding: 40px 36px;
+    position: relative;
+  }
+
+  .login-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--gold);
+  }
+
+  .login-error {
+    background: #fdf7f7;
+    border: 1px solid #d4433a;
+    border-left: 3px solid #d4433a;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-family: var(--font-ui);
+    font-size: 12px;
+    color: var(--red);
+    display: none;
+  }
+
+  .login-error.visible { display: block; }
+
+  .login-hint {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    color: var(--gray-light);
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--gray-border);
+    line-height: 1.6;
+    font-style: italic;
+  }
+
+  /* ══════════════════════════════════════════════════
+     PAGE 2 — CASE ENTRY
+  ══════════════════════════════════════════════════ */
+  .case-entry-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .case-panel {
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    padding: 32px 28px;
+    position: relative;
+  }
+
+  .case-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--gold);
+  }
+
+  .case-panel-label {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 24px;
+  }
+
+  /* ══════════════════════════════════════════════════
+     PAGE 3 — DASHBOARD
+  ══════════════════════════════════════════════════ */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+
+  .case-summary-panel {
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    border-top: 3px solid var(--gold);
+    padding: 24px 24px 20px;
+  }
+
+  .case-summary-label {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+
+  .case-summary-name {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--black);
+    margin-bottom: 4px;
+  }
+
+  .case-summary-detail {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    color: var(--gray-mid);
+    letter-spacing: 0.06em;
+  }
+
+  .case-summary-edit {
+    display: block;
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-top: 14px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* Progress bar */
+  .progress-section {
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+
+  .progress-count {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 500;
+    color: var(--gold);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .progress-count span {
+    font-size: 18px;
+    color: var(--gray-light);
+    font-weight: 400;
+  }
+
+  .progress-track {
+    flex: 1;
+  }
+
+  .progress-label {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gray-dark);
+    margin-bottom: 8px;
+  }
+
+  .progress-bar-track {
+    height: 4px;
+    background: var(--gray-border);
+    position: relative;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--gold);
+    transition: width 0.4s ease;
+  }
+
+  .progress-note {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-style: italic;
+    color: var(--gray-light);
+    margin-top: 6px;
+  }
+
+  /* Instrument cards */
+  .section-heading {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gray-dark);
+    padding: 0 0 12px;
+    border-bottom: 1px solid var(--gray-border);
+    margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .instrument-row {
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    border-left: 3px solid transparent;
+    padding: 20px 24px;
+    margin-bottom: 2px;
+    display: grid;
+    grid-template-columns: 56px 1fr auto auto;
+    gap: 16px;
+    align-items: center;
+    transition: border-left-color 0.2s;
+  }
+
+  .instrument-row:hover { border-left-color: var(--gold); }
+
+  .instrument-row.complete { border-left-color: var(--green); }
+  .instrument-row.in-progress { border-left-color: var(--gold); }
+
+  .instrument-abbr {
+    font-family: var(--font-ui);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--gold);
+  }
+
+  .instrument-name {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--black);
+    margin-bottom: 2px;
+    line-height: 1.3;
+  }
+
+  .instrument-desc {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--gray-mid);
+    line-height: 1.4;
+  }
+
+  .instrument-status {
+    font-family: var(--font-ui);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    white-space: nowrap;
+  }
+
+  .instrument-status.not-started {
+    color: var(--gray-light);
+    border: 1px solid var(--gray-border);
+  }
+
+  .instrument-status.in-progress {
+    color: var(--gold);
+    border: 1px solid var(--gold);
+    background: var(--gold-pale);
+  }
+
+  .instrument-status.complete {
+    color: var(--green);
+    border: 1px solid var(--green);
+    background: #f0f6f0;
+  }
+
+  .instrument-btn {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--white);
+    background: var(--gold);
+    border: 1.5px solid var(--gold);
+    padding: 9px 18px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .instrument-btn:hover {
+    background: var(--black);
+    border-color: var(--black);
+  }
+
+  .instrument-btn.done {
+    background: transparent;
+    color: var(--green);
+    border-color: var(--green);
+    cursor: default;
+  }
+
+  /* Report release section */
+  .report-release {
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    border-top: 3px solid var(--gray-border);
+    padding: 28px 28px;
+    margin-top: 8px;
+    margin-bottom: 24px;
+  }
+
+  .report-release.unlocked {
+    border-top-color: var(--gold);
+  }
+
+  .report-release-title {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gray-light);
+    margin-bottom: 12px;
+  }
+
+  .report-release.unlocked .report-release-title {
+    color: var(--gold);
+  }
+
+  .report-release-text {
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--gray-mid);
+  }
+
+  .report-release.unlocked .report-release-text {
+    color: var(--gray-dark);
+  }
+
+  .report-download-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .report-download-item {
+    border: 1px solid var(--gray-border);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .report-download-abbr {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--gold);
+  }
+
+  .report-download-name {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--gray-dark);
+    line-height: 1.3;
+  }
+
+  .report-download-btn {
+    font-family: var(--font-ui);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: none;
+    border: 1px solid var(--gold);
+    padding: 6px 10px;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .report-download-btn:hover {
+    background: var(--gold);
+    color: var(--white);
+  }
+
+  /* Discussion section */
+  .discussion-section {
+    background: var(--gray-bg);
+    border: 1px solid var(--gray-border);
+    padding: 28px 32px;
+    margin-bottom: 24px;
+  }
+
+  /* Expectations */
+  .expectations-list {
+    list-style: none;
+  }
+
+  .expectations-list li {
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--gray-dark);
+    padding: 10px 0;
+    border-bottom: 1px solid var(--gray-border);
+    display: flex;
+    gap: 14px;
+    align-items: baseline;
+  }
+
+  .expectations-list li:last-child { border-bottom: none; }
+
+  .expectations-list li::before {
+    content: '—';
+    color: var(--gold);
+    font-family: var(--font-ui);
+    flex-shrink: 0;
+  }
+
+  /* ══════════════════════════════════════════════════
+     ORIENTATION PAGE
+  ══════════════════════════════════════════════════ */
+  .orientation-wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 60px 40px 80px;
+  }
+
+  .orientation-item {
+    display: flex;
+    gap: 20px;
+    align-items: baseline;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--gray-border);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--gray-dark);
+  }
+
+  .orientation-item:last-child { border-bottom: none; }
+
+  .orientation-item::before {
+    content: '—';
+    color: var(--gold);
+    font-family: var(--font-ui);
+    flex-shrink: 0;
+  }
+
+  /* CCI recommended panel */
+  .recommended-panel {
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    border-left: 3px solid var(--gold);
+    border-top: 3px solid var(--gold);
+    padding: 24px 28px;
+    margin-bottom: 8px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .recommended-label {
+    font-family: var(--font-ui);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .recommended-name {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--black);
+    margin-bottom: 4px;
+  }
+
+  .recommended-desc {
+    font-family: var(--font-body);
+    font-size: 15px;
+    color: var(--gray-mid);
+    line-height: 1.6;
+  }
+
+  /* Window timestamp row */
+  .window-timestamps {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+  }
+
+  .timestamp-item {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.06em;
+    line-height: 1.8;
+  }
+
+  .timestamp-item strong {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.75);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* Dual counter row */
+  .counter-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 0;
+  }
+
+  .counter-cell {
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .counter-value {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 500;
+    color: var(--gold);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .counter-value span {
+    font-size: 16px;
+    color: var(--gray-light);
+    font-weight: 400;
+  }
+
+  .counter-label {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gray-dark);
+    line-height: 1.4;
+  }
+
+  /* Completion message */
+  .completion-message {
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    border-top: 3px solid var(--gold);
+    padding: 28px 32px;
+    margin-bottom: 16px;
+    text-align: center;
+    display: none;
+  }
+
+  .completion-message.visible { display: block; }
+
+  .completion-title {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--black);
+    margin-bottom: 8px;
+  }
+
+  .completion-text {
+    font-family: var(--font-body);
+    font-size: 17px;
+    color: var(--gray-mid);
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+
+  /* ══════════════════════════════════════════════════
+     PAGE 4 — EXPIRED
+  ══════════════════════════════════════════════════ */
+  .expired-wrap {
+    min-height: calc(100vh - 60px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+  }
+
+  .expired-box {
+    max-width: 520px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .expired-icon {
+    width: 52px;
+    height: 52px;
+    border: 1.5px solid #d4433a;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 28px;
+  }
+
+  .expired-title {
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 500;
+    color: var(--black);
+    margin-bottom: 16px;
+  }
+
+  .expired-text {
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.75;
+    color: var(--gray-mid);
+    margin-bottom: 32px;
+  }
+
+  /* ── RESPONSIVE ───────────────────────────────────── */
+  @media (max-width: 720px) {
+    .portal-header { padding: 0 20px; }
+    .portal-body { padding: 32px 20px 60px; }
+    .case-entry-grid { grid-template-columns: 1fr; }
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .instrument-row { grid-template-columns: 40px 1fr; grid-template-rows: auto auto; }
+    .instrument-status { grid-column: 2; }
+    .instrument-btn { grid-column: 1 / -1; }
+    .report-download-grid { grid-template-columns: 1fr 1fr; }
+    .timer-badge { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════
+     SHARED PORTAL HEADER (hidden on login page)
+══════════════════════════════════════════════════════ -->
+<header class="portal-header" id="portal-header" style="display:none;">
+  <div class="portal-logo">
+    <div class="portal-logo-box"><span>R</span></div>
+    <div class="portal-logo-text">
+      <strong>Case Clarity Project</strong>
+      Assessment Portal
+    </div>
+  </div>
+  <div class="portal-header-right">
+    <div>
+      <div class="timer-badge" id="header-timer-badge">
+        <div class="timer-label">Window Remaining</div>
+        <div class="timer-value" id="header-timer">72:00:00</div>
+      </div>
+      <div class="window-timestamps" id="window-timestamps">
+        <div class="timestamp-item">
+          <strong>Assessment Window</strong>
+        </div>
+        <div class="timestamp-item">
+          Started: <span id="ts-started">—</span>
+        </div>
+        <div class="timestamp-item">
+          Expires: <span id="ts-expires">—</span>
+        </div>
+      </div>
+    </div>
+    <div class="portal-user" id="header-user"></div>
+  </div>
+</header>
+
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE 1 — LOGIN
+══════════════════════════════════════════════════════ -->
+<div id="page-login" class="page active">
+  <div class="login-wrap">
+
+    <div class="login-header-block">
+      <div class="login-logo">
+        <div class="login-logo-box"><span>R</span></div>
+        <div class="login-logo-text">
+          Reconcile Care Management Services
+          <em>Forensic Care Management</em>
+        </div>
+      </div>
+      <h1 class="login-title">Assessment Portal</h1>
+      <p class="login-subtitle">Enter your Assessment ID and PIN to access the Case Clarity Project evaluation portal.</p>
+      <p style="font-family:var(--font-body); font-size:15px; color:var(--gray-mid); margin-top:12px; line-height:1.65; max-width:380px; margin-left:auto; margin-right:auto; font-style:italic;">Access to the assessment portal requires the credentials issued in your approval email. Your assessment window begins when you first log in.</p>
+    </div>
+
+    <div class="login-card">
+      <div class="login-error" id="login-error">
+        The Assessment ID or PIN entered is incorrect. Please check your access email and try again.
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Assessment ID</label>
+        <input type="text" class="form-input" id="login-id" placeholder="CCP-000000" style="letter-spacing:0.12em; text-transform:uppercase;">
+      </div>
+
+      <div class="form-group" style="margin-bottom:28px;">
+        <label class="form-label">Access PIN</label>
+        <input type="password" class="form-input" id="login-pin" placeholder="6-digit PIN" maxlength="6">
+      </div>
+
+      <button class="btn-primary" style="width:100%;" onclick="handleLogin()">Access Assessment Portal</button>
+
+      <p class="login-hint">
+        Credentials were provided in your assessment access email. If you have not received your credentials within one business day, contact <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bacec8dbd9d3fac8d9d7c9cad6d6d994d9d5d7">[email&#160;protected]</a>.
+      </p>
+    </div>
+
+  </div>
+</div>
+<!-- END PAGE 1 -->
+
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE 2 — ASSESSMENT ORIENTATION
+══════════════════════════════════════════════════════ -->
+<div id="page-orientation" class="page">
+  <div class="orientation-wrap">
+
+    <div class="page-kicker">Before You Begin</div>
+    <h1 class="page-title">Assessment Orientation</h1>
+    <div class="gold-rule"></div>
+
+    <p style="font-family:var(--font-body); font-size:18px; line-height:1.8; color:var(--gray-dark); margin-bottom:32px;">
+      This evaluation includes six forensic instruments designed to examine structural case factors affecting medical care progression, recovery trajectory, and litigation risk.
+    </p>
+
+    <div class="card" style="margin-bottom:28px;">
+      <div class="card-title">What to Expect</div>
+      <div class="orientation-item">You will complete the instruments using two cases: one active case and one previously closed case.</div>
+      <div class="orientation-item">Case information will be entered once and applied across all six instruments.</div>
+      <div class="orientation-item" style="font-style:italic;">Case information entered once will automatically populate across all six instruments. You will not be required to re-enter the same information in each tool.</div>
+      <div class="orientation-item">Each instrument typically requires approximately <strong>10–15 minutes</strong> to complete.</div>
+      <div class="orientation-item">Estimated total assessment time: <strong>approximately 60–90 minutes</strong>.</div>
+      <div class="orientation-item">Most attorneys complete the assessment over multiple sessions during the 72-hour access period.</div>
+    </div>
+
+    <div class="notice">
+      <div class="notice-title">Access Window</div>
+      <p>Your 72-hour assessment window is now active. Progress is automatically saved. You may log out and return at any time before expiration.</p>
+    </div>
+
+    <div style="border:1px solid var(--gray-border); padding:20px 24px; margin-bottom:32px; background:var(--gray-bg);">
+      <div style="font-family:var(--font-ui); font-size:9px; font-weight:600; letter-spacing:0.22em; text-transform:uppercase; color:var(--gray-mid); margin-bottom:10px;">Important Note</div>
+      <p style="font-family:var(--font-body); font-size:16px; line-height:1.7; color:var(--gray-dark);">The instruments do not function as simple calculators. Each tool evaluates structural elements of case progression, treatment sequencing, and recovery dynamics.</p>
+    </div>
+
+    <button class="btn-primary" onclick="goToPage('case-entry')">Continue to Case Entry</button>
+
+  </div>
+</div>
+<!-- END PAGE 2 -->
+
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE 3 — CASE ENTRY
+══════════════════════════════════════════════════════ -->
+<div id="page-case-entry" class="page">
+  <div class="portal-body">
+
+    <div class="page-kicker">Step 1 of 2</div>
+    <h1 class="page-title">Enter Your Case Information</h1>
+    <p class="page-subtitle">Provide basic information for both cases. This information will be used across all six assessment instruments — you will not be asked to re-enter it within each tool.</p>
+    <div class="gold-rule"></div>
+
+    <div class="notice">
+      <div class="notice-title">Data Storage Notice</div>
+      <p>Case information entered here is stored only during the active 72-hour assessment window. All case data, instrument responses, and generated reports are automatically deleted when the assessment period expires. Once the window closes, nothing can be retrieved or restored.</p>
+      <p>Please download or print any reports you wish to retain before the access period ends.</p>
+    </div>
+
+    <div class="case-entry-grid">
+
+      <!-- ACTIVE CASE -->
+      <div class="case-panel">
+        <div class="case-panel-label">Active Case</div>
+
+        <div class="form-group">
+          <label class="form-label">Case Name or Internal Reference</label>
+          <input type="text" class="form-input" id="active-name" placeholder="Internal reference only">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Case Type</label>
+          <select class="form-select" id="active-type">
+            <option value="" disabled selected>Select case type</option>
+            <option>Personal Injury — Motor Vehicle</option>
+            <option>Personal Injury — Premises Liability</option>
+            <option>Personal Injury — Product Liability</option>
+            <option>Workers' Compensation</option>
+            <option>Disability Litigation</option>
+            <option>Other Personal Injury</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Date of Injury</label>
+          <input type="date" class="form-input" id="active-doi">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Primary Injury / Condition</label>
+          <input type="text" class="form-input" id="active-injury" placeholder="e.g. Lumbar herniation, TBI, rotator cuff">
+        </div>
+
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label">Current Treatment Status</label>
+          <select class="form-select" id="active-status">
+            <option value="" disabled selected>Select status</option>
+            <option>Active treatment — ongoing</option>
+            <option>Treatment paused — pending authorization</option>
+            <option>Treatment paused — patient non-compliant</option>
+            <option>IME / FCE scheduled or completed</option>
+            <option>MMI approaching</option>
+            <option>MMI reached</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- CLOSED CASE -->
+      <div class="case-panel">
+        <div class="case-panel-label">Closed Case</div>
+
+        <div class="form-group">
+          <label class="form-label">Case Name or Internal Reference</label>
+          <input type="text" class="form-input" id="closed-name" placeholder="Internal reference only">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Case Type</label>
+          <select class="form-select" id="closed-type">
+            <option value="" disabled selected>Select case type</option>
+            <option>Personal Injury — Motor Vehicle</option>
+            <option>Personal Injury — Premises Liability</option>
+            <option>Personal Injury — Product Liability</option>
+            <option>Workers' Compensation</option>
+            <option>Disability Litigation</option>
+            <option>Other Personal Injury</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Date of Injury</label>
+          <input type="date" class="form-input" id="closed-doi">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Primary Injury / Condition</label>
+          <input type="text" class="form-input" id="closed-injury" placeholder="e.g. Lumbar herniation, TBI, rotator cuff">
+        </div>
+
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label">Final Outcome / Current Status</label>
+          <select class="form-select" id="closed-outcome">
+            <option value="" disabled selected>Select outcome</option>
+            <option>Settled — pre-trial</option>
+            <option>Settled — during trial</option>
+            <option>Verdict — plaintiff</option>
+            <option>Verdict — defense</option>
+            <option>Dismissed</option>
+            <option>Ongoing dispute / appeal</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+
+    </div><!-- /case-entry-grid -->
+
+    <div style="padding-top:24px; border-top:1px solid var(--gray-border); display:flex; align-items:center; gap:24px; flex-wrap:wrap;">
+      <button class="btn-primary" onclick="handleCaseEntry()">Save Case Information &amp; Continue</button>
+      <div style="font-family:var(--font-ui); font-size:11px; color:var(--gray-light); font-style:italic;">You may edit this information from the dashboard at any time during the assessment window.</div>
+    </div>
+
+  </div>
+</div>
+<!-- END PAGE 3 -->
+
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE 4 — DASHBOARD
+══════════════════════════════════════════════════════ -->
+<div id="page-dashboard" class="page">
+  <div class="portal-body">
+
+    <div class="page-kicker">Assessment Dashboard</div>
+    <h1 class="page-title">Case Clarity Project</h1>
+
+    <!-- DATA NOTICE -->
+    <div class="notice warning">
+      <div class="notice-title">Assessment Window Notice</div>
+      <p>Reports and case information are available only during the active assessment window. Please download or print all reports before expiration. Once the assessment period expires, all data is permanently deleted and cannot be retrieved.</p>
+    </div>
+
+    <!-- CASE SUMMARIES -->
+    <div class="dashboard-grid">
+      <div class="case-summary-panel">
+        <div class="case-summary-label">Active Case</div>
+        <div class="case-summary-name" id="dash-active-name">—</div>
+        <div class="case-summary-detail" id="dash-active-detail">—</div>
+        <button class="case-summary-edit" onclick="goToPage('case-entry')">Edit Case Information</button>
+      </div>
+      <div class="case-summary-panel">
+        <div class="case-summary-label">Closed Case</div>
+        <div class="case-summary-name" id="dash-closed-name">—</div>
+        <div class="case-summary-detail" id="dash-closed-detail">—</div>
+        <button class="case-summary-edit" onclick="goToPage('case-entry')">Edit Case Information</button>
+      </div>
+    </div>
+
+    <!-- COMPLETION MESSAGE (shown when all 6 done) -->
+    <div class="completion-message" id="completion-message">
+      <div class="completion-title">Assessment Complete</div>
+      <p class="completion-text">Your forensic case analysis is now available. Please download all reports before the assessment window expires.</p>
+      <button class="btn-primary" onclick="document.getElementById('report-release-section').scrollIntoView({behavior:'smooth'})">View Reports</button>
+    </div>
+
+    <!-- RECOMMENDED STARTING INSTRUMENT (hidden once CCI is complete) -->
+    <div class="recommended-panel" id="recommended-panel">
+      <div>
+        <div class="recommended-label">Recommended Starting Point</div>
+        <div class="recommended-name">Case Complexity Index (CCI)</div>
+        <div class="recommended-desc">Most attorneys begin the assessment with the Case Complexity Index. This instrument establishes the structural characteristics of the case and provides the analytical foundation for interpretation of the remaining instruments.</div>
+      </div>
+      <button class="instrument-btn" onclick="runInstrument(0)">Start Case Complexity Index</button>
+    </div>
+
+    <!-- DUAL CASE COUNTERS + PROGRESS -->
+    <div class="counter-row" style="margin-bottom:4px;">
+      <div class="counter-cell">
+        <div class="counter-value" id="counter-active">0 <span>/ 6</span></div>
+        <div class="counter-label" style="font-size:9px; line-height:1.4;">Active Case<br>Instruments Completed</div>
+      </div>
+      <div class="counter-cell">
+        <div class="counter-value" id="counter-closed">0 <span>/ 6</span></div>
+        <div class="counter-label" style="font-size:9px; line-height:1.4;">Closed Case<br>Instruments Completed</div>
+      </div>
+      <div class="counter-cell">
+        <div class="counter-value" id="counter-reports">0 <span>/ 12</span></div>
+        <div class="counter-label" style="font-size:9px; line-height:1.4;">Reports<br>Generated</div>
+      </div>
+    </div>
+
+    <div class="progress-section" style="margin-top:4px;">
+      <div class="progress-track" style="width:100%;">
+        <div class="progress-label">Assessment Progress</div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+        <div class="progress-note" id="progress-note">Complete all six instruments to release reports.</div>
+        <div style="font-family:var(--font-body); font-size:13px; font-style:italic; color:var(--gray-light); margin-top:4px;">Your progress is saved automatically as you complete each instrument.</div>
+        <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--gray-border); display:flex; flex-wrap:wrap; gap:20px;">
+          <div style="font-family:var(--font-ui); font-size:10px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:var(--gray-dark);">6 Instruments Required</div>
+          <div style="font-family:var(--font-ui); font-size:10px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:var(--gray-dark);">Up to 12 Reports Generated</div>
+          <div style="font-family:var(--font-body); font-size:14px; font-style:italic; color:var(--gray-light); width:100%;">Reports become available as each instrument set is completed. Completing all six instruments for a case releases the full report set for that case.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ASSESSMENT TIME EXPECTATIONS -->
+    <div class="card" style="margin-bottom:24px;">
+      <div class="card-title">Assessment Time Expectations</div>
+      <ul class="expectations-list">
+        <li>Each instrument is designed to be completed in approximately 10–15 minutes per instrument.</li>
+        <li>The questions require thoughtful consideration of case structure, treatment progression, and recovery factors.</li>
+        <li>Most attorneys complete the assessment over multiple sessions rather than in a single sitting.</li>
+        <li>The portal remains active for 72 hours from first login to allow time to return and continue.</li>
+        <li>Progress is saved during the active assessment window.</li>
+        <li>Estimated total assessment time: approximately <strong>60–90 minutes</strong>.</li>
+      </ul>
+    </div>
+
+    <!-- NEXT RECOMMENDED STEP -->
+    <div id="next-step-panel" style="background:var(--white); border:1px solid var(--gray-border); border-left:3px solid var(--gold); padding:22px 28px; margin-bottom:4px; display:grid; grid-template-columns:1fr auto; gap:20px; align-items:center;">
+      <div>
+        <div style="font-family:var(--font-ui); font-size:9px; font-weight:600; letter-spacing:0.24em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;">Next Recommended Step</div>
+        <div id="next-step-name" style="font-family:var(--font-display); font-size:18px; font-weight:500; color:var(--black); margin-bottom:4px;">—</div>
+        <div id="next-step-desc" style="font-family:var(--font-body); font-size:14px; color:var(--gray-mid); line-height:1.5;"></div>
+      </div>
+      <button class="instrument-btn" id="next-step-btn" onclick="runNextInstrument()">Start Assessment</button>
+    </div>
+
+    <!-- INSTRUMENTS -->
+    <div style="font-family:var(--font-body); font-size:15px; line-height:1.7; color:var(--gray-mid); padding:14px 0; border-top:1px solid var(--gray-border); margin-top:8px; font-style:italic;">
+      Completing all six instruments produces the full structural analysis. Partial completion generates limited reports and may not reveal cross-instrument risk signals.
+    </div>
+
+    <div class="section-heading" style="margin-top:8px;">
+      Forensic Instruments
+      <span style="font-family:var(--font-body); font-size:13px; font-weight:400; letter-spacing:0; text-transform:none; font-style:italic; color:var(--gray-light);">Open each instrument in a new tab. Return here to track progress.</span>
+    </div>
+
+    <div id="instruments-list">
+      <!-- Rendered by JS -->
+    </div>
+
+    <!-- REPORT RELEASE POLICY -->
+    <div style="font-family:var(--font-body); font-size:15px; font-style:italic; color:var(--gray-light); padding:14px 0 0; margin-bottom:28px; border-top:1px solid var(--gray-border);">
+      Reports become available as each instrument set is completed. Please download or print all available reports before the assessment window expires.
+    </div>
+
+    <!-- REPORT RELEASE SECTION -->
+    <div class="report-release" id="report-release-section">
+      <div class="report-release-title" id="report-release-title">Reports — No Instruments Completed</div>
+      <div class="report-release-text" id="report-release-text">
+        Reports become available as each instrument set is completed. Begin with the Case Complexity Index to generate your first reports.
+      </div>
+      <div class="report-download-grid" id="report-download-grid" style="display:none;">
+        <!-- Rendered by JS when instruments complete -->
+      </div>
+    </div>
+
+    <!-- DISCUSS YOUR RESULTS -->
+    <div class="discussion-section">
+      <div class="card-title">Discuss Your Results</div>
+      <p style="font-family:var(--font-body); font-size:17px; line-height:1.75; color:var(--gray-dark); margin-bottom:20px;">
+        If you would like to review the assessment findings with a Registered Nurse Care Manager, you may request a consultation after completing the instruments.
+      </p>
+      <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bdc9cfdcded4fdcfded0cecdd1d1de93ded2d0">[email&#160;protected]</a>
+      <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ef9b9d8e8c86af9d8c829c9f83838cc18c8082">[email&#160;protected]</a>
+
+    <!-- EXPIRATION NOTICE -->
+    <div class="notice warning">
+      <div class="notice-title">Data Retention Notice</div>
+      <p>All case information and generated reports are permanently deleted when the 72-hour window expires. Reports must be downloaded or printed before expiration. We cannot retrieve them after deletion.</p>
+    </div>
+
+  </div>
+</div>
+<!-- END PAGE 4 -->
+
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE 5 — EXPIRED
+══════════════════════════════════════════════════════ -->
+<div id="page-expired" class="page">
+  <div class="expired-wrap">
+    <div class="expired-box">
+
+      <div class="expired-icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M10 4v6l4 2" stroke="#8b2020" stroke-width="1.5" stroke-linecap="square"/>
+          <circle cx="10" cy="10" r="8.5" stroke="#8b2020" stroke-width="1.5"/>
+        </svg>
+      </div>
+
+      <h1 class="expired-title">Assessment Window Expired</h1>
+      <p class="expired-text">Your complimentary assessment period has ended. All case information and report access have been removed in accordance with the assessment terms.</p>
+
+      <div style="border:1px solid #d4433a; padding:20px 24px; margin-bottom:32px; background:#fdf7f7; text-align:left;">
+        <div style="font-family:var(--font-ui); font-size:9px; font-weight:600; letter-spacing:0.22em; text-transform:uppercase; color:var(--red); margin-bottom:10px;">Data Deletion Notice</div>
+        <p style="font-family:var(--font-body); font-size:16px; line-height:1.7; color:var(--gray-dark);">All case information, instrument responses, and generated reports associated with your assessment have been permanently deleted. This data cannot be retrieved or restored.</p>
+      </div>
+
+      <p style="font-family:var(--font-body); font-size:16px; color:var(--gray-mid); margin-bottom:28px; line-height:1.7;">
+        If you would like to request a new assessment, contact <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="14606675777d5466777967647878773a777b79">[email&#160;protected]</a>.
+      </p>
+
+    </div>
+  </div>
+</div>
+<!-- END PAGE 5 -->
+
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ══════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════
+const state = {
+  user: null,
+  timerStart: null,
+  loginTimestamp: null,
+  expiryTimestamp: null,
+  timerInterval: null,
+  totalSeconds: 72 * 60 * 60,
+  remainingSeconds: 72 * 60 * 60,
+  activeName: '',
+  activeType: '',
+  closedName: '',
+  closedType: '',
+  instruments: [
+    { abbr: 'CCI', name: 'Case Complexity Index',          desc: 'Evaluates injury severity, life disruption, and care coordination demands throughout the case lifecycle.', status: 'not-started' },
+    { abbr: 'CSA', name: 'Clinical Sequencing Auditor',    desc: 'Assesses alignment with the 7 Rights of Injury Care Management and treatment pathway defensibility.',       status: 'not-started' },
+    { abbr: 'CAF', name: 'C.A.R.E. Access Friction Score', desc: 'Identifies insurance, referral, and provider access barriers that may delay appropriate care.',             status: 'not-started' },
+    { abbr: 'HSI', name: 'Holistic Stability Index',       desc: 'Evaluates stability across the 4Ps of Wellness and social determinants of health.',                        status: 'not-started' },
+    { abbr: 'FCI', name: 'Functional Capacity Index',      desc: 'Assesses capacity to return to work and maintain independence following injury.',                           status: 'not-started' },
+    { abbr: 'RRF', name: 'Recovery Risk Forecaster',       desc: 'Identifies psychological, behavioral, and situational factors affecting recovery trajectory.',              status: 'not-started' },
+  ]
+};
+
+// ══════════════════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════════════════
+function goToPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ══════════════════════════════════════════════════════
+//  LOGIN  →  ORIENTATION
+// Credentials: Assessment ID (any CCP-XXXXXX format) + 6-digit PIN
+// In production replace validation with server-side check
+// ══════════════════════════════════════════════════════
+function handleLogin() {
+  const id  = document.getElementById('login-id').value.trim().toUpperCase();
+  const pin = document.getElementById('login-pin').value.trim();
+  const err = document.getElementById('login-error');
+
+  // Validate: ID must start with CCP- and PIN must be exactly 6 digits
+  const validId  = /^CCP-[A-Z0-9]{6}$/.test(id);
+  const validPin = /^\d{6}$/.test(pin);
+
+  if (!validId || !validPin) {
+    err.classList.add('visible');
+    return;
+  }
+
+  err.classList.remove('visible');
+  state.user = id;
+
+  // Record timestamps
+  state.loginTimestamp = new Date();
+  state.expiryTimestamp = new Date(state.loginTimestamp.getTime() + 72 * 60 * 60 * 1000);
+  state.timerStart = Date.now();
+  state.remainingSeconds = state.totalSeconds;
+
+  // Show header
+  document.getElementById('portal-header').style.display = 'flex';
+  document.getElementById('header-user').textContent = 'ID: ' + id;
+
+  // Render timestamps
+  const fmt = (d) => d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })
+                  + ' ' + d.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+  document.getElementById('ts-started').textContent = fmt(state.loginTimestamp);
+  document.getElementById('ts-expires').textContent = fmt(state.expiryTimestamp);
+
+  startTimer();
+  goToPage('orientation');
+}
+
+// ══════════════════════════════════════════════════════
+//  TIMER
+// ══════════════════════════════════════════════════════
+function startTimer() {
+  if (state.timerInterval) clearInterval(state.timerInterval);
+  renderTimer();
+  state.timerInterval = setInterval(() => {
+    state.remainingSeconds--;
+    if (state.remainingSeconds <= 0) {
+      clearInterval(state.timerInterval);
+      goToPage('expired');
+      return;
+    }
+    renderTimer();
+  }, 1000);
+}
+
+function renderTimer() {
+  const s   = state.remainingSeconds;
+  const h   = Math.floor(s / 3600);
+  const m   = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  const display = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+  const el = document.getElementById('header-timer');
+  el.textContent = display;
+  el.className = 'timer-value' + (h < 2 ? ' urgent' : '');
+}
+
+// ══════════════════════════════════════════════════════
+//  CASE ENTRY  →  DASHBOARD
+// ══════════════════════════════════════════════════════
+function handleCaseEntry() {
+  const an = document.getElementById('active-name').value.trim();
+  const at = document.getElementById('active-type').value;
+  const cn = document.getElementById('closed-name').value.trim();
+  const ct = document.getElementById('closed-type').value;
+
+  if (!an || !at || !cn || !ct) {
+    alert('Please complete all required fields for both cases before continuing.');
+    return;
+  }
+
+  state.activeName   = an;
+  state.activeType   = at;
+  state.closedName   = cn;
+  state.closedType   = ct;
+  state.activeStatus = document.getElementById('active-status').value  || '';
+  state.closedOutcome= document.getElementById('closed-outcome').value || '';
+
+  renderDashboard();
+  goToPage('dashboard');
+}
+
+// ══════════════════════════════════════════════════════
+//  DASHBOARD RENDER
+// ══════════════════════════════════════════════════════
+function renderDashboard() {
+  document.getElementById('dash-active-name').textContent   = state.activeName  || '—';
+  document.getElementById('dash-active-detail').textContent = state.activeType  || '—';
+  document.getElementById('dash-closed-name').textContent   = state.closedName  || '—';
+  document.getElementById('dash-closed-detail').textContent = state.closedType  || '—';
+
+  renderRecommended();
+  renderNextStep();
+  renderInstruments();
+  renderProgress();
+  renderReportSection();
+}
+
+// ══════════════════════════════════════════════════════
+//  RECOMMENDED PANEL  — hides once CCI (index 0) is complete
+// ══════════════════════════════════════════════════════
+function renderRecommended() {
+  const panel = document.getElementById('recommended-panel');
+  if (state.instruments[0].status === 'complete') {
+    panel.style.display = 'none';
+  } else {
+    panel.style.display = '';
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  NEXT RECOMMENDED STEP PANEL
+//  Order: CCI → CSA → CAF → HSI → FCI → RRF
+//  - In-progress instrument = resume it first
+//  - Otherwise next not-started in sequence
+//  - All complete = show completion message only
+// ══════════════════════════════════════════════════════
+function renderNextStep() {
+  const panel = document.getElementById('next-step-panel');
+  const nameEl = document.getElementById('next-step-name');
+  const descEl = document.getElementById('next-step-desc');
+  const btn    = document.getElementById('next-step-btn');
+
+  const allComplete = state.instruments.every(i => i.status === 'complete');
+  if (allComplete) {
+    panel.style.display = 'none';
+    return;
+  }
+  panel.style.display = '';
+
+  // Prioritise in-progress, then first not-started
+  let target = state.instruments.find(i => i.status === 'in-progress');
+  let targetIndex = target ? state.instruments.indexOf(target) : -1;
+  if (!target) {
+    targetIndex = state.instruments.findIndex(i => i.status !== 'complete');
+    target = state.instruments[targetIndex];
+  }
+
+  const resuming = target.status === 'in-progress';
+  nameEl.textContent = `${resuming ? 'Continue with' : 'Continue with'}: ${target.name} (${target.abbr})`;
+  descEl.textContent = resuming
+    ? 'This instrument is currently in progress. Resume to complete this step.'
+    : 'This instrument is the next recommended step in the assessment sequence.';
+  btn.textContent = resuming ? 'Resume Assessment' : 'Start Assessment';
+  btn.onclick = () => runInstrument(targetIndex);
+}
+
+// ══════════════════════════════════════════════════════
+//  INSTRUMENTS LIST
+// ══════════════════════════════════════════════════════
+function renderInstruments() {
+  const list = document.getElementById('instruments-list');
+  list.innerHTML = '';
+  state.instruments.forEach((inst, i) => {
+    const row = document.createElement('div');
+    const statusClass = inst.status === 'complete' ? 'complete' : inst.status === 'in-progress' ? 'in-progress' : '';
+    row.className = 'instrument-row ' + statusClass;
+    row.id = 'inst-row-' + i;
+
+    const labelMap = { 'not-started': 'Not Started', 'in-progress': 'In Progress', 'complete': 'Complete' };
+    const statusLabel = labelMap[inst.status] || 'Not Started';
+
+    const btnHTML = inst.status === 'complete'
+      ? `<button class="instrument-btn done">Complete</button>`
+      : `<button class="instrument-btn" onclick="runInstrument(${i})">Start Assessment</button>`;
+
+    row.innerHTML = `
+      <div class="instrument-abbr">${inst.abbr}</div>
+      <div>
+        <div class="instrument-name">${inst.name}</div>
+        <div class="instrument-desc">${inst.desc}</div>
+      </div>
+      <div class="instrument-status ${inst.status}">${statusLabel}</div>
+      ${btnHTML}
+    `;
+    list.appendChild(row);
+  });
+}
+
+// ══════════════════════════════════════════════════════
+//  PROGRESS  — instruments + reports counters
+// Report logic: each completed instrument generates 3 reports
+// (Active, Closed, Comparative) = 2 per case + 1 comparative
+// Total possible = 12
+// ══════════════════════════════════════════════════════
+function renderProgress() {
+  const completed = state.instruments.filter(i => i.status === 'complete').length;
+  const reports   = completed * 2;
+  const totalReports = completed === 6 ? 12 : reports;
+  const pct = Math.round((completed / 6) * 100);
+
+  // Dual case counters — in this prototype both cases use same instrument set
+  // In production these would track active vs closed separately
+  const activeEl  = document.getElementById('counter-active');
+  const closedEl  = document.getElementById('counter-closed');
+  const reportsEl = document.getElementById('counter-reports');
+  if (activeEl)  activeEl.innerHTML  = `${completed} <span>/ 6</span>`;
+  if (closedEl)  closedEl.innerHTML  = `${completed} <span>/ 6</span>`;
+  if (reportsEl) reportsEl.innerHTML = `${totalReports} <span>/ 12</span>`;
+
+  document.getElementById('progress-fill').style.width = pct + '%';
+
+  const note = document.getElementById('progress-note');
+  if (completed === 6) {
+    note.textContent = 'Assessment complete. All 12 reports are now available.';
+    document.getElementById('completion-message').classList.add('visible');
+  } else if (completed === 0) {
+    note.textContent = 'Begin with the Case Complexity Index. Reports become available as each instrument is completed.';
+    document.getElementById('completion-message').classList.remove('visible');
+  } else {
+    note.textContent = `${completed} of 6 instruments complete. Reports are being generated as you progress. ${6 - completed} remaining.`;
+    document.getElementById('completion-message').classList.remove('visible');
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  REPORT SECTION — progressive unlock
+//  Each completed instrument releases:
+//    - Active Case Report
+//    - Closed Case Report
+//  All 6 complete also releases:
+//    - Full Comparative Analysis (1 report)
+//  Total possible = 13 items but we display as 12 by
+//  counting comparative as part of the set
+// ══════════════════════════════════════════════════════
+function renderReportSection() {
+  const completed = state.instruments.filter(i => i.status === 'complete').length;
+  const section   = document.getElementById('report-release-section');
+  const title     = document.getElementById('report-release-title');
+  const text      = document.getElementById('report-release-text');
+  const grid      = document.getElementById('report-download-grid');
+
+  if (completed === 0) {
+    section.classList.remove('unlocked');
+    title.textContent = 'Reports — No Instruments Completed';
+    text.innerHTML    = 'Reports become available as each instrument set is completed. Begin with the Case Complexity Index to generate your first reports.';
+    grid.style.display = 'none';
+    const dlAll = document.getElementById('download-all-btn');
+    if (dlAll) dlAll.style.display = 'none';
+    return;
+  }
+
+  // Partial or full unlock
+  section.classList.add('unlocked');
+  const allDone = completed === 6;
+
+  if (allDone) {
+    title.textContent = 'Assessment Complete — All Reports Available';
+    text.innerHTML    = 'Your 12 assessment reports are now available. Please download or print all reports before the assessment window expires. Once the window closes, reports cannot be retrieved.';
+  } else {
+    title.textContent = `Reports Available — ${completed} of 6 Instruments Complete`;
+    text.innerHTML    = `Reports become available as each instrument set is completed. ${completed * 2} report${completed * 2 > 1 ? 's are' : ' is'} currently available. Please download or print all available reports before the assessment window expires.`;
+  }
+
+  grid.style.display = 'grid';
+  const completedInstruments = state.instruments.filter(i => i.status === 'complete');
+  grid.innerHTML = completedInstruments.map(inst => `
+    <div class="report-download-item">
+      <div class="report-download-abbr">${inst.abbr}</div>
+      <div class="report-download-name">${inst.name} — Active Case</div>
+      <button class="report-download-btn">Download PDF</button>
+    </div>
+    <div class="report-download-item">
+      <div class="report-download-abbr">${inst.abbr}</div>
+      <div class="report-download-name">${inst.name} — Closed Case</div>
+      <button class="report-download-btn">Download PDF</button>
+    </div>
+  `).join('') + (allDone ? `
+    <div class="report-download-item" style="grid-column:1/-1; border-top:2px solid var(--gold); margin-top:4px;">
+      <div class="report-download-abbr" style="font-size:11px; color:var(--gray-mid);">COMPARATIVE</div>
+      <div class="report-download-name" style="font-size:14px; font-weight:500;">Full Comparative Analysis — Active vs. Closed</div>
+      <button class="report-download-btn" style="width:fit-content;">Download PDF</button>
+    </div>
+  ` : '');
+
+  // Download All button
+  let dlAll = document.getElementById('download-all-btn');
+  if (!dlAll) {
+    dlAll = document.createElement('button');
+    dlAll.id = 'download-all-btn';
+    dlAll.className = 'btn-primary';
+    dlAll.style.cssText = 'margin-top:20px; padding:16px 40px; font-size:12px; letter-spacing:0.22em; display:block; width:100%; text-align:center;';
+    dlAll.onclick = () => alert('In production: downloads a ZIP of all currently available report PDFs.');
+    section.appendChild(dlAll);
+  }
+  dlAll.textContent = allDone ? 'Download Complete Assessment' : `Download Available Reports (${completed * 2})`;
+  dlAll.style.display = 'block';
+}
+function runInstrument(index) {
+  const inst = state.instruments[index];
+  if (inst.status === 'not-started')      inst.status = 'in-progress';
+  else if (inst.status === 'in-progress') inst.status = 'complete';
+
+  renderRecommended();
+  renderNextStep
+function runInstrument(index) {
+  const inst = state.instruments[index];
+  if (inst.status === 'not-started')      inst.status = 'in-progress';
+  else if (inst.status === '
