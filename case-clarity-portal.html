@@ -1371,7 +1371,7 @@
         <div class="recommended-name" id="recommended-name">Case Complexity Index (CCI)</div>
         <div class="recommended-desc" id="recommended-desc">Most attorneys begin the assessment with the Case Complexity Index. This instrument establishes the structural characteristics of the case and provides the analytical foundation for interpretation of the remaining instruments.</div>
       </div>
-      <button class="instrument-btn" id="recommended-btn">Start Case Complexity Index</button>
+      <button class="instrument-btn" id="recommended-btn" data-launch-instrument="CCI">Start Case Complexity Index</button>
     </div>
 
     <div id="debug-banner" style="font-family:monospace; font-size:11px; color:#333; background:#fffbe6; border:1px solid #e0c040; padding:4px 10px; margin-bottom:6px;">DEBUG MODE ACTIVE — launch binding test</div>
@@ -1696,8 +1696,9 @@ function renderRecommended() {
     : 'This instrument is the next recommended step in the assessment sequence.';
 
   btn.textContent = inProgress ? 'Resume Assessment' : `Start ${target.abbr}`;
-  btn.onclick = () => launchInstrument(target.abbr);
-  console.log('RECOMMENDED BUTTON BOUND TO:', target.abbr);
+  btn.setAttribute('data-launch-instrument', target.abbr);
+  btn.removeAttribute('disabled');
+  console.log('RECOMMENDED BUTTON data-launch-instrument SET TO:', target.abbr);
 }
 
 // Stub — next-step panel removed; all callers preserved safely
@@ -1725,8 +1726,10 @@ function renderInstruments() {
       ? 'Resume Assessment'
       : 'Start Assessment';
 
-    const btnDisabled = inst.status === 'complete' ? 'disabled' : '';
-    const btnClass    = inst.status === 'complete' ? 'instrument-btn done' : 'instrument-btn';
+    const isLaunchable = inst.status !== 'complete';
+    const btnClass = inst.status === 'complete' ? 'instrument-btn done' : 'instrument-btn';
+    const dataAttr = isLaunchable ? `data-launch-instrument="${inst.abbr}"` : '';
+    const disabledAttr = isLaunchable ? '' : 'disabled';
 
     row.innerHTML = `
       <div class="instrument-abbr">${inst.abbr}</div>
@@ -1735,17 +1738,8 @@ function renderInstruments() {
         <div class="instrument-desc">${inst.desc}</div>
       </div>
       <div class="instrument-status ${inst.status}">${statusLabel}</div>
-      <button class="${btnClass}" data-launch="${inst.abbr}" ${btnDisabled}>${btnLabel}</button>
+      <button class="${btnClass}" ${dataAttr} ${disabledAttr}>${btnLabel}</button>
     `;
-
-    // Bind click via DOM — no inline onclick attribute
-    if (inst.status !== 'complete') {
-      const btn = row.querySelector('[data-launch]');
-      if (btn) {
-        btn.onclick = () => launchInstrument(inst.abbr);
-        console.log('ROW BUTTON BOUND TO:', inst.abbr);
-      }
-    }
 
     list.appendChild(row);
   });
@@ -1916,10 +1910,16 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// Capture-phase click debugger — logs the actual element receiving each click
+// Delegated click handler — sole launch path for all instrument buttons
 document.addEventListener('click', function(e) {
-  console.log('CLICK TARGET:', e.target);
-}, true);
+  const btn = e.target.closest('[data-launch-instrument]');
+  if (!btn) return;
+  e.preventDefault();
+  const instrumentKey = btn.getAttribute('data-launch-instrument');
+  console.log('DELEGATED LAUNCH CLICK:', instrumentKey, btn);
+  alert('DELEGATED LAUNCH CLICK: ' + instrumentKey);
+  launchInstrument(instrumentKey);
+});
 </script>
 
 <script>
