@@ -1370,6 +1370,8 @@
       <button class="instrument-btn" id="recommended-btn">Start Case Complexity Index</button>
     </div>
 
+    <div id="debug-banner" style="font-family:monospace; font-size:11px; color:#333; background:#fffbe6; border:1px solid #e0c040; padding:4px 10px; margin-bottom:6px;">DEBUG MODE ACTIVE — launch binding test</div>
+
     <!-- DUAL CASE COUNTERS + PROGRESS -->
     <div class="counter-row" style="margin-bottom:4px;">
       <div class="counter-cell">
@@ -1691,7 +1693,7 @@ function renderRecommended() {
 
   btn.textContent = inProgress ? 'Resume Assessment' : `Start ${target.abbr}`;
   btn.onclick = () => launchInstrument(target.abbr);
-  console.log('Bound recommended CTA to:', target.abbr);
+  console.log('RECOMMENDED BUTTON BOUND TO:', target.abbr);
 }
 
 // Stub — next-step panel removed; all callers preserved safely
@@ -1737,7 +1739,7 @@ function renderInstruments() {
       const btn = row.querySelector('[data-launch]');
       if (btn) {
         btn.onclick = () => launchInstrument(inst.abbr);
-        console.log('Bound row CTA to:', inst.abbr);
+        console.log('ROW BUTTON BOUND TO:', inst.abbr);
       }
     }
 
@@ -1856,7 +1858,8 @@ function renderReportSection() {
 }
 
 function launchInstrument(instrumentKey) {
-  console.log('Launching instrument from portal:', instrumentKey);
+  console.log('LAUNCH FUNCTION ENTERED:', instrumentKey);
+  alert('LAUNCH FUNCTION ENTERED: ' + instrumentKey);
   const toolUrls = {
     CCI: "https://case-complexity-index.vercel.app",
     CSA: "https://clinical-sequencing-auditor.vercel.app",
@@ -1873,6 +1876,7 @@ function launchInstrument(instrumentKey) {
   const idx = state.instruments.findIndex(i => i.abbr === instrumentKey);
   if (idx >= 0 && state.instruments[idx].status === 'not-started') {
     state.instruments[idx].status = 'in-progress';
+    console.log('ROW UPDATED TO IN PROGRESS:', instrumentKey);
     renderRecommended();
     renderNextStep();
     renderInstruments();
@@ -1880,6 +1884,7 @@ function launchInstrument(instrumentKey) {
     renderReportSection();
   }
 
+  console.log('ABOUT TO OPEN TOOL URL:', url);
   window.open(url, "_blank");
 }
 
