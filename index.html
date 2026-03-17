@@ -2055,6 +2055,22 @@ window.addEventListener('message', (e) => {
     console.log('Portal received completion:', e.data.instrument, e.data.caseType || '(no caseType — defaulting to active)');
     completeInstrument(e.data.instrument, e.data.caseType || 'active');
   }
+
+  if (e.data && e.data.type === 'GO_TO_NEXT_ASSESSMENT' && e.data.instrument) {
+    const sequence = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
+    const currentIdx = sequence.indexOf(e.data.instrument);
+    const caseType   = e.data.caseType || 'active';
+    console.log('Portal received GO_TO_NEXT_ASSESSMENT:', e.data.instrument, caseType);
+
+    if (currentIdx === -1 || currentIdx === sequence.length - 1) {
+      // RRF or unknown — just stay on dashboard
+      console.log('Last instrument in sequence — returning to dashboard.');
+    } else {
+      const nextAbbr = sequence[currentIdx + 1];
+      console.log('Launching next instrument:', nextAbbr, caseType);
+      launchInstrument(nextAbbr, caseType);
+    }
+  }
 });
 
 </script>
