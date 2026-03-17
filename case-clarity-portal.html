@@ -14,8 +14,8 @@
     --gold-pale: #f5f0e0;
     --black: #0d0d0d;
     --gray-dark: #2a2a2a;
-    --gray-mid: #666;
-    --gray-light: #999;
+    --gray-mid: #4a4a4a;
+    --gray-light: #666;
     --gray-border: #e0ddd4;
     --gray-bg: #f8f7f4;
     --white: #ffffff;
@@ -1360,14 +1360,14 @@
       <button class="btn-primary" onclick="document.getElementById('report-release-section').scrollIntoView({behavior:'smooth'})">View Reports</button>
     </div>
 
-    <!-- RECOMMENDED STARTING INSTRUMENT (hidden once CCI is complete) -->
+    <!-- SINGLE RECOMMENDATION PANEL — driven by renderRecommended() -->
     <div class="recommended-panel" id="recommended-panel">
       <div>
-        <div class="recommended-label">Recommended Starting Point</div>
-        <div class="recommended-name">Case Complexity Index (CCI)</div>
-        <div class="recommended-desc">Most attorneys begin the assessment with the Case Complexity Index. This instrument establishes the structural characteristics of the case and provides the analytical foundation for interpretation of the remaining instruments.</div>
+        <div class="recommended-label" id="recommended-label">Recommended Starting Point</div>
+        <div class="recommended-name" id="recommended-name">Case Complexity Index (CCI)</div>
+        <div class="recommended-desc" id="recommended-desc">Most attorneys begin the assessment with the Case Complexity Index. This instrument establishes the structural characteristics of the case and provides the analytical foundation for interpretation of the remaining instruments.</div>
       </div>
-      <button class="instrument-btn" onclick="launchInstrument('CCI')">Start Case Complexity Index</button>
+      <button class="instrument-btn" id="recommended-btn" onclick="launchInstrument('CCI')">Start Case Complexity Index</button>
     </div>
 
     <!-- DUAL CASE COUNTERS + PROGRESS -->
@@ -1413,16 +1413,6 @@
         <li>Progress is saved during the active assessment window.</li>
         <li>Estimated total assessment time: approximately <strong>60–90 minutes</strong>.</li>
       </ul>
-    </div>
-
-    <!-- NEXT RECOMMENDED STEP -->
-    <div id="next-step-panel" style="background:var(--white); border:1px solid var(--gray-border); border-left:3px solid var(--gold); padding:22px 28px; margin-bottom:4px; display:grid; grid-template-columns:1fr auto; gap:20px; align-items:center;">
-      <div>
-        <div style="font-family:var(--font-ui); font-size:9px; font-weight:600; letter-spacing:0.24em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;">Next Recommended Step</div>
-        <div id="next-step-name" style="font-family:var(--font-display); font-size:18px; font-weight:500; color:var(--black); margin-bottom:4px;">—</div>
-        <div id="next-step-desc" style="font-family:var(--font-body); font-size:14px; color:var(--gray-mid); line-height:1.5;"></div>
-      </div>
-      <button class="instrument-btn" id="next-step-btn" onclick="runNextInstrument()">Start Assessment</button>
     </div>
 
     <!-- INSTRUMENTS -->
@@ -1656,27 +1646,21 @@ function renderDashboard() {
 // ══════════════════════════════════════════════════════
 //  RECOMMENDED PANEL  — hides once CCI (index 0) is complete
 // ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
+//  SINGLE RECOMMENDATION PANEL
+//  Covers all 6 instruments in sequence.
+//  - Shows first incomplete instrument
+//  - Hides when all are complete
+//  - Button always calls launchInstrument() — never runInstrument()
+// ══════════════════════════════════════════════════════
 function renderRecommended() {
-  const panel = document.getElementById('recommended-panel');
-  if (instrumentState['CCI'] === true) {
-    panel.style.display = 'none';
-  } else {
-    panel.style.display = '';
-  }
-}
+  const panel   = document.getElementById('recommended-panel');
+  const label   = document.getElementById('recommended-label');
+  const nameEl  = document.getElementById('recommended-name');
+  const descEl  = document.getElementById('recommended-desc');
+  const btn     = document.getElementById('recommended-btn');
 
-// ══════════════════════════════════════════════════════
-//  NEXT RECOMMENDED STEP PANEL
-//  Order: CCI → CSA → CAF → HSI → FCI → RRF
-//  - first incomplete instrument in sequence
-//  - all complete = hide panel
-// ══════════════════════════════════════════════════════
-function renderNextStep() {
-  const panel = document.getElementById('next-step-panel');
-  const nameEl = document.getElementById('next-step-name');
-  const descEl = document.getElementById('next-step-desc');
-  const btn    = document.getElementById('next-step-btn');
-
+  // Hide if all 6 complete
   const allComplete = state.instruments.every(i => i.status === 'complete');
   if (allComplete) {
     panel.style.display = 'none';
@@ -1684,18 +1668,33 @@ function renderNextStep() {
   }
   panel.style.display = '';
 
-  // First not-complete instrument in sequence
-  const targetIndex = state.instruments.findIndex(i => i.status !== 'complete');
-  const target = state.instruments[targetIndex];
+  // Find first incomplete instrument in sequence
+  const target = state.instruments.find(i => i.status !== 'complete');
+  if (!target) { panel.style.display = 'none'; return; }
 
   const inProgress = target.status === 'in-progress';
-  nameEl.textContent = `${inProgress ? 'Continue with' : 'Next Instrument'}: ${target.name} (${target.abbr})`;
-  descEl.textContent = inProgress
-    ? 'This instrument is currently in progress. Resume to complete this step.'
+  const isFirst    = target.abbr === 'CCI' && !inProgress;
+
+  label.textContent = isFirst
+    ? 'Recommended Starting Point'
+    : inProgress
+    ? 'Currently In Progress'
+    : 'Next Recommended Step';
+
+  nameEl.textContent = `${target.name} (${target.abbr})`;
+
+  descEl.textContent = isFirst
+    ? 'Most attorneys begin the assessment with the Case Complexity Index. This instrument establishes the structural characteristics of the case and provides the analytical foundation for interpretation of the remaining instruments.'
+    : inProgress
+    ? 'This instrument is currently in progress. Return to it to complete this step.'
     : 'This instrument is the next recommended step in the assessment sequence.';
-  btn.textContent = inProgress ? 'Resume Assessment' : 'Start Assessment';
+
+  btn.textContent = inProgress ? 'Resume Assessment' : `Start ${target.abbr}`;
   btn.onclick = () => launchInstrument(target.abbr);
 }
+
+// Stub — next-step panel removed; all callers preserved safely
+function renderNextStep() {}
 
 // ══════════════════════════════════════════════════════
 //  INSTRUMENTS LIST
