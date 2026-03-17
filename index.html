@@ -40,7 +40,6 @@
   }
 
   /* ── DEBUG OUTLINES (temporary) ── */
-  #recommended-btn { outline: 1px solid red !important; }
   .instrument-row button { outline: 1px solid blue !important; }
 
   /* ── PAGE SYSTEM ──────────────────────────────────── */
@@ -654,9 +653,17 @@
   /* Case action pair — Active + Closed side by side */
   .case-actions {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    min-width: 340px;
+    grid-template-columns: 1fr 1px 1fr;
+    gap: 0;
+    min-width: 360px;
+    align-items: start;
+  }
+
+  .case-action-divider {
+    width: 1px;
+    background: var(--gray-border);
+    align-self: stretch;
+    margin: 0 12px;
   }
 
   .case-action-group {
@@ -1400,7 +1407,10 @@
         <div class="recommended-name" id="recommended-name">Case Complexity Index (CCI)</div>
         <div class="recommended-desc" id="recommended-desc">Most attorneys begin the assessment with the Case Complexity Index. This instrument establishes the structural characteristics of the case and provides the analytical foundation for interpretation of the remaining instruments.</div>
       </div>
-      <button class="instrument-btn" id="recommended-btn" data-launch-instrument="CCI">Start Case Complexity Index</button>
+      <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
+        <button class="instrument-btn" id="recommended-btn-active" data-launch-instrument="CCI" data-launch-case="active">Start Active Assessment</button>
+        <button class="instrument-btn" id="recommended-btn-closed" data-launch-instrument="CCI" data-launch-case="closed">Start Retrospective Assessment</button>
+      </div>
     </div>
 
     <!-- DUAL CASE COUNTERS + PROGRESS -->
@@ -1702,7 +1712,8 @@ function renderRecommended() {
   const label  = document.getElementById('recommended-label');
   const nameEl = document.getElementById('recommended-name');
   const descEl = document.getElementById('recommended-desc');
-  const btn    = document.getElementById('recommended-btn');
+  const btnActive = document.getElementById('recommended-btn-active');
+  const btnClosed = document.getElementById('recommended-btn-closed');
 
   const next = getNextUnit();
   if (!next) {
@@ -1713,26 +1724,35 @@ function renderRecommended() {
 
   const [abbr, caseType] = next.split('_');
   const inst = state.instruments.find(i => i.abbr === abbr);
-  const caseLabel = caseType === 'active' ? 'Active Case' : 'Closed Case (Retrospective Analysis)';
-  const isFirst = next === 'CCI_active';
-  const isInProgress = progressState[next] === 'in-progress';
+  const isFirst      = next === 'CCI_active';
+  const activeStatus = progressState[`${abbr}_active`] || 'not-started';
+  const closedStatus = progressState[`${abbr}_closed`] || 'not-started';
 
-  label.textContent = isFirst ? 'Recommended Starting Point'
-    : isInProgress ? 'Currently In Progress'
-    : 'Next Recommended Step';
-
-  nameEl.textContent = `${inst.name} (${abbr}) — ${caseLabel}`;
-
+  label.textContent = isFirst ? 'Recommended Starting Point' : 'Next Recommended Step';
+  nameEl.textContent = `${inst.name} (${abbr})`;
   descEl.textContent = isFirst
     ? 'Most attorneys begin with the Case Complexity Index for the Active Case. This establishes the structural foundation for the remaining instruments.'
-    : isInProgress
-    ? 'This assessment unit is currently in progress. Return to it to complete this step.'
-    : 'This is the next recommended step in the assessment sequence.';
+    : 'Select which case to assess next, or run both in sequence.';
 
-  btn.textContent = isInProgress ? `Resume ${abbr}` : `Start ${abbr} — ${caseType === 'active' ? 'Active' : 'Closed'}`;
-  btn.setAttribute('data-launch-instrument', abbr);
-  btn.setAttribute('data-launch-case', caseType);
-  btn.removeAttribute('disabled');
+  // Active button
+  const activeComplete = instrumentState[`${abbr}_active`];
+  btnActive.textContent = activeComplete ? 'Active — Complete'
+    : activeStatus === 'in-progress' ? 'Resume Active Assessment'
+    : 'Start Active Assessment';
+  btnActive.setAttribute('data-launch-instrument', abbr);
+  btnActive.setAttribute('data-launch-case', 'active');
+  btnActive.disabled = !!activeComplete;
+  btnActive.className = activeComplete ? 'instrument-btn done' : 'instrument-btn';
+
+  // Retrospective button
+  const closedComplete = instrumentState[`${abbr}_closed`];
+  btnClosed.textContent = closedComplete ? 'Retrospective — Complete'
+    : closedStatus === 'in-progress' ? 'Resume Retrospective Assessment'
+    : 'Start Retrospective Assessment';
+  btnClosed.setAttribute('data-launch-instrument', abbr);
+  btnClosed.setAttribute('data-launch-case', 'closed');
+  btnClosed.disabled = !!closedComplete;
+  btnClosed.className = closedComplete ? 'instrument-btn done' : 'instrument-btn';
 }
 
 // Stub — callers preserved safely
@@ -1770,6 +1790,7 @@ function renderInstruments() {
       </div>
       <div class="case-actions">
         ${caseActionHTML(inst.abbr, 'active', activeSt)}
+        <div class="case-action-divider"></div>
         ${caseActionHTML(inst.abbr, 'closed', closedSt)}
       </div>
     `;
@@ -1778,13 +1799,13 @@ function renderInstruments() {
 }
 
 function caseActionHTML(abbr, caseType, status) {
-  const labelText = caseType === 'active' ? 'Active Case' : 'Closed (Retrospective)';
+  const labelText = caseType === 'active' ? 'Active Case' : 'Retrospective Assessment';
   const isComplete   = status === 'complete';
   const isInProgress = status === 'in-progress';
 
   const btnLabel = isComplete ? 'Complete'
-    : isInProgress ? `Resume ${caseType === 'active' ? 'Active' : 'Closed'}`
-    : `Start ${caseType === 'active' ? 'Active' : 'Closed'}`;
+    : isInProgress ? `Resume ${caseType === 'active' ? 'Active' : 'Retrospective'} Assessment`
+    : `${caseType === 'active' ? 'Active' : 'Retrospective'} Assessment`;
 
   const btnClass = isComplete ? 'instrument-btn done' : 'instrument-btn';
   const dataAttrs = isComplete ? 'disabled'
