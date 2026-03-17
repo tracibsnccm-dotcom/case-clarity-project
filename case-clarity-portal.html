@@ -1902,174 +1902,6 @@ document.addEventListener('keydown', (e) => {
    INSTRUMENT COMPLETION SYSTEM
 ============================ */
 
-const instrumentState = {
-  CCI: false,
-  CSA: false,
-  CAF: false,
-  HSI: false,
-  FCI: false,
-  RRF: false
-};
-
-function completeInstrument(instrumentKey) {
-  if (!instrumentState.hasOwnProperty(instrumentKey)) return;
-
-  instrumentState[instrumentKey] = true;
-
-  // Update state.instruments so existing renderInstruments() also stays in sync
-  const idx = state.instruments.findIndex(i => i.abbr === instrumentKey);
-  if (idx >= 0) state.instruments[idx].status = 'complete';
-
-  const row = document.querySelector(`[data-instrument="${instrumentKey}"]`);
-  if (row) {
-    row.classList.remove('in-progress', 'not-started');
-    row.classList.add('complete');
-
-    const status = row.querySelector('.instrument-status');
-    if (status) {
-      status.textContent = 'Complete';
-      status.classList.remove('in-progress', 'not-started');
-      status.classList.add('complete');
-    }
-
-    const button = row.querySelector('.instrument-btn');
-    if (button) {
-      button.textContent = 'Complete';
-      button.classList.add('done');
-      button.disabled = true;
-    }
-  }
-
-  updateProgress();
-  unlockReports();
-
-  // Keep existing render system in sync
-  renderRecommended();
-  renderNextStep();
-  renderProgress();
-}
-
-/* ============================
-   PROGRESS BAR UPDATE
-============================ */
-
-function updateProgress() {
-  const total    = Object.keys(instrumentState).length;
-  const complete = Object.values(instrumentState).filter(v => v === true).length;
-  const percent  = Math.round((complete / total) * 100);
-
-  const progressFill = document.querySelector('.progress-bar-fill');
-  if (progressFill) progressFill.style.width = percent + '%';
-
-  const progressCount = document.querySelector('.progress-count');
-  if (progressCount) progressCount.innerHTML = `${complete} <span>/ ${total}</span>`;
-
-  // Also update dual counters
-  const activeEl  = document.getElementById('counter-active');
-  const closedEl  = document.getElementById('counter-closed');
-  const reportsEl = document.getElementById('counter-reports');
-  if (activeEl)  activeEl.innerHTML  = `${complete} <span>/ 6</span>`;
-  if (closedEl)  closedEl.innerHTML  = `${complete} <span>/ 6</span>`;
-  if (reportsEl) reportsEl.innerHTML = `${complete * 2} <span>/ 12</span>`;
-
-  // Update progress note
-  const note = document.getElementById('progress-note');
-  if (note) {
-    if (complete === 0) {
-      note.textContent = 'Begin with the Case Complexity Index. Reports become available as each instrument is completed.';
-    } else if (complete === 6) {
-      note.textContent = 'Assessment complete. All 12 reports are now available.';
-      const msg = document.getElementById('completion-message');
-      if (msg) msg.classList.add('visible');
-    } else {
-      note.textContent = `${complete} of 6 instruments complete. Reports are being generated as you progress. ${6 - complete} remaining.`;
-    }
-  }
-}
-
-/* ============================
-   REPORT UNLOCK
-============================ */
-
-function unlockReports() {
-  const completed = Object.values(instrumentState).filter(v => v === true).length;
-  if (completed === 0) return;
-
-  const reportSection = document.getElementById('report-release-section');
-  if (reportSection) reportSection.classList.add('unlocked');
-
-  const title = document.getElementById('report-release-title');
-  if (title) {
-    title.textContent = completed === 6
-      ? 'Assessment Complete — All Reports Available'
-      : `Reports Available — ${completed} of 6 Instruments Complete`;
-  }
-
-  const text = document.getElementById('report-release-text');
-  if (text) {
-    text.innerHTML = completed === 6
-      ? 'Your 12 assessment reports are now available. Please download or print all reports before the assessment window expires.'
-      : `Reports become available as each instrument set is completed. ${completed * 2} report${completed * 2 > 1 ? 's are' : ' is'} currently available.`;
-  }
-
-  const grid = document.getElementById('report-download-grid');
-  if (grid) {
-    grid.style.display = 'grid';
-
-    // Build download items for completed instruments
-    const completedInsts = state.instruments.filter(i => i.status === 'complete');
-    grid.innerHTML = completedInsts.map(inst => `
-      <div class="report-download-item">
-        <div class="report-download-abbr">${inst.abbr}</div>
-        <div class="report-download-name">${inst.name} — Active Case</div>
-        <button class="report-download-btn">Download PDF</button>
-      </div>
-      <div class="report-download-item">
-        <div class="report-download-abbr">${inst.abbr}</div>
-        <div class="report-download-name">${inst.name} — Closed Case</div>
-        <button class="report-download-btn">Download PDF</button>
-      </div>
-    `).join('') + (completed === 6 ? `
-      <div class="report-download-item" style="grid-column:1/-1; border-top:2px solid var(--gold); margin-top:4px;">
-        <div class="report-download-abbr" style="font-size:11px; color:var(--gray-mid);">COMPARATIVE</div>
-        <div class="report-download-name" style="font-size:14px; font-weight:500;">Full Comparative Analysis — Active vs. Closed</div>
-        <button class="report-download-btn" style="width:fit-content;">Download PDF</button>
-      </div>
-    ` : '');
-
-    // Download All button
-    let dlAll = document.getElementById('download-all-btn');
-    if (!dlAll) {
-      dlAll = document.createElement('button');
-      dlAll.id = 'download-all-btn';
-      dlAll.className = 'btn-primary';
-      dlAll.style.cssText = 'margin-top:20px; padding:16px 40px; font-size:12px; letter-spacing:0.22em; display:block; width:100%; text-align:center;';
-      dlAll.onclick = () => alert('In production: downloads a ZIP of all currently available report PDFs.');
-      reportSection.appendChild(dlAll);
-    }
-    dlAll.textContent = completed === 6 ? 'Download Complete Assessment' : `Download Available Reports (${completed * 2})`;
-    dlAll.style.display = 'block';
-  }
-}
-
-/* ============================
-   TEST / MANUAL COMPLETION
-============================ */
-
-function markComplete(instrumentKey) {
-  completeInstrument(instrumentKey);
-}
-
-// Listen for postMessage from tool windows (production integration)
-window.addEventListener('message', (e) => {
-  if (e.data && e.data.type === 'INSTRUMENT_COMPLETE' && e.data.instrument) {
-    completeInstrument(e.data.instrument);
-  }
-});
-
-</script>
-
-<script>
 /* ============================
    INSTRUMENT COMPLETION SYSTEM
 ============================ */
@@ -2085,19 +1917,18 @@ const instrumentState = {
 
 function completeInstrument(instrumentKey) {
   if (!instrumentState.hasOwnProperty(instrumentKey)) return;
-
   instrumentState[instrumentKey] = true;
 
-  const row = document.querySelector('[data-instrument="' + instrumentKey + '"]');
+  // Update DOM row
+  const row = document.querySelector(`[data-instrument="${instrumentKey}"]`);
   if (row) {
-    row.classList.remove('in-progress');
+    row.classList.remove('in-progress', 'not-started');
     row.classList.add('complete');
 
     const status = row.querySelector('.instrument-status');
     if (status) {
       status.textContent = 'Complete';
-      status.classList.remove('in-progress', 'not-started');
-      status.classList.add('complete');
+      status.className = 'instrument-status complete';
     }
 
     const button = row.querySelector('.instrument-btn');
@@ -2105,11 +1936,18 @@ function completeInstrument(instrumentKey) {
       button.textContent = 'Complete';
       button.classList.add('done');
       button.disabled = true;
+      button.onclick = null;
     }
   }
 
+  // Also sync state.instruments for existing renderX functions
+  const idx = state.instruments.findIndex(i => i.abbr === instrumentKey);
+  if (idx >= 0) state.instruments[idx].status = 'complete';
+
   updateProgress();
   unlockReports();
+  renderRecommended();
+  renderNextStep();
 }
 
 /* ============================
@@ -2121,19 +1959,30 @@ function updateProgress() {
   const complete = Object.values(instrumentState).filter(v => v === true).length;
   const percent  = Math.round((complete / total) * 100);
 
-  const progressFill = document.querySelector('.progress-bar-fill');
-  if (progressFill) progressFill.style.width = percent + '%';
+  const fill = document.querySelector('.progress-bar-fill');
+  if (fill) fill.style.width = percent + '%';
 
-  const progressCount = document.querySelector('.progress-count');
-  if (progressCount) progressCount.innerHTML = complete + ' <span>/ ' + total + '</span>';
+  // Update dual counters
+  const activeEl  = document.getElementById('counter-active');
+  const closedEl  = document.getElementById('counter-closed');
+  const reportsEl = document.getElementById('counter-reports');
+  const reports   = complete === 6 ? 12 : complete * 2;
+  if (activeEl)  activeEl.innerHTML  = `${complete} <span>/ 6</span>`;
+  if (closedEl)  closedEl.innerHTML  = `${complete} <span>/ 6</span>`;
+  if (reportsEl) reportsEl.innerHTML = `${reports} <span>/ 12</span>`;
 
-  // Also update the dual case counters if present
-  const counterActive = document.getElementById('counter-active');
-  const counterClosed = document.getElementById('counter-closed');
-  const counterReports = document.getElementById('counter-reports');
-  if (counterActive)  counterActive.innerHTML  = complete + ' <span>/ 6</span>';
-  if (counterClosed)  counterClosed.innerHTML  = complete + ' <span>/ 6</span>';
-  if (counterReports) counterReports.innerHTML = (complete === 6 ? 12 : complete * 2) + ' <span>/ 12</span>';
+  const note = document.getElementById('progress-note');
+  if (note) {
+    if (complete === 6) {
+      note.textContent = 'Assessment complete. All 12 reports are now available.';
+      const msg = document.getElementById('completion-message');
+      if (msg) msg.classList.add('visible');
+    } else if (complete === 0) {
+      note.textContent = 'Begin with the Case Complexity Index. Reports become available as each instrument is completed.';
+    } else {
+      note.textContent = `${complete} of 6 instruments complete. ${6 - complete} remaining.`;
+    }
+  }
 }
 
 /* ============================
@@ -2141,23 +1990,84 @@ function updateProgress() {
 ============================ */
 
 function unlockReports() {
-  const completed = Object.values(instrumentState).filter(v => v === true).length;
-  if (completed === 0) return;
+  const complete = Object.values(instrumentState).filter(v => v === true).length;
+  if (complete === 0) return;
 
-  const reportSection = document.querySelector('.report-release');
-  if (reportSection) reportSection.classList.add('unlocked');
+  const section = document.getElementById('report-release-section');
+  if (section) section.classList.add('unlocked');
 
-  const buttons = document.querySelectorAll('.report-download-btn');
-  buttons.forEach(btn => { btn.style.display = 'inline-block'; });
+  const title = document.getElementById('report-release-title');
+  if (title) {
+    title.textContent = complete === 6
+      ? 'Assessment Complete — All Reports Available'
+      : `Reports Available — ${complete} of 6 Instruments Complete`;
+  }
+
+  const text = document.getElementById('report-release-text');
+  if (text) {
+    text.textContent = complete === 6
+      ? 'Your 12 assessment reports are now available. Please download or print all reports before the assessment window expires.'
+      : `Reports become available as each instrument set is completed. ${complete * 2} report${complete * 2 > 1 ? 's are' : ' is'} currently available.`;
+  }
+
+  // Show report grid with download buttons for completed instruments
+  const grid = document.getElementById('report-download-grid');
+  if (grid) {
+    grid.style.display = 'grid';
+    const completedAbbrs = Object.entries(instrumentState)
+      .filter(([k, v]) => v === true)
+      .map(([k]) => k);
+    const inst = state.instruments.filter(i => completedAbbrs.includes(i.abbr));
+    grid.innerHTML = inst.map(i => `
+      <div class="report-download-item">
+        <div class="report-download-abbr">${i.abbr}</div>
+        <div class="report-download-name">${i.name} — Active Case</div>
+        <button class="report-download-btn">Download PDF</button>
+      </div>
+      <div class="report-download-item">
+        <div class="report-download-abbr">${i.abbr}</div>
+        <div class="report-download-name">${i.name} — Closed Case</div>
+        <button class="report-download-btn">Download PDF</button>
+      </div>
+    `).join('') + (complete === 6 ? `
+      <div class="report-download-item" style="grid-column:1/-1; border-top:2px solid var(--gold); margin-top:4px;">
+        <div class="report-download-abbr" style="font-size:11px;color:var(--gray-mid);">COMPARATIVE</div>
+        <div class="report-download-name" style="font-size:14px;font-weight:500;">Full Comparative Analysis — Active vs. Closed</div>
+        <button class="report-download-btn" style="width:fit-content;">Download PDF</button>
+      </div>` : '');
+
+    // Download All button
+    let dlAll = document.getElementById('download-all-btn');
+    if (!dlAll) {
+      dlAll = document.createElement('button');
+      dlAll.id = 'download-all-btn';
+      dlAll.className = 'btn-primary';
+      dlAll.style.cssText = 'margin-top:20px;padding:16px 40px;font-size:12px;letter-spacing:0.22em;display:block;width:100%;text-align:center;';
+      dlAll.onclick = () => alert('In production: downloads ZIP of all available report PDFs.');
+      section.appendChild(dlAll);
+    }
+    dlAll.textContent = complete === 6
+      ? 'Download Complete Assessment'
+      : `Download Available Reports (${complete * 2})`;
+    dlAll.style.display = 'block';
+  }
 }
 
 /* ============================
-   TEST MODE — open console and type: markComplete('CCI')
+   TEST / MANUAL COMPLETION
 ============================ */
 
 function markComplete(instrumentKey) {
   completeInstrument(instrumentKey);
 }
+
+// Listen for postMessage from tool iframes/tabs
+window.addEventListener('message', (e) => {
+  if (e.data && e.data.type === 'instrumentComplete' && e.data.instrument) {
+    completeInstrument(e.data.instrument);
+  }
+});
+
 </script>
 </body>
 </html>
