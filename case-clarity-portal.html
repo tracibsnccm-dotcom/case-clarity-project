@@ -1658,7 +1658,7 @@ function renderDashboard() {
 // ══════════════════════════════════════════════════════
 function renderRecommended() {
   const panel = document.getElementById('recommended-panel');
-  if (state.instruments[0].status === 'complete') {
+  if (instrumentState['CCI'] === true) {
     panel.style.display = 'none';
   } else {
     panel.style.display = '';
@@ -1668,9 +1668,8 @@ function renderRecommended() {
 // ══════════════════════════════════════════════════════
 //  NEXT RECOMMENDED STEP PANEL
 //  Order: CCI → CSA → CAF → HSI → FCI → RRF
-//  - In-progress instrument = resume it first
-//  - Otherwise next not-started in sequence
-//  - All complete = show completion message only
+//  - first incomplete instrument in sequence
+//  - all complete = hide panel
 // ══════════════════════════════════════════════════════
 function renderNextStep() {
   const panel = document.getElementById('next-step-panel');
@@ -1685,21 +1684,17 @@ function renderNextStep() {
   }
   panel.style.display = '';
 
-  // Prioritise in-progress, then first not-started
-  let target = state.instruments.find(i => i.status === 'in-progress');
-  let targetIndex = target ? state.instruments.indexOf(target) : -1;
-  if (!target) {
-    targetIndex = state.instruments.findIndex(i => i.status !== 'complete');
-    target = state.instruments[targetIndex];
-  }
+  // First not-complete instrument in sequence
+  const targetIndex = state.instruments.findIndex(i => i.status !== 'complete');
+  const target = state.instruments[targetIndex];
 
-  const resuming = target.status === 'in-progress';
-  nameEl.textContent = `${resuming ? 'Continue with' : 'Continue with'}: ${target.name} (${target.abbr})`;
-  descEl.textContent = resuming
+  const inProgress = target.status === 'in-progress';
+  nameEl.textContent = `${inProgress ? 'Continue with' : 'Next Instrument'}: ${target.name} (${target.abbr})`;
+  descEl.textContent = inProgress
     ? 'This instrument is currently in progress. Resume to complete this step.'
     : 'This instrument is the next recommended step in the assessment sequence.';
-  btn.textContent = resuming ? 'Resume Assessment' : 'Start Assessment';
-  btn.onclick = () => runInstrument(targetIndex);
+  btn.textContent = inProgress ? 'Resume Assessment' : 'Start Assessment';
+  btn.onclick = () => launchInstrument(target.abbr);
 }
 
 // ══════════════════════════════════════════════════════
@@ -1719,7 +1714,9 @@ function renderInstruments() {
     const statusLabel = labelMap[inst.status] || 'Not Started';
 
     const btnHTML = inst.status === 'complete'
-      ? `<button class="instrument-btn done">Complete</button>`
+      ? `<button class="instrument-btn done" disabled>Complete</button>`
+      : inst.status === 'in-progress'
+      ? `<button class="instrument-btn" onclick="launchInstrument('${inst.abbr}')">Resume Assessment</button>`
       : `<button class="instrument-btn" onclick="launchInstrument('${inst.abbr}')">Start Assessment</button>`;
 
     row.innerHTML = `
