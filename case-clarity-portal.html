@@ -39,6 +39,10 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* ── DEBUG OUTLINES (temporary) ── */
+  #recommended-btn { outline: 1px solid red !important; }
+  .instrument-row button { outline: 1px solid blue !important; }
+
   /* ── PAGE SYSTEM ──────────────────────────────────── */
   .page { display: none; min-height: 100vh; }
   .page.active { display: block; }
@@ -1454,7 +1458,7 @@
         If you would like to review the assessment findings with a Registered Nurse Care Manager, you may request a consultation after completing the instruments.
       </p>
       traci@rcmspllc.com
-      traci@rcmspllc.com
+    </div>
 
     <!-- EXPIRATION NOTICE -->
     <div class="notice warning">
@@ -1911,6 +1915,11 @@ document.addEventListener('keydown', (e) => {
     handleLogin();
   }
 });
+
+// Capture-phase click debugger — logs the actual element receiving each click
+document.addEventListener('click', function(e) {
+  console.log('CLICK TARGET:', e.target);
+}, true);
 </script>
 
 <script>
