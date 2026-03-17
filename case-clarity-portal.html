@@ -808,6 +808,7 @@
     cursor: pointer;
     margin-top: 4px;
     transition: background 0.2s, color 0.2s;
+    display: none;
   }
 
   .report-download-btn:hover {
@@ -2066,6 +2067,97 @@ window.addEventListener('message', (e) => {
   }
 });
 
+</script>
+
+<script>
+/* ============================
+   INSTRUMENT COMPLETION SYSTEM
+============================ */
+
+const instrumentState = {
+  CCI: false,
+  CSA: false,
+  CAF: false,
+  HSI: false,
+  FCI: false,
+  RRF: false
+};
+
+function completeInstrument(instrumentKey) {
+  if (!instrumentState.hasOwnProperty(instrumentKey)) return;
+
+  instrumentState[instrumentKey] = true;
+
+  const row = document.querySelector('[data-instrument="' + instrumentKey + '"]');
+  if (row) {
+    row.classList.remove('in-progress');
+    row.classList.add('complete');
+
+    const status = row.querySelector('.instrument-status');
+    if (status) {
+      status.textContent = 'Complete';
+      status.classList.remove('in-progress', 'not-started');
+      status.classList.add('complete');
+    }
+
+    const button = row.querySelector('.instrument-btn');
+    if (button) {
+      button.textContent = 'Complete';
+      button.classList.add('done');
+      button.disabled = true;
+    }
+  }
+
+  updateProgress();
+  unlockReports();
+}
+
+/* ============================
+   PROGRESS BAR UPDATE
+============================ */
+
+function updateProgress() {
+  const total    = Object.keys(instrumentState).length;
+  const complete = Object.values(instrumentState).filter(v => v === true).length;
+  const percent  = Math.round((complete / total) * 100);
+
+  const progressFill = document.querySelector('.progress-bar-fill');
+  if (progressFill) progressFill.style.width = percent + '%';
+
+  const progressCount = document.querySelector('.progress-count');
+  if (progressCount) progressCount.innerHTML = complete + ' <span>/ ' + total + '</span>';
+
+  // Also update the dual case counters if present
+  const counterActive = document.getElementById('counter-active');
+  const counterClosed = document.getElementById('counter-closed');
+  const counterReports = document.getElementById('counter-reports');
+  if (counterActive)  counterActive.innerHTML  = complete + ' <span>/ 6</span>';
+  if (counterClosed)  counterClosed.innerHTML  = complete + ' <span>/ 6</span>';
+  if (counterReports) counterReports.innerHTML = (complete === 6 ? 12 : complete * 2) + ' <span>/ 12</span>';
+}
+
+/* ============================
+   REPORT UNLOCK
+============================ */
+
+function unlockReports() {
+  const completed = Object.values(instrumentState).filter(v => v === true).length;
+  if (completed === 0) return;
+
+  const reportSection = document.querySelector('.report-release');
+  if (reportSection) reportSection.classList.add('unlocked');
+
+  const buttons = document.querySelectorAll('.report-download-btn');
+  buttons.forEach(btn => { btn.style.display = 'inline-block'; });
+}
+
+/* ============================
+   TEST MODE — open console and type: markComplete('CCI')
+============================ */
+
+function markComplete(instrumentKey) {
+  completeInstrument(instrumentKey);
+}
 </script>
 </body>
 </html>
