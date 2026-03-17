@@ -1269,7 +1269,7 @@
 
       <!-- CLOSED CASE -->
       <div class="case-panel">
-        <div class="case-panel-label">Closed Case</div>
+        <div class="case-panel-label">Closed Case (Retrospective Analysis)</div>
 
         <div class="form-group">
           <label class="form-label">Case Name or Internal Reference</label>
@@ -1350,7 +1350,7 @@
         <button class="case-summary-edit" onclick="goToPage('case-entry')">Edit Case Information</button>
       </div>
       <div class="case-summary-panel">
-        <div class="case-summary-label">Closed Case</div>
+        <div class="case-summary-label">Closed Case (Retrospective Analysis)</div>
         <div class="case-summary-name" id="dash-closed-name">—</div>
         <div class="case-summary-detail" id="dash-closed-detail">—</div>
         <button class="case-summary-edit" onclick="goToPage('case-entry')">Edit Case Information</button>
@@ -1384,7 +1384,7 @@
       </div>
       <div class="counter-cell">
         <div class="counter-value" id="counter-closed">0 <span>/ 6</span></div>
-        <div class="counter-label" style="font-size:9px; line-height:1.4;">Closed Case<br>Instruments Completed</div>
+        <div class="counter-label" style="font-size:9px; line-height:1.4;">Closed Case<br>(Retrospective)<br>Instruments Completed</div>
       </div>
       <div class="counter-cell">
         <div class="counter-value" id="counter-reports">0 <span>/ 12</span></div>
@@ -1830,7 +1830,7 @@ function renderReportSection() {
     </div>
     <div class="report-download-item">
       <div class="report-download-abbr">${inst.abbr}</div>
-      <div class="report-download-name">${inst.name} — Closed Case</div>
+      <div class="report-download-name">${inst.name} — Closed Case (Retrospective Analysis)</div>
       <button class="report-download-btn">Download PDF</button>
     </div>
   `).join('') + (allDone ? `
@@ -2051,7 +2051,7 @@ function unlockReports() {
       </div>
       <div class="report-download-item">
         <div class="report-download-abbr">${i.abbr}</div>
-        <div class="report-download-name">${i.name} — Closed Case</div>
+        <div class="report-download-name">${i.name} — Closed Case (Retrospective Analysis)</div>
         <button class="report-download-btn">Download PDF</button>
       </div>
     `).join('') + (complete === 6 ? `
