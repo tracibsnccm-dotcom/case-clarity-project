@@ -1941,6 +1941,11 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// Refresh dashboard when user returns from an instrument tab
+window.addEventListener('focus', () => {
+  renderDashboard();
+});
+
 // ══════════════════════════════════════════════════════
 //  DELEGATED CLICK — sole launch path
 // ══════════════════════════════════════════════════════
