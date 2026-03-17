@@ -1871,8 +1871,8 @@ function renderReportSection() {
     title.textContent = 'Reports — No Units Completed';
     text.innerHTML    = 'Reports unlock individually as each case-specific assessment unit is completed. Begin with the Case Complexity Index — Active Case.';
     grid.style.display = 'none';
-    const dlAll = document.getElementById('download-all-btn');
-    if (dlAll) dlAll.style.display = 'none';
+    const dlWrapHide = document.getElementById('download-bulk-wrap');
+    if (dlWrapHide) dlWrapHide.style.display = 'none';
     return;
   }
 
@@ -1912,17 +1912,32 @@ function renderReportSection() {
 
   grid.innerHTML = rows + comparativeRow;
 
-  let dlAll = document.getElementById('download-all-btn');
-  if (!dlAll) {
-    dlAll = document.createElement('button');
-    dlAll.id        = 'download-all-btn';
-    dlAll.className = 'btn-primary';
-    dlAll.style.cssText = 'margin-top:20px; padding:16px 40px; font-size:12px; letter-spacing:0.22em; display:block; width:100%; text-align:center;';
-    dlAll.onclick   = () => alert('In production: downloads a ZIP of all currently available report PDFs.');
-    section.appendChild(dlAll);
+  // Two gated bulk download buttons — each enabled only at 6/6 for that side
+  const activeCount  = ABBRS.filter(a => instrumentState[`${a}_active`]).length;
+  const closedCount  = ABBRS.filter(a => instrumentState[`${a}_closed`]).length;
+
+  let dlWrap = document.getElementById('download-bulk-wrap');
+  if (!dlWrap) {
+    dlWrap = document.createElement('div');
+    dlWrap.id = 'download-bulk-wrap';
+    dlWrap.style.cssText = 'margin-top:20px; display:flex; gap:12px; flex-wrap:wrap;';
+    section.appendChild(dlWrap);
   }
-  dlAll.textContent  = allDone ? 'Download Complete Assessment' : `Download Available Reports (${totalComplete})`;
-  dlAll.style.display = 'block';
+
+  dlWrap.innerHTML = `
+    <button id="dl-active-btn"
+      style="flex:1; padding:14px 24px; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; font-family:var(--font-ui); font-weight:600; cursor:${activeCount===6?'pointer':'not-allowed'}; background:${activeCount===6?'var(--gold)':'var(--gray-border)'}; color:${activeCount===6?'var(--white)':'var(--gray-light)'}; border:none;"
+      ${activeCount===6?'':'disabled'}
+      onclick="alert('In production: downloads ZIP of Active Case reports.')">
+      Download Active Case Reports ${activeCount===6?'':'('+activeCount+'/6 complete)'}
+    </button>
+    <button id="dl-closed-btn"
+      style="flex:1; padding:14px 24px; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; font-family:var(--font-ui); font-weight:600; cursor:${closedCount===6?'pointer':'not-allowed'}; background:${closedCount===6?'var(--gold)':'var(--gray-border)'}; color:${closedCount===6?'var(--white)':'var(--gray-light)'}; border:none;"
+      ${closedCount===6?'':'disabled'}
+      onclick="alert('In production: downloads ZIP of Retrospective Assessment reports.')">
+      Download Retrospective Reports ${closedCount===6?'':'('+closedCount+'/6 complete)'}
+    </button>
+  `;
 }
 
 // ══════════════════════════════════════════════════════
