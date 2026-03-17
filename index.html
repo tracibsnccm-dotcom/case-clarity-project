@@ -641,16 +641,44 @@
     padding: 20px 24px;
     margin-bottom: 2px;
     display: grid;
-    grid-template-columns: 56px 1fr auto auto;
+    grid-template-columns: 56px 1fr auto;
     gap: 16px;
-    align-items: center;
+    align-items: start;
     transition: border-left-color 0.2s;
   }
 
   .instrument-row:hover { border-left-color: var(--gold); }
-
+  .instrument-row.partial  { border-left-color: var(--gold); }
   .instrument-row.complete { border-left-color: var(--green); }
-  .instrument-row.in-progress { border-left-color: var(--gold); }
+
+  /* Case action pair — Active + Closed side by side */
+  .case-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    min-width: 340px;
+  }
+
+  .case-action-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+  }
+
+  .case-action-label {
+    font-family: var(--font-ui);
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gray-mid);
+    white-space: nowrap;
+  }
+
+  .case-action-label.closed-label {
+    color: var(--gray-mid);
+  }
 
   .instrument-abbr {
     font-family: var(--font-ui);
@@ -1073,6 +1101,7 @@
     .instrument-row { grid-template-columns: 40px 1fr; grid-template-rows: auto auto; }
     .instrument-status { grid-column: 2; }
     .instrument-btn { grid-column: 1 / -1; }
+    .case-actions { grid-column: 1 / -1; grid-template-columns: 1fr; min-width: unset; }
     .report-download-grid { grid-template-columns: 1fr 1fr; }
     .timer-badge { display: none; }
   }
@@ -1374,8 +1403,6 @@
       <button class="instrument-btn" id="recommended-btn" data-launch-instrument="CCI">Start Case Complexity Index</button>
     </div>
 
-    <div id="debug-banner" style="font-family:monospace; font-size:11px; color:#333; background:#fffbe6; border:1px solid #e0c040; padding:4px 10px; margin-bottom:6px;">DEBUG MODE ACTIVE — launch binding test</div>
-
     <!-- DUAL CASE COUNTERS + PROGRESS -->
     <div class="counter-row" style="margin-bottom:4px;">
       <div class="counter-cell">
@@ -1398,12 +1425,12 @@
         <div class="progress-bar-track">
           <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
         </div>
-        <div class="progress-note" id="progress-note">Complete all six instruments to release reports.</div>
-        <div style="font-family:var(--font-body); font-size:13px; font-style:italic; color:var(--gray-light); margin-top:4px;">Your progress is saved automatically as you complete each instrument.</div>
+        <div class="progress-note" id="progress-note">Complete all 12 assessment units to release reports.</div>
+        <div style="font-family:var(--font-body); font-size:13px; font-style:italic; color:var(--gray-light); margin-top:4px;">Your progress is saved automatically as you complete each assessment unit.</div>
         <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--gray-border); display:flex; flex-wrap:wrap; gap:20px;">
-          <div style="font-family:var(--font-ui); font-size:10px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:var(--gray-dark);">6 Instruments Required</div>
-          <div style="font-family:var(--font-ui); font-size:10px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:var(--gray-dark);">Up to 12 Reports Generated</div>
-          <div style="font-family:var(--font-body); font-size:14px; font-style:italic; color:var(--gray-light); width:100%;">Reports become available as each instrument set is completed. Completing all six instruments for a case releases the full report set for that case.</div>
+          <div style="font-family:var(--font-ui); font-size:10px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:var(--gray-dark);">6 Instruments × 2 Cases = 12 Units</div>
+          <div style="font-family:var(--font-ui); font-size:10px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:var(--gray-dark);">12 Reports Generated</div>
+          <div style="font-family:var(--font-body); font-size:14px; font-style:italic; color:var(--gray-light); width:100%;">Each instrument must be completed separately for the Active Case and the Closed Case (Retrospective Analysis). Reports unlock per completion.</div>
         </div>
       </div>
     </div>
@@ -1520,12 +1547,12 @@ const state = {
   closedName: '',
   closedType: '',
   instruments: [
-    { abbr: 'CCI', name: 'Case Complexity Index',          desc: 'Evaluates injury severity, life disruption, and care coordination demands throughout the case lifecycle.', status: 'not-started' },
-    { abbr: 'CSA', name: 'Clinical Sequencing Auditor',    desc: 'Assesses alignment with the 7 Rights of Injury Care Management and treatment pathway defensibility.',       status: 'not-started' },
-    { abbr: 'CAF', name: 'C.A.R.E. Access Friction Score', desc: 'Identifies insurance, referral, and provider access barriers that may delay appropriate care.',             status: 'not-started' },
-    { abbr: 'HSI', name: 'Holistic Stability Index',       desc: 'Evaluates stability across the 4Ps of Wellness and social determinants of health.',                        status: 'not-started' },
-    { abbr: 'FCI', name: 'Functional Capacity Index',      desc: 'Assesses capacity to return to work and maintain independence following injury.',                           status: 'not-started' },
-    { abbr: 'RRF', name: 'Recovery Risk Forecaster',       desc: 'Identifies psychological, behavioral, and situational factors affecting recovery trajectory.',              status: 'not-started' },
+    { abbr: 'CCI', name: 'Case Complexity Index',          desc: 'Evaluates injury severity, life disruption, and care coordination demands throughout the case lifecycle.' },
+    { abbr: 'CSA', name: 'Clinical Sequencing Auditor',    desc: 'Assesses alignment with the 7 Rights of Injury Care Management and treatment pathway defensibility.' },
+    { abbr: 'CAF', name: 'C.A.R.E. Access Friction Score', desc: 'Identifies insurance, referral, and provider access barriers that may delay appropriate care.' },
+    { abbr: 'HSI', name: 'Holistic Stability Index',       desc: 'Evaluates stability across the 4Ps of Wellness and social determinants of health.' },
+    { abbr: 'FCI', name: 'Functional Capacity Index',      desc: 'Assesses capacity to return to work and maintain independence following injury.' },
+    { abbr: 'RRF', name: 'Recovery Risk Forecaster',       desc: 'Identifies psychological, behavioral, and situational factors affecting recovery trajectory.' },
   ]
 };
 
@@ -1659,77 +1686,81 @@ function renderDashboard() {
 //  - Hides when all are complete
 //  - Button always calls launchInstrument() — never runInstrument()
 // ══════════════════════════════════════════════════════
-function renderRecommended() {
-  const panel   = document.getElementById('recommended-panel');
-  const label   = document.getElementById('recommended-label');
-  const nameEl  = document.getElementById('recommended-name');
-  const descEl  = document.getElementById('recommended-desc');
-  const btn     = document.getElementById('recommended-btn');
+// ══════════════════════════════════════════════════════
+//  RECOMMENDATION SEQUENCE (12 units: Active first, then Closed per instrument)
+//  CCI_active → CCI_closed → CSA_active → CSA_closed → … → RRF_closed
+// ══════════════════════════════════════════════════════
+const ABBRS = ['CCI','CSA','CAF','HSI','FCI','RRF'];
+const CASE_SEQUENCE = ABBRS.flatMap(a => [`${a}_active`, `${a}_closed`]);
 
-  // Hide if all 6 complete
-  const allComplete = state.instruments.every(i => i.status === 'complete');
-  if (allComplete) {
+function getNextUnit() {
+  return CASE_SEQUENCE.find(key => !instrumentState[key]) || null;
+}
+
+function renderRecommended() {
+  const panel  = document.getElementById('recommended-panel');
+  const label  = document.getElementById('recommended-label');
+  const nameEl = document.getElementById('recommended-name');
+  const descEl = document.getElementById('recommended-desc');
+  const btn    = document.getElementById('recommended-btn');
+
+  const next = getNextUnit();
+  if (!next) {
     panel.style.display = 'none';
     return;
   }
   panel.style.display = '';
 
-  // Find first incomplete instrument in sequence
-  const target = state.instruments.find(i => i.status !== 'complete');
-  if (!target) { panel.style.display = 'none'; return; }
+  const [abbr, caseType] = next.split('_');
+  const inst = state.instruments.find(i => i.abbr === abbr);
+  const caseLabel = caseType === 'active' ? 'Active Case' : 'Closed Case (Retrospective Analysis)';
+  const isFirst = next === 'CCI_active';
+  const isInProgress = progressState[next] === 'in-progress';
 
-  const inProgress = target.status === 'in-progress';
-  const isFirst    = target.abbr === 'CCI' && !inProgress;
-
-  label.textContent = isFirst
-    ? 'Recommended Starting Point'
-    : inProgress
-    ? 'Currently In Progress'
+  label.textContent = isFirst ? 'Recommended Starting Point'
+    : isInProgress ? 'Currently In Progress'
     : 'Next Recommended Step';
 
-  nameEl.textContent = `${target.name} (${target.abbr})`;
+  nameEl.textContent = `${inst.name} (${abbr}) — ${caseLabel}`;
 
   descEl.textContent = isFirst
-    ? 'Most attorneys begin the assessment with the Case Complexity Index. This instrument establishes the structural characteristics of the case and provides the analytical foundation for interpretation of the remaining instruments.'
-    : inProgress
-    ? 'This instrument is currently in progress. Return to it to complete this step.'
-    : 'This instrument is the next recommended step in the assessment sequence.';
+    ? 'Most attorneys begin with the Case Complexity Index for the Active Case. This establishes the structural foundation for the remaining instruments.'
+    : isInProgress
+    ? 'This assessment unit is currently in progress. Return to it to complete this step.'
+    : 'This is the next recommended step in the assessment sequence.';
 
-  btn.textContent = inProgress ? 'Resume Assessment' : `Start ${target.abbr}`;
-  btn.setAttribute('data-launch-instrument', target.abbr);
+  btn.textContent = isInProgress ? `Resume ${abbr}` : `Start ${abbr} — ${caseType === 'active' ? 'Active' : 'Closed'}`;
+  btn.setAttribute('data-launch-instrument', abbr);
+  btn.setAttribute('data-launch-case', caseType);
   btn.removeAttribute('disabled');
-  console.log('RECOMMENDED BUTTON data-launch-instrument SET TO:', target.abbr);
 }
 
-// Stub — next-step panel removed; all callers preserved safely
+// Stub — callers preserved safely
 function renderNextStep() {}
 
 // ══════════════════════════════════════════════════════
-//  INSTRUMENTS LIST
+//  INSTRUMENTS LIST — dual-case rows
 // ══════════════════════════════════════════════════════
 function renderInstruments() {
   const list = document.getElementById('instruments-list');
   list.innerHTML = '';
-  state.instruments.forEach((inst, i) => {
+
+  state.instruments.forEach((inst) => {
+    const activeKey = `${inst.abbr}_active`;
+    const closedKey = `${inst.abbr}_closed`;
+    const activeSt  = progressState[activeKey]  || 'not-started';
+    const closedSt  = progressState[closedKey]  || 'not-started';
+
+    // Row border: green if both complete, gold if either in-progress/partial, none otherwise
+    const bothComplete = instrumentState[activeKey] && instrumentState[closedKey];
+    const anyActive    = activeSt !== 'not-started' || closedSt !== 'not-started';
+    const rowClass = bothComplete ? 'instrument-row complete'
+      : anyActive ? 'instrument-row partial'
+      : 'instrument-row';
+
     const row = document.createElement('div');
-    const statusClass = inst.status === 'complete' ? 'complete' : inst.status === 'in-progress' ? 'in-progress' : '';
-    row.className = 'instrument-row ' + statusClass;
-    row.id = 'inst-row-' + i;
+    row.className = rowClass;
     row.setAttribute('data-instrument', inst.abbr);
-
-    const labelMap = { 'not-started': 'Not Started', 'in-progress': 'In Progress', 'complete': 'Complete' };
-    const statusLabel = labelMap[inst.status] || 'Not Started';
-
-    const btnLabel = inst.status === 'complete'
-      ? 'Complete'
-      : inst.status === 'in-progress'
-      ? 'Resume Assessment'
-      : 'Start Assessment';
-
-    const isLaunchable = inst.status !== 'complete';
-    const btnClass = inst.status === 'complete' ? 'instrument-btn done' : 'instrument-btn';
-    const dataAttr = isLaunchable ? `data-launch-instrument="${inst.abbr}"` : '';
-    const disabledAttr = isLaunchable ? '' : 'disabled';
 
     row.innerHTML = `
       <div class="instrument-abbr">${inst.abbr}</div>
@@ -1737,127 +1768,146 @@ function renderInstruments() {
         <div class="instrument-name">${inst.name}</div>
         <div class="instrument-desc">${inst.desc}</div>
       </div>
-      <div class="instrument-status ${inst.status}">${statusLabel}</div>
-      <button class="${btnClass}" ${dataAttr} ${disabledAttr}>${btnLabel}</button>
+      <div class="case-actions">
+        ${caseActionHTML(inst.abbr, 'active', activeSt)}
+        ${caseActionHTML(inst.abbr, 'closed', closedSt)}
+      </div>
     `;
-
     list.appendChild(row);
   });
 }
 
+function caseActionHTML(abbr, caseType, status) {
+  const labelText = caseType === 'active' ? 'Active Case' : 'Closed (Retrospective)';
+  const isComplete   = status === 'complete';
+  const isInProgress = status === 'in-progress';
+
+  const btnLabel = isComplete ? 'Complete'
+    : isInProgress ? `Resume ${caseType === 'active' ? 'Active' : 'Closed'}`
+    : `Start ${caseType === 'active' ? 'Active' : 'Closed'}`;
+
+  const btnClass = isComplete ? 'instrument-btn done' : 'instrument-btn';
+  const dataAttrs = isComplete ? 'disabled'
+    : `data-launch-instrument="${abbr}" data-launch-case="${caseType}"`;
+
+  return `
+    <div class="case-action-group">
+      <div class="case-action-label ${caseType === 'closed' ? 'closed-label' : ''}">${labelText}</div>
+      <div class="instrument-status ${status}">${status === 'not-started' ? 'Not Started' : status === 'in-progress' ? 'In Progress' : 'Complete'}</div>
+      <button class="${btnClass}" ${dataAttrs}>${btnLabel}</button>
+    </div>
+  `;
+}
+
 // ══════════════════════════════════════════════════════
-//  PROGRESS  — instruments + reports counters
-// Report logic: each completed instrument generates 3 reports
-// (Active, Closed, Comparative) = 2 per case + 1 comparative
-// Total possible = 12
+//  PROGRESS — 12 units (6 Active + 6 Closed)
 // ══════════════════════════════════════════════════════
 function renderProgress() {
-  const completed = state.instruments.filter(i => i.status === 'complete').length;
-  const reports   = completed * 2;
-  const totalReports = completed === 6 ? 12 : reports;
-  const pct = Math.round((completed / 6) * 100);
+  const activeComplete = ABBRS.filter(a => instrumentState[`${a}_active`]).length;
+  const closedComplete = ABBRS.filter(a => instrumentState[`${a}_closed`]).length;
+  const totalComplete  = activeComplete + closedComplete;
+  const pct = Math.round((totalComplete / 12) * 100);
 
-  // Dual case counters — in this prototype both cases use same instrument set
-  // In production these would track active vs closed separately
   const activeEl  = document.getElementById('counter-active');
   const closedEl  = document.getElementById('counter-closed');
   const reportsEl = document.getElementById('counter-reports');
-  if (activeEl)  activeEl.innerHTML  = `${completed} <span>/ 6</span>`;
-  if (closedEl)  closedEl.innerHTML  = `${completed} <span>/ 6</span>`;
-  if (reportsEl) reportsEl.innerHTML = `${totalReports} <span>/ 12</span>`;
+  if (activeEl)  activeEl.innerHTML  = `${activeComplete} <span>/ 6</span>`;
+  if (closedEl)  closedEl.innerHTML  = `${closedComplete} <span>/ 6</span>`;
+  if (reportsEl) reportsEl.innerHTML = `${totalComplete} <span>/ 12</span>`;
 
   document.getElementById('progress-fill').style.width = pct + '%';
 
   const note = document.getElementById('progress-note');
-  if (completed === 6) {
-    note.textContent = 'Assessment complete. All 12 reports are now available.';
-    document.getElementById('completion-message').classList.add('visible');
-  } else if (completed === 0) {
-    note.textContent = 'Begin with the Case Complexity Index. Reports become available as each instrument is completed.';
-    document.getElementById('completion-message').classList.remove('visible');
-  } else {
-    note.textContent = `${completed} of 6 instruments complete. Reports are being generated as you progress. ${6 - completed} remaining.`;
-    document.getElementById('completion-message').classList.remove('visible');
+  if (note) {
+    if (totalComplete === 12) {
+      note.textContent = 'Assessment complete. All 12 reports are now available.';
+      const msg = document.getElementById('completion-message');
+      if (msg) msg.classList.add('visible');
+    } else if (totalComplete === 0) {
+      note.textContent = 'Begin with the Case Complexity Index — Active Case. Reports unlock as each unit is completed.';
+      const msg = document.getElementById('completion-message');
+      if (msg) msg.classList.remove('visible');
+    } else {
+      note.textContent = `${totalComplete} of 12 units complete. ${12 - totalComplete} remaining.`;
+      const msg = document.getElementById('completion-message');
+      if (msg) msg.classList.remove('visible');
+    }
   }
 }
 
 // ══════════════════════════════════════════════════════
-//  REPORT SECTION — progressive unlock
-//  Each completed instrument releases:
-//    - Active Case Report
-//    - Closed Case Report
-//  All 6 complete also releases:
-//    - Full Comparative Analysis (1 report)
-//  Total possible = 13 items but we display as 12 by
-//  counting comparative as part of the set
+//  REPORT SECTION — unlocks per case-specific completion
 // ══════════════════════════════════════════════════════
 function renderReportSection() {
-  const completed = state.instruments.filter(i => i.status === 'complete').length;
-  const section   = document.getElementById('report-release-section');
-  const title     = document.getElementById('report-release-title');
-  const text      = document.getElementById('report-release-text');
-  const grid      = document.getElementById('report-download-grid');
+  const totalComplete = CASE_SEQUENCE.filter(k => instrumentState[k]).length;
+  const section = document.getElementById('report-release-section');
+  const title   = document.getElementById('report-release-title');
+  const text    = document.getElementById('report-release-text');
+  const grid    = document.getElementById('report-download-grid');
 
-  if (completed === 0) {
+  if (totalComplete === 0) {
     section.classList.remove('unlocked');
-    title.textContent = 'Reports — No Instruments Completed';
-    text.innerHTML    = 'Reports become available as each instrument set is completed. Begin with the Case Complexity Index to generate your first reports.';
+    title.textContent = 'Reports — No Units Completed';
+    text.innerHTML    = 'Reports unlock individually as each case-specific assessment unit is completed. Begin with the Case Complexity Index — Active Case.';
     grid.style.display = 'none';
     const dlAll = document.getElementById('download-all-btn');
     if (dlAll) dlAll.style.display = 'none';
     return;
   }
 
-  // Partial or full unlock
   section.classList.add('unlocked');
-  const allDone = completed === 6;
+  const allDone = totalComplete === 12;
 
-  if (allDone) {
-    title.textContent = 'Assessment Complete — All Reports Available';
-    text.innerHTML    = 'Your 12 assessment reports are now available. Please download or print all reports before the assessment window expires. Once the window closes, reports cannot be retrieved.';
-  } else {
-    title.textContent = `Reports Available — ${completed} of 6 Instruments Complete`;
-    text.innerHTML    = `Reports become available as each instrument set is completed. ${completed * 2} report${completed * 2 > 1 ? 's are' : ' is'} currently available. Please download or print all available reports before the assessment window expires.`;
-  }
+  title.textContent = allDone
+    ? 'Assessment Complete — All 12 Reports Available'
+    : `Reports Available — ${totalComplete} of 12 Units Complete`;
 
+  text.innerHTML = allDone
+    ? 'All 12 assessment reports are now available. Please download or print all reports before the assessment window expires.'
+    : `${totalComplete} report${totalComplete > 1 ? 's are' : ' is'} currently available. Reports unlock as each case-specific assessment unit is completed.`;
+
+  // Build report rows — one per completed case unit
   grid.style.display = 'grid';
-  const completedInstruments = state.instruments.filter(i => i.status === 'complete');
-  grid.innerHTML = completedInstruments.map(inst => `
-    <div class="report-download-item">
-      <div class="report-download-abbr">${inst.abbr}</div>
-      <div class="report-download-name">${inst.name} — Active Case</div>
-      <button class="report-download-btn">Download PDF</button>
-    </div>
-    <div class="report-download-item">
-      <div class="report-download-abbr">${inst.abbr}</div>
-      <div class="report-download-name">${inst.name} — Closed Case (Retrospective Analysis)</div>
-      <button class="report-download-btn">Download PDF</button>
-    </div>
-  `).join('') + (allDone ? `
+  const rows = CASE_SEQUENCE
+    .filter(k => instrumentState[k])
+    .map(k => {
+      const [abbr, caseType] = k.split('_');
+      const inst = state.instruments.find(i => i.abbr === abbr);
+      const caseLabel = caseType === 'active' ? 'Active Case' : 'Closed Case (Retrospective Analysis)';
+      return `
+        <div class="report-download-item">
+          <div class="report-download-abbr">${abbr}</div>
+          <div class="report-download-name">${inst.name} — ${caseLabel}</div>
+          <button class="report-download-btn">Download PDF</button>
+        </div>`;
+    }).join('');
+
+  const comparativeRow = allDone ? `
     <div class="report-download-item" style="grid-column:1/-1; border-top:2px solid var(--gold); margin-top:4px;">
       <div class="report-download-abbr" style="font-size:11px; color:var(--gray-mid);">COMPARATIVE</div>
       <div class="report-download-name" style="font-size:14px; font-weight:500;">Full Comparative Analysis — Active vs. Closed</div>
       <button class="report-download-btn" style="width:fit-content;">Download PDF</button>
-    </div>
-  ` : '');
+    </div>` : '';
 
-  // Download All button
+  grid.innerHTML = rows + comparativeRow;
+
   let dlAll = document.getElementById('download-all-btn');
   if (!dlAll) {
     dlAll = document.createElement('button');
-    dlAll.id = 'download-all-btn';
+    dlAll.id        = 'download-all-btn';
     dlAll.className = 'btn-primary';
     dlAll.style.cssText = 'margin-top:20px; padding:16px 40px; font-size:12px; letter-spacing:0.22em; display:block; width:100%; text-align:center;';
-    dlAll.onclick = () => alert('In production: downloads a ZIP of all currently available report PDFs.');
+    dlAll.onclick   = () => alert('In production: downloads a ZIP of all currently available report PDFs.');
     section.appendChild(dlAll);
   }
-  dlAll.textContent = allDone ? 'Download Complete Assessment' : `Download Available Reports (${completed * 2})`;
+  dlAll.textContent  = allDone ? 'Download Complete Assessment' : `Download Available Reports (${totalComplete})`;
   dlAll.style.display = 'block';
 }
 
-function launchInstrument(instrumentKey) {
-  console.log('LAUNCH FUNCTION ENTERED:', instrumentKey);
-  alert('LAUNCH FUNCTION ENTERED: ' + instrumentKey);
+// ══════════════════════════════════════════════════════
+//  LAUNCH INSTRUMENT — accepts key + caseType
+// ══════════════════════════════════════════════════════
+function launchInstrument(instrumentKey, caseType) {
   const toolUrls = {
     CCI: "https://case-complexity-index.vercel.app",
     CSA: "https://clinical-sequencing-auditor.vercel.app",
@@ -1867,41 +1917,22 @@ function launchInstrument(instrumentKey) {
     RRF: "https://recovery-risk-forecaster.vercel.app"
   };
 
-  const url = toolUrls[instrumentKey];
-  if (!url) { console.error("Tool URL not defined:", instrumentKey); return; }
+  const baseUrl = toolUrls[instrumentKey];
+  if (!baseUrl) { console.error('Tool URL not defined:', instrumentKey); return; }
 
-  // Mark row as in-progress in state
-  const idx = state.instruments.findIndex(i => i.abbr === instrumentKey);
-  if (idx >= 0 && state.instruments[idx].status === 'not-started') {
-    state.instruments[idx].status = 'in-progress';
-    console.log('ROW UPDATED TO IN PROGRESS:', instrumentKey);
+  const stateKey = `${instrumentKey}_${caseType}`;
+
+  // Mark as in-progress if not yet started
+  if (!instrumentState[stateKey] && progressState[stateKey] !== 'in-progress') {
+    progressState[stateKey] = 'in-progress';
     renderRecommended();
-    renderNextStep();
     renderInstruments();
     renderProgress();
-    renderReportSection();
   }
 
-  console.log('ABOUT TO OPEN TOOL URL:', url);
-  window.open(url, "_blank");
-}
-
-function runInstrument(index) {
-  const inst = state.instruments[index];
-  if (inst.status === 'not-started')      inst.status = 'in-progress';
-  else if (inst.status === 'in-progress') inst.status = 'complete';
-
-  renderRecommended();
-  renderNextStep();
-  renderInstruments();
-  renderProgress();
-  renderReportSection();
-}
-
-function runNextInstrument() {
-  const target = state.instruments.find(i => i.status === 'in-progress')
-              || state.instruments.find(i => i.status !== 'complete');
-  if (target) runInstrument(state.instruments.indexOf(target));
+  const url = `${baseUrl}?caseType=${caseType}&instrument=${instrumentKey}`;
+  console.log('Launching:', url);
+  window.open(url, '_blank');
 }
 
 document.addEventListener('keydown', (e) => {
@@ -1910,187 +1941,78 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// Delegated click handler — sole launch path for all instrument buttons
+// ══════════════════════════════════════════════════════
+//  DELEGATED CLICK — sole launch path
+// ══════════════════════════════════════════════════════
 document.addEventListener('click', function(e) {
   const btn = e.target.closest('[data-launch-instrument]');
   if (!btn) return;
   e.preventDefault();
   const instrumentKey = btn.getAttribute('data-launch-instrument');
-  console.log('DELEGATED LAUNCH CLICK:', instrumentKey, btn);
-  alert('DELEGATED LAUNCH CLICK: ' + instrumentKey);
-  launchInstrument(instrumentKey);
+  const caseType      = btn.getAttribute('data-launch-case') || 'active';
+  console.log('DELEGATED LAUNCH:', instrumentKey, caseType);
+  launchInstrument(instrumentKey, caseType);
 });
 </script>
 
 <script>
 /* ============================
-   INSTRUMENT COMPLETION SYSTEM
+   INSTRUMENT COMPLETION SYSTEM — 12 case-specific units
 ============================ */
 
+// Flat completion flags: CCI_active, CCI_closed, CSA_active, … RRF_closed
 const instrumentState = {
-  CCI: false,
-  CSA: false,
-  CAF: false,
-  HSI: false,
-  FCI: false,
-  RRF: false
+  CCI_active: false, CCI_closed: false,
+  CSA_active: false, CSA_closed: false,
+  CAF_active: false, CAF_closed: false,
+  HSI_active: false, HSI_closed: false,
+  FCI_active: false, FCI_closed: false,
+  RRF_active: false, RRF_closed: false,
 };
 
-function completeInstrument(instrumentKey) {
-  if (!instrumentState.hasOwnProperty(instrumentKey)) return;
+// In-progress tracking (not-started | in-progress) — completion is in instrumentState
+const progressState = {};
 
-  // Idempotent: if already complete, do nothing
-  if (instrumentState[instrumentKey] === true) return;
+function completeInstrument(instrumentKey, caseType) {
+  // Support legacy payload (no caseType) — default to active during transition
+  const ct       = caseType || 'active';
+  const stateKey = `${instrumentKey}_${ct}`;
 
-  instrumentState[instrumentKey] = true;
-
-  // Update DOM row
-  const row = document.querySelector(`[data-instrument="${instrumentKey}"]`);
-  if (row) {
-    row.classList.remove('in-progress', 'not-started');
-    row.classList.add('complete');
-
-    const status = row.querySelector('.instrument-status');
-    if (status) {
-      status.textContent = 'Complete';
-      status.className = 'instrument-status complete';
-    }
-
-    const button = row.querySelector('.instrument-btn');
-    if (button) {
-      button.textContent = 'Complete';
-      button.classList.add('done');
-      button.disabled = true;
-      button.onclick = null;
-    }
+  if (!instrumentState.hasOwnProperty(stateKey)) {
+    console.warn('Unknown completion key:', stateKey);
+    return;
   }
+  if (instrumentState[stateKey] === true) return; // idempotent
 
-  // Also sync state.instruments for existing renderX functions
-  const idx = state.instruments.findIndex(i => i.abbr === instrumentKey);
-  if (idx >= 0) state.instruments[idx].status = 'complete';
+  instrumentState[stateKey] = true;
+  progressState[stateKey]   = 'complete';
 
-  updateProgress();
-  unlockReports();
+  renderInstruments();
   renderRecommended();
-  renderNextStep();
+  renderProgress();
+  renderReportSection();
 }
 
-/* ============================
-   PROGRESS BAR UPDATE
-============================ */
+// updateProgress is now an alias — renderProgress does the work
+function updateProgress() { renderProgress(); }
 
-function updateProgress() {
-  const total    = Object.keys(instrumentState).length;
-  const complete = Object.values(instrumentState).filter(v => v === true).length;
-  const percent  = Math.round((complete / total) * 100);
-
-  const fill = document.querySelector('.progress-bar-fill');
-  if (fill) fill.style.width = percent + '%';
-
-  // Update dual counters
-  const activeEl  = document.getElementById('counter-active');
-  const closedEl  = document.getElementById('counter-closed');
-  const reportsEl = document.getElementById('counter-reports');
-  const reports   = complete === 6 ? 12 : complete * 2;
-  if (activeEl)  activeEl.innerHTML  = `${complete} <span>/ 6</span>`;
-  if (closedEl)  closedEl.innerHTML  = `${complete} <span>/ 6</span>`;
-  if (reportsEl) reportsEl.innerHTML = `${reports} <span>/ 12</span>`;
-
-  const note = document.getElementById('progress-note');
-  if (note) {
-    if (complete === 6) {
-      note.textContent = 'Assessment complete. All 12 reports are now available.';
-      const msg = document.getElementById('completion-message');
-      if (msg) msg.classList.add('visible');
-    } else if (complete === 0) {
-      note.textContent = 'Begin with the Case Complexity Index. Reports become available as each instrument is completed.';
-    } else {
-      note.textContent = `${complete} of 6 instruments complete. ${6 - complete} remaining.`;
-    }
-  }
-}
-
-/* ============================
-   REPORT UNLOCK
-============================ */
-
-function unlockReports() {
-  const complete = Object.values(instrumentState).filter(v => v === true).length;
-  if (complete === 0) return;
-
-  const section = document.getElementById('report-release-section');
-  if (section) section.classList.add('unlocked');
-
-  const title = document.getElementById('report-release-title');
-  if (title) {
-    title.textContent = complete === 6
-      ? 'Assessment Complete — All Reports Available'
-      : `Reports Available — ${complete} of 6 Instruments Complete`;
-  }
-
-  const text = document.getElementById('report-release-text');
-  if (text) {
-    text.textContent = complete === 6
-      ? 'Your 12 assessment reports are now available. Please download or print all reports before the assessment window expires.'
-      : `Reports become available as each instrument set is completed. ${complete * 2} report${complete * 2 > 1 ? 's are' : ' is'} currently available.`;
-  }
-
-  // Show report grid with download buttons for completed instruments
-  const grid = document.getElementById('report-download-grid');
-  if (grid) {
-    grid.style.display = 'grid';
-    const completedAbbrs = Object.entries(instrumentState)
-      .filter(([k, v]) => v === true)
-      .map(([k]) => k);
-    const inst = state.instruments.filter(i => completedAbbrs.includes(i.abbr));
-    grid.innerHTML = inst.map(i => `
-      <div class="report-download-item">
-        <div class="report-download-abbr">${i.abbr}</div>
-        <div class="report-download-name">${i.name} — Active Case</div>
-        <button class="report-download-btn">Download PDF</button>
-      </div>
-      <div class="report-download-item">
-        <div class="report-download-abbr">${i.abbr}</div>
-        <div class="report-download-name">${i.name} — Closed Case (Retrospective Analysis)</div>
-        <button class="report-download-btn">Download PDF</button>
-      </div>
-    `).join('') + (complete === 6 ? `
-      <div class="report-download-item" style="grid-column:1/-1; border-top:2px solid var(--gold); margin-top:4px;">
-        <div class="report-download-abbr" style="font-size:11px;color:var(--gray-mid);">COMPARATIVE</div>
-        <div class="report-download-name" style="font-size:14px;font-weight:500;">Full Comparative Analysis — Active vs. Closed</div>
-        <button class="report-download-btn" style="width:fit-content;">Download PDF</button>
-      </div>` : '');
-
-    // Download All button
-    let dlAll = document.getElementById('download-all-btn');
-    if (!dlAll) {
-      dlAll = document.createElement('button');
-      dlAll.id = 'download-all-btn';
-      dlAll.className = 'btn-primary';
-      dlAll.style.cssText = 'margin-top:20px;padding:16px 40px;font-size:12px;letter-spacing:0.22em;display:block;width:100%;text-align:center;';
-      dlAll.onclick = () => alert('In production: downloads ZIP of all available report PDFs.');
-      section.appendChild(dlAll);
-    }
-    dlAll.textContent = complete === 6
-      ? 'Download Complete Assessment'
-      : `Download Available Reports (${complete * 2})`;
-    dlAll.style.display = 'block';
-  }
-}
+// unlockReports is now an alias — renderReportSection does the work
+function unlockReports() { renderReportSection(); }
 
 /* ============================
    TEST / MANUAL COMPLETION
 ============================ */
-
-function markComplete(instrumentKey) {
-  completeInstrument(instrumentKey);
+function markComplete(instrumentKey, caseType) {
+  completeInstrument(instrumentKey, caseType || 'active');
 }
 
-// Listen for postMessage from tool iframes/tabs
+// Listen for postMessage from tool tabs
+// Supports new payload: { type, instrument, caseType }
+// Also tolerates legacy payload without caseType (defaults to 'active')
 window.addEventListener('message', (e) => {
   if (e.data && e.data.type === 'INSTRUMENT_COMPLETE' && e.data.instrument) {
-    console.log('Portal received instrument completion:', e.data.instrument);
-    completeInstrument(e.data.instrument);
+    console.log('Portal received completion:', e.data.instrument, e.data.caseType || '(no caseType — defaulting to active)');
+    completeInstrument(e.data.instrument, e.data.caseType || 'active');
   }
 });
 
