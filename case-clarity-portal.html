@@ -1917,6 +1917,10 @@ const instrumentState = {
 
 function completeInstrument(instrumentKey) {
   if (!instrumentState.hasOwnProperty(instrumentKey)) return;
+
+  // Idempotent: if already complete, do nothing
+  if (instrumentState[instrumentKey] === true) return;
+
   instrumentState[instrumentKey] = true;
 
   // Update DOM row
@@ -2063,7 +2067,8 @@ function markComplete(instrumentKey) {
 
 // Listen for postMessage from tool iframes/tabs
 window.addEventListener('message', (e) => {
-  if (e.data && e.data.type === 'instrumentComplete' && e.data.instrument) {
+  if (e.data && e.data.type === 'INSTRUMENT_COMPLETE' && e.data.instrument) {
+    console.log('Portal received instrument completion:', e.data.instrument);
     completeInstrument(e.data.instrument);
   }
 });
