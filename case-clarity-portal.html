@@ -1691,6 +1691,7 @@ function renderRecommended() {
 
   btn.textContent = inProgress ? 'Resume Assessment' : `Start ${target.abbr}`;
   btn.onclick = () => launchInstrument(target.abbr);
+  console.log('Bound recommended CTA to:', target.abbr);
 }
 
 // Stub — next-step panel removed; all callers preserved safely
@@ -1712,11 +1713,14 @@ function renderInstruments() {
     const labelMap = { 'not-started': 'Not Started', 'in-progress': 'In Progress', 'complete': 'Complete' };
     const statusLabel = labelMap[inst.status] || 'Not Started';
 
-    const btnHTML = inst.status === 'complete'
-      ? `<button class="instrument-btn done" disabled>Complete</button>`
+    const btnLabel = inst.status === 'complete'
+      ? 'Complete'
       : inst.status === 'in-progress'
-      ? `<button class="instrument-btn" onclick="launchInstrument('${inst.abbr}')">Resume Assessment</button>`
-      : `<button class="instrument-btn" onclick="launchInstrument('${inst.abbr}')">Start Assessment</button>`;
+      ? 'Resume Assessment'
+      : 'Start Assessment';
+
+    const btnDisabled = inst.status === 'complete' ? 'disabled' : '';
+    const btnClass    = inst.status === 'complete' ? 'instrument-btn done' : 'instrument-btn';
 
     row.innerHTML = `
       <div class="instrument-abbr">${inst.abbr}</div>
@@ -1725,8 +1729,18 @@ function renderInstruments() {
         <div class="instrument-desc">${inst.desc}</div>
       </div>
       <div class="instrument-status ${inst.status}">${statusLabel}</div>
-      ${btnHTML}
+      <button class="${btnClass}" data-launch="${inst.abbr}" ${btnDisabled}>${btnLabel}</button>
     `;
+
+    // Bind click via DOM — no inline onclick attribute
+    if (inst.status !== 'complete') {
+      const btn = row.querySelector('[data-launch]');
+      if (btn) {
+        btn.onclick = () => launchInstrument(inst.abbr);
+        console.log('Bound row CTA to:', inst.abbr);
+      }
+    }
+
     list.appendChild(row);
   });
 }
@@ -1842,6 +1856,7 @@ function renderReportSection() {
 }
 
 function launchInstrument(instrumentKey) {
+  console.log('Launching instrument from portal:', instrumentKey);
   const toolUrls = {
     CCI: "https://case-complexity-index.vercel.app",
     CSA: "https://clinical-sequencing-auditor.vercel.app",
