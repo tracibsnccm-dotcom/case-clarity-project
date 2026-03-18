@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Clarity Project - Login</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: #f6f3ed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .login-card {
+            background: #fff;
+            border: 1px solid #d6d0c4;
+            border-top: 3px solid #0c1c34;
+            padding: 48px 40px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 2px 12px rgba(12,28,52,0.06);
+        }
+        .brand {
+            font-size: 11px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #b8922a;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 26px;
+            font-weight: normal;
+            color: #0c1c34;
+            margin: 0 0 8px;
+            letter-spacing: 0.02em;
+        }
+        .subtitle {
+            font-size: 15px;
+            color: #3a4a5a;
+            margin: 0 0 32px;
+            line-height: 1.7;
+        }
+        .field-label {
+            font-size: 11px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #6a7a8a;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .field-input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #d6d0c4;
+            background: #faf8f4;
+            font-size: 14px;
+            color: #0e1c2e;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            margin-bottom: 20px;
+            outline: none;
+        }
+        .field-input:focus {
+            border-color: #b8922a;
+        }
+        .btn-primary {
+            width: 100%;
+            background: #0c1c34;
+            color: #e8e2d4;
+            border: none;
+            padding: 14px 40px;
+            font-size: 11px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            cursor: pointer;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            margin-top: 10px;
+        }
+        .btn-primary:hover {
+            background: #1a2c44;
+        }
+        .error-message {
+            color: #c0392b;
+            font-size: 12px;
+            margin-top: 10px;
+            padding: 10px;
+            background: #fdf1f0;
+            border: 1px solid #f5c6cb;
+            display: none;
+        }
+        .info {
+            font-size: 11px;
+            color: #9aabb8;
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="brand">Reconcile Care Management Services</div>
+        <h1>Assessment Portal</h1>
+        <p class="subtitle">Enter your Assessment ID and PIN to access the Case Clarity Project evaluation portal.</p>
+        
+        <div class="field-label">ASSESSMENT ID</div>
+        <input type="text" id="assessment-id" class="field-input" placeholder="CCP-0001">
+        
+        <div class="field-label">ACCESS PIN</div>
+        <input type="password" id="pin" class="field-input" placeholder="6-digit PIN" maxlength="6">
+        
+        <button onclick="handleLogin()" class="btn-primary">ACCESS ASSESSMENT PORTAL</button>
+        
+        <div id="error-message" class="error-message"></div>
+        
+        <p class="info">Credentials were provided in your assessment access email.</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // REPLACE THESE WITH YOUR SUPABASE CREDENTIALS
+        const SUPABASE_URL = 'https://zmjxyspizdqhrtdcgkwk.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptanh5c3BpemRxaHJ0ZGNna3drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MjQ1NDcsImV4cCI6MjA4NTE4NDU0N30.szuVr87xdq1aqYpaM6p390f48ozj4CENU4ksg8vumhM';
+        
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function handleLogin() {
+            const assessmentId = document.getElementById('assessment-id').value.trim();
+            const pin = document.getElementById('pin').value.trim();
+            const errorEl = document.getElementById('error-message');
+            
+            // Clear previous errors
+            errorEl.style.display = 'none';
+            
+            // Validate inputs
+            if (!assessmentId || !pin) {
+                showError('Please enter both Assessment ID and PIN');
+                return;
+            }
+            
+            if (!assessmentId.startsWith('CCP-')) {
+                showError('Assessment ID must start with CCP-');
+                return;
+            }
+            
+            if (pin.length !== 6 || !/^\d+$/.test(pin)) {
+                showError('PIN must be a 6-digit number');
+                return;
+            }
+            
+            try {
+                // Query Supabase
+                const { data: session, error } = await supabaseClient
+                    .from('assessment_sessions')
+                    .select('*')
+                    .eq('assessment_id', assessmentId)
+                    .eq('pin', pin)
+                    .single();
+                
+                if (error || !session) {
+                    showError('Invalid Assessment ID or PIN');
+                    return;
+                }
+                
+                // Check status
+                if (session.status === 'expired') {
+                    showError('This assessment has expired. Contact support.');
+                    return;
+                }
+                
+                // Check if first login
+                if (!session.first_login_at) {
+                    // Set first login and expiration (7 days from now)
+                    const now = new Date().toISOString();
+                    const expiresAt = new Date();
+                    expiresAt.setDate(expiresAt.getDate() + 7);
+                    
+                    const { error: updateError } = await supabaseClient
+                        .from('assessment_sessions')
+                        .update({
+                            first_login_at: now,
+                            expires_at: expiresAt.toISOString(),
+                            status: 'active'
+                        })
+                        .eq('id', session.id);
+                    
+                    if (updateError) {
+                        showError('Error starting session');
+                        return;
+                    }
+                } else {
+                    // Check if expired
+                    if (new Date() > new Date(session.expires_at)) {
+                        await supabaseClient
+                            .from('assessment_sessions')
+                            .update({ status: 'expired' })
+                            .eq('id', session.id);
+                        
+                        showError('Your 7-day access window has expired');
+                        return;
+                    }
+                }
+                
+                // Store session info
+                localStorage.setItem('assessment_id', assessmentId);
+                localStorage.setItem('session_id', session.id);
+                
+                // Redirect to dashboard
+                window.location.href = 'dashboard.html';
+                
+            } catch (err) {
+                showError('Login failed. Please try again.');
+                console.error(err);
+            }
+        }
+        
+        function showError(message) {
+            const errorEl = document.getElementById('error-message');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+        }
+        
+        // Allow Enter key to submit
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                handleLogin();
+            }
+        });
+    </script>
+</body>
+</html>
