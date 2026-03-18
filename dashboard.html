@@ -244,6 +244,14 @@
             .reports-grid {
                 grid-template-columns: 1fr;
             }
+            .case-entry-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+        .dashboard-heading {
+            font-size: 28px;
+            color: #0c1c34;
+            margin-bottom: 24px;
         }
     </style>
 </head>
@@ -366,16 +374,72 @@
             }
         }
 
+        function escapeAttr(s) {
+            if (!s) return '';
+            return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+        }
+
         function renderDashboard(session, activeComplete, retroComplete, activeAllDone, retroAllDone, daysLeft) {
             const container = document.getElementById('dashboard-content');
             
             const timerClass = daysLeft <= 2 ? 'timer-warning' : '';
+            const activeRef = escapeAttr(session.active_case?.reference || '');
+            const closedRef = escapeAttr(session.retrospective_case?.reference || '');
             
             let html = `
                 <div class="timer-card">
                     <span class="timer-label">Time Remaining</span>
                     <span class="timer-value ${timerClass}">${daysLeft} days</span>
                 </div>
+
+                <!-- ORIENTATION SECTION -->
+                <div style="background: #f9f7f2; border: 1px solid #d6d0c4; border-left: 3px solid #b8922a; padding: 24px; margin-bottom: 32px;">
+                  <h2 style="font-size: 20px; margin-bottom: 16px;">Before You Begin</h2>
+                  <h3 style="font-size: 16px; margin-bottom: 12px;">Assessment Orientation</h3>
+                  <p style="margin-bottom: 16px; line-height: 1.6;">This evaluation includes six forensic instruments designed to examine structural case factors affecting medical care progression, recovery trajectory, and litigation risk.</p>
+                  
+                  <h4 style="margin: 20px 0 10px;">What to Expect</h4>
+                  <ul style="margin-bottom: 16px; padding-left: 20px;">
+                    <li>You will complete the instruments using two cases: one active case and one previously closed case.</li>
+                    <li>Case information will be entered once and applied across all six instruments.</li>
+                    <li>Each instrument typically requires approximately 10–15 minutes to complete.</li>
+                    <li>Estimated total assessment time: approximately 60–90 minutes.</li>
+                    <li>Most attorneys complete the assessment over multiple sessions during the 72-hour access period.</li>
+                  </ul>
+                  
+                  <h4 style="margin: 20px 0 10px;">Access Window</h4>
+                  <p>Your 72-hour assessment window is now active. Progress is automatically saved. You may log out and return at any time before expiration.</p>
+                  
+                  <h4 style="margin: 20px 0 10px;">Important Note</h4>
+                  <p>The instruments do not function as simple calculators. Each tool evaluates structural elements of case progression, treatment sequencing, and recovery dynamics.</p>
+                </div>
+
+                <!-- CASE ENTRY SECTION -->
+                <div style="background: #fff; border: 1px solid #d6d0c4; padding: 24px; margin-bottom: 32px;">
+                  <h2 style="font-size: 20px; margin-bottom: 16px;">Enter Your Case Information</h2>
+                  <p style="margin-bottom: 20px;">Provide basic information for both cases. This information will be used across all six assessment instruments — you will not be asked to re-enter it within each tool.</p>
+                  
+                  <div style="margin-bottom: 20px; padding: 12px; background: #f1f0eb; border-left: 3px solid #b8922a;">
+                    <p style="font-size: 14px;"><strong>Data Storage Notice:</strong> Case information entered here is stored only during the active 72-hour assessment window. All case data, instrument responses, and generated reports are automatically deleted when the assessment period expires.</p>
+                  </div>
+                  
+                  <div class="case-entry-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 20px;">
+                    <div>
+                      <label style="display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Active Case Reference</label>
+                      <input type="text" id="active-case-ref" style="width: 100%; padding: 10px; border: 1px solid #d6d0c4; background: #faf8f4;" placeholder="e.g., Smith v. Insurance" value="${activeRef}">
+                    </div>
+                    <div>
+                      <label style="display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Closed Case Reference (Retrospective)</label>
+                      <input type="text" id="closed-case-ref" style="width: 100%; padding: 10px; border: 1px solid #d6d0c4; background: #faf8f4;" placeholder="e.g., Jones v. Carrier" value="${closedRef}">
+                    </div>
+                  </div>
+                  
+                  <button type="button" id="save-case-info" style="background: #0c1c34; color: white; border: none; padding: 10px 24px; cursor: pointer;">Save Case Information</button>
+                  <span style="margin-left: 16px; font-size: 13px; color: #666;">You may edit this information from the dashboard at any time during the assessment window.</span>
+                </div>
+
+                <h1 class="dashboard-heading">Assessment Dashboard</h1>
+
             `;
 
             // Active Case Section
@@ -384,13 +448,6 @@
                     <div class="case-header">
                         <h2 class="case-title">Active Case Assessments</h2>
                         <span class="case-progress">${activeComplete}/6 Complete</span>
-                    </div>
-                    
-                    <div class="case-reference">
-                        <input type="text" id="active-reference" class="reference-input" 
-                               placeholder="Enter Active Case Reference" 
-                               value="${session.active_case?.reference || ''}">
-                        <button onclick="saveReference('active')" class="btn-save">Save Reference</button>
                     </div>
                     
                     <div class="tools-grid">
@@ -411,13 +468,6 @@
                     <div class="case-header">
                         <h2 class="case-title">Retrospective Case Assessments</h2>
                         <span class="case-progress">${retroComplete}/6 Complete</span>
-                    </div>
-                    
-                    <div class="case-reference">
-                        <input type="text" id="retro-reference" class="reference-input" 
-                               placeholder="Enter Retrospective Case Reference" 
-                               value="${session.retrospective_case?.reference || ''}">
-                        <button onclick="saveReference('retrospective')" class="btn-save">Save Reference</button>
                     </div>
                     
                     <div class="tools-grid">
@@ -463,6 +513,36 @@
             `;
 
             container.innerHTML = html;
+
+            document.getElementById('save-case-info').addEventListener('click', saveCaseInfo);
+        }
+
+        async function saveCaseInfo() {
+            const activeRef = document.getElementById('active-case-ref').value;
+            const closedRef = document.getElementById('closed-case-ref').value;
+
+            const { data: session, error } = await supabaseClient
+                .from('assessment_sessions')
+                .select('active_case, retrospective_case')
+                .eq('id', sessionId)
+                .single();
+
+            if (error || !session) {
+                alert('Could not save. Please try again.');
+                return;
+            }
+
+            const activeCase = session.active_case || { reference: '', assessments: {} };
+            const retroCase = session.retrospective_case || { reference: '', assessments: {} };
+            activeCase.reference = activeRef;
+            retroCase.reference = closedRef;
+
+            await supabaseClient
+                .from('assessment_sessions')
+                .update({ active_case: activeCase, retrospective_case: retroCase })
+                .eq('id', sessionId);
+
+            alert('Case information saved');
         }
 
         function getToolCard(toolKey, tool, status, caseType) {
@@ -490,30 +570,6 @@
                 </div>
             `;
         }
-
-        // Global functions
-        window.saveReference = async function(caseType) {
-            const inputId = caseType === 'active' ? 'active-reference' : 'retro-reference';
-            const reference = document.getElementById(inputId).value;
-            
-            const field = caseType === 'active' ? 'active_case' : 'retrospective_case';
-            
-            const { data: session } = await supabaseClient
-                .from('assessment_sessions')
-                .select(field)
-                .eq('id', sessionId)
-                .single();
-            
-            const updatedCase = session[field] || { reference: '', assessments: {} };
-            updatedCase.reference = reference;
-            
-            await supabaseClient
-                .from('assessment_sessions')
-                .update({ [field]: updatedCase })
-                .eq('id', sessionId);
-            
-            alert('Reference saved');
-        };
 
         window.launchTool = function(toolKey, caseType) {
             const tool = TOOL_INFO[toolKey];
