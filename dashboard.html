@@ -5,6 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Case Clarity Project - Dashboard</title>
     <style>
+        .collapsible-header {
+            background: #f1f0eb;
+            padding: 16px 24px;
+            margin: 16px 0 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #d6d0c4;
+            border-left: 3px solid #b8922a;
+        }
+        .collapsible-header:hover {
+            background: #e8e3d8;
+        }
+        .collapsible-content {
+            display: none;
+            padding: 16px 0;
+        }
+        .collapsible-content.expanded {
+            display: block;
+        }
+        .arrow {
+            font-size: 18px;
+            transition: transform 0.2s;
+        }
+        .arrow.expanded {
+            transform: rotate(90deg);
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Georgia', 'Times New Roman', serif;
@@ -497,6 +525,20 @@
 
         document.getElementById('assessment-id-display').textContent = assessmentId;
 
+        window.toggleSection = function (sectionId) {
+            var content = document.getElementById(sectionId);
+            var arrow = document.getElementById('arrow-' + sectionId.split('-')[0]);
+            if (content) content.classList.toggle('expanded');
+            if (arrow) arrow.classList.toggle('expanded');
+        };
+
+        window.updateCollapsibleProgress = function (activeComplete, retroComplete) {
+            var ap = document.getElementById('active-progress');
+            var rp = document.getElementById('retro-progress');
+            if (ap != null && activeComplete != null) ap.textContent = activeComplete + '/6';
+            if (rp != null && retroComplete != null) rp.textContent = retroComplete + '/6';
+        };
+
         // Load dashboard
         loadDashboard();
 
@@ -669,8 +711,13 @@
                 <div class="case-section case-section-active">
                     <h2 style="font-size: 20px; margin: 32px 0 16px;">Active Case — Recommended Order</h2>
                     <p style="margin-bottom: 20px; color: #4a5568; line-height: 1.6;">It is recommended that you complete in order, but you may choose any sequence. Reports will unlock for download once all assessments in this section are completed.</p>
-                    <div style="margin-bottom: 16px; font-size: 14px; color: #b8922a;">Active Progress: ${activeComplete}/6 | Retro Progress: ${retroComplete}/6</div>
                     <p style="margin-bottom: 24px; color: #4a5568; line-height: 1.6; padding: 16px; background: #f4f6f8; border-left: 3px solid #0c1c34;">Consider beginning with a case that has stalled or where clinical direction is unclear. This process also provides a framework for new cases, offering guidance from the outset.</p>
+                    <div class="collapsible-section">
+                      <div class="collapsible-header" onclick="toggleSection('active-tools')">
+                        <span><strong>Active Case Tools</strong> — <span id="active-progress">${activeComplete}/6</span> completed</span>
+                        <span class="arrow expanded" id="arrow-active">▶</span>
+                      </div>
+                      <div class="collapsible-content expanded" id="active-tools">
                     <div class="tools-grid">
             `;
 
@@ -686,14 +733,19 @@
                 });
             });
 
-            html += `</div></div>`;
+            html += `</div></div></div></div>`;
 
             // Retrospective Case Section
             html += `
                 <div class="case-section case-section-retro">
                     <h2 style="font-size: 20px; margin: 48px 0 16px;">Retrospective Case</h2>
-                    <div style="margin-bottom: 16px; font-size: 14px; color: #b8922a;">Active Progress: ${activeComplete}/6 | Retro Progress: ${retroComplete}/6</div>
                     <p style="margin-bottom: 24px; color: #4a5568; line-height: 1.6; padding: 16px; background: #faf6f0; border-left: 3px solid #8b6914;">For cases that have already settled, this review may identify factors that could have influenced the outcome or settlement value.</p>
+                    <div class="collapsible-section">
+                      <div class="collapsible-header" onclick="toggleSection('retro-tools')">
+                        <span><strong>Retrospective Case Tools</strong> — <span id="retro-progress">${retroComplete}/6</span> completed</span>
+                        <span class="arrow" id="arrow-retro">▶</span>
+                      </div>
+                      <div class="collapsible-content" id="retro-tools">
                     <div class="tools-grid">
             `;
 
@@ -710,7 +762,7 @@
                 });
             });
 
-            html += `</div></div>`;
+            html += `</div></div></div></div>`;
 
             const activeCaptured = Object.keys(window.reportData.active || {}).length;
             const retroCaptured = Object.keys(window.reportData.retro || {}).length;
@@ -750,6 +802,7 @@
 
             document.getElementById('save-case-info').addEventListener('click', saveCaseInfo);
             updateReportUI();
+            updateCollapsibleProgress(activeComplete, retroComplete);
         }
 
         async function saveCaseInfo() {
