@@ -60,6 +60,32 @@
         .case-section {
             margin-bottom: 48px;
         }
+        .case-section-active {
+            padding: 28px 28px 8px;
+            background: linear-gradient(180deg, #f0f4f8 0%, #faf8f4 100%);
+            border: 1px solid #c5d0dc;
+            border-left: 4px solid #0c1c34;
+            border-radius: 2px;
+        }
+        .case-section-retro {
+            padding: 28px 28px 8px;
+            background: #f7f5f0;
+            border: 1px solid #d6d0c4;
+            border-left: 4px solid #8b6914;
+            border-radius: 2px;
+        }
+        .tool-card-active {
+            border-top-color: #0c1c34;
+            box-shadow: 0 1px 3px rgba(12, 28, 52, 0.06);
+        }
+        .tool-card-retro {
+            border-top-color: #8b6914;
+            background: #fffefb;
+        }
+        .tool-card-locked .btn-launch {
+            background: #a8a49a;
+            cursor: not-allowed;
+        }
         .case-header {
             display: flex;
             justify-content: space-between;
@@ -278,6 +304,14 @@
 
         // Tool configuration
         const TOOL_ORDER = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
+        const ACTIVE_NUMBERED_TITLES = {
+            'CCI': '1. Case Complexity Index',
+            'CSA': '2. Clinical Sequencing Auditor',
+            'CAF': '3. C.A.R.E. Access Friction Score',
+            'HSI': '4. Holistic Stability Index',
+            'FCI': '5. Functional Capacity Index',
+            'RRF': '6. Recovery Risk Forecaster'
+        };
         const TOOL_INFO = {
             'CCI': {
                 name: 'Case Complexity Index',
@@ -444,40 +478,50 @@
 
             // Active Case Section
             html += `
-                <div class="case-section">
-                    <div class="case-header">
-                        <h2 class="case-title">Active Case Assessments</h2>
-                        <span class="case-progress">${activeComplete}/6 Complete</span>
-                    </div>
-                    
+                <div class="case-section case-section-active">
+                    <h2 style="font-size: 20px; margin: 32px 0 16px;">Active Case — Complete in Order</h2>
+                    <p style="margin-bottom: 24px; color: #4a5568;">Start with CCI and follow the sequence. Each tool unlocks the next.</p>
+                    <div style="margin-bottom: 16px; font-size: 14px; color: #b8922a;">Active Progress: ${activeComplete}/6 | Retro Progress: ${retroComplete}/6</div>
                     <div class="tools-grid">
             `;
 
-            // Add active case tools
-            TOOL_ORDER.forEach(toolKey => {
+            const activeAssessments = session.active_case?.assessments || {};
+            TOOL_ORDER.forEach((toolKey, idx) => {
                 const tool = TOOL_INFO[toolKey];
-                const status = session.active_case?.assessments?.[toolKey]?.status || 'not_started';
-                html += getToolCard(toolKey, tool, status, 'active');
+                const status = activeAssessments[toolKey]?.status || 'not_started';
+                const prevKey = idx > 0 ? TOOL_ORDER[idx - 1] : null;
+                const prevComplete = !prevKey || activeAssessments[prevKey]?.status === 'complete';
+                const canLaunchActive = status === 'complete' ? false : (prevComplete || status === 'in_progress');
+                html += getToolCard(toolKey, tool, status, 'active', {
+                    displayName: ACTIVE_NUMBERED_TITLES[toolKey],
+                    cardClass: 'tool-card-active',
+                    launchDisabled: status === 'complete' || !canLaunchActive,
+                    lockedBySequence: status !== 'complete' && !canLaunchActive
+                });
             });
 
             html += `</div></div>`;
 
             // Retrospective Case Section
             html += `
-                <div class="case-section">
-                    <div class="case-header">
-                        <h2 class="case-title">Retrospective Case Assessments</h2>
-                        <span class="case-progress">${retroComplete}/6 Complete</span>
-                    </div>
-                    
+                <div class="case-section case-section-retro">
+                    <h2 style="font-size: 20px; margin: 48px 0 16px;">Retrospective Case — Complete After Active</h2>
+                    <p style="margin-bottom: 24px; color: #4a5568;">These will unlock once the Active Case sequence is complete.</p>
+                    <div style="margin-bottom: 16px; font-size: 14px; color: #b8922a;">Active Progress: ${activeComplete}/6 | Retro Progress: ${retroComplete}/6</div>
                     <div class="tools-grid">
             `;
 
-            // Add retrospective case tools
+            const retroAssessments = session.retrospective_case?.assessments || {};
             TOOL_ORDER.forEach(toolKey => {
                 const tool = TOOL_INFO[toolKey];
-                const status = session.retrospective_case?.assessments?.[toolKey]?.status || 'not_started';
-                html += getToolCard(toolKey, tool, status, 'retrospective');
+                const status = retroAssessments[toolKey]?.status || 'not_started';
+                const retroLocked = !activeAllDone;
+                html += getToolCard(toolKey, tool, status, 'retrospective', {
+                    displayName: tool.name,
+                    cardClass: 'tool-card-retro',
+                    launchDisabled: status === 'complete' || retroLocked,
+                    lockedBySequence: retroLocked && status !== 'complete'
+                });
             });
 
             html += `</div></div>`;
@@ -545,7 +589,11 @@
             alert('Case information saved');
         }
 
-        function getToolCard(toolKey, tool, status, caseType) {
+        function getToolCard(toolKey, tool, status, caseType, opts) {
+            opts = opts || {};
+            const displayName = opts.displayName || tool.name;
+            const cardExtra = opts.cardClass ? ' ' + opts.cardClass : '';
+            const lockedClass = opts.lockedBySequence ? ' tool-card-locked' : '';
             let statusClass = 'status-not-started';
             let statusText = 'NOT STARTED';
             
@@ -557,15 +605,19 @@
                 statusText = 'COMPLETE';
             }
 
+            let btnLabel = 'Launch Assessment';
+            if (status === 'complete') btnLabel = 'Completed';
+            else if (opts.lockedBySequence) btnLabel = caseType === 'active' ? 'Complete previous step first' : 'Complete Active Case first';
+
             return `
-                <div class="tool-card">
-                    <h3 class="tool-name">${tool.name}</h3>
+                <div class="tool-card${cardExtra}${lockedClass}">
+                    <h3 class="tool-name">${displayName}</h3>
                     <p class="tool-desc">${tool.desc}</p>
                     <div class="tool-status ${statusClass}">${statusText}</div>
                     <button class="btn-launch" 
                             onclick="launchTool('${toolKey}', '${caseType}')"
-                            ${status === 'complete' ? 'disabled' : ''}>
-                        ${status === 'complete' ? 'Completed' : 'Launch Assessment'}
+                            ${opts.launchDisabled ? 'disabled' : ''}>
+                        ${btnLabel}
                     </button>
                 </div>
             `;
