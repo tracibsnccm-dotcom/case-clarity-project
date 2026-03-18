@@ -59,7 +59,6 @@
             font-size: 14px;
             color: #0e1c2e;
             font-family: 'Georgia', 'Times New Roman', serif;
-            margin-bottom: 20px;
             outline: none;
         }
         .field-input:focus {
@@ -76,7 +75,7 @@
             text-transform: uppercase;
             cursor: pointer;
             font-family: 'Georgia', 'Times New Roman', serif;
-            margin-top: 10px;
+            margin-top: 20px;
         }
         .btn-primary:hover {
             background: #1a2c44;
@@ -104,128 +103,136 @@
         <h1>Assessment Portal</h1>
         <p class="subtitle">Enter your Assessment ID and PIN to access the Case Clarity Project evaluation portal.</p>
         
-        <form id="login-form" onsubmit="event.preventDefault(); handleLogin()">
+        <form id="login-form" onsubmit="event.preventDefault(); window.handleLogin && window.handleLogin()">
             <div class="field-label">ASSESSMENT ID</div>
-            <input type="text" id="assessment-id" class="field-input" placeholder="CCP-0001" autocomplete="username">
+            <input type="text" id="assessment-id" class="field-input" placeholder="CCP-0001" autocomplete="off">
             
             <div class="field-label">ACCESS PIN</div>
-            <input type="password" id="pin" class="field-input" placeholder="6-digit PIN" maxlength="6" autocomplete="current-password">
+            <input type="password" id="pin" class="field-input" placeholder="6-digit PIN" maxlength="6" autocomplete="off">
             
             <button type="submit" class="btn-primary">ACCESS ASSESSMENT PORTAL</button>
         </form>
         
         <div id="error-message" class="error-message"></div>
-        
         <p class="info">Credentials were provided in your assessment access email.</p>
     </div>
 
     <!-- Load Supabase first -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+    
     <script>
-    // Wait for everything to load
-    window.addEventListener('DOMContentLoaded', function() {
-        // Supabase credentials
-        const SUPABASE_URL = 'https://zmjxyspizdqhrtdcgkwk.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptanh5c3BpemRxaHJ0ZGNna3drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MjQ1NDcsImV4cCI6MjA4NTE4NDU0N30.szuVr87xdq1aqYpaM6p390f48ozj4CENU4ksg8vumhM';
+        // Wait for DOM and Supabase to be ready
+        (function() {
+            // Supabase credentials
+            const SUPABASE_URL = 'https://zmjxyspizdqhrtdcgkwk.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptanh5c3BpemRxaHJ0ZGNna3drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MjQ1NDcsImV4cCI6MjA4NTE4NDU0N30.szuVr87xdq1aqYpaM6p390f48ozj4CENU4ksg8vumhM';
+            
+            // Create client immediately
+            const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            
+            // Make globally available
+            window.supabaseClient = supabaseClient;
+            window.supabase = supabaseClient;
+            
+            console.log('✅ Supabase client ready');
 
-        // Create client (library script above has already executed)
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // Make it globally available
-        window.supabaseClient = supabaseClient;
-        window.supabase = supabaseClient;
-
-        console.log('✅ Supabase client ready');
-
-        function showError(message) {
-            const errorEl = document.getElementById('error-message');
-            errorEl.textContent = message;
-            errorEl.style.display = 'block';
-        }
-
-        // Make handleLogin available globally
-        window.handleLogin = async function() {
-            const assessmentId = document.getElementById('assessment-id').value.trim();
-            const pin = document.getElementById('pin').value.trim();
-            const errorEl = document.getElementById('error-message');
-
-            errorEl.style.display = 'none';
-
-            if (!assessmentId || !pin) {
-                showError('Please enter both Assessment ID and PIN');
-                return;
-            }
-
-            if (!assessmentId.startsWith('CCP-')) {
-                showError('Assessment ID must start with CCP-');
-                return;
-            }
-
-            if (pin.length !== 6 || !/^\d+$/.test(pin)) {
-                showError('PIN must be a 6-digit number');
-                return;
-            }
-
-            try {
-                const { data: session, error } = await supabaseClient
-                    .from('assessment_sessions')
-                    .select('*')
-                    .eq('assessment_id', assessmentId)
-                    .eq('pin', pin)
-                    .single();
-
-                if (error || !session) {
-                    showError('Invalid Assessment ID or PIN');
+            // Define login handler
+            window.handleLogin = async function() {
+                const assessmentId = document.getElementById('assessment-id').value.trim();
+                const pin = document.getElementById('pin').value.trim();
+                const errorEl = document.getElementById('error-message');
+                
+                // Clear previous errors
+                errorEl.style.display = 'none';
+                
+                // Validate inputs
+                if (!assessmentId || !pin) {
+                    showError('Please enter both Assessment ID and PIN');
                     return;
                 }
-
-                if (session.status === 'expired') {
-                    showError('This assessment has expired');
+                
+                if (!assessmentId.startsWith('CCP-')) {
+                    showError('Assessment ID must start with CCP-');
                     return;
                 }
-
-                if (!session.first_login_at) {
-                    const now = new Date().toISOString();
-                    const expiresAt = new Date();
-                    expiresAt.setDate(expiresAt.getDate() + 7);
-
-                    const { error: updateError } = await supabaseClient
+                
+                if (pin.length !== 6 || !/^\d+$/.test(pin)) {
+                    showError('PIN must be a 6-digit number');
+                    return;
+                }
+                
+                try {
+                    // Query Supabase
+                    const { data: session, error } = await supabaseClient
                         .from('assessment_sessions')
-                        .update({
-                            first_login_at: now,
-                            expires_at: expiresAt.toISOString(),
-                            status: 'active'
-                        })
-                        .eq('id', session.id);
-
-                    if (updateError) {
-                        showError('Error starting session');
+                        .select('*')
+                        .eq('assessment_id', assessmentId)
+                        .eq('pin', pin)
+                        .single();
+                    
+                    if (error || !session) {
+                        showError('Invalid Assessment ID or PIN');
                         return;
                     }
-                } else {
-                    if (new Date() > new Date(session.expires_at)) {
-                        await supabaseClient
+                    
+                    // Check status
+                    if (session.status === 'expired') {
+                        showError('This assessment has expired. Contact support.');
+                        return;
+                    }
+                    
+                    // Check if first login
+                    if (!session.first_login_at) {
+                        // Set first login and expiration (7 days from now)
+                        const now = new Date().toISOString();
+                        const expiresAt = new Date();
+                        expiresAt.setDate(expiresAt.getDate() + 7);
+                        
+                        const { error: updateError } = await supabaseClient
                             .from('assessment_sessions')
-                            .update({ status: 'expired' })
+                            .update({
+                                first_login_at: now,
+                                expires_at: expiresAt.toISOString(),
+                                status: 'active'
+                            })
                             .eq('id', session.id);
-
-                        showError('Your 7-day access window has expired');
-                        return;
+                        
+                        if (updateError) {
+                            showError('Error starting session');
+                            return;
+                        }
+                    } else {
+                        // Check if expired
+                        if (new Date() > new Date(session.expires_at)) {
+                            await supabaseClient
+                                .from('assessment_sessions')
+                                .update({ status: 'expired' })
+                                .eq('id', session.id);
+                            
+                            showError('Your 7-day access window has expired');
+                            return;
+                        }
                     }
+                    
+                    // Store session info
+                    localStorage.setItem('assessment_id', assessmentId);
+                    localStorage.setItem('session_id', session.id);
+                    
+                    // Redirect to dashboard
+                    window.location.href = 'dashboard.html';
+                    
+                } catch (err) {
+                    showError('Login failed. Please try again.');
+                    console.error(err);
                 }
+            };
 
-                localStorage.setItem('assessment_id', assessmentId);
-                localStorage.setItem('session_id', session.id);
-
-                window.location.href = 'dashboard.html';
-
-            } catch (err) {
-                showError('Login failed');
-                console.error(err);
+            function showError(message) {
+                const errorEl = document.getElementById('error-message');
+                errorEl.textContent = message;
+                errorEl.style.display = 'block';
             }
-        };
-    });
+        })();
     </script>
 </body>
 </html>
