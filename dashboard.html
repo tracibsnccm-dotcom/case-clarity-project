@@ -302,6 +302,118 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptanh5c3BpemRxaHJ0ZGNna3drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MjQ1NDcsImV4cCI6MjA4NTE4NDU0N30.szuVr87xdq1aqYpaM6p390f48ozj4CENU4ksg8vumhM';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // ===== REPORT STORAGE (No Database Required) =====
+        try {
+            window.reportData = JSON.parse(sessionStorage.getItem('reportData') || 'null') || { active: {}, retro: {} };
+        } catch (e) {
+            window.reportData = { active: {}, retro: {} };
+        }
+        if (!window.reportData.active) window.reportData.active = {};
+        if (!window.reportData.retro) window.reportData.retro = {};
+
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'ASSESSMENT_COMPLETE') {
+                const { caseType, tool, data } = event.data;
+                if (!tool) return;
+                let key = caseType === 'retrospective' || caseType === 'retro' ? 'retro' : 'active';
+                window.reportData[key][tool] = {
+                    data: data,
+                    completedAt: new Date().toISOString()
+                };
+                sessionStorage.setItem('reportData', JSON.stringify(window.reportData));
+                updateReportUI();
+                console.log('✅ Saved ' + tool + ' results for ' + key + ' case');
+            }
+        });
+
+        function updateReportUI() {
+            const activeTools = Object.keys(window.reportData.active || {}).length;
+            const retroTools = Object.keys(window.reportData.retro || {}).length;
+            const activeComplete = activeTools === 6;
+            const retroComplete = retroTools === 6;
+
+            var capA = document.getElementById('report-active-capture');
+            var capR = document.getElementById('report-retro-capture');
+            if (capA) {
+                capA.textContent = activeComplete ? '✓ All 6 tools captured for print' : ('Captured for print: ' + activeTools + '/6');
+            }
+            if (capR) {
+                capR.textContent = retroComplete ? '✓ All 6 tools captured for print' : ('Captured for print: ' + retroTools + '/6');
+            }
+            document.querySelectorAll('[data-report-btn="active"]').forEach(function(b) {
+                b.disabled = !activeComplete;
+            });
+            document.querySelectorAll('[data-report-btn="retro"]').forEach(function(b) {
+                b.disabled = !retroComplete;
+            });
+        }
+
+        window.printActiveReports = function() {
+            var tools = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
+            var completed = tools.filter(function(t) { return window.reportData.active[t]; });
+            if (completed.length === 6) {
+                generateAndPrintReports('active', window.reportData.active);
+            } else {
+                alert('Please complete all 6 Active assessments first.');
+            }
+        };
+
+        window.printRetroReports = function() {
+            var tools = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
+            var completed = tools.filter(function(t) { return window.reportData.retro[t]; });
+            if (completed.length === 6) {
+                generateAndPrintReports('retro', window.reportData.retro);
+            } else {
+                alert('Please complete all 6 Retrospective assessments first.');
+            }
+        };
+
+        function generateAndPrintReports(caseType, data) {
+            var printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                alert('Please allow pop-ups for this site to print reports.');
+                return;
+            }
+            var titleLabel = caseType === 'active' ? 'Active' : 'Retrospective';
+            var html = '<!DOCTYPE html><html><head><title>' + titleLabel + ' Case Reports</title><style>' +
+                'body { font-family: Georgia, serif; margin: 40px; }' +
+                'h1 { color: #0c1c34; border-bottom: 2px solid #b8922a; padding-bottom: 10px; }' +
+                'h2 { color: #0c1c34; margin-top: 30px; }' +
+                '.report-section { margin-bottom: 40px; page-break-after: always; }' +
+                '.field { margin: 10px 0; }' +
+                '.label { font-weight: bold; color: #6a7a8a; }' +
+                '@media print { body { margin: 0.5in; } }' +
+                '</style></head><body>' +
+                '<h1>' + titleLabel + ' Case Assessment Reports</h1>' +
+                '<p>Generated: ' + new Date().toLocaleString() + '</p>';
+
+            var toolList = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
+            toolList.forEach(function(tool) {
+                if (data[tool]) {
+                    html += '<div class="report-section"><h2>' + tool + ' Assessment</h2>' +
+                        '<p>Completed: ' + new Date(data[tool].completedAt).toLocaleString() + '</p>' +
+                        '<div style="margin-top: 20px;">' + formatToolData(tool, data[tool].data) + '</div></div>';
+                }
+            });
+            html += '</body></html>';
+            printWindow.document.write(html);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function formatToolData(tool, data) {
+            if (!data) return '<p>No data available</p>';
+            var raw = JSON.stringify(data, null, 2);
+            var esc = raw.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return '<pre style="background: #f5f5f5; padding: 15px; overflow-x: auto;">' + esc + '</pre>';
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', updateReportUI);
+        } else {
+            updateReportUI();
+        }
+
         // Tool configuration
         const TOOL_ORDER = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
         const ACTIVE_NUMBERED_TITLES = {
@@ -526,31 +638,35 @@
 
             html += `</div></div>`;
 
+            const activeCaptured = Object.keys(window.reportData.active || {}).length;
+            const retroCaptured = Object.keys(window.reportData.retro || {}).length;
+            const activePrintReady = activeCaptured === 6;
+            const retroPrintReady = retroCaptured === 6;
+
             // Reports Section
             html += `
                 <div class="reports-section">
                     <h2 class="reports-title">Available Reports</h2>
+                    <p style="font-size: 13px; color: #6a7a8a; margin-bottom: 20px;">Print uses data captured when each tool sends completion to this dashboard (same browser session). Open tools from this page so results can be saved.</p>
                     <div class="reports-grid">
-                        <div class="report-card ${!activeAllDone ? 'locked' : ''}">
+                        <div class="report-card ${!activePrintReady ? 'locked' : ''}">
                             <h3>Active Case Report</h3>
                             <div class="report-status">
-                                ${activeAllDone ? '✓ Ready to download' : '🔒 Complete all 6 active assessments'}
+                                ${activeAllDone ? '✓ All active assessments marked complete' : '🔒 Complete all 6 active assessments (dashboard)'}
                             </div>
-                            <button class="btn-report" ${!activeAllDone ? 'disabled' : ''} 
-                                    onclick="downloadReport('active')">Download</button>
-                            <button class="btn-report" ${!activeAllDone ? 'disabled' : ''} 
-                                    onclick="printReport('active')">Print</button>
+                            <div id="report-active-capture" style="font-size: 13px; color: #b8922a; margin-bottom: 16px;">${activePrintReady ? '✓ All 6 tools captured for print' : 'Captured for print: ' + activeCaptured + '/6'}</div>
+                            <button type="button" class="btn-report" data-report-btn="active" ${!activePrintReady ? 'disabled' : ''} onclick="printActiveReports()">Download</button>
+                            <button type="button" class="btn-report" data-report-btn="active" ${!activePrintReady ? 'disabled' : ''} onclick="printActiveReports()">Print</button>
                         </div>
                         
-                        <div class="report-card ${!retroAllDone ? 'locked' : ''}">
+                        <div class="report-card ${!retroPrintReady ? 'locked' : ''}">
                             <h3>Retrospective Case Report</h3>
                             <div class="report-status">
-                                ${retroAllDone ? '✓ Ready to download' : '🔒 Complete all 6 retrospective assessments'}
+                                ${retroAllDone ? '✓ All retrospective assessments marked complete' : '🔒 Complete all 6 retrospective assessments (dashboard)'}
                             </div>
-                            <button class="btn-report" ${!retroAllDone ? 'disabled' : ''} 
-                                    onclick="downloadReport('retrospective')">Download</button>
-                            <button class="btn-report" ${!retroAllDone ? 'disabled' : ''} 
-                                    onclick="printReport('retrospective')">Print</button>
+                            <div id="report-retro-capture" style="font-size: 13px; color: #b8922a; margin-bottom: 16px;">${retroPrintReady ? '✓ All 6 tools captured for print' : 'Captured for print: ' + retroCaptured + '/6'}</div>
+                            <button type="button" class="btn-report" data-report-btn="retro" ${!retroPrintReady ? 'disabled' : ''} onclick="printRetroReports()">Download</button>
+                            <button type="button" class="btn-report" data-report-btn="retro" ${!retroPrintReady ? 'disabled' : ''} onclick="printRetroReports()">Print</button>
                         </div>
                     </div>
                 </div>
@@ -559,6 +675,7 @@
             container.innerHTML = html;
 
             document.getElementById('save-case-info').addEventListener('click', saveCaseInfo);
+            updateReportUI();
         }
 
         async function saveCaseInfo() {
@@ -632,14 +749,6 @@
             url.searchParams.set('tool', toolKey);
             
             window.open(url.toString(), `${toolKey}-${caseType}`, 'width=1400,height=900');
-        };
-
-        window.downloadReport = function(caseType) {
-            alert(`Download ${caseType} case report - To be implemented`);
-        };
-
-        window.printReport = function(caseType) {
-            alert(`Print ${caseType} case report - To be implemented`);
         };
 
         function showExpiredMessage() {
