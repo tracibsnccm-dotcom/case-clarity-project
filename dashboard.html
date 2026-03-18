@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Clarity Project - Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: #f6f3ed;
+            color: #0e1c2e;
+        }
+        .app-header {
+            background: #0c1c34;
+            color: #e8e2d4;
+            padding: 0 48px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid #b8922a;
+        }
+        .app-header-left { display: flex; align-items: baseline; gap: 20px; }
+        .app-header-brand { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #b8922a; }
+        .app-header-title { font-size: 15px; letter-spacing: 0.04em; }
+        .app-header-right { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #6a8aaa; }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 32px;
+        }
+        
+        .timer-card {
+            background: #fff;
+            border: 1px solid #d6d0c4;
+            border-left: 3px solid #b8922a;
+            padding: 20px 32px;
+            margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .timer-label {
+            font-size: 11px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #b8922a;
+        }
+        .timer-value {
+            font-size: 24px;
+            color: #0c1c34;
+            font-weight: bold;
+        }
+        .timer-warning {
+            color: #c0392b;
+        }
+        
+        .case-section {
+            margin-bottom: 48px;
+        }
+        .case-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #d6d0c4;
+        }
+        .case-title {
+            font-size: 20px;
+            color: #0c1c34;
+        }
+        .case-progress {
+            font-size: 14px;
+            color: #b8922a;
+        }
+        .case-reference {
+            margin-bottom: 24px;
+        }
+        .reference-input {
+            padding: 10px 14px;
+            border: 1px solid #d6d0c4;
+            background: #faf8f4;
+            width: 400px;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            margin-right: 10px;
+        }
+        .btn-save {
+            background: #0c1c34;
+            color: #e8e2d4;
+            border: none;
+            padding: 10px 24px;
+            font-size: 11px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        .tool-card {
+            background: #fff;
+            border: 1px solid #d6d0c4;
+            border-top: 3px solid #0c1c34;
+            padding: 24px;
+        }
+        .tool-name {
+            font-size: 18px;
+            color: #0c1c34;
+            margin-bottom: 8px;
+        }
+        .tool-desc {
+            font-size: 13px;
+            color: #3a4a5a;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .tool-status {
+            display: inline-block;
+            padding: 4px 12px;
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+        .status-not-started {
+            background: #e8e3d8;
+            color: #6a7a8a;
+        }
+        .status-in-progress {
+            background: #fff3d6;
+            color: #b8922a;
+        }
+        .status-complete {
+            background: #0c1c34;
+            color: #b8922a;
+        }
+        .btn-launch {
+            width: 100%;
+            background: #0c1c34;
+            color: #e8e2d4;
+            border: none;
+            padding: 12px;
+            font-size: 11px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+        .btn-launch:disabled {
+            background: #c0bbad;
+            cursor: not-allowed;
+        }
+        
+        .reports-section {
+            margin-top: 48px;
+            padding: 32px;
+            background: #fff;
+            border: 1px solid #d6d0c4;
+        }
+        .reports-title {
+            font-size: 18px;
+            color: #0c1c34;
+            margin-bottom: 24px;
+        }
+        .reports-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        .report-card {
+            padding: 24px;
+            background: #faf8f4;
+            border: 1px solid #d6d0c4;
+        }
+        .report-card.locked {
+            opacity: 0.7;
+        }
+        .report-card h3 {
+            font-size: 14px;
+            margin-bottom: 12px;
+            color: #0c1c34;
+        }
+        .report-status {
+            font-size: 12px;
+            color: #b8922a;
+            margin-bottom: 20px;
+        }
+        .btn-report {
+            background: #0c1c34;
+            color: #e8e2d4;
+            border: none;
+            padding: 10px 20px;
+            font-size: 11px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .btn-report:disabled {
+            background: #c0bbad;
+            cursor: not-allowed;
+        }
+        
+        .expired-message {
+            text-align: center;
+            padding: 60px;
+            background: #fff;
+            border: 1px solid #d6d0c4;
+        }
+        .expired-message h2 {
+            color: #c0392b;
+            margin-bottom: 20px;
+        }
+        .expired-message .btn-primary {
+            background: #0c1c34;
+            color: #e8e2d4;
+            border: none;
+            padding: 14px 40px;
+            font-size: 11px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            cursor: pointer;
+            font-family: 'Georgia', 'Times New Roman', serif;
+        }
+        .expired-message .btn-primary:hover {
+            background: #1a2c44;
+        }
+        
+        @media (max-width: 900px) {
+            .tools-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 600px) {
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <div class="app-header-left">
+            <span class="app-header-brand">Reconcile Care Management Services</span>
+            <span class="app-header-div">|</span>
+            <span class="app-header-title">Case Clarity Project</span>
+        </div>
+        <span class="app-header-right" id="assessment-id-display"></span>
+    </header>
+
+    <div class="container" id="dashboard-content">
+        <!-- Content loaded dynamically -->
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase setup
+        const SUPABASE_URL = 'https://zmjxyspizdqhrtdcgkwk.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptanh5c3BpemRxaHJ0ZGNna3drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MjQ1NDcsImV4cCI6MjA4NTE4NDU0N30.szuVr87xdq1aqYpaM6p390f48ozj4CENU4ksg8vumhM';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Tool configuration
+        const TOOL_ORDER = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
+        const TOOL_INFO = {
+            'CCI': {
+                name: 'Case Complexity Index',
+                desc: 'Evaluates injury severity, life disruption, and care coordination demands.',
+                url: 'https://case-complexity-index-e0hdp2mvz-tracis-projects-26fd65a2.vercel.app'
+            },
+            'CSA': {
+                name: 'Clinical Sequencing Auditor',
+                desc: 'Assesses alignment with the 7 Rights of Injury Care Management.',
+                url: 'https://care-auditor-cvds0k5dx-tracis-projects-26fd65a2.vercel.app'
+            },
+            'CAF': {
+                name: 'C.A.R.E. Access Friction Score',
+                desc: 'Identifies insurance, referral, and provider access barriers.',
+                url: 'https://care-access-friction-score-133sg5wgb-tracis-projects-26fd65a2.vercel.app'
+            },
+            'HSI': {
+                name: 'Holistic Stability Index',
+                desc: 'Evaluates stability across the 4Ps of Wellness.',
+                url: 'https://holistic-stability-index-1bbz5j5r7-tracis-projects-26fd65a2.vercel.app'
+            },
+            'FCI': {
+                name: 'Functional Capacity Index',
+                desc: 'Assesses capacity to return to work and maintain independence.',
+                url: 'https://fci-portal-clean-4jbc10zs1-tracis-projects-26fd65a2.vercel.app'
+            },
+            'RRF': {
+                name: 'Recovery Risk Forecaster',
+                desc: 'Identifies factors affecting recovery trajectory.',
+                url: 'https://recovery-risk-forecaster-n7s9o0uzm-tracis-projects-26fd65a2.vercel.app'
+            }
+        };
+
+        // Check authentication
+        const assessmentId = localStorage.getItem('assessment_id');
+        const sessionId = localStorage.getItem('session_id');
+
+        if (!assessmentId || !sessionId) {
+            window.location.href = 'login.html';
+        }
+
+        document.getElementById('assessment-id-display').textContent = assessmentId;
+
+        // Load dashboard
+        loadDashboard();
+
+        async function loadDashboard() {
+            try {
+                // Get session data
+                const { data: session, error } = await supabaseClient
+                    .from('assessment_sessions')
+                    .select('*')
+                    .eq('id', sessionId)
+                    .single();
+
+                if (error || !session) {
+                    handleLogout();
+                    return;
+                }
+
+                // Check expiration
+                if (new Date() > new Date(session.expires_at)) {
+                    await supabaseClient
+                        .from('assessment_sessions')
+                        .update({ status: 'expired' })
+                        .eq('id', sessionId);
+                    
+                    showExpiredMessage();
+                    return;
+                }
+
+                // Calculate progress
+                const activeAssessments = session.active_case?.assessments || {};
+                const retroAssessments = session.retropective_case?.assessments || {};
+                
+                const activeComplete = Object.values(activeAssessments)
+                    .filter(a => a?.status === 'complete').length;
+                const retroComplete = Object.values(retroAssessments)
+                    .filter(a => a?.status === 'complete').length;
+                
+                const activeAllDone = activeComplete === 6;
+                const retroAllDone = retroComplete === 6;
+
+                // Calculate time remaining
+                const expiresAt = new Date(session.expires_at);
+                const now = new Date();
+                const daysLeft = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
+
+                // Render dashboard
+                renderDashboard(session, activeComplete, retroComplete, activeAllDone, retroAllDone, daysLeft);
+
+            } catch (err) {
+                console.error('Error loading dashboard:', err);
+            }
+        }
+
+        function renderDashboard(session, activeComplete, retroComplete, activeAllDone, retroAllDone, daysLeft) {
+            const container = document.getElementById('dashboard-content');
+            
+            const timerClass = daysLeft <= 2 ? 'timer-warning' : '';
+            
+            let html = `
+                <div class="timer-card">
+                    <span class="timer-label">Time Remaining</span>
+                    <span class="timer-value ${timerClass}">${daysLeft} days</span>
+                </div>
+            `;
+
+            // Active Case Section
+            html += `
+                <div class="case-section">
+                    <div class="case-header">
+                        <h2 class="case-title">Active Case Assessments</h2>
+                        <span class="case-progress">${activeComplete}/6 Complete</span>
+                    </div>
+                    
+                    <div class="case-reference">
+                        <input type="text" id="active-reference" class="reference-input" 
+                               placeholder="Enter Active Case Reference" 
+                               value="${session.active_case?.reference || ''}">
+                        <button onclick="saveReference('active')" class="btn-save">Save Reference</button>
+                    </div>
+                    
+                    <div class="tools-grid">
+            `;
+
+            // Add active case tools
+            TOOL_ORDER.forEach(toolKey => {
+                const tool = TOOL_INFO[toolKey];
+                const status = session.active_case?.assessments?.[toolKey]?.status || 'not_started';
+                html += getToolCard(toolKey, tool, status, 'active');
+            });
+
+            html += `</div></div>`;
+
+            // Retrospective Case Section
+            html += `
+                <div class="case-section">
+                    <div class="case-header">
+                        <h2 class="case-title">Retrospective Case Assessments</h2>
+                        <span class="case-progress">${retroComplete}/6 Complete</span>
+                    </div>
+                    
+                    <div class="case-reference">
+                        <input type="text" id="retro-reference" class="reference-input" 
+                               placeholder="Enter Retrospective Case Reference" 
+                               value="${session.retrospective_case?.reference || ''}">
+                        <button onclick="saveReference('retrospective')" class="btn-save">Save Reference</button>
+                    </div>
+                    
+                    <div class="tools-grid">
+            `;
+
+            // Add retrospective case tools
+            TOOL_ORDER.forEach(toolKey => {
+                const tool = TOOL_INFO[toolKey];
+                const status = session.retrospective_case?.assessments?.[toolKey]?.status || 'not_started';
+                html += getToolCard(toolKey, tool, status, 'retrospective');
+            });
+
+            html += `</div></div>`;
+
+            // Reports Section
+            html += `
+                <div class="reports-section">
+                    <h2 class="reports-title">Available Reports</h2>
+                    <div class="reports-grid">
+                        <div class="report-card ${!activeAllDone ? 'locked' : ''}">
+                            <h3>Active Case Report</h3>
+                            <div class="report-status">
+                                ${activeAllDone ? '✓ Ready to download' : '🔒 Complete all 6 active assessments'}
+                            </div>
+                            <button class="btn-report" ${!activeAllDone ? 'disabled' : ''} 
+                                    onclick="downloadReport('active')">Download</button>
+                            <button class="btn-report" ${!activeAllDone ? 'disabled' : ''} 
+                                    onclick="printReport('active')">Print</button>
+                        </div>
+                        
+                        <div class="report-card ${!retroAllDone ? 'locked' : ''}">
+                            <h3>Retrospective Case Report</h3>
+                            <div class="report-status">
+                                ${retroAllDone ? '✓ Ready to download' : '🔒 Complete all 6 retrospective assessments'}
+                            </div>
+                            <button class="btn-report" ${!retroAllDone ? 'disabled' : ''} 
+                                    onclick="downloadReport('retrospective')">Download</button>
+                            <button class="btn-report" ${!retroAllDone ? 'disabled' : ''} 
+                                    onclick="printReport('retrospective')">Print</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function getToolCard(toolKey, tool, status, caseType) {
+            let statusClass = 'status-not-started';
+            let statusText = 'NOT STARTED';
+            
+            if (status === 'in_progress') {
+                statusClass = 'status-in-progress';
+                statusText = 'IN PROGRESS';
+            } else if (status === 'complete') {
+                statusClass = 'status-complete';
+                statusText = 'COMPLETE';
+            }
+
+            return `
+                <div class="tool-card">
+                    <h3 class="tool-name">${tool.name}</h3>
+                    <p class="tool-desc">${tool.desc}</p>
+                    <div class="tool-status ${statusClass}">${statusText}</div>
+                    <button class="btn-launch" 
+                            onclick="launchTool('${toolKey}', '${caseType}')"
+                            ${status === 'complete' ? 'disabled' : ''}>
+                        ${status === 'complete' ? 'Completed' : 'Launch Assessment'}
+                    </button>
+                </div>
+            `;
+        }
+
+        // Global functions
+        window.saveReference = async function(caseType) {
+            const inputId = caseType === 'active' ? 'active-reference' : 'retro-reference';
+            const reference = document.getElementById(inputId).value;
+            
+            const field = caseType === 'active' ? 'active_case' : 'retrospective_case';
+            
+            const { data: session } = await supabaseClient
+                .from('assessment_sessions')
+                .select(field)
+                .eq('id', sessionId)
+                .single();
+            
+            const updatedCase = session[field] || { reference: '', assessments: {} };
+            updatedCase.reference = reference;
+            
+            await supabaseClient
+                .from('assessment_sessions')
+                .update({ [field]: updatedCase })
+                .eq('id', sessionId);
+            
+            alert('Reference saved');
+        };
+
+        window.launchTool = function(toolKey, caseType) {
+            const tool = TOOL_INFO[toolKey];
+            const url = new URL(tool.url);
+            url.searchParams.set('session', sessionId);
+            url.searchParams.set('assessmentId', assessmentId);
+            url.searchParams.set('caseType', caseType);
+            url.searchParams.set('tool', toolKey);
+            
+            window.open(url.toString(), `${toolKey}-${caseType}`, 'width=1400,height=900');
+        };
+
+        window.downloadReport = function(caseType) {
+            alert(`Download ${caseType} case report - To be implemented`);
+        };
+
+        window.printReport = function(caseType) {
+            alert(`Print ${caseType} case report - To be implemented`);
+        };
+
+        function showExpiredMessage() {
+            document.getElementById('dashboard-content').innerHTML = `
+                <div class="expired-message">
+                    <h2>Access Expired</h2>
+                    <p>Your 7-day assessment window has expired.</p>
+                    <p>Please contact support if you need assistance.</p>
+                    <button onclick="handleLogout()" class="btn-primary" style="margin-top: 20px;">Return to Login</button>
+                </div>
+            `;
+        }
+
+        window.handleLogout = function() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        };
+
+        // Refresh progress every 30 seconds
+        setInterval(loadDashboard, 30000);
+    </script>
+</body>
+</html>
