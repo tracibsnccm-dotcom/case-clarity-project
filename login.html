@@ -104,13 +104,15 @@
         <h1>Assessment Portal</h1>
         <p class="subtitle">Enter your Assessment ID and PIN to access the Case Clarity Project evaluation portal.</p>
         
-        <div class="field-label">ASSESSMENT ID</div>
-        <input type="text" id="assessment-id" class="field-input" placeholder="CCP-0001">
-        
-        <div class="field-label">ACCESS PIN</div>
-        <input type="password" id="pin" class="field-input" placeholder="6-digit PIN" maxlength="6">
-        
-        <button onclick="handleLogin()" class="btn-primary">ACCESS ASSESSMENT PORTAL</button>
+        <form id="login-form" onsubmit="event.preventDefault(); handleLogin();">
+            <div class="field-label">ASSESSMENT ID</div>
+            <input type="text" id="assessment-id" class="field-input" placeholder="CCP-0001" autocomplete="username">
+            
+            <div class="field-label">ACCESS PIN</div>
+            <input type="password" id="pin" class="field-input" placeholder="6-digit PIN" maxlength="6" autocomplete="current-password">
+            
+            <button type="submit" class="btn-primary">ACCESS ASSESSMENT PORTAL</button>
+        </form>
         
         <div id="error-message" class="error-message"></div>
         
@@ -124,6 +126,8 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptanh5c3BpemRxaHJ0ZGNna3drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MjQ1NDcsImV4cCI6MjA4NTE4NDU0N30.szuVr87xdq1aqYpaM6p390f48ozj4CENU4ksg8vumhM';
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        window.supabaseClient = supabaseClient;
+        window.supabase = supabaseClient;
 
         async function handleLogin() {
             const assessmentId = document.getElementById('assessment-id').value.trim();
@@ -221,12 +225,6 @@
             errorEl.style.display = 'block';
         }
         
-        // Allow Enter key to submit
-        document.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                handleLogin();
-            }
-        });
     </script>
 </body>
 </html>
