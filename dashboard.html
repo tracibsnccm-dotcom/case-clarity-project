@@ -274,6 +274,36 @@
                 grid-template-columns: 1fr !important;
             }
         }
+        .case-entry-block {
+            margin-bottom: 28px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #e8e4dc;
+        }
+        .case-entry-block:last-of-type {
+            border-bottom: none;
+            margin-bottom: 20px;
+            padding-bottom: 0;
+        }
+        .case-entry-field {
+            margin-bottom: 16px;
+        }
+        .case-entry-field label {
+            display: block;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            color: #3a4a5a;
+        }
+        .case-entry-field input,
+        .case-entry-field select {
+            width: 100%;
+            max-width: 480px;
+            padding: 10px;
+            border: 1px solid #d6d0c4;
+            background: #faf8f4;
+            font-family: inherit;
+        }
         .dashboard-heading {
             font-size: 28px;
             color: #0c1c34;
@@ -529,8 +559,17 @@
             const container = document.getElementById('dashboard-content');
             
             const timerClass = daysLeft <= 2 ? 'timer-warning' : '';
-            const activeRef = escapeAttr(session.active_case?.reference || '');
-            const closedRef = escapeAttr(session.retrospective_case?.reference || '');
+            const ac = session.active_case || {};
+            const rc = session.retrospective_case || {};
+            const acName = escapeAttr(ac.name_case_id || ac.reference || '');
+            const acDate = escapeAttr(ac.date_of_injury || '');
+            const acMech = escapeAttr(ac.mechanism || '');
+            const acType = ac.case_type === 'PI' || ac.case_type === 'WC' || ac.case_type === 'Disability' ? ac.case_type : '';
+            const rcName = escapeAttr(rc.name_case_id || rc.reference || '');
+            const rcDate = escapeAttr(rc.date_of_injury || '');
+            const rcMech = escapeAttr(rc.mechanism || '');
+            const rcType = rc.case_type === 'PI' || rc.case_type === 'WC' || rc.case_type === 'Disability' ? rc.case_type : '';
+            const sel = function (cur, val) { return cur === val ? ' selected' : ''; };
             
             let html = `
                 <div class="timer-card">
@@ -569,17 +608,54 @@
                     <p style="font-size: 14px;"><strong>Data Storage Notice:</strong> Case information entered here is stored only during the active 72-hour assessment window. All case data, instrument responses, and generated reports are automatically deleted when the assessment period expires.</p>
                   </div>
                   
-                  <div class="case-entry-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 20px;">
-                    <div>
-                      <label style="display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Active Case Reference</label>
-                      <input type="text" id="active-case-ref" style="width: 100%; padding: 10px; border: 1px solid #d6d0c4; background: #faf8f4;" placeholder="e.g., Smith v. Insurance" value="${activeRef}">
+                  <div class="case-entry-block">
+                    <h3 style="font-size: 17px; color: #0c1c34; margin-bottom: 18px;">Active Case</h3>
+                    <div class="case-entry-field">
+                      <label for="active-name-case-id">Name / Case ID</label>
+                      <input type="text" id="active-name-case-id" placeholder="e.g., Smith v. Carrier" value="${acName}">
                     </div>
-                    <div>
-                      <label style="display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Closed Case Reference (Retrospective)</label>
-                      <input type="text" id="closed-case-ref" style="width: 100%; padding: 10px; border: 1px solid #d6d0c4; background: #faf8f4;" placeholder="e.g., Jones v. Carrier" value="${closedRef}">
+                    <div class="case-entry-field">
+                      <label for="active-date-injury">Date of Injury / Loss</label>
+                      <input type="date" id="active-date-injury" value="${acDate}">
+                    </div>
+                    <div class="case-entry-field">
+                      <label for="active-mechanism">Mechanism of Injury</label>
+                      <input type="text" id="active-mechanism" placeholder="e.g., MVA, slip and fall" value="${acMech}">
+                    </div>
+                    <div class="case-entry-field">
+                      <label for="active-case-type">Case Type</label>
+                      <select id="active-case-type">
+                        <option value="">Select…</option>
+                        <option value="PI"${sel(acType, 'PI')}>PI</option>
+                        <option value="WC"${sel(acType, 'WC')}>WC</option>
+                        <option value="Disability"${sel(acType, 'Disability')}>Disability</option>
+                      </select>
                     </div>
                   </div>
-                  
+                  <div class="case-entry-block">
+                    <h3 style="font-size: 17px; color: #0c1c34; margin-bottom: 18px;">Retrospective (closed case)</h3>
+                    <div class="case-entry-field">
+                      <label for="retro-name-case-id">Name / Case ID</label>
+                      <input type="text" id="retro-name-case-id" placeholder="e.g., Jones v. Carrier" value="${rcName}">
+                    </div>
+                    <div class="case-entry-field">
+                      <label for="retro-date-injury">Date of Injury / Loss</label>
+                      <input type="date" id="retro-date-injury" value="${rcDate}">
+                    </div>
+                    <div class="case-entry-field">
+                      <label for="retro-mechanism">Mechanism of Injury</label>
+                      <input type="text" id="retro-mechanism" placeholder="e.g., work injury" value="${rcMech}">
+                    </div>
+                    <div class="case-entry-field">
+                      <label for="retro-case-type">Case Type</label>
+                      <select id="retro-case-type">
+                        <option value="">Select…</option>
+                        <option value="PI"${sel(rcType, 'PI')}>PI</option>
+                        <option value="WC"${sel(rcType, 'WC')}>WC</option>
+                        <option value="Disability"${sel(rcType, 'Disability')}>Disability</option>
+                      </select>
+                    </div>
+                  </div>
                   <button type="button" id="save-case-info" style="background: #0c1c34; color: white; border: none; padding: 10px 24px; cursor: pointer;">Save Case Information</button>
                   <span style="margin-left: 16px; font-size: 13px; color: #666;">You may edit this information from the dashboard at any time during the assessment window.</span>
                 </div>
@@ -592,23 +668,21 @@
             html += `
                 <div class="case-section case-section-active">
                     <h2 style="font-size: 20px; margin: 32px 0 16px;">Active Case — Recommended Order</h2>
-                    <p style="margin-bottom: 24px; color: #4a5568;">Start with 1 and follow the sequence for best results.</p>
+                    <p style="margin-bottom: 20px; color: #4a5568; line-height: 1.6;">It is recommended that you complete in order, but you may choose any sequence. Reports will unlock for download once all assessments in this section are completed.</p>
                     <div style="margin-bottom: 16px; font-size: 14px; color: #b8922a;">Active Progress: ${activeComplete}/6 | Retro Progress: ${retroComplete}/6</div>
+                    <p style="margin-bottom: 24px; color: #4a5568; line-height: 1.6; padding: 16px; background: #f4f6f8; border-left: 3px solid #0c1c34;">Consider beginning with a case that has stalled or where clinical direction is unclear. This process also provides a framework for new cases, offering guidance from the outset.</p>
                     <div class="tools-grid">
             `;
 
             const activeAssessments = session.active_case?.assessments || {};
-            TOOL_ORDER.forEach((toolKey, idx) => {
+            TOOL_ORDER.forEach((toolKey) => {
                 const tool = TOOL_INFO[toolKey];
                 const status = activeAssessments[toolKey]?.status || 'not_started';
-                const prevKey = idx > 0 ? TOOL_ORDER[idx - 1] : null;
-                const prevComplete = !prevKey || activeAssessments[prevKey]?.status === 'complete';
-                const canLaunchActive = status === 'complete' ? false : (prevComplete || status === 'in_progress');
                 html += getToolCard(toolKey, tool, status, 'active', {
                     displayName: ACTIVE_NUMBERED_TITLES[toolKey],
                     cardClass: 'tool-card-active',
-                    launchDisabled: status === 'complete' || !canLaunchActive,
-                    lockedBySequence: status !== 'complete' && !canLaunchActive
+                    launchDisabled: status === 'complete',
+                    lockedBySequence: false
                 });
             });
 
@@ -618,8 +692,8 @@
             html += `
                 <div class="case-section case-section-retro">
                     <h2 style="font-size: 20px; margin: 48px 0 16px;">Retrospective Case</h2>
-                    <p style="margin-bottom: 24px; color: #4a5568;">Complete in any order after Active Case.</p>
                     <div style="margin-bottom: 16px; font-size: 14px; color: #b8922a;">Active Progress: ${activeComplete}/6 | Retro Progress: ${retroComplete}/6</div>
+                    <p style="margin-bottom: 24px; color: #4a5568; line-height: 1.6; padding: 16px; background: #faf6f0; border-left: 3px solid #8b6914;">For cases that have already settled, this review may identify factors that could have influenced the outcome or settlement value.</p>
                     <div class="tools-grid">
             `;
 
@@ -679,8 +753,8 @@
         }
 
         async function saveCaseInfo() {
-            const activeRef = document.getElementById('active-case-ref').value;
-            const closedRef = document.getElementById('closed-case-ref').value;
+            const activeName = document.getElementById('active-name-case-id').value.trim();
+            const retroName = document.getElementById('retro-name-case-id').value.trim();
 
             const { data: session, error } = await supabaseClient
                 .from('assessment_sessions')
@@ -693,10 +767,22 @@
                 return;
             }
 
-            const activeCase = session.active_case || { reference: '', assessments: {} };
-            const retroCase = session.retrospective_case || { reference: '', assessments: {} };
-            activeCase.reference = activeRef;
-            retroCase.reference = closedRef;
+            const activeCase = session.active_case || { assessments: {} };
+            const retroCase = session.retrospective_case || { assessments: {} };
+            if (!activeCase.assessments) activeCase.assessments = {};
+            if (!retroCase.assessments) retroCase.assessments = {};
+
+            activeCase.name_case_id = activeName;
+            activeCase.reference = activeName;
+            activeCase.date_of_injury = document.getElementById('active-date-injury').value || '';
+            activeCase.mechanism = document.getElementById('active-mechanism').value.trim();
+            activeCase.case_type = document.getElementById('active-case-type').value || '';
+
+            retroCase.name_case_id = retroName;
+            retroCase.reference = retroName;
+            retroCase.date_of_injury = document.getElementById('retro-date-injury').value || '';
+            retroCase.mechanism = document.getElementById('retro-mechanism').value.trim();
+            retroCase.case_type = document.getElementById('retro-case-type').value || '';
 
             await supabaseClient
                 .from('assessment_sessions')
