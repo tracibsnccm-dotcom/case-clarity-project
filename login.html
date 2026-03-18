@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Case Clarity Project - Login</title>
+    <!-- Load Supabase first -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -98,6 +100,7 @@
     </style>
 </head>
 <body>
+    <!-- DEPLOYMENT VERSION: 2.0 - FIXED SUPABASE SCRIPT -->
     <div class="login-card">
         <div class="brand">Reconcile Care Management Services</div>
         <h1>Assessment Portal</h1>
@@ -117,10 +120,10 @@
         <p class="info">Credentials were provided in your assessment access email.</p>
     </div>
 
-    <!-- Load Supabase first -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <script>
+        console.log('🔍 Login page v2.0 loaded');
+        console.log('Supabase script found?', !!document.querySelector('script[src*="supabase"]'));
+        console.log('Supabase library loaded?', typeof supabase !== 'undefined');
         // Wait for DOM and Supabase to be ready
         (function() {
             // Supabase credentials
