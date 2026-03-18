@@ -355,6 +355,16 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        (function () {
+        // Protect dashboard — redirect to login if not authenticated
+        const assessmentId = localStorage.getItem('assessment_id');
+        const sessionId = localStorage.getItem('session_id');
+
+        if (!assessmentId || !sessionId) {
+            window.location.href = 'login.html';
+            return;
+        }
+
         // Supabase setup
         const SUPABASE_URL = 'https://zmjxyspizdqhrtdcgkwk.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptanh5c3BpemRxaHJ0ZGNna3drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MjQ1NDcsImV4cCI6MjA4NTE4NDU0N30.szuVr87xdq1aqYpaM6p390f48ozj4CENU4ksg8vumhM';
@@ -514,14 +524,6 @@
                 url: 'https://recovery-risk-forecaster-n7s9o0uzm-tracis-projects-26fd65a2.vercel.app'
             }
         };
-
-        // Check authentication
-        const assessmentId = localStorage.getItem('assessment_id');
-        const sessionId = localStorage.getItem('session_id');
-
-        if (!assessmentId || !sessionId) {
-            window.location.href = 'login.html';
-        }
 
         document.getElementById('assessment-id-display').textContent = assessmentId;
 
@@ -908,6 +910,7 @@
 
         // Refresh progress every 30 seconds
         setInterval(loadDashboard, 30000);
+        })();
     </script>
 </body>
 </html>
