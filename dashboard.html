@@ -394,6 +394,149 @@
             color: #0c1c34;
             margin-bottom: 24px;
         }
+
+        /* Trial: complete report (localStorage from all 6 tools) */
+        .trial-report-panel {
+            background: #fff;
+            border: 1px solid #d6d0c4;
+            border-left: 4px solid #0c1c34;
+            padding: 28px 32px;
+            margin-bottom: 32px;
+        }
+        .trial-report-panel h2 {
+            font-size: 20px;
+            color: #0c1c34;
+            margin-bottom: 12px;
+        }
+        .trial-report-panel .trial-report-lead {
+            font-size: 14px;
+            color: #3a4a5a;
+            line-height: 1.65;
+            margin-bottom: 16px;
+        }
+        .trial-report-progress {
+            font-size: 13px;
+            color: #b8922a;
+            margin-bottom: 16px;
+            letter-spacing: 0.04em;
+        }
+        .trial-report-panel .btn-generate-complete {
+            background: #b8922a;
+            color: #0c1c34;
+            border: none;
+            padding: 12px 28px;
+            font-size: 11px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            cursor: pointer;
+            font-family: 'Georgia', 'Times New Roman', serif;
+        }
+        .trial-report-panel .btn-generate-complete:hover {
+            background: #a67f24;
+        }
+        .trial-report-output {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid #e8e3d8;
+        }
+        .trial-report-toolbar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        .trial-report-toolbar .btn-print-trial {
+            background: #0c1c34;
+            color: #e8e2d4;
+            border: none;
+            padding: 10px 22px;
+            font-size: 11px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            cursor: pointer;
+            font-family: 'Georgia', 'Times New Roman', serif;
+        }
+        .trial-report-toolbar .btn-print-trial:hover {
+            background: #1a2c44;
+        }
+        .trial-report-meta {
+            font-size: 12px;
+            color: #6a7a8a;
+            margin-bottom: 24px;
+        }
+        .trial-report-body {
+            font-size: 14px;
+            color: #0e1c2e;
+            line-height: 1.65;
+        }
+        .trial-tool-block {
+            background: #faf8f4;
+            border: 1px solid #d6d0c4;
+            padding: 20px 22px;
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+        }
+        .trial-tool-block h3 {
+            font-size: 15px;
+            color: #0c1c34;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #d6d0c4;
+            letter-spacing: 0.04em;
+        }
+        .trial-tool-block .trial-kv {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 8px 20px;
+            font-size: 13px;
+        }
+        @media (max-width: 600px) {
+            .trial-tool-block .trial-kv {
+                grid-template-columns: 1fr;
+            }
+        }
+        .trial-tool-block .trial-k {
+            color: #6a7a8a;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .trial-tool-block .trial-v {
+            color: #0e1c2e;
+        }
+        .trial-tool-block .trial-note {
+            margin-top: 12px;
+            font-size: 12px;
+            color: #5a6a7a;
+            font-style: italic;
+        }
+        .trial-json-fallback {
+            margin-top: 12px;
+            padding: 12px;
+            background: #fff;
+            border: 1px solid #e8e3d8;
+            font-family: ui-monospace, monospace;
+            font-size: 11px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            .trial-print-root, .trial-print-root * { visibility: visible; }
+            .trial-print-root {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 0 24px 24px;
+                background: #fff;
+            }
+            .no-print { display: none !important; }
+            .app-header { display: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -540,6 +683,189 @@
             document.addEventListener('DOMContentLoaded', updateReportUI);
         } else {
             updateReportUI();
+        }
+
+        // ===== TRIAL: all 6 tools → localStorage → consolidated report =====
+        function allToolsComplete() {
+            for (let i = 1; i <= 6; i++) {
+                if (!localStorage.getItem('tool' + i + '_complete')) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        window.allToolsComplete = allToolsComplete;
+
+        function safeParseLocalStorage(key) {
+            try {
+                var s = localStorage.getItem(key);
+                if (!s) return null;
+                return JSON.parse(s);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function gatherTrialReportData() {
+            return {
+                tool1: safeParseLocalStorage('tool1_data'),
+                tool2: safeParseLocalStorage('tool2_data'),
+                tool3: safeParseLocalStorage('tool3_data'),
+                tool4: safeParseLocalStorage('tool4_data'),
+                tool5: safeParseLocalStorage('tool5_data'),
+                tool6: safeParseLocalStorage('tool6_data'),
+                generatedAt: new Date().toISOString()
+            };
+        }
+
+        function escTrialHtml(s) {
+            if (s == null || s === '') return '—';
+            return String(s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function trialKvRow(k, v) {
+            return '<div class="trial-k">' + escTrialHtml(k) + '</div><div class="trial-v">' + escTrialHtml(v) + '</div>';
+        }
+
+        function trialToolBlock(title, innerHtml) {
+            return '<div class="trial-tool-block"><h3>' + escTrialHtml(title) + '</h3>' + innerHtml + '</div>';
+        }
+
+        function buildComprehensiveReportHTML(reportData) {
+            var parts = [];
+
+            var t1 = reportData.tool1;
+            if (t1) {
+                var ad = t1.assessmentData || {};
+                var rows = '';
+                rows += trialKvRow('Case complexity level', t1.level != null ? String(t1.level) : (ad.level != null ? String(ad.level) : '—'));
+                rows += trialKvRow('Level summary', ad.levelName || '—');
+                rows += trialKvRow('Review interval', ad.interval || '—');
+                rows += trialKvRow('Domain tiers (D1 / D2 / D3)', [t1.d1Tier, t1.d2Tier, t1.d3Tier].filter(function (x) { return x != null; }).join(' / ') || '—');
+                rows += trialKvRow('Composite (weighted)', t1.composite != null ? String(Math.round(t1.composite)) : '—');
+                rows += trialKvRow('Saved', t1.timestamp || '—');
+                parts.push(trialToolBlock('1. Case Complexity Index™', '<div class="trial-kv">' + rows + '</div>'));
+            } else {
+                parts.push(trialToolBlock('1. Case Complexity Index™', '<p class="trial-note">No saved data.</p>'));
+            }
+
+            var t2 = reportData.tool2;
+            if (t2 && t2.data) {
+                var d = t2.data;
+                var rows2 = '';
+                rows2 += trialKvRow('Overall alignment', d.overallLabel || d.overallKey || '—');
+                rows2 += trialKvRow('Alignment indicator', d.alignmentPercent != null ? String(d.alignmentPercent) + '%' : '—');
+                rows2 += trialKvRow('Instrument', d.tool || 'CSA');
+                rows2 += trialKvRow('Completed at', d.completedAt || t2.timestamp || '—');
+                parts.push(trialToolBlock('2. Clinical Sequencing Auditor™', '<div class="trial-kv">' + rows2 + '</div>'));
+            } else {
+                parts.push(trialToolBlock('2. Clinical Sequencing Auditor™', '<p class="trial-note">No saved data.</p>'));
+            }
+
+            var t3 = reportData.tool3;
+            if (t3) {
+                var rows3 = '';
+                rows3 += trialKvRow('Access friction level (determining domain)', t3.finalLevel != null ? String(t3.finalLevel) : '—');
+                rows3 += trialKvRow('Determining domain', t3.determiningDomainTitle || '—');
+                rows3 += trialKvRow('Critical barrier flags', Array.isArray(t3.flags) ? String(t3.flags.length) + ' item(s)' : '—');
+                if (Array.isArray(t3.flags) && t3.flags.length) {
+                    rows3 += trialKvRow('Flag summary', t3.flags.slice(0, 6).join('; ') + (t3.flags.length > 6 ? '…' : ''));
+                }
+                rows3 += trialKvRow('Saved', t3.timestamp || '—');
+                parts.push(trialToolBlock('3. C.A.R.E. Access Friction Score™', '<div class="trial-kv">' + rows3 + '</div>'));
+            } else {
+                parts.push(trialToolBlock('3. C.A.R.E. Access Friction Score™', '<p class="trial-note">No saved data.</p>'));
+            }
+
+            var t4 = reportData.tool4;
+            if (t4) {
+                var rows4 = '';
+                var intr = t4.intrinsic != null ? String(t4.intrinsic) : '';
+                rows4 += trialKvRow('Intrinsic signal', (intr + (t4.pCode || '')) || '—');
+                rows4 += trialKvRow('Extrinsic (social drivers)', t4.extrinsic != null ? String(t4.extrinsic) : '—');
+                var dest = t4.destab;
+                rows4 += trialKvRow('Clinical destabilizers (scores)', Array.isArray(dest) ? dest.join(', ') : '—');
+                rows4 += trialKvRow('Saved', t4.timestamp || '—');
+                parts.push(trialToolBlock('4. Holistic Stability Index™', '<div class="trial-kv">' + rows4 + '</div>'));
+            } else {
+                parts.push(trialToolBlock('4. Holistic Stability Index™', '<p class="trial-note">No saved data.</p>'));
+            }
+
+            var t5 = reportData.tool5;
+            if (t5) {
+                var rows5 = '';
+                rows5 += trialKvRow('FCI score (lowest domain)', t5.fciMinScore != null ? String(t5.fciMinScore) : '—');
+                rows5 += trialKvRow('Functional Vulnerability Indicator', t5.functionalVulnerabilityIndicator || '—');
+                rows5 += trialKvRow('Primary instability domain(s)', Array.isArray(t5.primaryInstabilityDomains) ? t5.primaryInstabilityDomains.join('; ') : '—');
+                rows5 += trialKvRow('Saved', t5.timestamp || '—');
+                parts.push(trialToolBlock('5. Functional Capacity Index™', '<div class="trial-kv">' + rows5 + '</div>'));
+            } else {
+                parts.push(trialToolBlock('5. Functional Capacity Index™', '<p class="trial-note">No saved data.</p>'));
+            }
+
+            var t6 = reportData.tool6;
+            if (t6) {
+                var rows6 = '';
+                var branchLabel = t6.branch === 'WC' ? "Workers' Compensation" : (t6.branch === 'PI' ? 'Personal Injury' : (t6.branch || '—'));
+                rows6 += trialKvRow('Branch', branchLabel);
+                rows6 += trialKvRow('Recovery risk level', t6.level || '—');
+                rows6 += trialKvRow('Score', t6.total != null ? String(t6.total) + ' / 100' : '—');
+                rows6 += trialKvRow('Estimated duration (illustrative)', t6.predictedDays != null ? String(t6.predictedDays) + ' days' : '—');
+                rows6 += trialKvRow('Saved', t6.timestamp || '—');
+                parts.push(trialToolBlock('6. Recovery Risk Forecaster™', '<div class="trial-kv">' + rows6 + '</div>'));
+            } else {
+                parts.push(trialToolBlock('6. Recovery Risk Forecaster™', '<p class="trial-note">No saved data.</p>'));
+            }
+
+            var html = '';
+            html += '<h2 style="font-size:22px;color:#0c1c34;margin:0 0 8px;padding:0;border:none;">Case Clarity — Complete Assessment Report</h2>';
+            html += '<p style="font-size:13px;color:#6a7a8a;margin:0 0 20px;">Consolidated results from all six trial instruments (data from this browser).</p>';
+            html += parts.join('');
+            var rawJson = '';
+            try {
+                rawJson = JSON.stringify(reportData, null, 2);
+            } catch (e2) {
+                rawJson = String(reportData);
+            }
+            html += '<div class="trial-tool-block"><h3>Complete payload (JSON)</h3><p class="trial-note">Full localStorage export for your records or support.</p>';
+            html += '<div class="trial-json-fallback">' + escTrialHtml(rawJson) + '</div></div>';
+            return html;
+        }
+
+        function updateTrialReportUI() {
+            var prog = document.getElementById('trial-local-progress');
+            var wrap = document.getElementById('trial-generate-wrap');
+            if (!prog || !wrap) return;
+            var n = 0;
+            for (var i = 1; i <= 6; i++) {
+                if (localStorage.getItem('tool' + i + '_complete')) n++;
+            }
+            prog.textContent = 'Instruments saved in this browser: ' + n + '/6';
+            wrap.style.display = allToolsComplete() ? 'block' : 'none';
+        }
+
+        function bindTrialReportHandlers() {
+            var gen = document.getElementById('btn-generate-complete-report');
+            var prt = document.getElementById('btn-print-trial-report');
+            if (gen) {
+                gen.onclick = function () {
+                    var reportData = gatherTrialReportData();
+                    var bodyEl = document.getElementById('trial-report-body');
+                    var outEl = document.getElementById('trial-report-output');
+                    var metaEl = document.getElementById('trial-report-generated-at');
+                    if (bodyEl) bodyEl.innerHTML = buildComprehensiveReportHTML(reportData);
+                    if (metaEl) metaEl.textContent = 'Generated: ' + new Date(reportData.generatedAt).toLocaleString();
+                    if (outEl) outEl.style.display = 'block';
+                };
+            }
+            if (prt) {
+                prt.onclick = function () {
+                    window.print();
+                };
+            }
         }
 
         // Tool configuration
@@ -722,6 +1048,22 @@
 
                 <h1 class="dashboard-heading">Assessment Dashboard</h1>
 
+                <div id="trial-complete-report-panel" class="trial-report-panel">
+                    <h2>Complete trial report</h2>
+                    <p class="trial-report-lead">After you finish all six instruments in this browser, generate a single consolidated report from the data saved on your device (localStorage). Use <strong>Print Report</strong> to print or save as PDF.</p>
+                    <p class="trial-report-progress" id="trial-local-progress">Instruments saved in this browser: —/6</p>
+                    <div id="trial-generate-wrap" style="display:none;">
+                        <button type="button" class="btn-generate-complete" id="btn-generate-complete-report">Generate Complete Report</button>
+                    </div>
+                    <div id="trial-report-output" class="trial-report-output trial-print-root" style="display:none;">
+                        <div class="trial-report-toolbar no-print">
+                            <button type="button" class="btn-print-trial" id="btn-print-trial-report">Print Report</button>
+                        </div>
+                        <p class="trial-report-meta" id="trial-report-generated-at"></p>
+                        <div id="trial-report-body" class="trial-report-body"></div>
+                    </div>
+                </div>
+
                 <!-- CASE ENTRY SECTION (side by side) -->
                 <div style="background: #fff; border: 1px solid #d6d0c4; padding: 24px; margin-bottom: 32px;">
                   <h2 style="font-size: 20px; margin-bottom: 16px;">Enter Your Case Information</h2>
@@ -882,6 +1224,20 @@
             updateCollapsibleProgress(activeComplete, retroComplete);
             syncCollapsiblePreview('retro-tools');
             syncCollapsiblePreview('active-tools');
+
+            bindTrialReportHandlers();
+            updateTrialReportUI();
+            var trialUrlParams = new URLSearchParams(window.location.search);
+            if (trialUrlParams.get('complete') === 'true') {
+                updateTrialReportUI();
+                if (allToolsComplete()) {
+                    var trialPanel = document.getElementById('trial-complete-report-panel');
+                    if (trialPanel) trialPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+                if (window.history && window.history.replaceState) {
+                    window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
+                }
+            }
         }
 
         async function saveCaseInfo() {
