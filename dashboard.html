@@ -57,6 +57,27 @@
         .app-header-brand { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #b8922a; }
         .app-header-title { font-size: 15px; letter-spacing: 0.04em; }
         .app-header-right { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #6a8aaa; }
+        .app-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .btn-logout {
+            background: transparent;
+            color: #e8e2d4;
+            border: 1px solid rgba(232, 226, 212, 0.45);
+            padding: 8px 16px;
+            font-size: 10px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            cursor: pointer;
+            font-family: 'Georgia', 'Times New Roman', serif;
+        }
+        .btn-logout:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: #b8922a;
+            color: #fff;
+        }
         
         .container {
             max-width: 1200px;
@@ -376,13 +397,22 @@
     </style>
 </head>
 <body>
+    <script>
+    // Protect dashboard - redirect to login if not logged in
+    if (!localStorage.getItem('user_logged_in')) {
+        window.location.href = 'login.html';
+    }
+    </script>
     <header class="app-header">
         <div class="app-header-left">
             <span class="app-header-brand">Reconcile Care Management Services</span>
             <span class="app-header-div">|</span>
             <span class="app-header-title">Case Clarity Project</span>
         </div>
-        <span class="app-header-right" id="assessment-id-display"></span>
+        <div class="app-header-actions">
+            <span class="app-header-right" id="assessment-id-display"></span>
+            <button type="button" class="btn-logout" onclick="localStorage.removeItem('user_logged_in'); window.location.href='login.html';">Logout</button>
+        </div>
     </header>
 
     <div class="container" id="dashboard-content">
