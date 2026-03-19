@@ -928,14 +928,17 @@
         }
 
         window.launchTool = function(toolKey, caseType) {
+            const sessionId = localStorage.getItem('session_id');
+            const assessmentId = localStorage.getItem('assessment_id');
             const tool = TOOL_INFO[toolKey];
-            const url = new URL(tool.url);
+            const toolUrl = tool.url;
+            const url = new URL(toolUrl);
             url.searchParams.set('session', sessionId);
             url.searchParams.set('assessmentId', assessmentId);
             url.searchParams.set('caseType', caseType);
             url.searchParams.set('tool', toolKey);
-            
-            window.open(url.toString(), `${toolKey}-${caseType}`, 'width=1400,height=900');
+
+            window.open(url.toString(), '_blank');
         };
 
         function showExpiredMessage() {
