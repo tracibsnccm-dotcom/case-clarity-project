@@ -552,36 +552,37 @@
             'FCI': '5. Functional Capacity Index',
             'RRF': '6. Recovery Risk Forecaster'
         };
+        // Same-origin HTML tools bundled with this deployment (not legacy multi-project URLs)
         const TOOL_INFO = {
             'CCI': {
                 name: 'Case Complexity Index',
                 desc: 'Evaluates injury severity, life disruption, and care coordination demands.',
-                url: 'https://case-complexity-index-e0hdp2mvz-tracis-projects-26fd65a2.vercel.app'
+                url: 'tool1-cci.html'
             },
             'CSA': {
                 name: 'Clinical Sequencing Auditor',
                 desc: 'Assesses alignment with the 7 Rights of Injury Care Management.',
-                url: 'https://care-auditor-cvds0k5dx-tracis-projects-26fd65a2.vercel.app'
+                url: 'tool2-csa.html'
             },
             'CAF': {
                 name: 'C.A.R.E. Access Friction Score',
                 desc: 'Identifies insurance, referral, and provider access barriers.',
-                url: 'https://care-access-friction-score-133sg5wgb-tracis-projects-26fd65a2.vercel.app'
+                url: 'tool3-caf.html'
             },
             'HSI': {
                 name: 'Holistic Stability Index',
                 desc: 'Evaluates stability across the 4Ps of Wellness.',
-                url: 'https://holistic-stability-index-1bbz5j5r7-tracis-projects-26fd65a2.vercel.app'
+                url: 'tool4-hsi.html'
             },
             'FCI': {
                 name: 'Functional Capacity Index',
                 desc: 'Assesses capacity to return to work and maintain independence.',
-                url: 'https://fci-portal-clean-4jbc10zs1-tracis-projects-26fd65a2.vercel.app'
+                url: 'tool5-fci.html'
             },
             'RRF': {
                 name: 'Recovery Risk Forecaster',
                 desc: 'Identifies factors affecting recovery trajectory.',
-                url: 'https://recovery-risk-forecaster-n7s9o0uzm-tracis-projects-26fd65a2.vercel.app'
+                url: 'tool6-rrf.html'
             }
         };
 
@@ -962,7 +963,7 @@
             const assessmentId = localStorage.getItem('assessment_id');
             const tool = TOOL_INFO[toolKey];
             const toolUrl = tool.url;
-            const url = new URL(toolUrl);
+            const url = new URL(toolUrl, window.location.href);
             url.searchParams.set('session', sessionId);
             url.searchParams.set('assessmentId', assessmentId);
             url.searchParams.set('caseType', caseType);
