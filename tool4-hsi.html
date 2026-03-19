@@ -1441,7 +1441,7 @@ function renderAllDomains() {
     const stg = STAGES[dom.key];
     const allAnswered = dom.questions.every((_, qi) => A[di][qi] !== undefined);
     const anyAnswered = dom.questions.some((_, qi) => A[di][qi] !== undefined);
-    const isOpen = !allAnswered; // start open if not yet complete
+    const isOpen = false; // start collapsed; users expand; pickDomainStage opens next when one domain completes
 
     const questionsHtml = dom.questions.map((q, qi) => {
       const saved = A[di][qi];

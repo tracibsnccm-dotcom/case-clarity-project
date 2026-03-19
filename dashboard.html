@@ -589,6 +589,76 @@
         if (!window.reportData.active) window.reportData.active = {};
         if (!window.reportData.retro) window.reportData.retro = {};
 
+        function allToolsComplete() {
+            for (var i = 1; i <= 6; i++) {
+                if (!localStorage.getItem('tool' + i + '_complete')) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        window.allToolsComplete = allToolsComplete;
+
+        function countLocalToolsComplete() {
+            var n = 0;
+            for (var i = 1; i <= 6; i++) {
+                if (localStorage.getItem('tool' + i + '_complete')) n++;
+            }
+            return n;
+        }
+
+        function safeParseLocalStorage(key) {
+            try {
+                var s = localStorage.getItem(key);
+                if (!s) return null;
+                return JSON.parse(s);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function buildTrialPrintPayloadFromLocal() {
+            var keys = [
+                ['CCI', 'tool1_data'],
+                ['CSA', 'tool2_data'],
+                ['CAF', 'tool3_data'],
+                ['HSI', 'tool4_data'],
+                ['FCI', 'tool5_data'],
+                ['RRF', 'tool6_data']
+            ];
+            var obj = {};
+            keys.forEach(function (row) {
+                var p = safeParseLocalStorage(row[1]);
+                if (!p) return;
+                var inner = p.data !== undefined ? p.data : p;
+                obj[row[0]] = {
+                    data: inner,
+                    completedAt: p.timestamp || p.generatedAt || p.completedAt || new Date().toISOString()
+                };
+            });
+            return obj;
+        }
+
+        function escPrintHtml(s) {
+            if (s == null || s === '') return '—';
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function buildDashboardCasePrintHtml(printCaseKind) {
+            var key = printCaseKind === 'active' ? 'dashboard_case_active' : 'dashboard_case_retro';
+            var c = safeParseLocalStorage(key);
+            if (!c) return '';
+            var has = c.nameCaseId || c.dateOfInjury || c.mechanism || c.caseType;
+            if (!has) return '';
+            var title = printCaseKind === 'active' ? 'Active case information' : 'Retrospective case information';
+            return '<div style="margin:24px 0;padding:16px;background:#f8f8f6;border:1px solid #d6d0c4;">' +
+                '<h2 style="margin:0 0 12px;font-size:18px;color:#0c1c34;">' + escPrintHtml(title) + '</h2>' +
+                '<div class="field"><span class="label">Name / Case ID: </span>' + escPrintHtml(c.nameCaseId) + '</div>' +
+                '<div class="field"><span class="label">Date of injury / loss: </span>' + escPrintHtml(c.dateOfInjury) + '</div>' +
+                '<div class="field"><span class="label">Mechanism: </span>' + escPrintHtml(c.mechanism) + '</div>' +
+                '<div class="field"><span class="label">Case type: </span>' + escPrintHtml(c.caseType) + '</div></div>';
+        }
+
         window.addEventListener('message', function(event) {
             if (event.data && event.data.type === 'ASSESSMENT_COMPLETE') {
                 const { caseType, tool, data } = event.data;
@@ -605,39 +675,45 @@
         });
 
         function updateReportUI() {
-            const activeTools = Object.keys(window.reportData.active || {}).length;
-            const retroTools = Object.keys(window.reportData.retro || {}).length;
-            const activeComplete = activeTools === 6;
-            const retroComplete = retroTools === 6;
-
+            var localN = countLocalToolsComplete();
             var capA = document.getElementById('report-active-capture');
             var capR = document.getElementById('report-retro-capture');
             if (capA) {
-                capA.textContent = activeComplete ? '✓ Print data captured from all 6 tools' : ('Print/download uses data from tools opened from this page: ' + activeTools + '/6 captured');
+                capA.textContent = localN === 6 ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localN + '/6. Complete all six to unlock downloads.');
             }
             if (capR) {
-                capR.textContent = retroComplete ? '✓ Print data captured from all 6 tools' : ('Print/download uses data from tools opened from this page: ' + retroTools + '/6 captured');
+                capR.textContent = localN === 6 ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localN + '/6. Complete all six to unlock downloads.');
             }
         }
 
         window.printActiveReports = function() {
-            var tools = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
-            var completed = tools.filter(function(t) { return window.reportData.active[t]; });
-            if (completed.length === 6) {
-                generateAndPrintReports('active', window.reportData.active);
-            } else {
-                alert('Download requires print data from all 6 tools. Open each Active Case instrument from this dashboard and finish so results are saved to this browser. Captured: ' + completed.length + '/6.');
+            if (countLocalToolsComplete() < 6) {
+                alert('Download requires all 6 instruments to be completed in this browser. Saved: ' + countLocalToolsComplete() + '/6.');
+                return;
             }
+            var data = buildTrialPrintPayloadFromLocal();
+            var tools = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
+            var missing = tools.filter(function (t) { return !data[t]; });
+            if (missing.length) {
+                alert('Some instrument data is missing from this browser (' + missing.join(', ') + '). Re-open those tools from the dashboard and complete them again.');
+                return;
+            }
+            generateAndPrintReports('active', data);
         };
 
         window.printRetroReports = function() {
-            var tools = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
-            var completed = tools.filter(function(t) { return window.reportData.retro[t]; });
-            if (completed.length === 6) {
-                generateAndPrintReports('retro', window.reportData.retro);
-            } else {
-                alert('Download requires print data from all 6 tools. Open each Retrospective instrument from this dashboard and finish so results are saved. Captured: ' + completed.length + '/6.');
+            if (countLocalToolsComplete() < 6) {
+                alert('Download requires all 6 instruments to be completed in this browser. Saved: ' + countLocalToolsComplete() + '/6.');
+                return;
             }
+            var data = buildTrialPrintPayloadFromLocal();
+            var tools = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
+            var missing = tools.filter(function (t) { return !data[t]; });
+            if (missing.length) {
+                alert('Some instrument data is missing from this browser (' + missing.join(', ') + '). Re-open those tools from the dashboard and complete them again.');
+                return;
+            }
+            generateAndPrintReports('retro', data);
         };
 
         function generateAndPrintReports(caseType, data) {
@@ -657,7 +733,8 @@
                 '@media print { body { margin: 0.5in; } }' +
                 '</style></head><body>' +
                 '<h1>' + titleLabel + ' Case Assessment Reports</h1>' +
-                '<p>Generated: ' + new Date().toLocaleString() + '</p>';
+                '<p>Generated: ' + new Date().toLocaleString() + '</p>' +
+                buildDashboardCasePrintHtml(caseType);
 
             var toolList = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
             toolList.forEach(function(tool) {
@@ -687,26 +764,6 @@
         }
 
         // ===== TRIAL: all 6 tools → localStorage → consolidated report =====
-        function allToolsComplete() {
-            for (let i = 1; i <= 6; i++) {
-                if (!localStorage.getItem(`tool${i}_complete`)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        window.allToolsComplete = allToolsComplete;
-
-        function safeParseLocalStorage(key) {
-            try {
-                var s = localStorage.getItem(key);
-                if (!s) return null;
-                return JSON.parse(s);
-            } catch (e) {
-                return null;
-            }
-        }
-
         function gatherTrialReportData() {
             return {
                 tool1: safeParseLocalStorage('tool1_data'),
@@ -715,6 +772,8 @@
                 tool4: safeParseLocalStorage('tool4_data'),
                 tool5: safeParseLocalStorage('tool5_data'),
                 tool6: safeParseLocalStorage('tool6_data'),
+                caseActive: safeParseLocalStorage('dashboard_case_active'),
+                caseRetro: safeParseLocalStorage('dashboard_case_retro'),
                 generatedAt: new Date().toISOString()
             };
         }
@@ -729,6 +788,18 @@
 
         function trialKvRow(k, v) {
             return '<div class="trial-k">' + escTrialHtml(k) + '</div><div class="trial-v">' + escTrialHtml(v) + '</div>';
+        }
+
+        function trialCaseInfoBlock(label, c) {
+            if (!c || typeof c !== 'object') return '';
+            var has = c.nameCaseId || c.dateOfInjury || c.mechanism || c.caseType;
+            if (!has) return '';
+            var rows = '';
+            rows += trialKvRow('Name / Case ID', c.nameCaseId || '');
+            rows += trialKvRow('Date of injury / loss', c.dateOfInjury || '');
+            rows += trialKvRow('Mechanism of injury', c.mechanism || '');
+            rows += trialKvRow('Case type', c.caseType || '');
+            return '<div class="trial-tool-block"><h3>' + escTrialHtml(label) + '</h3><div class="trial-kv">' + rows + '</div></div>';
         }
 
         function trialToolBlock(title, innerHtml) {
@@ -824,6 +895,8 @@
             var html = '';
             html += '<h2 style="font-size:22px;color:#0c1c34;margin:0 0 8px;padding:0;border:none;">Case Clarity — Complete Assessment Report</h2>';
             html += '<p style="font-size:13px;color:#6a7a8a;margin:0 0 20px;">Consolidated results from all six trial instruments (data from this browser).</p>';
+            html += trialCaseInfoBlock('Case information — Active case', reportData.caseActive);
+            html += trialCaseInfoBlock('Case information — Retrospective case', reportData.caseRetro);
             html += parts.join('');
             var rawJson = '';
             try {
@@ -918,13 +991,6 @@
             var idx = TOOL_LOCAL_INDEX[toolKey];
             if (!idx) return false;
             return !!localStorage.getItem('tool' + idx + '_complete');
-        }
-        function countLocalToolsComplete() {
-            var n = 0;
-            for (var i = 1; i <= 6; i++) {
-                if (localStorage.getItem('tool' + i + '_complete')) n++;
-            }
-            return n;
         }
         function computeTrialDaysRemaining() {
             var raw = localStorage.getItem('trial_start_at');
@@ -1031,16 +1097,16 @@
             var timerLabel = trialExpired ? 'Trial access' : 'Trial time remaining';
             var timerClass = trialExpired ? 'timer-warning' : (trialDaysRemaining <= 2 && trialDaysRemaining >= 0 ? 'timer-warning' : '');
             var timerValue = trialExpired ? 'Trial expired' : (trialDaysRemaining === 0 ? 'Final day' : (trialDaysRemaining + ' day' + (trialDaysRemaining === 1 ? '' : 's')));
-            const ac = session.active_case || {};
-            const rc = session.retrospective_case || {};
-            const acName = escapeAttr(ac.name_case_id || ac.reference || '');
-            const acDate = escapeAttr(ac.date_of_injury || '');
-            const acMech = escapeAttr(ac.mechanism || '');
-            const acType = ac.case_type === 'PI' || ac.case_type === 'WC' || ac.case_type === 'Disability' ? ac.case_type : '';
-            const rcName = escapeAttr(rc.name_case_id || rc.reference || '');
-            const rcDate = escapeAttr(rc.date_of_injury || '');
-            const rcMech = escapeAttr(rc.mechanism || '');
-            const rcType = rc.case_type === 'PI' || rc.case_type === 'WC' || rc.case_type === 'Disability' ? rc.case_type : '';
+            const locA = safeParseLocalStorage('dashboard_case_active') || {};
+            const locR = safeParseLocalStorage('dashboard_case_retro') || {};
+            const acName = escapeAttr(locA.nameCaseId || '');
+            const acDate = escapeAttr(locA.dateOfInjury || '');
+            const acMech = escapeAttr(locA.mechanism || '');
+            const acType = locA.caseType === 'PI' || locA.caseType === 'WC' || locA.caseType === 'Disability' ? locA.caseType : '';
+            const rcName = escapeAttr(locR.nameCaseId || '');
+            const rcDate = escapeAttr(locR.dateOfInjury || '');
+            const rcMech = escapeAttr(locR.mechanism || '');
+            const rcType = locR.caseType === 'PI' || locR.caseType === 'WC' || locR.caseType === 'Disability' ? locR.caseType : '';
             const sel = function (cur, val) { return cur === val ? ' selected' : ''; };
             const activePrintReady = localN === 6;
             const retroPrintReady = localN === 6;
@@ -1109,7 +1175,7 @@
                         <h3 style="font-size: 17px; color: #0c1c34; margin-bottom: 18px;">Active Case</h3>
                         <div class="case-entry-field">
                           <label for="active-name-case-id">Name / Case ID</label>
-                          <input type="text" id="active-name-case-id" placeholder="e.g., Smith v. Carrier" value="${acName}">
+                          <input type="text" id="active-name-case-id" placeholder="" value="${acName}" autocomplete="off">
                         </div>
                         <div class="case-entry-field">
                           <label for="active-date-injury">Date of Injury / Loss</label>
@@ -1117,7 +1183,7 @@
                         </div>
                         <div class="case-entry-field">
                           <label for="active-mechanism">Mechanism of Injury</label>
-                          <input type="text" id="active-mechanism" placeholder="e.g., MVA, slip and fall" value="${acMech}">
+                          <input type="text" id="active-mechanism" placeholder="" value="${acMech}" autocomplete="off">
                         </div>
                         <div class="case-entry-field">
                           <label for="active-case-type">Case Type</label>
@@ -1135,7 +1201,7 @@
                         <h3 style="font-size: 17px; color: #0c1c34; margin-bottom: 18px;">Retrospective (closed case)</h3>
                         <div class="case-entry-field">
                           <label for="retro-name-case-id">Name / Case ID</label>
-                          <input type="text" id="retro-name-case-id" placeholder="e.g., Jones v. Carrier" value="${rcName}">
+                          <input type="text" id="retro-name-case-id" placeholder="" value="${rcName}" autocomplete="off">
                         </div>
                         <div class="case-entry-field">
                           <label for="retro-date-injury">Date of Injury / Loss</label>
@@ -1143,7 +1209,7 @@
                         </div>
                         <div class="case-entry-field">
                           <label for="retro-mechanism">Mechanism of Injury</label>
-                          <input type="text" id="retro-mechanism" placeholder="e.g., work injury" value="${rcMech}">
+                          <input type="text" id="retro-mechanism" placeholder="" value="${rcMech}" autocomplete="off">
                         </div>
                         <div class="case-entry-field">
                           <label for="retro-case-type">Case Type</label>
@@ -1174,7 +1240,7 @@
                       <div class="collapsible-header" onclick="toggleSection('active-tools')">
                         <span style="display: flex; align-items: center; gap: 12px;">
                           <span class="arrow expanded" id="arrow-active">▶</span>
-                          <span>Active Case Tools (<span id="active-progress">${activeComplete}/6</span> completed)</span>
+                          <span>Active Case Tools (<span id="active-progress">${localN}/6</span> completed)</span>
                         </span>
                       </div>
                       <div class="collapsible-content expanded" id="active-tools">
@@ -1252,6 +1318,7 @@
             container.innerHTML = html;
 
             document.getElementById('save-case-info').addEventListener('click', saveCaseInfo);
+            wireDashboardCaseAutoSave();
             updateReportUI();
             updateCollapsibleProgress(localN, localN);
             syncCollapsiblePreview('retro-tools');
@@ -1272,7 +1339,51 @@
             }
         }
 
+        function persistDashboardCaseToLocal() {
+            try {
+                function fieldTrim(id) {
+                    var n = document.getElementById(id);
+                    return n && n.value != null ? String(n.value).trim() : '';
+                }
+                function fieldRaw(id) {
+                    var n = document.getElementById(id);
+                    return n && n.value ? n.value : '';
+                }
+                var active = {
+                    nameCaseId: fieldTrim('active-name-case-id'),
+                    dateOfInjury: fieldRaw('active-date-injury'),
+                    mechanism: fieldTrim('active-mechanism'),
+                    caseType: fieldRaw('active-case-type')
+                };
+                var retro = {
+                    nameCaseId: fieldTrim('retro-name-case-id'),
+                    dateOfInjury: fieldRaw('retro-date-injury'),
+                    mechanism: fieldTrim('retro-mechanism'),
+                    caseType: fieldRaw('retro-case-type')
+                };
+                localStorage.setItem('dashboard_case_active', JSON.stringify(active));
+                localStorage.setItem('dashboard_case_retro', JSON.stringify(retro));
+            } catch (e) {}
+        }
+
+        function wireDashboardCaseAutoSave() {
+            var ids = ['active-name-case-id', 'active-date-injury', 'active-mechanism', 'active-case-type',
+                'retro-name-case-id', 'retro-date-injury', 'retro-mechanism', 'retro-case-type'];
+            var t;
+            function schedule() {
+                clearTimeout(t);
+                t = setTimeout(persistDashboardCaseToLocal, 400);
+            }
+            ids.forEach(function (id) {
+                var node = document.getElementById(id);
+                if (!node) return;
+                node.addEventListener('input', schedule);
+                node.addEventListener('change', schedule);
+            });
+        }
+
         async function saveCaseInfo() {
+            persistDashboardCaseToLocal();
             const activeName = document.getElementById('active-name-case-id').value.trim();
             const retroName = document.getElementById('retro-name-case-id').value.trim();
 
