@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C.A.R.E. Access Friction Score™</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --nv:#0a1628;--nv2:#152238;--nv3:#1e3352;
+  --gd:#c9a84c;--gd2:#e8c97a;--gd3:#f5e9c8;
+  --cr:#faf8f3;--wh:#ffffff;
+  --t1:#0a1628;--t2:#3a4a5c;--t3:#6b7a8d;
+  --bd:rgba(10,22,40,0.12);--bg:rgba(201,168,76,0.3);
+  --rd:#8b1a1a;--rp:#fdf0f0;
+}
+html{background:#eceae3}
+body{background:transparent;font-family:Georgia,'Times New Roman',serif;color:var(--t1);min-height:100vh;padding:2rem 1rem}
+
+/* ── SHARED ── */
+.page{max-width:860px;margin:0 auto;padding-bottom:4rem}
+.hidden{display:none}
+
+/* ── EXPLAINER ── */
+.exp-hdr{background:var(--nv);padding:2.5rem 3rem;border-radius:12px 12px 0 0}
+.exp-tag{font-size:10px;letter-spacing:2.5px;color:var(--gd2);text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:12px}
+.exp-hdr h1{font-size:22px;font-weight:400;color:white;line-height:1.4;margin-bottom:12px;max-width:640px}
+.exp-hdr .sub{font-size:13px;color:rgba(255,255,255,0.55);font-family:Arial,sans-serif;line-height:1.7;max-width:600px}
+.exp-body{background:var(--cr);border:1px solid var(--bd);border-top:none;border-radius:0 0 12px 12px}
+.sec{padding:2rem 3rem;border-bottom:1px solid var(--bd)}
+.sec-alt{background:var(--wh)}
+.sec-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gd);font-family:Arial,sans-serif;margin-bottom:.625rem}
+.sec p{font-size:14px;color:var(--t2);font-family:Arial,sans-serif;line-height:1.75;margin-bottom:.875rem}
+.sec p:last-child{margin-bottom:0}
+.domain-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:1.25rem}
+@media(max-width:560px){.domain-grid{grid-template-columns:1fr}}
+.dom-card{background:var(--wh);border:1px solid var(--bd);border-radius:8px;padding:1rem 1.125rem}
+.dom-card.full{grid-column:1/-1}
+.dom-num{width:26px;height:26px;border-radius:50%;background:var(--gd3);border:1px solid rgba(201,168,76,0.35);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--nv);font-family:Arial,sans-serif;margin-bottom:.625rem}
+.dom-name{font-size:13px;font-weight:400;color:var(--nv);margin-bottom:.375rem;font-family:Arial,sans-serif}
+.dom-desc{font-size:12px;color:var(--t3);font-family:Arial,sans-serif;line-height:1.6}
+.pullout{background:var(--nv2);border-radius:8px;padding:1.125rem 1.375rem;margin:1.25rem 0}
+.pullout p{font-size:13px;color:rgba(255,255,255,0.65);font-family:Arial,sans-serif;line-height:1.7;margin-bottom:.5rem}
+.pullout p:last-child{margin-bottom:0}
+.highlight{font-size:14px;color:var(--gd2);font-family:Georgia,serif;font-style:italic;line-height:1.6}
+.callout{background:var(--gd3);border:1px solid rgba(201,168,76,0.4);border-radius:8px;padding:1.125rem 1.375rem;margin:1.25rem 0}
+.callout p{font-size:13px;color:var(--nv);font-family:Arial,sans-serif;line-height:1.7}
+.numbered-list{list-style:none;margin:1rem 0}
+.numbered-list li{display:flex;gap:12px;margin-bottom:1rem;font-size:13px;color:var(--t2);font-family:Arial,sans-serif;line-height:1.65}
+.numbered-list li:last-child{margin-bottom:0}
+.nl-num{width:24px;height:24px;border-radius:50%;background:var(--nv);color:var(--gd);font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.nl-body strong{display:block;color:var(--nv);font-size:13px;margin-bottom:2px;font-family:Arial,sans-serif}
+.rule-box{background:var(--nv);border-radius:8px;padding:1.25rem 1.5rem;margin:1.25rem 0}
+.rule-box p{font-size:13px;color:rgba(255,255,255,0.65);font-family:Arial,sans-serif;line-height:1.7;margin-bottom:.5rem}
+.rule-box p:last-child{margin-bottom:0}
+.rule-box strong{color:var(--gd2)}
+.cta-sec{padding:2.5rem 3rem;background:var(--nv2);border-radius:0 0 12px 12px;text-align:center}
+.cta-btn{display:inline-block;background:var(--gd);color:var(--nv);padding:14px 36px;font-size:14px;font-family:Arial,sans-serif;letter-spacing:.5px;border-radius:6px;cursor:pointer;border:none;transition:background .15s}
+.cta-btn:hover{background:var(--gd2)}
+.cta-note{font-size:11px;color:rgba(255,255,255,0.38);font-family:Arial,sans-serif;margin-top:10px;letter-spacing:.5px}
+
+/* ── ASSESSMENT ── */
+.asx-hdr{background:var(--nv);padding:2rem 2.5rem;border-radius:12px 12px 0 0}
+.asx-tag{font-size:10px;letter-spacing:2px;color:var(--gd2);text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:10px}
+.asx-hdr h1{font-size:22px;font-weight:400;color:white;margin-bottom:6px}
+.asx-hdr p{font-size:13px;color:rgba(255,255,255,0.55);font-family:Arial,sans-serif;line-height:1.65;max-width:620px}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.45);font-family:Arial,sans-serif;cursor:pointer;margin-bottom:14px;background:none;border:none;padding:0;transition:color .15s}
+.back-link:hover{color:var(--gd2)}
+.prog{background:var(--nv2);padding:9px 2.5rem;display:flex;align-items:center;gap:14px}
+.pb{flex:1;height:3px;background:rgba(255,255,255,0.1);border-radius:2px}
+.pf{height:3px;background:var(--gd);border-radius:2px;transition:width .3s}
+.pl{font-size:11px;color:var(--gd2);font-family:Arial,sans-serif;white-space:nowrap;min-width:110px;text-align:right}
+.doms{border:1px solid var(--bd);border-top:none;background:var(--cr);border-radius:0 0 12px 12px}
+.dom{border-bottom:1px solid var(--bd)}
+.dom:last-child{border-bottom:none}
+.dh{padding:1.1rem 2rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:var(--wh);transition:background .15s}
+.dh:hover{background:#f9f7f2}
+.dh.open{background:var(--nv)}
+.dl{display:flex;align-items:center;gap:12px}
+.dc{width:30px;height:30px;border-radius:50%;background:var(--gd3);border:1px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--nv);font-family:Arial,sans-serif;flex-shrink:0;transition:all .15s}
+.dh.open .dc{background:var(--gd);border-color:var(--gd)}
+.dn{font-size:14px;color:var(--t1);transition:color .15s}
+.dh.open .dn{color:white}
+.ds{font-size:11px;color:var(--t3);font-family:Arial,sans-serif;margin-top:1px;transition:color .15s}
+.dh.open .ds{color:rgba(255,255,255,0.42)}
+.dr{display:flex;align-items:center;gap:12px}
+.db{font-size:11px;font-family:Arial,sans-serif;padding:3px 10px;border-radius:20px;background:var(--gd3);border:1px solid var(--bg);color:var(--nv);transition:all .15s;white-space:nowrap}
+.dh.open .db{background:rgba(201,168,76,0.15);border-color:var(--gd);color:var(--gd2)}
+.cv{width:14px;height:14px;color:var(--t3);transition:transform .25s,color .15s;flex-shrink:0}
+.dh.open .cv{transform:rotate(180deg);color:var(--gd)}
+.dbody{display:none;padding:1.5rem 2rem 1.75rem;background:var(--wh)}
+.dbody.open{display:block}
+.ddesc{font-size:12px;color:var(--t3);font-family:Arial,sans-serif;line-height:1.6;margin-bottom:1.25rem;padding:.75rem 1rem;background:var(--cr);border-left:2px solid var(--gd);border-radius:0 6px 6px 0}
+.wc-note{font-size:11px;color:var(--t3);font-style:italic;margin-top:5px}
+.qb{margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--bd)}
+.qb:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.ql{font-size:13px;color:var(--t1);line-height:1.6;margin-bottom:.75rem;font-family:Arial,sans-serif}
+.qn{color:var(--gd);margin-right:4px}
+.sc{display:flex}
+.so{flex:1}
+.so input{display:none}
+.so label{display:block;text-align:center;padding:7px 3px;border:1px solid var(--bd);margin-right:-1px;cursor:pointer;transition:all .12s;font-family:Arial,sans-serif}
+.so:first-child label{border-radius:6px 0 0 6px}
+.so:last-child label{border-radius:0 6px 6px 0;margin-right:0}
+.sn{display:block;font-size:15px;color:var(--t1)}
+.sd{display:block;font-size:9px;color:var(--t3);line-height:1.3;margin-top:1px}
+.so input:checked+label{background:var(--nv);border-color:var(--nv);z-index:1;position:relative}
+.so input:checked+label .sn{color:var(--gd)}
+.so input:checked+label .sd{color:rgba(255,255,255,0.52)}
+.so label:hover{background:var(--gd3);border-color:var(--gd);z-index:1;position:relative}
+.ar{padding:1.5rem 2.5rem;background:var(--wh);border-top:1px solid var(--bd);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.bp{background:var(--nv);color:var(--gd2);border:none;padding:10px 24px;font-size:13px;font-family:Arial,sans-serif;cursor:pointer;border-radius:6px;letter-spacing:.4px;transition:background .15s}
+.bp:hover{background:var(--nv3)}
+.bs{background:transparent;color:var(--t3);border:1px solid var(--bd);padding:10px 18px;font-size:12px;font-family:Arial,sans-serif;cursor:pointer;border-radius:6px;transition:all .15s}
+.bs:hover{border-color:var(--t3);color:var(--t1)}
+.btn-primary{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;padding:10px 24px;background:#b09837;color:#fff;border:none;cursor:pointer;border-radius:6px;transition:background .15s}
+.btn-primary:hover{background:#9a8230}
+.btn-ghost{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;padding:10px 24px;background:#fff;color:#b09837;border:1.5px solid #b09837;cursor:pointer;border-radius:6px;transition:all .15s}
+.btn-ghost:hover{background:#faf8f3}
+.an{font-size:11px;color:var(--t3);font-family:Arial,sans-serif;margin-left:4px}
+.rpt{display:none;margin-top:1.5rem;border:1px solid var(--bd);border-radius:12px;overflow:hidden}
+.rpt.show{display:block}
+.rh{background:var(--nv);padding:2rem 2.5rem}
+.rh h2{font-size:17px;font-weight:400;color:white;margin-bottom:3px}
+.rdate{font-size:11px;color:rgba(255,255,255,0.32);font-family:Arial,sans-serif;margin-bottom:1.5rem}
+.rsr{display:flex;align-items:flex-end;gap:18px;margin-bottom:.875rem;flex-wrap:wrap}
+.rsm{display:flex;align-items:baseline;gap:5px}
+.rsb{font-size:58px;line-height:1;color:var(--gd)}
+.rsd{font-size:22px;color:rgba(255,255,255,0.22);font-family:Arial,sans-serif;padding-bottom:4px}
+.rlp{padding:5px 14px;border-radius:20px;font-size:13px;font-family:Arial,sans-serif;align-self:center}
+.ri{font-size:13px;color:rgba(255,255,255,0.52);font-family:Arial,sans-serif;line-height:1.6;max-width:580px}
+.rb{background:var(--cr);padding:2rem 2.5rem}
+.st{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gd);font-family:Arial,sans-serif;margin-bottom:.875rem}
+.dg{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;margin-bottom:2rem}
+.dc2{background:var(--wh);border:1px solid var(--bd);border-radius:8px;padding:1rem 1.125rem;position:relative}
+.dc2.det{border:2px solid #c0392b}
+.det-badge{display:inline-block;font-size:10px;font-family:Arial,sans-serif;background:#c0392b;color:white;padding:2px 8px;border-radius:4px;letter-spacing:.4px;margin-bottom:8px}
+.dc2-name{font-size:12px;color:var(--t3);font-family:Arial,sans-serif;margin-bottom:6px;line-height:1.4}
+.dc2-level-row{display:flex;align-items:flex-start;gap:6px}
+.dc2-level{font-size:17px;color:var(--nv);font-family:Arial,sans-serif}
+.dc2-meaning{font-size:11px;font-family:Arial,sans-serif;margin-top:3px}
+.info-btn{width:18px;height:18px;border-radius:50%;background:transparent;border:1px solid var(--t3);color:var(--t3);font-size:10px;font-family:Arial,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;position:relative;padding:0;line-height:1;margin-left:auto;margin-top:2px}
+.info-btn:hover{background:var(--nv);border-color:var(--nv);color:var(--gd2)}
+.tooltip{display:none;position:absolute;bottom:calc(100% + 8px);right:0;background:var(--nv);color:rgba(255,255,255,0.82);font-size:11px;font-family:Arial,sans-serif;line-height:1.6;padding:.75rem 1rem;border-radius:6px;width:220px;z-index:100;white-space:normal}
+.tooltip::after{content:'';position:absolute;top:100%;right:8px;border:5px solid transparent;border-top-color:var(--nv)}
+.tooltip.vis{display:block}
+.tooltip strong{color:var(--gd2)}
+.dbb{height:3px;background:var(--bd);border-radius:2px;margin-top:10px}
+.dbf{height:3px;border-radius:2px}
+.fb{background:var(--rp);border:1px solid rgba(139,26,26,0.2);border-radius:8px;padding:1.1rem 1.25rem;margin-bottom:1.75rem}
+.ft{font-size:12px;color:var(--rd);font-family:Arial,sans-serif;margin-bottom:.625rem;display:flex;align-items:center;gap:7px}
+.fdot{width:7px;height:7px;border-radius:50%;background:var(--rd);flex-shrink:0}
+.fl{list-style:none}
+.fl li{font-size:12px;color:var(--rd);font-family:Arial,sans-serif;padding:3px 0 3px 14px;line-height:1.5;position:relative}
+.fl li::before{content:'';position:absolute;left:0;top:10px;width:5px;height:1px;background:var(--rd)}
+.nr{background:var(--wh);border:1px solid var(--bd);border-radius:8px;padding:1.25rem;margin-bottom:1.75rem}
+.nr p{font-size:13px;color:var(--t1);font-family:Arial,sans-serif;line-height:1.75;margin-bottom:.625rem}
+.nr p:last-child{margin-bottom:0}
+.rg{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:1.5rem}
+.rc{background:var(--wh);border:1px solid var(--bd);border-radius:6px;padding:.625rem .5rem;text-align:center}
+.rs{font-size:18px;color:var(--nv);font-family:Arial,sans-serif}
+.rl{font-size:9px;color:var(--t3);font-family:Arial,sans-serif;line-height:1.4;margin-top:3px}
+.mn{background:var(--nv2);border-radius:8px;padding:1rem 1.25rem;margin-bottom:1.5rem}
+.mn p{font-size:12px;color:rgba(255,255,255,0.5);font-family:Arial,sans-serif;line-height:1.65}
+.pr{padding:1rem 2.5rem;background:var(--cr);border-top:1px solid var(--bd);display:flex;gap:10px;flex-wrap:wrap}
+.rf{background:var(--nv);color:rgba(255,255,255,0.28);font-size:10px;font-family:Arial,sans-serif;padding:.875rem 2.5rem;line-height:1.65}
+
+@media print{
+  html{background:white}
+  body{padding:0}
+  #explainer{display:none !important}
+  .pr,.prog,.ar,.back-link{display:none}
+  .rpt{border:none}
+  .dbody{display:block !important}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ EXPLAINER PAGE ═══════════════════════════════ -->
+<div id="explainer" class="page">
+
+  <div class="exp-hdr">
+    <div class="exp-tag">Reconcile C.A.R.E. &mdash; Clinical Analysis Instrument</div>
+    <h1>Before You Begin &mdash; Understanding the C.A.R.E. Access Friction Score™</h1>
+    <p class="sub">A structured assessment designed to identify systemic barriers that may disrupt treatment continuity, documentation integrity, and recovery progression in injury cases.</p>
+  </div>
+
+  <div class="exp-body">
+
+    <div class="sec sec-alt">
+      <div class="sec-label">About This Assessment</div>
+      <p>Many treatment disruptions are not caused by the client or the provider alone, but by friction within the healthcare and insurance systems.</p>
+      <p>The purpose of this assessment is to help identify those barriers early so they can be addressed and documented appropriately, reducing the risk of treatment gaps that can ultimately undermine the strength of a case.</p>
+      <p>The C.A.R.E. Access Friction Score™ is part of the Reconcile C.A.R.E. (Clinical Analysis &amp; Recovery Entitlements) methodology, developed by RN Care Managers to help attorneys identify and monitor systemic barriers that interfere with treatment continuity and recovery progression.</p>
+    </div>
+
+    <div class="sec">
+      <div class="sec-label">About the Assessment Process</div>
+      <p>This assessment is designed to provide a structured evaluation of potential barriers affecting treatment continuity in injury cases.</p>
+      <p>While the assessment can be completed in several minutes, it was not designed to be rushed. Thoughtful responses will produce a more accurate picture of where systemic barriers may be affecting recovery and documentation.</p>
+      <div class="pullout"><p class="highlight">The goal is not speed, but clarity.</p></div>
+    </div>
+
+    <div class="sec sec-alt">
+      <div class="sec-label">What This Assessment Evaluates</div>
+      <p>The C.A.R.E. Access Friction Score™ evaluates five domains that commonly interfere with treatment continuity and case stability.</p>
+      <div class="domain-grid">
+        <div class="dom-card">
+          <div class="dom-num">1</div>
+          <div class="dom-name">Provider Access</div>
+          <div class="dom-desc">Evaluates whether appropriate medical providers are realistically available to treat the injuries involved in the case, including specialist availability, referral access, and whether providers are willing to treat in litigation or lien-based environments.</div>
+        </div>
+        <div class="dom-card">
+          <div class="dom-num">2</div>
+          <div class="dom-name">Insurance &amp; Authorization Barriers</div>
+          <div class="dom-desc">Evaluates whether payer requirements, authorization delays, utilization review decisions, or administrative denials are preventing treatment from occurring when medically necessary.</div>
+        </div>
+        <div class="dom-card">
+          <div class="dom-num">3</div>
+          <div class="dom-name">Transportation &amp; Travel Access</div>
+          <div class="dom-desc">Evaluates whether the client can reliably attend appointments due to transportation availability, travel distance, mobility limitations, or logistical barriers.</div>
+        </div>
+        <div class="dom-card">
+          <div class="dom-num">4</div>
+          <div class="dom-name">Administrative &amp; Documentation Integrity</div>
+          <div class="dom-desc">Evaluates administrative issues that may interfere with treatment progression, including incorrect identifying information, documentation delays, incomplete records, or claim identification problems.</div>
+        </div>
+        <div class="dom-card full">
+          <div class="dom-num">5</div>
+          <div class="dom-name">Care Coordination</div>
+          <div class="dom-desc">Evaluates whether treating providers are communicating and coordinating effectively so referrals, treatment progression, and documentation remain consistent throughout the case.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-label">How the C.A.R.E. Framework Interprets Scores</div>
+      <p>In economic contexts, the difference between $4.99 and $5.00 is essentially meaningless. One cent rarely determines whether someone buys an item. In terms of money, those two numbers are practically the same.</p>
+      <div class="pullout"><p class="highlight">Human capability and functioning do not work that way.</p></div>
+      <p>When we evaluate human capability or system stability, for example, 4.99 and 5 are not the same state. A level 5 represents full stability. A level 4.99 may be close, but it is still not the same level of capability.</p>
+      <p>In the C.A.R.E. framework, everything behind the decimal point is simply noise. When we focus too heavily on decimals or percentages, we can lose sight of what the base number actually represents.</p>
+      <div class="callout">
+        <p>Whether a value is 4.00, 4.50, or 4.99, the functional state is still 4. That means the system is operating at roughly 80% capacity, not 5, which represents full stability.</p>
+      </div>
+      <div class="sec-label" style="margin-top:1.5rem">Why This Distinction Matters</div>
+      <ul class="numbered-list">
+        <li>
+          <div class="nl-num">1</div>
+          <div class="nl-body"><strong>Capability Changes Between Levels</strong>What a person or system can sustain at 80% capacity versus 100% capacity can be dramatically different.</div>
+        </li>
+        <li>
+          <div class="nl-num">2</div>
+          <div class="nl-body"><strong>Operating Above True Capacity Creates Risk</strong>Attempting to operate at a level the underlying conditions cannot support increases the risk of instability, reinjury, or system breakdown.</div>
+        </li>
+        <li>
+          <div class="nl-num">3</div>
+          <div class="nl-body"><strong>Inflated Scores Create False Stability</strong>Overstating stability can create a false sense of progress. Clients, providers, and payors may begin to believe the situation is more stable than it actually is.</div>
+        </li>
+      </ul>
+      <p>If a system is truly operating at a higher level of stability, the assessment results should demonstrate that. Advancing to the next level should occur because the underlying conditions support it — not because numbers were rounded to reach a higher score.</p>
+      <p>For this reason, the C.A.R.E. methodology evaluates stability using whole-number functional levels rather than decimals or percentages.</p>
+      <p>It is also important to recognize that reaching the highest level is not always possible. In clinical recovery, a patient may reach Maximum Medical Improvement below full function. The same principle applies when evaluating case environments: a system may stabilize below the maximum possible score.</p>
+      <div class="pullout"><p>The purpose of the assessment is not to inflate the score, but to accurately identify the system's true level of stability so informed decisions can be made.</p></div>
+    </div>
+
+    <div class="sec sec-alt">
+      <div class="sec-label">Important Scoring Note</div>
+      <div class="rule-box">
+        <p>Each domain is scored independently based on the five responses within that section.</p>
+        <p>The domain total is converted to a <strong>whole-number functional level by rounding down</strong>.</p>
+        <p>The overall C.A.R.E. Access Friction Score™ is then determined by the <strong>lowest domain level</strong>, because system stability cannot exceed its weakest barrier.</p>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-label">Why This Matters to Attorneys</div>
+      <p>System barriers can delay treatment, interrupt referrals, complicate documentation, and create gaps that later appear to be non-compliance or poor recovery progression.</p>
+      <p>This assessment helps attorneys identify those barriers earlier so they can monitor the case more effectively, narrow their focus sooner, and address issues before they create larger treatment or documentation problems.</p>
+    </div>
+
+    <div class="sec sec-alt">
+      <div class="sec-label">About Reconcile C.A.R.E.</div>
+      <p>The issues highlighted in this assessment are the very types of barriers Reconcile C.A.R.E. was designed to identify, monitor, and help resolve.</p>
+      <p>The C.A.R.E. methodology focuses on improving care coordination, identifying treatment barriers early, supporting documentation integrity, and helping attorneys maintain treatment continuity throughout the life of a case.</p>
+    </div>
+
+    <div class="cta-sec">
+      <button class="cta-btn" onclick="showAssessment()">Begin the C.A.R.E. Access Friction Score™</button>
+      <div class="cta-note">Assessment length: 25 questions across 5 domains</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ ASSESSMENT PAGE ═══════════════════════════════ -->
+<div id="assessment" class="page hidden">
+
+  <div class="asx-hdr">
+    <button class="back-link" onclick="showExplainer()">&#8592; Back to Overview</button>
+    <div class="asx-tag">Reconcile C.A.R.E. &mdash; Clinical Analysis Instrument</div>
+    <h1>C.A.R.E. Access Friction Score™</h1>
+    <p>This assessment identifies system-driven barriers that interfere with treatment access, continuity, and coordination. It reflects the case environment at a point in time — not client behavior or clinical decision-making.</p>
+  </div>
+
+  <div class="prog">
+    <div class="pb"><div class="pf" id="pf" style="width:0%"></div></div>
+    <div class="pl" id="pl">0 of 25 answered</div>
+  </div>
+
+  <div class="doms" id="dw"></div>
+
+  <div class="ar">
+    <button class="bp" onclick="gen()">Generate Report</button>
+    <button class="bs" onclick="resetTool()">Reset</button>
+    <span class="an" id="an">Answer all 25 questions to generate the report.</span>
+  </div>
+
+  <div class="rpt" id="rpt"></div>
+</div>
+
+<script>
+// Read case type from portal launch URL or session (?caseType=active|closed)
+const caseType = new URLSearchParams(window.location.search).get('caseType') || sessionStorage.getItem('tool_caseType') || 'active';
+
+function showAssessment(){
+  document.getElementById('explainer').classList.add('hidden');
+  document.getElementById('assessment').classList.remove('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function showExplainer(){
+  document.getElementById('assessment').classList.add('hidden');
+  document.getElementById('explainer').classList.remove('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+const DOMS=[
+  {id:'D1',n:'1',title:'Provider Access',
+   desc:'Evaluates whether the client can access appropriate providers in a timely manner and whether providers are willing to treat within litigation environments.',wc:null,
+   qs:[
+    'Has the client been able to obtain timely appointments with appropriate medical providers following the injury?',
+    'Has any provider refused to treat the client because the case involves litigation, liens, or third-party payment arrangements?',
+    'Are appropriate specialists available to treat the client\'s injuries within a reasonable geographic distance?',
+    'Have provider availability limitations caused delays in diagnostic testing, specialist referrals, or treatment progression?',
+    'Have provider scheduling limitations created gaps between recommended treatment visits?'
+   ],
+   flags:[{qi:1,lbl:'Provider refusal to treat due to litigation, liens, or third-party payment'},{qi:3,lbl:'Provider availability causing delays in diagnostics, referrals, or treatment progression'}]
+  },
+  {id:'D2',n:'2',title:'Insurance & Authorization Barriers',
+   desc:'Evaluates delays, denials, and authorization barriers that may prevent treatment from occurring when medically necessary.',wc:null,
+   qs:[
+    'Have insurance authorization requirements delayed medically necessary treatment or diagnostic testing?',
+    'Have treatment requests been denied due to administrative issues such as incorrect DOI, DOB, claim number, or patient identification?',
+    'When treatment requests were denied, were appeals submitted timely and with appropriate documentation?',
+    'Have utilization review or payer authorization requirements caused delays in treatment sequencing?',
+    'Have insurance or payer administrative processes created gaps between referral and approved treatment?'
+   ],
+   flags:[{qi:0,lbl:'Insurance authorization actively delaying medically necessary treatment'},{qi:1,lbl:'Treatment denials due to administrative identification or claim errors'}]
+  },
+  {id:'D3',n:'3',title:'Transportation & Travel Access',
+   desc:'Evaluates whether the client can reliably attend appointments due to transportation or logistical barriers.',
+   wc:'Workers\' compensation note: Transportation to medical appointments should typically be arranged or reimbursed by the carrier. Document any failure to provide this benefit.',
+   qs:[
+    'Does the client have reliable transportation to attend scheduled medical appointments?',
+    'Have transportation limitations caused missed or delayed medical visits?',
+    'Is the distance between the client and treating providers creating barriers to consistent treatment attendance?',
+    'Are transportation services (rideshare, medical transport, family support) available when the client cannot drive?',
+    'Have travel limitations prevented the client from attending specialist consultations or diagnostic testing?'
+   ],
+   flags:[{qi:1,lbl:'Transportation limitations causing missed or delayed medical visits'},{qi:4,lbl:'Travel limitations preventing specialist consultations or diagnostic testing'}]
+  },
+  {id:'D4',n:'4',title:'Administrative & Documentation Integrity',
+   desc:'Evaluates administrative barriers that may interfere with treatment progression, including incorrect identifying information, documentation delays, or claim identification problems.',wc:null,
+   qs:[
+    'Are medical records and treatment documentation being generated and maintained consistently across providers?',
+    'Have delays in obtaining medical records or reports affected the attorney\'s ability to monitor treatment progression?',
+    'Have providers submitted documentation that is incomplete, inconsistent, or missing critical information?',
+    'Have administrative errors (incorrect identifiers, claim mismatches, missing authorizations) delayed treatment or billing processing?',
+    'Are medical reports being produced in a timeframe that supports legal documentation and case preparation?'
+   ],
+   flags:[{qi:2,lbl:'Provider documentation is incomplete, inconsistent, or missing critical information'},{qi:3,lbl:'Administrative errors delaying treatment or billing processing'}]
+  },
+  {id:'D5',n:'5',title:'Care Coordination',
+   desc:'Evaluates whether treating providers are communicating and coordinating effectively so referrals, treatment progression, and documentation remain consistent throughout the case.',wc:null,
+   qs:[
+    'Are treating providers coordinating referrals appropriately when additional specialties are required?',
+    'Are treatment recommendations from one provider being communicated effectively to other treating providers?',
+    'Have gaps occurred between referral and actual specialist evaluation?',
+    'Are multiple providers involved in the case operating within a coordinated treatment plan?',
+    'Has the lack of coordinated care created delays in treatment progression or documentation continuity?'
+   ],
+   flags:[{qi:2,lbl:'Gaps between referral and actual specialist evaluation'},{qi:4,lbl:'Lack of coordinated care causing treatment delays or documentation gaps'}]
+  }
+];
+
+const TIE_ORDER=['D1','D3','D5','D2','D4'];
+const SCALE=[{val:5,desc:'No barrier'},{val:4,desc:'Minor barrier'},{val:3,desc:'Moderate'},{val:2,desc:'Significant'},{val:1,desc:'Severe barrier'}];
+const LVL_LABEL={5:'Stable / Minimal Friction',4:'Minor Barrier',3:'Moderate Barrier',2:'Significant Barrier',1:'Severe Barrier'};
+const LVL_COLOR={5:'#0a5c2e',4:'#4a5e00',3:'#7a4f00',2:'#7a2200',1:'#8b1a1a'};
+const LVL_BG={5:'#e8f7ee',4:'#f4f9e0',3:'#fff8e6',2:'#fff1e8',1:'#fdf0f0'};
+const BAR_COLOR={5:'#2e8b57',4:'#7a9e00',3:'#c9a84c',2:'#c0602b',1:'#c0392b'};
+
+let ans={};
+
+function domLvl(raw){return Math.floor(raw/5);}
+
+function build(){
+  const w=document.getElementById('dw');w.innerHTML='';
+  DOMS.forEach((d,di)=>{
+    const sec=document.createElement('div');sec.className='dom';sec.id='d-'+di;
+    const hdr=document.createElement('div');hdr.className='dh';
+    hdr.innerHTML=`<div class="dl"><div class="dc">${d.n}</div><div><div class="dn">${d.title}</div><div class="ds">5 questions</div></div></div><div class="dr"><div class="db" id="b-${di}">Not scored</div><svg class="cv" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
+    hdr.onclick=()=>tog(di);
+    const body=document.createElement('div');body.className='dbody';body.id='bd-'+di;
+    let html=`<div class="ddesc">${d.desc}${d.wc?'<div class="wc-note">'+d.wc+'</div>':''}</div>`;
+    d.qs.forEach((q,qi)=>{
+      const qid=`${d.id}_Q${qi}`;
+      let sc='<div class="sc">';
+      SCALE.forEach(s=>{sc+=`<div class="so"><input type="radio" name="${qid}" id="${qid}_${s.val}" value="${s.val}" onchange="onA('${qid}',${s.val})"><label for="${qid}_${s.val}"><span class="sn">${s.val}</span><span class="sd">${s.desc}</span></label></div>`;});
+      sc+='</div>';
+      html+=`<div class="qb"><div class="ql"><span class="qn">Q${di*5+qi+1}.</span>${q}</div>${sc}</div>`;
+    });
+    body.innerHTML=html;sec.appendChild(hdr);sec.appendChild(body);w.appendChild(sec);
+  });
+  tog(0);
+}
+
+function tog(idx){
+  DOMS.forEach((_,di)=>{
+    const h=document.querySelector('#d-'+di+' .dh'),b=document.getElementById('bd-'+di);
+    if(di===idx){const o=b.classList.contains('open');h.classList.toggle('open',!o);b.classList.toggle('open',!o);}
+    else{h.classList.remove('open');b.classList.remove('open');}
+  });
+}
+
+function onA(qid,val){ans[qid]=parseInt(val);updProg();updBadges();}
+
+function updProg(){
+  const tot=25,a=Object.keys(ans).length;
+  document.getElementById('pf').style.width=(a/tot*100)+'%';
+  document.getElementById('pl').textContent=a+' of '+tot+' answered';
+  const n=document.getElementById('an');
+  if(a===tot){n.textContent='All questions answered. Ready to generate report.';n.style.color='#0a5c2e';}
+  else{n.textContent=(tot-a)+' question'+(tot-a!==1?'s':'')+' remaining.';n.style.color='';}
+}
+
+function updBadges(){
+  DOMS.forEach((d,di)=>{
+    const vals=d.qs.map((_,qi)=>ans[`${d.id}_Q${qi}`]).filter(v=>v!==undefined);
+    const b=document.getElementById('b-'+di);
+    if(!vals.length){b.textContent='Not scored';return;}
+    if(vals.length<5){b.textContent=vals.length+'/5 answered';return;}
+    const raw=vals.reduce((s,v)=>s+v,0);
+    b.textContent='Level '+domLvl(raw);
+  });
+}
+
+function calcAll(){
+  return DOMS.map(d=>{
+    const vals=d.qs.map((_,qi)=>ans[`${d.id}_Q${qi}`]||0);
+    const raw=vals.reduce((s,v)=>s+v,0);
+    return{raw,lvl:domLvl(raw),max:25,id:d.id};
+  });
+}
+
+function getFlags(){
+  const f=[];
+  DOMS.forEach(d=>{d.flags.forEach(fl=>{const v=ans[`${d.id}_Q${fl.qi}`];if(v!==undefined&&v<=2)f.push(fl.lbl);});});
+  return f;
+}
+
+function lvlMeta(score){
+  const labels={5:'Level 5 — Stable / Minimal Friction',4:'Level 4 — Minor Barrier',3:'Level 3 — Moderate Barrier',2:'Level 2 — Significant Barrier',1:'Level 1 — Severe Barrier'};
+  const subs={5:'The care environment is stable. No significant systemic barriers are interfering with treatment access or continuity at this time.',4:'Minor barriers are present but unlikely to materially disrupt treatment or documentation without proactive attention.',3:'Moderate systemic barriers are present. These may affect treatment consistency and documentation quality if not addressed.',2:'Significant barriers are actively interfering with care access. Attorney and clinical management attention is warranted.',1:'Critical systemic barriers are disrupting care access. Immediate intervention is required to prevent further treatment and documentation failure.'};
+  return{lbl:labels[score],sub:subs[score]};
+}
+
+function showTip(id){
+  document.querySelectorAll('.tooltip').forEach(t=>{if(t.id!=='tip-'+id)t.classList.remove('vis');});
+  const t=document.getElementById('tip-'+id);
+  if(t)t.classList.toggle('vis');
+}
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.info-btn'))document.querySelectorAll('.tooltip').forEach(t=>t.classList.remove('vis'));
+});
+
+function sortedDomains(scores){
+  return scores.map((s,i)=>({...s,di:i})).sort((a,b)=>{
+    if(a.lvl!==b.lvl)return a.lvl-b.lvl;
+    return TIE_ORDER.indexOf(a.id)-TIE_ORDER.indexOf(b.id);
+  });
+}
+
+function buildNarr(finalScore,detIdx,scores,flags){
+  const ld=DOMS[detIdx];
+  const lv=lvlMeta(finalScore);
+
+  const domainContext={
+    'Provider Access':'the ability to obtain appropriate medical care',
+    'Insurance & Authorization Barriers':'the ability to obtain timely payer approval for necessary treatment',
+    'Transportation & Travel Access':'the ability to reliably attend scheduled medical appointments',
+    'Administrative & Documentation Integrity':'the accuracy and availability of administrative and clinical documentation',
+    'Care Coordination':'the ability to maintain coordinated, continuous care across treating providers'
+  };
+
+  const levelContext={
+    5:'A Level 5 result indicates the care environment is stable with minimal systemic friction. No significant access barriers have been identified at this time.',
+    4:'A Level 4 result indicates minor barriers are present. These are unlikely to materially disrupt treatment or documentation but should be monitored as the case progresses.',
+    3:'A Level 3 result indicates moderate systemic friction. In environments like this, treatment delays and documentation inconsistencies can develop if barriers are not identified and addressed early.',
+    2:'A Level 2 result indicates significant systemic friction. In environments like this, treatment delays, referral gaps, and documentation problems are commonly driven by system-level barriers rather than client behavior.',
+    1:'A Level 1 result indicates severe systemic friction. In environments like this, treatment delays, missed appointments, referral breakdowns, and documentation gaps are commonly driven by system-level barriers rather than client behavior.'
+  };
+
+  const closing={
+    5:'Continued monitoring is recommended as the case develops to ensure stability is maintained throughout the treatment progression.',
+    4:'Attorneys should monitor these areas proactively to prevent minor friction from compounding into larger treatment or documentation problems.',
+    3:'The clinical record should be interpreted within the context of these access limitations. Identifying and documenting these barriers early helps clarify why treatment progression may appear inconsistent and allows those issues to be addressed within both the clinical management strategy and the legal case narrative.',
+    2:'The clinical record should be interpreted within the context of these access limitations. Identifying and documenting these barriers early helps clarify why treatment progression may appear inconsistent and allows those issues to be addressed within both the clinical management strategy and the legal case narrative.',
+    1:'The clinical record should therefore be interpreted within the context of these access limitations. Identifying and documenting these barriers early helps clarify why treatment progression may appear inconsistent and allows those issues to be addressed within both the clinical management strategy and the legal case narrative.'
+  };
+
+  const ctx=domainContext[ld.title]||'the ability to maintain consistent treatment access';
+
+  const p1=`The C.A.R.E. Access Friction Score™ for this case is <strong>${lv.lbl}</strong>.`;
+  const p2=`The Determining Domain is <strong>${ld.title}</strong>, indicating that the most significant systemic barrier affecting this case is ${ctx}.`;
+  const p3=`Under the C.A.R.E. methodology, the overall Access Friction Level reflects the most significant barrier within the treatment environment, because system stability cannot exceed its weakest point.`;
+  const p4=levelContext[finalScore];
+  const p5=closing[finalScore];
+
+  let html=`<p>${p1}</p><p>${p2}</p><p>${p3}</p><p>${p4}</p><p>${p5}</p>`;
+
+  const p6='This assessment captures the case environment at the time of evaluation. The Access Friction profile may change as the case progresses. Attorneys should consider reassessing following significant case events — insurer actions, provider changes, authorization decisions, or transitions in treatment phase.';
+  html+=`<p>${p6}</p>`;
+
+  if(flags.length)html+=`<p>This assessment triggered <strong>${flags.length} critical barrier flag${flags.length>1?'s':''}</strong>. These conditions indicate specific access failures severe enough to warrant immediate documentation and case management response.</p>`;
+  return html;
+}
+
+function gen(){
+  if(Object.keys(ans).length<25){alert('Please answer all 25 questions before generating the report.');return;}
+  const scores=calcAll();const sorted=sortedDomains(scores);
+  const det=sorted[0];const detIdx=det.di;const minLvl=det.lvl;
+  const flags=getFlags();const lv=lvlMeta(minLvl);
+  const dateStr=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  let cards='';
+  sorted.forEach((r,si)=>{
+    const isDet=(si===0);const pct=Math.round((r.raw/r.max)*100);
+    const domTitle=DOMS[r.di].title;const tipId='d'+r.di;
+    const ex=r.raw+' \u00F7 5 \u2192 Level '+r.lvl+' after rounding down';
+    cards+=`<div class="dc2${isDet?' det':''}">
+      ${isDet?'<div class="det-badge">Determining Barrier</div>':''}
+      <div class="dc2-name">${domTitle}</div>
+      <div class="dc2-level-row">
+        <div>
+          <div class="dc2-level">Level ${r.lvl}</div>
+          <div class="dc2-meaning" style="color:${LVL_COLOR[r.lvl]}">${LVL_LABEL[r.lvl]}</div>
+        </div>
+        <div style="position:relative">
+          <button class="info-btn" onclick="showTip('${tipId}')" aria-label="Score detail">i</button>
+          <div class="tooltip" id="tip-${tipId}"><strong>Scoring Detail: ${r.raw} / 25</strong><br><br>Each domain contains five questions scored from 5 to 1.<br><br>The domain total is divided by five and rounded down to determine the functional level.<br><br><strong>Calculation:</strong><br>${ex}</div>
+        </div>
+      </div>
+      <div class="dbb"><div class="dbf" style="width:${pct}%;background:${BAR_COLOR[r.lvl]}"></div></div>
+    </div>`;
+  });
+  let flagHtml='';
+  if(flags.length)flagHtml=`<div class="fb"><div class="ft"><div class="fdot"></div>Critical Barrier Flags — ${flags.length} Triggered</div><ul class="fl">${flags.map(f=>`<li>${f}</li>`).join('')}</ul></div>`;
+  const el=document.getElementById('rpt');
+  el.innerHTML=`
+    <div class="rh">
+      <h2>C.A.R.E. Access Friction Score™ — Clinical Report</h2>
+      <div class="rdate">Generated ${dateStr} &nbsp;&middot;&nbsp; Reconcile C.A.R.E. Clinical Analysis Suite</div>
+      <div class="rsr"><div class="rsm"><div style="font-size:15px;color:rgba(255,255,255,0.45);font-family:Arial,sans-serif;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Access Friction Level</div><div class="rsb">${minLvl}</div></div><div class="rlp" style="background:${LVL_BG[minLvl]};color:${LVL_COLOR[minLvl]}">${lv.lbl}</div></div>
+      <div class="ri">${lv.sub}</div>
+    </div>
+    <div class="rb">
+      <div class="st">Domain Results — sorted lowest to highest</div>
+      <div class="dg">${cards}</div>
+      ${flagHtml}
+      <div class="st">Clinical Interpretation</div>
+      <div class="nr">${buildNarr(minLvl,detIdx,scores,flags)}</div>
+      <div class="st">Level Reference</div>
+      <div class="rg">
+        <div class="rc"><div class="rs" style="color:#0a5c2e">5</div><div class="rl">Stable / Minimal Friction</div></div>
+        <div class="rc"><div class="rs" style="color:#4a5e00">4</div><div class="rl">Minor Barrier</div></div>
+        <div class="rc"><div class="rs" style="color:#7a4f00">3</div><div class="rl">Moderate Barrier</div></div>
+        <div class="rc"><div class="rs" style="color:#7a2200">2</div><div class="rl">Significant Barrier</div></div>
+        <div class="rc"><div class="rs" style="color:#8b1a1a">1</div><div class="rl">Severe Barrier</div></div>
+      </div>
+      <div class="mn"><p>Scoring methodology: Each domain is converted to a whole-number functional level. The overall C.A.R.E. Access Friction Score is determined by the lowest Domain Level, because system stability cannot exceed its weakest barrier. Domains are displayed from lowest to highest, with ties resolved by clinical priority: Provider Access, Transportation &amp; Travel Access, Care Coordination, Insurance &amp; Authorization Barriers, Administrative &amp; Documentation Integrity.</p></div>
+    </div>
+    <div class="rf">C.A.R.E. Access Friction Score™ is a proprietary clinical analysis instrument developed by Reconcile Care Management Services (RCMS). This report reflects system-barrier conditions at the time of assessment and does not constitute a clinical diagnosis, treatment recommendation, or legal opinion. It is intended to support attorneys and legal teams in identifying systemic barriers that may affect treatment continuity, documentation integrity, and recovery progression within the Reconcile C.A.R.E. methodology. &copy; Reconcile C.A.R.E. / RCMS.</div>
+    <div style="display: flex; gap: 16px; justify-content: center; margin-top: 40px;">
+    <button onclick="returnToDashboard()" class="btn-ghost">
+        ← Return to Dashboard
+    </button>
+    <button onclick="goToNext()" class="btn-primary">
+        Continue to Next Assessment →
+    </button>
+</div>`;
+  el.classList.add('show');
+
+  if (typeof window.markAssessmentComplete === 'function') {
+    window.markAssessmentComplete({
+      instrument: 'CAF',
+      finalLevel: minLvl,
+      flags,
+      scores: scores.map((s, i) => ({ domain: DOMS[i].id, domainTitle: DOMS[i].title, raw: s.raw, level: s.lvl }))
+    });
+  }
+
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function resetTool(){
+  ans={};
+  document.getElementById('rpt').classList.remove('show');
+  document.querySelectorAll('input[type=radio]').forEach(r=>r.checked=false);
+  updProg();
+  DOMS.forEach((_,di)=>{document.getElementById('b-'+di).textContent='Not scored';});
+  DOMS.forEach((_,di)=>{document.querySelector('#d-'+di+' .dh').classList.remove('open');document.getElementById('bd-'+di).classList.remove('open');});
+  tog(0);
+}
+
+build();
+</script>
+<script>
+function goToNext() {
+    localStorage.setItem('tool_complete_' + window.location.pathname, 'true');
+    if (window.location.pathname.includes('tool1')) {
+        window.location.href = 'tool2-csa.html';
+    } else if (window.location.pathname.includes('tool2')) {
+        window.location.href = 'tool3-caf.html';
+    } else if (window.location.pathname.includes('tool3')) {
+        window.location.href = 'tool4-hsi.html';
+    } else if (window.location.pathname.includes('tool4')) {
+        window.location.href = 'tool5-fci.html';
+    } else if (window.location.pathname.includes('tool5')) {
+        window.location.href = 'tool6-rrf.html';
+    } else if (window.location.pathname.includes('tool6')) {
+        window.location.href = 'dashboard.html?allComplete=true';
+    }
+}
+
+function returnToDashboard() {
+    window.location.href = 'dashboard.html';
+}
+</script>
+</body>
+</html>

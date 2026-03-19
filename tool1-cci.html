@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Case Complexity Index™</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#fff;color:#000;font-size:15px;line-height:1.7}
+
+/* ── EXPLAINER ─────────────────────────────────────── */
+#explainer{font-family:'DM Sans',sans-serif;padding:3.5rem 1.5rem 5rem}
+.ex-wrap{max-width:780px;margin:0 auto}
+.ex-eyebrow{font-size:10.5px;font-weight:500;color:#b09837;text-transform:uppercase;letter-spacing:0.14em;margin-bottom:1rem}
+.ex-header{border-bottom:2px solid #b09837;padding-bottom:2rem;margin-bottom:2.75rem}
+.ex-header h1{font-family:'Playfair Display',serif;font-size:38px;font-weight:500;color:#000;line-height:1.15;margin-bottom:0.5rem}
+.ex-header .subtitle{font-family:'Playfair Display',serif;font-size:17px;font-weight:400;color:#555;margin-bottom:1.75rem;line-height:1.5}
+.ex-intro{font-size:15px;color:#333;line-height:1.8;max-width:680px}
+.ex-section{margin-bottom:3rem}
+.ex-section-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:500;color:#000;margin-bottom:1.1rem;padding-bottom:0.5rem;border-bottom:1px solid #e8dfa0}
+.ex-section p{color:#333;margin-bottom:0.9rem;max-width:680px}
+.ex-section p:last-child{margin-bottom:0}
+.ex-dim-list{list-style:none;margin:0.75rem 0 0.5rem;padding:0}
+.ex-dim-list li{display:flex;align-items:flex-start;gap:10px;font-size:14.5px;color:#222;margin-bottom:5px;line-height:1.5}
+.ex-dot{width:5px;height:5px;border-radius:50%;background:#b09837;flex-shrink:0;margin-top:8px}
+.ex-domain-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:1.4rem}
+@media(max-width:640px){.ex-domain-grid{grid-template-columns:1fr}}
+.ex-domain-card{border:1px solid #e0d090;border-radius:7px;padding:1.25rem 1.1rem}
+.ex-domain-card-title{font-size:10px;font-weight:500;color:#b09837;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.65rem;padding-bottom:0.5rem;border-bottom:1px solid #eedfa0}
+.ex-domain-card p{font-size:13px;color:#444;line-height:1.6;margin-bottom:0.6rem}
+.ex-domain-card p:last-child{margin-bottom:0}
+.ex-domain-card ul{list-style:none;padding:0;margin:0.4rem 0 0}
+.ex-domain-card ul li{display:flex;align-items:flex-start;gap:7px;font-size:12.5px;color:#444;margin-bottom:3px;line-height:1.45}
+.ex-domain-card ul li:before{content:'';width:3px;height:3px;border-radius:50%;background:#b09837;flex-shrink:0;margin-top:7px}
+.ex-note-box{background:#fdf8e8;border:1.5px solid #b09837;border-radius:7px;padding:1.5rem 1.6rem;margin-top:1.25rem}
+.ex-note-box p{font-size:14px;color:#333;margin-bottom:0.8rem;line-height:1.7}
+.ex-note-box p:last-child{margin-bottom:0}
+.ex-note-box ul{list-style:none;padding:0;margin:0.5rem 0 0.85rem}
+.ex-note-box ul li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:#333;margin-bottom:5px;line-height:1.5}
+.ex-note-box ul li:before{content:'';width:4px;height:4px;border-radius:50%;background:#b09837;flex-shrink:0;margin-top:8px}
+.ex-note-time{font-size:13.5px;color:#7a6a22;font-weight:500;margin-top:0.85rem}
+.ex-conf{border-left:3px solid #b09837;padding:0.85rem 1.1rem;background:#fafafa;border-radius:0 5px 5px 0;margin-top:1.25rem}
+.ex-conf p{font-size:13.5px;color:#444;margin-bottom:0.4rem;line-height:1.6}
+.ex-conf p:last-child{margin-bottom:0}
+.ex-cta{margin-top:3.5rem;text-align:center;padding-top:2.5rem;border-top:1px solid #e8dfa0}
+.ex-cta-label{font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1.25rem}
+.ex-cta-btn{display:inline-block;padding:0.95rem 2.75rem;background:#b09837;color:#fff;border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;letter-spacing:0.05em;cursor:pointer;transition:background 0.15s}
+.ex-cta-btn:hover{background:#9a8430}
+.ex-cta-note{font-size:12px;color:#aaa;margin-top:1rem}
+.btn-primary{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;padding:10px 24px;background:#b09837;color:#fff;border:none;cursor:pointer;border-radius:4px}
+.btn-primary:hover{background:#9a8430}
+.btn-ghost{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;padding:10px 24px;background:#fff;color:#b09837;border:1.5px solid #b09837;cursor:pointer;border-radius:4px}
+
+/* ── ASSESSMENT ────────────────────────────────────── */
+#assessment{display:none;font-family:'Segoe UI',Arial,sans-serif;padding:2rem 1rem 3rem}
+.wrap{max-width:900px;margin:0 auto}
+.page-header{padding-bottom:1.25rem;margin-bottom:0.5rem}
+.page-header h1{font-size:28px;font-weight:700;color:#000;letter-spacing:0.01em}
+.page-header .company{font-size:13px;color:#888;margin-top:3px;margin-bottom:1rem}
+.disclaimer{background:#fdf8e8;border:1.5px solid #b09837;border-radius:6px;padding:0.9rem 1.1rem;font-size:13px;color:#333;line-height:1.65}
+.disclaimer strong{color:#7a6a22}
+
+/* Accordion steps */
+.step{border:1.5px solid #b09837;border-radius:8px;margin-bottom:0.75rem;overflow:hidden}
+.step-head{background:#b09837;padding:0.75rem 1.25rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.step-head-left{display:flex;align-items:baseline;gap:10px}
+.step-head .step-num{font-size:11px;color:rgba(255,255,255,0.75);text-transform:uppercase;letter-spacing:0.1em;font-weight:600}
+.step-head h2{font-size:15px;font-weight:600;color:#fff;margin:0}
+.step-chevron{font-size:12px;color:rgba(255,255,255,0.8);transition:transform 0.2s;flex-shrink:0}
+.step-chevron.open{transform:rotate(180deg)}
+.step-body{padding:1.4rem 1.25rem;display:none}
+.step-body.open{display:block}
+
+.sub{margin-bottom:1.5rem}
+.sub:last-child{margin-bottom:0}
+.sub-label{font-size:11px;font-weight:700;color:#b09837;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.55rem}
+.sub-desc{font-size:13px;color:#555;margin-bottom:0.7rem;line-height:1.5}
+hr.div{border:none;border-top:1px solid #ecdfa0;margin:1.4rem 0}
+select{width:100%;padding:0.52rem 0.75rem;font-size:13px;border:1px solid #c8b76a;border-radius:5px;background:#fff;color:#000;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath fill='%23b09837' d='M5 7L0 0h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+select:focus{outline:none;border-color:#b09837;box-shadow:0 0 0 2px rgba(176,152,55,0.15)}
+.cb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:4px}
+.cb-grid.one-col{grid-template-columns:1fr}
+@media(max-width:580px){.cb-grid{grid-template-columns:1fr}}
+.cb-item{display:flex;align-items:flex-start;gap:8px;padding:5px 7px;border-radius:4px;border:0.5px solid transparent;cursor:pointer;transition:background 0.1s,border-color 0.1s}
+.cb-item:hover{background:#fdf8e8;border-color:#d4bb55}
+.cb-item.selected{background:#fdf8e8;border-color:#b09837}
+.cb-item input[type=checkbox]{accent-color:#b09837;margin-top:2px;flex-shrink:0;width:14px;height:14px;cursor:pointer}
+.cb-item label{font-size:13px;color:#222;cursor:pointer;line-height:1.4}
+.domain-group{margin-bottom:1.1rem}
+.domain-group:last-child{margin-bottom:0}
+.domain-label{font-size:11px;font-weight:700;color:#7a6a22;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.4rem;padding-left:2px}
+.p-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem}
+@media(max-width:620px){.p-grid{grid-template-columns:1fr}}
+.p-block{border:1px solid #e0d090;border-radius:6px;padding:1rem 1rem 0.85rem}
+.p-title{font-size:12px;font-weight:700;color:#b09837;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.3rem}
+.p-section-label{font-size:11px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:0.06em;margin:0.75rem 0 0.35rem;padding-left:2px}
+input[type=text]{width:100%;padding:0.45rem 0.7rem;font-size:13px;border:1px solid #c8b76a;border-radius:5px;background:#fff;color:#000;margin-top:4px}
+input[type=text]:focus{outline:none;border-color:#b09837;box-shadow:0 0 0 2px rgba(176,152,55,0.15)}
+input[type=text]::placeholder{color:#bbb}
+.calc-btn{display:block;width:100%;padding:0.9rem;background:#b09837;color:#fff;border:none;border-radius:6px;font-size:16px;font-weight:600;cursor:pointer;letter-spacing:0.03em;margin-top:1rem;font-family:'Segoe UI',Arial,sans-serif;transition:background 0.15s}
+.calc-btn:hover{background:#9a8430}
+
+/* ── REPORT ─────────────────────────────────────────── */
+#report-view{display:none;font-family:'Segoe UI',Arial,sans-serif;padding:0 1rem 4rem}
+.report-wrap{max-width:900px;margin:0 auto}
+
+/* Report Header */
+.rpt-header{background:#1a1a1a;border-radius:8px 8px 0 0;padding:1.1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem}
+.rpt-header-title{font-size:11px;font-weight:700;color:#b09837;text-transform:uppercase;letter-spacing:0.14em}
+.rpt-header-meta{font-size:11px;color:#888;text-align:right}
+.rpt-header-meta span{display:block}
+
+/* Complexity Meter */
+.rpt-meter{background:#111;padding:1rem 1.5rem 0.9rem;border-bottom:1px solid #2a2a2a}
+.rpt-meter-label{font-size:9px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:0.5rem}
+.rpt-meter-track{display:flex;gap:5px;margin-bottom:0.35rem}
+.rpt-meter-seg{flex:1;height:7px;border-radius:3px;background:#2a2a2a;transition:background 0.3s}
+.rpt-meter-ticks{display:flex;justify-content:space-between}
+.rpt-meter-tick{font-size:9px;color:#444;text-transform:uppercase;letter-spacing:0.05em;transition:color 0.3s}
+
+/* Banner */
+.rpt-banner{padding:1.4rem 1.5rem 0;background:#fff}
+.rpt-banner-level{font-size:28px;font-weight:700;color:#1a1a1a;line-height:1.1;margin-bottom:0.2rem}
+.rpt-banner-sub{font-size:13px;color:#555;line-height:1.5;margin-bottom:0.85rem}
+.rpt-banner-interval{display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1rem;background:#1a1a1a;border-radius:5px;margin-bottom:1.25rem;flex-wrap:wrap}
+.rpt-banner-interval-label{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.1em}
+.rpt-banner-interval-badge{background:#b09837;color:#fff;font-size:13px;font-weight:700;padding:0.3rem 0.9rem;border-radius:4px;letter-spacing:0.02em}
+
+/* Sections — accordion */
+.rpt-section{border-top:1px solid #eee;background:#fff}
+.rpt-section-head{display:flex;align-items:center;justify-content:space-between;padding:0.85rem 1.5rem;cursor:pointer;user-select:none}
+.rpt-section-head:hover{background:#fafafa}
+.rpt-section-label{font-size:9.5px;font-weight:700;color:#1a1a1a;text-transform:uppercase;letter-spacing:0.13em;padding-bottom:0.35rem;border-bottom:2px solid #b09837;display:inline-block;margin:0}
+.rpt-section-chev{font-size:11px;color:#b09837;transition:transform 0.2s;flex-shrink:0}
+.rpt-section-chev.open{transform:rotate(180deg)}
+.rpt-section-body{padding:0 1.5rem 1.1rem;display:none}
+.rpt-section-body.open{display:block}
+
+/* Driver cards */
+.r-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem}
+@media(max-width:680px){.r-cards{grid-template-columns:1fr}}
+.r-card{background:#fafafa;border:1px solid #e0d090;border-radius:6px;padding:0.9rem 1rem}
+.r-card-label{font-size:9px;font-weight:700;color:#7a6a22;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.6rem;padding-bottom:0.35rem;border-bottom:1px solid #ecdfa0}
+.driver-item{display:flex;align-items:flex-start;gap:7px;font-size:12.5px;color:#1a1a1a;margin-bottom:5px;line-height:1.45}
+.driver-item:last-child{margin-bottom:0}
+.driver-dot{width:4px;height:4px;border-radius:50%;background:#b09837;flex-shrink:0;margin-top:5px}
+.r-card-empty{font-size:12px;color:#bbb;font-style:italic}
+
+/* Coordination demands */
+.coord-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.65rem;margin-bottom:0.85rem}
+@media(max-width:560px){.coord-grid{grid-template-columns:1fr}}
+.coord-stat{background:#fafafa;border:1px solid #e8e8e8;border-radius:5px;padding:0.65rem 0.85rem}
+.coord-stat-label{font-size:9px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:2px}
+.coord-stat-value{font-size:13px;font-weight:600;color:#1a1a1a}
+.coord-stat-value.risk-high{color:#c0392b}
+.coord-stat-value.risk-mod{color:#b09837}
+.coord-stat-value.risk-low{color:#2e7d32}
+.coord-impact{font-size:13px;color:#444;line-height:1.65;padding:0.7rem 0.9rem;background:#fdf8e8;border-left:3px solid #b09837;border-radius:0 4px 4px 0}
+
+/* Clinical interpretation */
+.r-interp{font-size:13.5px;color:#333;line-height:1.8}
+.r-interp p{margin-bottom:0.5rem}
+.r-interp p:last-child{margin-bottom:0}
+
+/* CMG */
+.cmg-list{list-style:none;padding:0;margin:0 0 0.85rem}
+.cmg-list li{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:#1a1a1a;margin-bottom:5px;line-height:1.5}
+.cmg-list li:before{content:'';width:4px;height:4px;border-radius:50%;background:#b09837;flex-shrink:0;margin-top:7px}
+.cmg-sub-label{font-size:9.5px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem;margin-top:0.85rem}
+
+/* Priority action */
+.priority-box{border-left:4px solid #b09837;background:#fdf8e8;border-radius:0 6px 6px 0;padding:0.85rem 1rem;margin-bottom:0.85rem}
+.priority-box-label{font-size:9px;font-weight:700;color:#7a6a22;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.3rem}
+.priority-box p{font-size:13px;color:#333;line-height:1.6}
+
+/* Two-col grid */
+.r-two-col{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem}
+@media(max-width:560px){.r-two-col{grid-template-columns:1fr}}
+.r-list-box{background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;padding:0.85rem 1rem}
+.r-list-box-label{font-size:9px;font-weight:700;color:#1a1a1a;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.45rem;padding-bottom:0.35rem;border-bottom:1px solid #eee}
+.r-list-box-intro{font-size:11.5px;color:#777;font-style:italic;margin-bottom:0.45rem;line-height:1.4}
+.r-plain-list{list-style:none;padding:0;margin:0}
+.r-plain-list li{display:flex;align-items:flex-start;gap:7px;font-size:12.5px;color:#222;margin-bottom:4px;line-height:1.45}
+.r-plain-list li:before{content:'';width:3px;height:3px;border-radius:50%;background:#b09837;flex-shrink:0;margin-top:7px}
+
+/* Next assessments */
+.next-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem}
+@media(max-width:640px){.next-grid{grid-template-columns:1fr}}
+.next-card{border:1px solid #e0d090;border-radius:6px;padding:0.85rem 1rem}
+.next-card-title{font-size:12px;font-weight:700;color:#1a1a1a;margin-bottom:0.25rem}
+.next-card-desc{font-size:12px;color:#555;line-height:1.5}
+
+/* Assessment Input Summary */
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.65rem}
+@media(max-width:560px){.summary-grid{grid-template-columns:1fr}}
+.summary-item{background:#fafafa;border:1px solid #e8e8e8;border-radius:5px;padding:0.65rem 0.85rem}
+.summary-item-label{font-size:9px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px}
+.summary-item-value{font-size:12.5px;color:#1a1a1a;line-height:1.5}
+.summary-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:0.35rem}
+.summary-tag{font-size:11px;color:#7a6a22;background:#fdf8e8;border:1px solid #e0d090;border-radius:3px;padding:2px 7px;line-height:1.4}
+
+/* Assessment scope */
+.rpt-scope{background:#f5f5f5;border-radius:0 0 8px 8px;padding:0.9rem 1.5rem}
+.rpt-scope-label{font-size:9px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.35rem}
+.rpt-scope p{font-size:12px;color:#777;line-height:1.65}
+
+/* Reset button */
+.reset-btn{display:block;width:100%;padding:0.8rem;margin-top:1rem;background:#fff;border:1.5px solid #b09837;color:#b09837;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Segoe UI',Arial,sans-serif;transition:background 0.15s}
+.reset-btn:hover{background:#fdf8e8}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════
+     EXPLAINER PAGE
+═══════════════════════════════════════════════════ -->
+<div id="explainer">
+<div class="ex-wrap">
+  <div class="ex-header">
+    <div class="ex-eyebrow">Reconcile Care Management Services</div>
+    <h1>Case Complexity Index™</h1>
+    <div class="subtitle">Understanding Case Severity, Recovery Disruption, and Coordination Demands</div>
+    <p class="ex-intro">The Case Complexity Index™ is a clinical assessment tool designed to help attorneys quickly understand the true complexity of an injury case. By evaluating injury severity, functional system disruption, and care coordination demands, the index provides a structured complexity level that helps guide case management strategy, recovery oversight, and litigation planning.</p>
+  </div>
+  <div class="ex-section">
+    <div class="ex-section-title">Why This Tool Matters</div>
+    <p>Many injury cases appear straightforward at first glance but later develop complications that significantly affect recovery timelines, treatment coordination, and case value.</p>
+    <p>The Case Complexity Index helps identify those risks early by analyzing three core dimensions:</p>
+    <ul class="ex-dim-list">
+      <li><span class="ex-dot"></span><span>Injury Severity</span></li>
+      <li><span class="ex-dot"></span><span>Functional System Disruption (4Ps of Wellness)</span></li>
+      <li><span class="ex-dot"></span><span>Medical &amp; Care Coordination Demands</span></li>
+    </ul>
+    <p style="margin-top:0.75rem">Together, these factors create a clearer picture of the case trajectory and potential recovery challenges.</p>
+  </div>
+  <div class="ex-section">
+    <div class="ex-section-title">What the Assessment Evaluates</div>
+    <p>The Case Complexity Index examines the following three domains:</p>
+    <div class="ex-domain-grid">
+      <div class="ex-domain-card">
+        <div class="ex-domain-card-title">Injury Severity</div>
+        <p>The physiological seriousness of the injury, including catastrophic indicators such as neurologic compromise, organ failure, ventilator dependence, or major trauma.</p>
+        <p>Injury severity carries the greatest weight in the overall complexity determination.</p>
+      </div>
+      <div class="ex-domain-card">
+        <div class="ex-domain-card-title">Functional System Disruption (4Ps)</div>
+        <p>The extent to which the injury disrupts key life domains:</p>
+        <ul><li>Physical function</li><li>Psychological stability</li><li>Psychosocial stability</li><li>Professional and economic functioning</li></ul>
+        <p style="margin-top:0.6rem">These disruptions often determine whether recovery proceeds smoothly or becomes unstable.</p>
+      </div>
+      <div class="ex-domain-card">
+        <div class="ex-domain-card-title">Care Coordination Demands</div>
+        <p>The number of medical specialties involved, referral pathways, treatment barriers, and pre-existing medical conditions that may complicate recovery.</p>
+        <p>Cases with higher coordination demands often require structured oversight to prevent delays or fragmentation of care.</p>
+      </div>
+    </div>
+  </div>
+  <div class="ex-section">
+    <div class="ex-section-title">Important Note Before Beginning</div>
+    <div class="ex-note-box">
+      <p>This assessment is only as accurate as the information entered. The tool should not be completed quickly or with partial information.</p>
+      <p>For best results:</p>
+      <ul>
+        <li>Review available medical records</li>
+        <li>Confirm major injuries and complications</li>
+        <li>Consider both injury-related and pre-existing conditions</li>
+        <li>Identify functional impacts across life domains</li>
+      </ul>
+      <p class="ex-note-time">Most assessments take approximately 5–10 minutes to complete.</p>
+    </div>
+  </div>
+  <div class="ex-section">
+    <div class="ex-section-title">Confidentiality</div>
+    <div class="ex-conf">
+      <p>This tool does not store or transmit case data.</p>
+      <p>All information entered into the assessment remains within the user's session. Only the user sees the results.</p>
+    </div>
+  </div>
+  <div class="ex-cta">
+    <div class="ex-cta-label">Ready to begin</div>
+    <button class="ex-cta-btn" onclick="startAssessment()">Start Case Complexity Assessment</button>
+    <p class="ex-cta-note">You will be taken to the five-step CCI assessment.</p>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     ASSESSMENT (accordion steps)
+═══════════════════════════════════════════════════ -->
+<div id="assessment">
+<div class="wrap">
+
+<div class="page-header">
+  <h1>Case Complexity Index™</h1>
+  <div class="company">Reconcile Care Management Services</div>
+  <div class="disclaimer"><strong>Important:</strong> This assessment should be completed thoughtfully and accurately. The Case Complexity Level generated is only as reliable as the information entered.</div>
+</div>
+
+<!-- STEP 1 -->
+<div class="step" id="step1">
+  <div class="step-head" onclick="toggleStep('step1')">
+    <div class="step-head-left"><span class="step-num">Step 1</span><h2>Identify Primary Injury</h2></div>
+    <span class="step-chevron" id="chevron-step1">▼</span>
+  </div>
+  <div class="step-body" id="body-step1">
+    <div class="sub">
+      <div class="sub-label">Primary Injury Region</div>
+      <select id="primary-region" onchange="updateSpecific()">
+        <option value="">— Select primary injury region —</option>
+        <option value="brain">Brain / Head</option>
+        <option value="cervical">Cervical Spine</option>
+        <option value="thoracic">Thoracic Spine</option>
+        <option value="lumbar">Lumbar Spine</option>
+        <option value="upper">Upper Extremity</option>
+        <option value="lower">Lower Extremity</option>
+        <option value="organ">Internal Organ</option>
+        <option value="multi">Multi-System Trauma</option>
+        <option value="burn">Severe Burn Injury</option>
+        <option value="amputation">Amputation</option>
+        <option value="chronic">Chronic Pain Syndrome</option>
+        <option value="other">Other Serious Medical Condition</option>
+      </select>
+    </div>
+    <div class="sub">
+      <div class="sub-label">Specific Injury / Condition</div>
+      <select id="specific-injury"><option value="">— Select primary injury region first —</option></select>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="step" id="step2">
+  <div class="step-head" onclick="toggleStep('step2')">
+    <div class="step-head-left"><span class="step-num">Step 2</span><h2>Acute / Catastrophic Severity Indicators</h2></div>
+    <span class="step-chevron" id="chevron-step2">▼</span>
+  </div>
+  <div class="step-body" id="body-step2">
+    <div class="sub-desc">Select all that apply. Catastrophic indicators automatically escalate severity.</div>
+    <div class="domain-group">
+      <div class="domain-label">Neurologic</div>
+      <div class="cb-grid">
+        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Coma"><label>Coma</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="cat" value="Loss of consciousness"><label>Loss of consciousness</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Anoxic brain injury"><label>Anoxic brain injury</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Severe TBI with neurologic deficit"><label>Severe TBI with neurologic deficit</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Diffuse axonal injury"><label>Diffuse axonal injury</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Permanent loss of sight"><label>Permanent loss of sight</label></label>
+      </div>
+    </div>
+    <div class="domain-group">
+      <div class="domain-label">Respiratory / Life Support</div>
+      <div class="cb-grid">
+        <label class="cb-item"><input type="checkbox" data-g="cat" value="ICU admission"><label>ICU admission</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Ventilator dependence"><label>Ventilator dependence</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="ECMO"><label>ECMO (Extracorporeal Membrane Oxygenation)</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="cat" value="Acute respiratory distress syndrome (ARDS)"><label>Acute respiratory distress syndrome (ARDS)</label></label>
+      </div>
+    </div>
+    <div class="domain-group">
+      <div class="domain-label">Trauma / Structural Injury</div>
+      <div class="cb-grid">
+        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Spinal cord injury with paralysis"><label>Spinal cord injury with paralysis</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Paraplegia"><label>Paraplegia</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Quadriplegia"><label>Quadriplegia</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Polytrauma with physiologic instability"><label>Polytrauma with physiologic instability</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Burns ≥25% body surface area"><label>Burns ≥25% body surface area</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Burns with airway compromise"><label>Burns with airway compromise</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="cat" value="Traumatic amputation"><label>Traumatic amputation</label></label>
+      </div>
+    </div>
+    <div class="domain-group">
+      <div class="domain-label">Cardiovascular / Systemic Collapse</div>
+      <div class="cb-grid">
+        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Cardiac arrest with resuscitation"><label>Cardiac arrest with resuscitation</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Heart failure requiring mechanical support"><label>Heart failure requiring mechanical support</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Multi-organ failure"><label>Multi-organ failure</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Acute liver failure"><label>Acute liver failure</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Sepsis with septic shock"><label>Sepsis with septic shock</label></label>
+      </div>
+    </div>
+    <div class="domain-group">
+      <div class="domain-label">Recovery Status Indicators</div>
+      <div class="cb-grid">
+        <label class="cb-item"><input type="checkbox" data-g="cat" value="Emergency surgery"><label>Emergency surgery</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="cat" value="Neurosurgical intervention"><label>Neurosurgical intervention</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Permanent nursing home / long-term care placement"><label>Permanent nursing home / long-term care placement</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Hospice placement"><label>Hospice placement</label></label>
+      </div>
+    </div>
+    <div class="domain-group">
+      <div class="domain-label">Other</div>
+      <label class="cb-item" style="margin-bottom:6px"><input type="checkbox" data-g="cat" data-cat="1" value="Other catastrophic medical event"><label>Other catastrophic medical event</label></label>
+      <input type="text" id="other-cat-text" placeholder="Describe other catastrophic event (optional)" style="margin-left:22px;width:calc(100% - 22px)"/>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 3 -->
+<div class="step" id="step3">
+  <div class="step-head" onclick="toggleStep('step3')">
+    <div class="step-head-left"><span class="step-num">Step 3</span><h2>Recovery Impact Indicators</h2></div>
+    <span class="step-chevron" id="chevron-step3">▼</span>
+  </div>
+  <div class="step-body" id="body-step3">
+    <div class="sub-desc">Select all recovery impact indicators that apply.</div>
+    <div class="cb-grid">
+      <label class="cb-item"><input type="checkbox" data-g="rec" value="Long-term rehabilitation required"><label>Long-term rehabilitation required</label></label>
+      <label class="cb-item"><input type="checkbox" data-g="rec" value="Permanent impairment likely"><label>Permanent impairment likely</label></label>
+      <label class="cb-item"><input type="checkbox" data-g="rec" value="Cognitive impairment present"><label>Cognitive impairment present</label></label>
+      <label class="cb-item"><input type="checkbox" data-g="rec" value="Lifelong care likely"><label>Lifelong care likely</label></label>
+      <label class="cb-item"><input type="checkbox" data-g="rec" value="Disability determination likely"><label>Disability determination likely</label></label>
+      <label class="cb-item"><input type="checkbox" data-g="rec" value="Loss of independent living capacity"><label>Loss of independent living capacity</label></label>
+      <label class="cb-item"><input type="checkbox" data-g="rec" value="Need for caregiver assistance"><label>Need for caregiver assistance</label></label>
+      <label class="cb-item"><input type="checkbox" data-g="rec" value="Loss of ability to return to prior occupation"><label>Loss of ability to return to prior occupation</label></label>
+      <label class="cb-item"><input type="checkbox" data-g="rec" value="Need for home modifications"><label>Need for home modifications</label></label>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 4 -->
+<div class="step" id="step4">
+  <div class="step-head" onclick="toggleStep('step4')">
+    <div class="step-head-left"><span class="step-num">Step 4</span><h2>Functional System Impact (4Ps)</h2></div>
+    <span class="step-chevron" id="chevron-step4">▼</span>
+  </div>
+  <div class="step-body" id="body-step4">
+    <div class="sub-desc" style="margin-bottom:1.1rem">Select all that apply across each functional domain.</div>
+    <div class="p-grid">
+      <div class="p-block">
+        <div class="p-title">P1 — Physical</div>
+        <div class="p-section-label">Injury-Related Impacts</div>
+        <div class="cb-grid one-col">
+          <label class="cb-item"><input type="checkbox" data-p="ph" value="Mobility limitation"><label>Mobility limitation</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="ph" data-high="1" value="Paralysis or severe neurologic deficit"><label>Paralysis or severe neurologic deficit</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="ph" value="Chronic or severe pain"><label>Chronic or severe pain</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="ph" data-high="1" value="Loss of independence with daily activities"><label>Loss of independence with daily activities</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="ph" value="Assistive device required"><label>Assistive device required</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="ph" data-high="1" value="Requires caregiver assistance"><label>Requires caregiver assistance</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="ph" value="Long-term rehabilitation required"><label>Long-term rehabilitation required</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="ph" value="Loss of sensory function"><label>Loss of sensory function</label></label>
+        </div>
+        <div class="p-section-label">Pre-Existing Conditions Affecting Recovery</div>
+        <div class="cb-grid one-col">
+          <label class="cb-item"><input type="checkbox" data-p="ph" value="Diabetes mellitus"><label>Diabetes mellitus</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="ph" value="Hypertension"><label>Hypertension</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="ph" value="Chronic lung disease (COPD / severe asthma)"><label>Chronic lung disease (COPD / severe asthma)</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="ph" value="Chronic kidney disease / dialysis"><label>Chronic kidney disease / dialysis</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="ph" value="Cardiovascular disease (CAD, CHF)"><label>Cardiovascular disease (CAD, CHF)</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="ph" value="Severe obesity affecting recovery"><label>Severe obesity affecting recovery</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="ph" value="Immunocompromised state"><label>Immunocompromised state</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="ph" value="Multiple chronic medical conditions"><label>Multiple chronic medical conditions</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="ph" value="History of stroke or neurologic disease"><label>History of stroke or neurologic disease</label></label>
+        </div>
+      </div>
+      <div class="p-block">
+        <div class="p-title">P2 — Psychological</div>
+        <div class="p-section-label">Injury-Related Psychological Effects</div>
+        <div class="cb-grid one-col">
+          <label class="cb-item"><input type="checkbox" data-p="ps" value="PTSD / trauma response"><label>PTSD / trauma response</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="ps" value="Depression related to injury"><label>Depression related to injury</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="ps" value="Anxiety affecting treatment participation"><label>Anxiety affecting treatment participation</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="ps" data-high="1" value="Cognitive impairment"><label>Cognitive impairment</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="ps" value="Emotional instability interfering with recovery"><label>Emotional instability interfering with recovery</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="ps" value="Fear / avoidance affecting recovery engagement"><label>Fear / avoidance affecting recovery engagement</label></label>
+        </div>
+        <div class="p-section-label">Pre-Existing Psychological Complexity</div>
+        <div class="cb-grid one-col">
+          <label class="cb-item"><input type="checkbox" data-p="ps" value="Serious pre-existing psychiatric illness affecting recovery"><label>Serious pre-existing psychiatric illness affecting recovery</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="ps" value="History of psychiatric hospitalization or crisis"><label>History of psychiatric hospitalization or crisis</label></label>
+        </div>
+        <div class="p-title" style="margin-top:1.1rem">P3 — Psychosocial</div>
+        <div class="cb-grid one-col" style="margin-top:0.4rem">
+          <label class="cb-item"><input type="checkbox" data-p="so" value="Housing instability"><label>Housing instability</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="so" value="Food insecurity"><label>Food insecurity</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="so" value="Caregiver strain within household"><label>Caregiver strain within household</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="so" value="Family disruption due to injury"><label>Family disruption due to injury</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="so" value="Vulnerability to exploitation or abuse"><label>Vulnerability to exploitation or abuse</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="so" data-high="1" value="Minor children at risk of placement or custody disruption"><label>Minor children at risk of placement or custody disruption</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="so" value="Loss of social support system"><label>Loss of social support system</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="so" value="Social isolation due to injury"><label>Social isolation due to injury</label></label>
+        </div>
+        <div class="p-title" style="margin-top:1.1rem">P4 — Professional</div>
+        <div class="cb-grid one-col" style="margin-top:0.4rem">
+          <label class="cb-item"><input type="checkbox" data-p="pr" data-high="1" value="Unable to return to work"><label>Unable to return to work</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="pr" value="Reduced earning capacity"><label>Reduced earning capacity</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="pr" value="Loss of career trajectory"><label>Loss of career trajectory</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="pr" value="Financial instability due to wage loss"><label>Financial instability due to wage loss</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="pr" value="No short-term disability coverage"><label>No short-term disability coverage</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="pr" value="No long-term disability coverage"><label>No long-term disability coverage</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="pr" value="Occupational displacement"><label>Occupational displacement</label></label>
+          <label class="cb-item"><input type="checkbox" data-p="pr" data-high="1" value="Significant reduction in household income"><label>Significant reduction in household income</label></label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 5 -->
+<div class="step" id="step5">
+  <div class="step-head" onclick="toggleStep('step5')">
+    <div class="step-head-left"><span class="step-num">Step 5</span><h2>Care Coordination Demands</h2></div>
+    <span class="step-chevron" id="chevron-step5">▼</span>
+  </div>
+  <div class="step-body" id="body-step5">
+    <div class="sub">
+      <div class="sub-label">Specialty Physician Involvement</div>
+      <div class="sub-desc">Select all specialty physicians involved. Do not include PT, OT, chiropractic, speech therapy, or vocational rehab.</div>
+      <div class="cb-grid">
+        <label class="cb-item"><input type="checkbox" data-g="spec" value="Orthopedics"><label>Orthopedics</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="spec" value="Neurology"><label>Neurology</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="spec" value="Neurosurgery"><label>Neurosurgery</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="spec" value="Trauma Surgery"><label>Trauma Surgery</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="spec" value="Pain Management"><label>Pain Management</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="spec" value="Psychiatry"><label>Psychiatry</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="spec" value="Physiatry"><label>Physiatry</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="spec" value="Cardiology"><label>Cardiology</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="spec" value="Pulmonology"><label>Pulmonology</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="spec" value="Gastroenterology"><label>Gastroenterology</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="spec" value="Endocrinology"><label>Endocrinology</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="spec" value="Vascular Surgery"><label>Vascular Surgery</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="spec" value="Infectious Disease"><label>Infectious Disease</label></label>
+      </div>
+    </div>
+    <hr class="div"/>
+    <div class="sub">
+      <div class="sub-label">Supporting / Rehabilitation Providers</div>
+      <div class="sub-desc">Select all supporting or rehabilitation providers involved.</div>
+      <div class="cb-grid">
+        <label class="cb-item"><input type="checkbox" data-g="rehab" value="Physical Therapy"><label>Physical Therapy</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="rehab" value="Occupational Therapy"><label>Occupational Therapy</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="rehab" value="Chiropractic"><label>Chiropractic</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="rehab" value="Speech Therapy"><label>Speech Therapy</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="rehab" value="Behavioral Therapy"><label>Behavioral Therapy</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="rehab" value="Vocational Rehabilitation"><label>Vocational Rehabilitation</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="rehab" value="Case Management / Care Coordination"><label>Case Management / Care Coordination</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="rehab" value="Home Health"><label>Home Health</label></label>
+      </div>
+    </div>
+    <hr class="div"/>
+    <div class="sub">
+      <div class="sub-label">Referral Chain Depth</div>
+      <select id="referral">
+        <option value="0">— Select referral chain depth —</option>
+        <option value="1">Single provider care</option>
+        <option value="2">Limited referrals</option>
+        <option value="3">Multi-step referral chain</option>
+        <option value="4">Ongoing multidisciplinary referrals</option>
+      </select>
+    </div>
+    <hr class="div"/>
+    <div class="sub">
+      <div class="sub-label">Evidence-Based Treatment Alignment Issues</div>
+      <div class="sub-desc">Select all treatment alignment or access issues that apply.</div>
+      <div class="cb-grid">
+        <label class="cb-item"><input type="checkbox" data-g="align" value="Medically necessary treatment denied"><label>Medically necessary treatment denied</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="align" value="Diagnostic imaging delayed or denied"><label>Diagnostic imaging delayed or denied</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="align" value="Surgery delayed or denied"><label>Surgery delayed or denied</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="align" value="Specialist referral delayed"><label>Specialist referral delayed</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="align" value="Utilization review barriers"><label>Utilization review barriers</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="align" value="Deviation from evidence-based pathway"><label>Deviation from evidence-based pathway</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="align" value="Repeated authorization barriers"><label>Repeated authorization barriers</label></label>
+        <label class="cb-item"><input type="checkbox" data-g="align" value="Care altered due to payer restrictions"><label>Care altered due to payer restrictions</label></label>
+      </div>
+    </div>
+    <hr class="div"/>
+    <div class="sub">
+      <div class="sub-label">Treatment Duration / Monitoring Horizon</div>
+      <select id="duration">
+        <option value="0">— Select expected duration of coordinated treatment needs —</option>
+        <option value="1">Short-term episode</option>
+        <option value="2">Moderate treatment course</option>
+        <option value="3">Extended rehabilitation</option>
+        <option value="4">Long-term medical management</option>
+        <option value="5">Lifelong care coordination</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<button class="calc-btn" onclick="calculate()">Calculate Case Complexity Level</button>
+
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     REPORT VIEW (shown after calculate, form hidden)
+═══════════════════════════════════════════════════ -->
+<div id="report-view">
+<div class="report-wrap">
+
+  <!-- 1. Report Header -->
+  <div class="rpt-header">
+    <div class="rpt-header-title">Case Complexity Index™ Report</div>
+    <div class="rpt-header-meta">
+      <span id="rpt-date"></span>
+      <span style="color:#555;font-size:10px">Reconcile Care Management Services</span>
+    </div>
+  </div>
+
+  <!-- 2. Complexity Meter -->
+  <div class="rpt-meter">
+    <div class="rpt-meter-label">Complexity Level</div>
+    <div class="rpt-meter-track">
+      <div class="rpt-meter-seg" id="ms1"></div>
+      <div class="rpt-meter-seg" id="ms2"></div>
+      <div class="rpt-meter-seg" id="ms3"></div>
+      <div class="rpt-meter-seg" id="ms4"></div>
+    </div>
+    <div class="rpt-meter-ticks">
+      <span class="rpt-meter-tick" id="mt1">Stable</span>
+      <span class="rpt-meter-tick" id="mt2">Moderate</span>
+      <span class="rpt-meter-tick" id="mt3">Significant</span>
+      <span class="rpt-meter-tick" id="mt4">Extreme</span>
+    </div>
+  </div>
+
+  <!-- 3. Banner + 5. Review Interval -->
+  <div class="rpt-banner">
+    <div class="rpt-banner-level" id="r-level-name">—</div>
+    <div class="rpt-banner-sub" id="r-level-sub"></div>
+    <div class="rpt-banner-interval">
+      <span class="rpt-banner-interval-label">Recommended Review Interval</span>
+      <span class="rpt-banner-interval-badge" id="banner-interval">—</span>
+    </div>
+  </div>
+
+  <!-- Clinical Interpretation — open by default -->
+  <div class="rpt-section">
+    <div class="rpt-section-head" onclick="toggleRptSection('rpt-interp')">
+      <span class="rpt-section-label">Clinical Interpretation</span>
+      <span class="rpt-section-chev" id="chev-rpt-interp">▼</span>
+    </div>
+    <div class="rpt-section-body" id="rpt-interp">
+      <div class="r-interp" id="r-interp"></div>
+    </div>
+  </div>
+
+  <!-- Case Management Guidance -->
+  <div class="rpt-section">
+    <div class="rpt-section-head" onclick="toggleRptSection('rpt-cmg')">
+      <span class="rpt-section-label">Case Management Guidance</span>
+      <span class="rpt-section-chev" id="chev-rpt-cmg">▼</span>
+    </div>
+    <div class="rpt-section-body" id="rpt-cmg">
+      <div class="cmg-sub-label">Oversight Guidance</div>
+      <ul class="cmg-list" id="cmg-guidance"></ul>
+      <div class="priority-box">
+        <div class="priority-box-label">Priority Action This Week</div>
+        <p id="priority-action"></p>
+      </div>
+      <div class="cmg-sub-label">Documentation Focus</div>
+      <p style="font-size:13px;color:#444;line-height:1.65;margin-bottom:0.85rem" id="doc-focus"></p>
+      <div class="cmg-sub-label" style="margin-top:0">Reassessment Triggers &amp; Escalation Indicators</div>
+      <div class="r-two-col" style="margin-top:0.4rem">
+        <div class="r-list-box">
+          <div class="r-list-box-label">Reassessment Triggers</div>
+          <div class="r-list-box-intro">Re-run CCI if any of the following occur:</div>
+          <ul class="r-plain-list">
+            <li>Surgery or invasive procedures</li>
+            <li>A new specialist becomes involved</li>
+            <li>Treatment delays exceed 30 days</li>
+            <li>New symptoms or complications emerge</li>
+            <li>Return-to-work expectations change</li>
+            <li>Insurance denies or delays authorized treatment</li>
+          </ul>
+        </div>
+        <div class="r-list-box">
+          <div class="r-list-box-label">Complexity Escalation Indicators</div>
+          <div class="r-list-box-intro">Reevaluate case complexity if any of the following occur:</div>
+          <ul class="r-plain-list">
+            <li>Unexpected treatment delays</li>
+            <li>Multiple specialist referrals</li>
+            <li>Care coordination breakdowns</li>
+            <li>Insurance authorization barriers</li>
+            <li>Decline in cognitive function or ADLs</li>
+            <li>Family or caregiver burnout reported</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recommended Next Assessments -->
+  <div class="rpt-section">
+    <div class="rpt-section-head" onclick="toggleRptSection('rpt-next')">
+      <span class="rpt-section-label">Recommended Next Assessments</span>
+      <span class="rpt-section-chev" id="chev-rpt-next">▼</span>
+    </div>
+    <div class="rpt-section-body" id="rpt-next">
+      <div class="next-grid">
+        <div class="next-card">
+          <div class="next-card-title">Clinical Sequencing Auditor</div>
+          <div class="next-card-desc">Verify treatment alignment across providers and the 7 Rights of Injury Care Management.</div>
+        </div>
+        <div class="next-card">
+          <div class="next-card-title">C.A.R.E. Access Friction Score</div>
+          <div class="next-card-desc">Identify insurance authorization or referral barriers affecting care access.</div>
+        </div>
+        <div class="next-card">
+          <div class="next-card-title">Holistic Stability Index</div>
+          <div class="next-card-desc">Evaluate whether psychosocial or environmental instability could derail recovery.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Care Coordination Demands -->
+  <div class="rpt-section">
+    <div class="rpt-section-head" onclick="toggleRptSection('rpt-coord')">
+      <span class="rpt-section-label">Care Coordination Demands</span>
+      <span class="rpt-section-chev" id="chev-rpt-coord">▼</span>
+    </div>
+    <div class="rpt-section-body" id="rpt-coord">
+      <div class="coord-grid">
+        <div class="coord-stat"><div class="coord-stat-label">Specialty Physicians</div><div class="coord-stat-value" id="coord-spec">—</div></div>
+        <div class="coord-stat"><div class="coord-stat-label">Authorization Risk Level</div><div class="coord-stat-value" id="coord-auth">—</div></div>
+        <div class="coord-stat"><div class="coord-stat-label">Referral Chain Complexity</div><div class="coord-stat-value" id="coord-ref">—</div></div>
+        <div class="coord-stat"><div class="coord-stat-label">Treatment Horizon</div><div class="coord-stat-value" id="coord-dur">—</div></div>
+      </div>
+      <div class="coord-impact" id="coord-impact"></div>
+    </div>
+  </div>
+
+  <!-- Primary Complexity Drivers -->
+  <div class="rpt-section">
+    <div class="rpt-section-head" onclick="toggleRptSection('rpt-drivers')">
+      <span class="rpt-section-label">Primary Complexity Drivers</span>
+      <span class="rpt-section-chev" id="chev-rpt-drivers">▼</span>
+    </div>
+    <div class="rpt-section-body" id="rpt-drivers">
+      <div class="r-cards">
+        <div class="r-card"><div class="r-card-label">Injury Severity</div><div id="r-card-d1"></div></div>
+        <div class="r-card"><div class="r-card-label">Functional System Disruption</div><div id="r-card-d2"></div></div>
+        <div class="r-card"><div class="r-card-label">Medical &amp; Care Coordination</div><div id="r-card-d3"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assessment Input Summary -->
+  <div class="rpt-section">
+    <div class="rpt-section-head" onclick="toggleRptSection('rpt-summary')">
+      <span class="rpt-section-label">Assessment Input Summary</span>
+      <span class="rpt-section-chev" id="chev-rpt-summary">▼</span>
+    </div>
+    <div class="rpt-section-body" id="rpt-summary">
+      <div class="summary-grid" id="summary-grid"></div>
+    </div>
+  </div>
+
+  <!-- Assessment Scope -->
+  <div class="rpt-section" style="border-bottom:none">
+    <div class="rpt-section-head" onclick="toggleRptSection('rpt-scope')" style="background:#f5f5f5;border-radius:0 0 8px 8px">
+      <span class="rpt-section-label" style="border-bottom-color:#888;color:#555">Assessment Scope</span>
+      <span class="rpt-section-chev" id="chev-rpt-scope" style="color:#888">▼</span>
+    </div>
+    <div class="rpt-section-body" id="rpt-scope" style="background:#f5f5f5;border-radius:0 0 8px 8px">
+      <p style="font-size:12px;color:#777;line-height:1.65">This report represents a point-in-time evaluation of case complexity based on the information provided during the assessment. Subsequent changes in medical condition, treatment progression, provider involvement, or healthcare access conditions will influence future case complexity evaluations.</p>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 16px; justify-content: center; margin-top: 40px;">
+    <button onclick="returnToDashboard()" class="btn-ghost">
+        ← Return to Dashboard
+    </button>
+    <button onclick="goToNext()" class="btn-primary">
+        Continue to Next Assessment →
+    </button>
+</div>
+
+</div>
+</div>
+</div>
+
+<script>
+
+// Read case type from portal launch URL (?caseType=active|closed)
+const caseType = new URLSearchParams(window.location.search).get('caseType') || 'active';
+
+// ── Report section accordion ──────────────────────────
+function toggleRptSection(id){
+  const body=document.getElementById(id);
+  const chev=document.getElementById('chev-'+id);
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  chev.classList.toggle('open',!isOpen);
+}
+// ── Accordion ─────────────────────────────────────────
+function toggleStep(id){
+  const body=document.getElementById('body-'+id);
+  const chev=document.getElementById('chevron-'+id);
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  chev.classList.toggle('open',!isOpen);
+}
+
+// ── Start assessment ──────────────────────────────────
+function startAssessment(){
+  document.getElementById('explainer').style.display='none';
+  document.getElementById('assessment').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── Dependent dropdowns ───────────────────────────────
+const injuryMap={
+  brain:['Concussion','Traumatic Brain Injury','Intracranial Hemorrhage','Diffuse Axonal Injury','Anoxic Brain Injury'],
+  cervical:['Disc Herniation','Fracture','Spinal Cord Injury','Nerve Root Injury','Instability'],
+  thoracic:['Disc Herniation','Fracture','Spinal Cord Injury','Nerve Root Injury','Instability'],
+  lumbar:['Disc Herniation','Fracture','Spinal Cord Injury','Nerve Root Injury','Instability'],
+  upper:['Fracture','Dislocation','Rotator Cuff Tear','Nerve Injury','Tendon Rupture','Amputation'],
+  lower:['Fracture','Dislocation','Ligament Injury','Nerve Injury','Tendon Rupture','Amputation'],
+  organ:['Heart Injury','Liver Injury','Kidney Injury','Lung Injury','Multi-Organ Injury'],
+  multi:['Polytrauma','Crush Injury','Multiple Fractures','Trauma with Organ Involvement'],
+  burn:['Burns <25% TBSA','Burns ≥25% TBSA','Burns with Airway Involvement'],
+  amputation:['Single Limb Amputation','Multiple Limb Amputations','Partial Amputation'],
+  chronic:['Complex Regional Pain Syndrome','Fibromyalgia','Chronic Neuropathic Pain','Post-Surgical Chronic Pain'],
+  other:['Other Serious Medical Condition — document in case notes']
+};
+function updateSpecific(){
+  const r=document.getElementById('primary-region').value;
+  const sel=document.getElementById('specific-injury');
+  sel.innerHTML='<option value="">— Select specific injury / condition —</option>';
+  (injuryMap[r]||[]).forEach(o=>{const el=document.createElement('option');el.value=el.textContent=o;sel.appendChild(el);});
+}
+
+// ── Checkbox visual toggle ────────────────────────────
+document.addEventListener('change',e=>{
+  if(e.target.type==='checkbox') e.target.closest('.cb-item').classList.toggle('selected',e.target.checked);
+});
+
+function checked(attr,val){return[...document.querySelectorAll(`input[type=checkbox][${attr}="${val}"]:checked`)];}
+
+// ── Calculate ─────────────────────────────────────────
+function calculate(){
+  // DOMAIN 1
+  const catAll=checked('data-g','cat');
+  const catTriggers=catAll.filter(c=>c.dataset.cat==='1');
+  const recAll=checked('data-g','rec');
+  const specificVal=document.getElementById('specific-injury').value;
+  const regionEl=document.getElementById('primary-region');
+  const regionText=regionEl.options[regionEl.selectedIndex]?.text||'';
+  const highRecItems=['Lifelong care likely','Loss of independent living capacity','Permanent impairment likely','Cognitive impairment present'];
+  const highRecCount=recAll.filter(c=>highRecItems.includes(c.value)).length;
+  let d1Tier=5;
+  if(catTriggers.length>0){d1Tier=1;}
+  else if(catAll.length>=3||(catAll.length>=2&&recAll.length>=3)||highRecCount>=3){d1Tier=2;}
+  else if(catAll.length>=2||(catAll.length>=1&&recAll.length>=2)||highRecCount>=2){d1Tier=3;}
+  else if(catAll.length>=1||recAll.length>=3){d1Tier=4;}
+  else if(recAll.length>=1){d1Tier=5;}
+  let d1Drivers=[];
+  const neuroItems=['Coma','Anoxic brain injury','Severe TBI with neurologic deficit','Diffuse axonal injury','Permanent loss of sight'];
+  const neuroHit=catAll.filter(c=>neuroItems.includes(c.value));
+  if(neuroHit.length>=2) d1Drivers.push('Catastrophic neurologic injury');
+  else if(neuroHit.length===1) d1Drivers.push(neuroHit[0].value);
+  const paralysisItems=['Spinal cord injury with paralysis','Paraplegia','Quadriplegia'];
+  const paralysisHit=catAll.filter(c=>paralysisItems.includes(c.value));
+  if(paralysisHit.length>=1) d1Drivers.push(paralysisHit.length>1?'Paralysis with spinal cord involvement':paralysisHit[0].value);
+  const sysItems=['Multi-organ failure','Cardiac arrest with resuscitation','Heart failure requiring mechanical support','Sepsis with septic shock','Acute liver failure'];
+  const sysHit=catAll.filter(c=>sysItems.includes(c.value));
+  if(sysHit.length>=2) d1Drivers.push('Multi-system physiologic collapse');
+  else if(sysHit.length===1) d1Drivers.push(sysHit[0].value);
+  const lsItems=['Ventilator dependence','ECMO'];
+  const lsHit=catAll.filter(c=>lsItems.includes(c.value));
+  if(lsHit.length>=1) d1Drivers.push(lsHit.length>1?'Life support dependency (ventilator / ECMO)':lsHit[0].value);
+  if(catAll.some(c=>['Burns ≥25% body surface area','Burns with airway compromise'].includes(c.value))) d1Drivers.push('Critical burn injury');
+  if(specificVal) d1Drivers.unshift(specificVal);
+  const highRecHit=recAll.filter(c=>highRecItems.includes(c.value));
+  if(highRecHit.length>=2) d1Drivers.push('Lifelong or permanent impairment anticipated');
+  else if(highRecHit.length===1) d1Drivers.push(highRecHit[0].value);
+  d1Drivers=[...new Set(d1Drivers)].slice(0,3);
+
+  // DOMAIN 2
+  const phAll=checked('data-p','ph');
+  const psAll=checked('data-p','ps');
+  const soAll=checked('data-p','so');
+  const prAll=checked('data-p','pr');
+  const preExistingItems=['Diabetes mellitus','Hypertension','Chronic lung disease (COPD / severe asthma)','Chronic kidney disease / dialysis','Cardiovascular disease (CAD, CHF)','Severe obesity affecting recovery','Immunocompromised state','Multiple chronic medical conditions','History of stroke or neurologic disease'];
+  const phPreExisting=phAll.filter(c=>preExistingItems.includes(c.value));
+  const psAffected=[phAll,psAll,soAll,prAll].filter(a=>a.length>0).length;
+  const totalP=phAll.length+psAll.length+soAll.length+prAll.length;
+  const highItems=['Paralysis or severe neurologic deficit','Loss of independence with daily activities','Requires caregiver assistance','Cognitive impairment','Minor children at risk of placement or custody disruption','Unable to return to work','Significant reduction in household income'];
+  const allP=[...phAll,...psAll,...soAll,...prAll];
+  const highCount=allP.filter(c=>highItems.includes(c.value)).length;
+  let d2Tier=5;
+  if(psAffected===4||highCount>=3||totalP>=12){d2Tier=1;}
+  else if(psAffected===3||highCount>=2||totalP>=8){d2Tier=2;}
+  else if(psAffected===2||highCount>=1||totalP>=4){d2Tier=3;}
+  else if(psAffected>=1||totalP>=1){d2Tier=4;}
+  let d2Drivers=[];
+  if(psAffected>=3) d2Drivers.push('Multi-domain functional system disruption ('+psAffected+' of 4 life domains affected)');
+  else if(psAffected===2) d2Drivers.push('Disruption across two functional life domains');
+  if(psAll.length>=2) d2Drivers.push('Psychological barriers to recovery engagement');
+  else if(psAll.length===1) d2Drivers.push(psAll[0].value);
+  if(soAll.length>=2) d2Drivers.push('Significant psychosocial vulnerability');
+  else if(soAll.some(c=>c.value.includes('Minor children'))) d2Drivers.push('Minor children at risk of placement or custody disruption');
+  if(prAll.length>=2) d2Drivers.push('Professional and economic impact');
+  else if(prAll.length===1) d2Drivers.push(prAll[0].value);
+  d2Drivers=[...new Set(d2Drivers)].slice(0,3);
+
+  let preExDrivers=[];
+  if(phPreExisting.length>=3) preExDrivers.push('Multiple chronic medical conditions affecting recovery trajectory');
+  else if(phPreExisting.length===2){preExDrivers.push(phPreExisting[0].value+' complicating rehabilitation');preExDrivers.push(phPreExisting[1].value+' affecting recovery');}
+  else if(phPreExisting.length===1) preExDrivers.push(phPreExisting[0].value+' affecting recovery trajectory');
+
+  // DOMAIN 3
+  const specAll=checked('data-g','spec');
+  const rehabAll=checked('data-g','rehab');
+  const alignAll=checked('data-g','align');
+  const refVal=parseInt(document.getElementById('referral').value)||0;
+  const durVal=parseInt(document.getElementById('duration').value)||0;
+  const specCount=specAll.length;
+  const alignCount=alignAll.length;
+  let d3Pts=0;
+  if(specCount>=5) d3Pts+=4; else if(specCount>=3) d3Pts+=3; else if(specCount>=2) d3Pts+=2; else if(specCount>=1) d3Pts+=1;
+  d3Pts+=refVal;
+  if(alignCount>=4) d3Pts+=4; else if(alignCount>=2) d3Pts+=3; else if(alignCount>=1) d3Pts+=2;
+  d3Pts+=durVal;
+  let d3Tier=5;
+  if(d3Pts>=14) d3Tier=1; else if(d3Pts>=10) d3Tier=2; else if(d3Pts>=6) d3Tier=3; else if(d3Pts>=3) d3Tier=4;
+  let d3Drivers=[...preExDrivers];
+  if(specCount>=5) d3Drivers.push(specCount+' specialty physicians involved');
+  else if(specCount>=3) d3Drivers.push('Multidisciplinary specialty physician involvement ('+specCount+' physicians)');
+  else if(specCount>=1) d3Drivers.push('Specialty physician coordination required');
+  if(alignCount>=3) d3Drivers.push('Significant evidence-based treatment barriers identified');
+  else if(alignCount>=1) d3Drivers.push('Treatment alignment issues identified');
+  if(refVal>=3) d3Drivers.push('Complex multi-step referral chain');
+  if(durVal>=4) d3Drivers.push('Long-term or lifelong care coordination anticipated');
+  else if(durVal>=3) d3Drivers.push('Extended rehabilitation and treatment duration');
+  d3Drivers=[...new Set(d3Drivers)].slice(0,3);
+
+  // COMPOSITE + SAFEGUARD (unchanged)
+  function tierToScore(t){return(5-t)*25;}
+  const composite=(tierToScore(d1Tier)*0.5)+(tierToScore(d2Tier)*0.25)+(tierToScore(d3Tier)*0.25);
+  let rawLevel;
+  if(composite>=87) rawLevel=1; else if(composite>=65) rawLevel=2; else if(composite>=42) rawLevel=3; else if(composite>=20) rawLevel=4; else rawLevel=5;
+  const tierCap={1:1,2:2,3:3,4:4,5:4}[d1Tier];
+  const level=d1Tier===1?1:Math.max(rawLevel,tierCap);
+
+  // HIDE FORM, SHOW REPORT
+  document.getElementById('assessment').style.display='none';
+  document.getElementById('report-view').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+
+  // Notify Case Clarity portal that CCI is fully complete
+  if (window.opener && !window.opener.closed) {
+    // Notify Case Clarity portal that CCI is fully complete for the selected case type
+    window.opener.postMessage(
+      { type: 'INSTRUMENT_COMPLETE', instrument: 'CCI', caseType },
+      '*'
+    );
+  }
+
+  // LABELS
+  const levelNames={1:'Extreme Case Complexity',2:'Severe Case Complexity',3:'Significant Case Complexity',4:'Moderate Case Complexity',5:'Stable Case Complexity'};
+  const levelSubs={1:'Level 1 — Catastrophic injury and multi-system disruption identified.',2:'Level 2 — Severe injury with significant functional and coordination demands.',3:'Level 3 — Multiple interacting complexity factors identified across domains.',4:'Level 4 — Moderate complexity with manageable coordination requirements.',5:'Level 5 — Lower complexity profile identified. Standard monitoring indicated.'};
+
+  // METER — only active segment highlighted
+  const meterConfig={
+    1:{seg:4,color:'#c0392b',textColor:'#c0392b'},
+    2:{seg:3,color:'#c0392b',textColor:'#c0392b'},
+    3:{seg:3,color:'#b09837',textColor:'#b09837'},
+    4:{seg:2,color:'#b09837',textColor:'#b09837'},
+    5:{seg:1,color:'#666',textColor:'#999'}
+  };
+  const mc=meterConfig[level];
+  const tickLabels=['Stable','Moderate','Significant','Extreme'];
+  const activeTickIdx={1:3,2:3,3:2,4:1,5:0}[level];
+  for(let i=1;i<=4;i++){
+    const seg=document.getElementById('ms'+i);
+    const tick=document.getElementById('mt'+i);
+    // Only the single active segment is lit — all others muted
+    if(i===mc.seg){
+      seg.style.background=mc.color;
+      tick.style.color=mc.textColor;
+      tick.style.fontWeight='700';
+    } else {
+      seg.style.background='#2a2a2a';
+      tick.style.color='#444';
+      tick.style.fontWeight='400';
+    }
+  }
+
+  // BANNER + INTERVAL
+  document.getElementById('rpt-date').textContent='Generated: '+new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('r-level-name').textContent=levelNames[level];
+  document.getElementById('r-level-sub').textContent=levelSubs[level];
+
+  const cmgData={
+    1:{interval:'Every 2–7 days',guidance:['Intensive case monitoring recommended','Frequent review of treatment sequencing and provider coordination','Monitor closely for treatment delays, authorization issues, and referral barriers','Early intervention may be required if recovery progression stalls'],priority:'Confirm all specialists have received records and are aligned on the treatment plan. Identify any pending authorizations and escalate immediately.',docFocus:'Establish baseline documentation for all catastrophic indicators. Document all provider communications, authorization requests, and treatment milestones from the outset.'},
+    2:{interval:'Weekly',guidance:['Monitor provider coordination and treatment progression','Watch for emerging access barriers or referral delays','Track treatment milestones closely to prevent disruption of recovery progress'],priority:'Verify all active referrals are scheduled and confirm no authorization barriers are pending with the insurer.',docFocus:'Document all specialist referrals, treatment responses, and any payer communications. Note any deviations from the expected treatment pathway.'},
+    3:{interval:'Every 10–14 days',guidance:['Periodic monitoring of treatment progression','Evaluate for emerging system barriers or coordination issues','Escalate monitoring frequency if recovery progress slows'],priority:'Confirm treatment milestones are on track and identify any emerging coordination issues before the next scheduled review.',docFocus:'Maintain running documentation of treatment progression and functional status. Note any changes in provider involvement or payer activity.'},
+    4:{interval:'Every 21–30 days',guidance:['Standard monitoring of treatment progression','Reassess complexity if treatment delays occur','Increase monitoring if new providers become involved or complications develop'],priority:'Confirm current treatment is progressing and that no new providers or complications have been introduced since the last review.',docFocus:'Keep standard treatment documentation current. Flag any new providers, complications, or payer activity for the next review cycle.'},
+    5:{interval:'Every 21–30 days',guidance:['Standard monitoring of treatment progression','Reassess complexity if treatment delays occur','Increase monitoring if new providers become involved or complications develop'],priority:'Confirm current treatment is progressing and that no new providers or complications have been introduced since the last review.',docFocus:'Keep standard treatment documentation current. Flag any new providers, complications, or payer activity for the next review cycle.'}
+  };
+  const cmg=cmgData[level];
+  document.getElementById('banner-interval').textContent=cmg.interval;
+
+  // DRIVER CARDS
+  function cardHTML(drivers){
+    if(!drivers.length) return '<div class="r-card-empty">No significant indicators identified.</div>';
+    return drivers.slice(0,3).map(d=>`<div class="driver-item"><div class="driver-dot"></div><span>${d}</span></div>`).join('');
+  }
+  document.getElementById('r-card-d1').innerHTML=cardHTML(d1Drivers);
+  document.getElementById('r-card-d2').innerHTML=cardHTML(d2Drivers);
+  document.getElementById('r-card-d3').innerHTML=cardHTML(d3Drivers);
+
+  // COORDINATION SUMMARY
+  const refLabels={0:'—',1:'Single provider',2:'Limited referrals',3:'Multi-step chain',4:'Multidisciplinary'};
+  const durLabels={0:'—',1:'Short-term',2:'Moderate course',3:'Extended rehab',4:'Long-term management',5:'Lifelong coordination'};
+  const authRisk=alignCount>=3?'HIGH':alignCount>=1?'MODERATE':'LOW';
+  const authClass=alignCount>=3?'risk-high':alignCount>=1?'risk-mod':'risk-low';
+  document.getElementById('coord-spec').textContent=specCount>0?specCount+' specialist'+(specCount>1?'s':''):'None identified';
+  const authEl=document.getElementById('coord-auth');
+  authEl.textContent=authRisk; authEl.className='coord-stat-value '+authClass;
+  document.getElementById('coord-ref').textContent=refLabels[refVal]||'—';
+  document.getElementById('coord-dur').textContent=durLabels[durVal]||'—';
+  const impactMap={1:'This case will require dedicated, high-frequency staff attention. Assign a single point of contact for care coordination and establish a structured monitoring schedule immediately.',2:'This case requires active staff coordination and frequent provider communication. Establish clear escalation protocols and a dedicated coordination contact.',3:'This case requires structured monitoring with regular check-ins. Assign coordination responsibility and track treatment milestones proactively.',4:'This case can be managed with standard coordination protocols. Periodic check-ins and timely communication with the treatment team are sufficient.',5:'Standard case monitoring protocols are appropriate. Reassess if treatment complexity increases.'};
+  document.getElementById('coord-impact').textContent=impactMap[level];
+
+  // CLINICAL INTERPRETATION
+  const s1Map={1:'This case demonstrates catastrophic injury severity with indicators consistent with profound physiologic compromise.',2:'This case presents severe injury with significant acute indicators that elevate the overall complexity profile.',3:'This case reflects significant injury with multiple factors affecting recovery trajectory and clinical management.',4:'This case involves moderate injury complexity with recovery indicators requiring coordinated follow-through.',5:'This case presents a stable injury profile with manageable clinical demands at this time.'};
+  let s2='';
+  if(psAffected>=3) s2='Disruption across '+(psAffected===4?'all four':'multiple')+' functional life domains significantly increases the burden on recovery and long-term care planning.';
+  else if(psAffected===2) s2='Impact across two functional life domains adds measurable complexity to care coordination and recovery management.';
+  else if(psAffected===1) s2='Functional system impact is present in one life domain and should be monitored for expansion during recovery.';
+  else s2='No significant functional system disruption was identified at this time.';
+  let s3='';
+  if(d3Pts>=10) s3='Sustained multidisciplinary coordination demands, evidence-based treatment barriers, and'+(phPreExisting.length>=2?' complicating pre-existing medical conditions further elevate':'')+' care management complexity.';
+  else if(d3Pts>=6) s3='Care coordination requirements are elevated, with'+(phPreExisting.length>=1?' pre-existing medical conditions and':'')+' active referral management needed across the treatment team.';
+  else if(phPreExisting.length>=1) s3='Pre-existing medical conditions are present and should be factored into care planning and recovery timelines.';
+  else s3='Care coordination demands appear manageable within standard case management protocols.';
+  const s4Map={1:'Cases at this level require structured oversight, immediate prioritization, multidisciplinary coordination, and continuous monitoring.',2:'Cases at this level require structured oversight, close interdisciplinary coordination, and proactive barrier resolution.',3:'Cases at this level require consistent monitoring, coordinated follow-through, and attention to emerging barriers to prevent deterioration.',4:'Cases at this level are manageable with regular follow-through, timely communication, and standard care coordination protocols.',5:'Continued monitoring is appropriate with escalation protocols in place should clinical or functional status change.'};
+  document.getElementById('r-interp').innerHTML=[s1Map[level],s2,s3,s4Map[level]].filter(Boolean).map(s=>`<p>${s}</p>`).join('');
+
+  // CMG
+  document.getElementById('cmg-guidance').innerHTML=cmg.guidance.map(g=>`<li>${g}</li>`).join('');
+  document.getElementById('priority-action').textContent=cmg.priority;
+  document.getElementById('doc-focus').textContent=cmg.docFocus;
+
+  // ASSESSMENT INPUT SUMMARY
+  const durTextMap={0:'Not specified',1:'Short-term episode',2:'Moderate treatment course',3:'Extended rehabilitation',4:'Long-term medical management',5:'Lifelong care coordination'};
+  const refTextMap={0:'Not specified',1:'Single provider care',2:'Limited referrals',3:'Multi-step referral chain',4:'Ongoing multidisciplinary referrals'};
+  function makeSummaryItem(label, value){
+    return`<div class="summary-item"><div class="summary-item-label">${label}</div><div class="summary-item-value">${value}</div></div>`;
+  }
+  function makeSummaryTags(label, items){
+    if(!items.length) return makeSummaryItem(label,'None selected');
+    const tags=items.map(v=>`<span class="summary-tag">${v}</span>`).join('');
+    return`<div class="summary-item"><div class="summary-item-label">${label}</div><div class="summary-tags">${tags}</div></div>`;
+  }
+  let summaryHTML='';
+  summaryHTML+=makeSummaryItem('Primary Injury',(regionText&&specificVal)?regionText+' — '+specificVal:regionText||specificVal||'Not specified');
+  summaryHTML+=makeSummaryItem('Catastrophic Indicators Selected', catAll.length>0?catAll.length+' indicator'+(catAll.length>1?'s':''):'None');
+  summaryHTML+=makeSummaryItem('Recovery Impact Indicators', recAll.length>0?recAll.length+' indicator'+(recAll.length>1?'s':''):'None');
+  summaryHTML+=makeSummaryItem('Functional Domains Affected', psAffected>0?psAffected+' of 4 life domains':'None');
+  summaryHTML+=makeSummaryTags('Specialty Physicians', specAll.map(c=>c.value));
+  summaryHTML+=makeSummaryTags('Rehabilitation Providers', rehabAll.map(c=>c.value));
+  summaryHTML+=makeSummaryItem('Referral Chain Depth', refTextMap[refVal]);
+  summaryHTML+=makeSummaryItem('Treatment Duration', durTextMap[durVal]);
+  if(alignCount>0) summaryHTML+=makeSummaryTags('Treatment Alignment Issues', alignAll.map(c=>c.value));
+  if(phPreExisting.length>0) summaryHTML+=makeSummaryTags('Pre-Existing Conditions', phPreExisting.map(c=>c.value));
+  document.getElementById('summary-grid').innerHTML=summaryHTML;
+
+  // Notify portal that this assessment is complete with full report data
+  const assessmentData = {
+    level,
+    levelName: levelNames[level],
+    levelSub: levelSubs[level],
+    interval: cmg.interval,
+    drivers: { injury: d1Drivers, functional: d2Drivers, coordination: d3Drivers },
+    priorityAction: cmg.priority,
+    docFocus: cmg.docFocus,
+    coord: { specCount, authRisk, ref: refLabels[refVal], dur: durLabels[durVal] },
+    generatedAt: new Date().toISOString()
+  };
+  if (typeof window.markAssessmentComplete === 'function') {
+    window.markAssessmentComplete(assessmentData);
+  }
+}
+
+// ── Reset ─────────────────────────────────────────────
+function resetAll(){
+  document.querySelectorAll('input[type=checkbox]').forEach(c=>{c.checked=false;c.closest('.cb-item').classList.remove('selected');});
+  document.getElementById('primary-region').value='';
+  document.getElementById('specific-injury').innerHTML='<option value="">— Select primary injury region first —</option>';
+  document.getElementById('referral').value='0';
+  document.getElementById('duration').value='0';
+  document.getElementById('other-cat-text').value='';
+  // Collapse all steps
+  ['step1','step2','step3','step4','step5'].forEach(id=>{
+    document.getElementById('body-'+id).classList.remove('open');
+    document.getElementById('chevron-'+id).classList.remove('open');
+  });
+  document.getElementById('report-view').style.display='none';
+  document.getElementById('assessment').style.display='none';
+  document.getElementById('explainer').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+
+</script>
+<script>
+function goToNext() {
+    localStorage.setItem('tool_complete_' + window.location.pathname, 'true');
+    if (window.location.pathname.includes('tool1')) {
+        window.location.href = 'tool2-csa.html';
+    } else if (window.location.pathname.includes('tool2')) {
+        window.location.href = 'tool3-caf.html';
+    } else if (window.location.pathname.includes('tool3')) {
+        window.location.href = 'tool4-hsi.html';
+    } else if (window.location.pathname.includes('tool4')) {
+        window.location.href = 'tool5-fci.html';
+    } else if (window.location.pathname.includes('tool5')) {
+        window.location.href = 'tool6-rrf.html';
+    } else if (window.location.pathname.includes('tool6')) {
+        window.location.href = 'dashboard.html?allComplete=true';
+    }
+}
+
+function returnToDashboard() {
+    window.location.href = 'dashboard.html';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recovery Risk Forecaster™ – RCMS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy: #1a2744;
+      --gold: #b8973a;
+      --gold-light: #d4af5a;
+      --cream: #f9f6f0;
+      --white: #ffffff;
+      --gray-100: #f4f4f4;
+      --gray-200: #e8e8e8;
+      --gray-400: #999;
+      --gray-600: #555;
+      --gray-800: #222;
+      --low: #2d6a4f;
+      --low-bg: #d8f3dc;
+      --moderate: #b5460a;
+      --moderate-bg: #fff0e0;
+      --high: #8b1a1a;
+      --high-bg: #fde8e8;
+      --critical: #5c0a0a;
+      --critical-bg: #fcd4d4;
+      --border: #d0ccc4;
+      --shadow: 0 2px 12px rgba(26,39,68,0.10);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Source Sans 3', sans-serif;
+      background: var(--cream);
+      color: var(--gray-800);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--navy);
+      color: var(--white);
+      padding: 2.5rem 2rem 2rem;
+      text-align: center;
+      border-bottom: 4px solid var(--gold);
+    }
+    header .eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+    }
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 0.5rem;
+    }
+    header h1 span { color: var(--gold-light); }
+    header .tagline {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.72);
+      max-width: 580px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+    header .badge {
+      display: inline-block;
+      margin-top: 1rem;
+      background: rgba(184,151,58,0.18);
+      border: 1px solid var(--gold);
+      color: var(--gold-light);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.85rem;
+      border-radius: 2px;
+    }
+
+    /* ── Main ── */
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      box-shadow: var(--shadow);
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      color: var(--navy);
+      border-bottom: 2px solid var(--gold);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    /* ── Case type buttons ── */
+    .intro-text {
+      font-size: 0.97rem;
+      color: var(--gray-600);
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+    .type-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+    .type-btn {
+      background: var(--navy);
+      color: var(--white);
+      border: none;
+      border-radius: 3px;
+      padding: 1.1rem 1rem;
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      text-align: center;
+    }
+    .type-btn:hover { background: #243560; transform: translateY(-1px); }
+    .type-btn.coming-soon {
+      background: var(--gray-200);
+      color: var(--gray-400);
+      cursor: default;
+      font-style: italic;
+    }
+    .type-btn .btn-label { display: block; font-size: 1rem; }
+    .type-btn .btn-sub {
+      display: block;
+      font-size: 0.74rem;
+      color: var(--gold-light);
+      margin-top: 0.25rem;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+    }
+    .type-btn.coming-soon .btn-sub { color: var(--gray-400); }
+
+    /* ── Disability placeholder ── */
+    #disabilityPlaceholder .dis-intro {
+      font-size: 0.97rem;
+      color: var(--gray-600);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+    #disabilityPlaceholder ul {
+      margin: 0.5rem 0 1rem 1.25rem;
+      font-size: 0.92rem;
+      color: var(--gray-600);
+      line-height: 1.8;
+    }
+    .dis-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.25rem; }
+
+    /* ── Accordion ── */
+    .accordion {
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      margin-bottom: 0.85rem;
+      overflow: hidden;
+    }
+    .accordion-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      background: var(--gray-100);
+      cursor: pointer;
+      user-select: none;
+      border-left: 3px solid var(--gold);
+      transition: background 0.15s;
+    }
+    .accordion-header:hover { background: var(--gray-200); }
+    .accordion-header.section-complete {
+      background: #d8f3dc;
+      border-left-color: var(--low);
+    }
+    .accordion-header.section-complete .accordion-title { color: var(--low); }
+    .accordion-header.section-complete .accordion-icon  { color: var(--low); }
+    .accordion-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.95rem;
+      color: var(--navy);
+      font-weight: 600;
+    }
+    .accordion-icon {
+      font-size: 0.8rem;
+      color: var(--gold);
+      font-weight: 700;
+      transition: transform 0.2s;
+    }
+    .accordion-body {
+      padding: 1.1rem 1rem 0.5rem;
+      display: none;
+    }
+    .accordion-body.open { display: block; }
+    .accordion-icon.open { transform: rotate(180deg); }
+
+    /* ── Fields ── */
+    .field { margin-bottom: 1rem; }
+    .field label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--gray-800);
+      margin-bottom: 0.3rem;
+      line-height: 1.4;
+    }
+    .field select {
+      width: 100%;
+      max-width: 520px;
+      padding: 0.48rem 0.65rem;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.88rem;
+      color: var(--gray-800);
+      background: var(--white);
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%231a2744' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      padding-right: 2rem;
+      cursor: pointer;
+    }
+    .field select:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
+    .field select.error { border-color: #cc0000; outline: 2px solid #cc0000; }
+
+    /* ── Buttons ── */
+    .calc-btn {
+      background: var(--gold);
+      color: var(--navy);
+      border: none;
+      border-radius: 3px;
+      padding: 0.75rem 2rem;
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      transition: background 0.2s, transform 0.15s;
+      margin-top: 1rem;
+    }
+    .calc-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--navy);
+      color: var(--navy);
+      border-radius: 3px;
+      padding: 0.55rem 1.1rem;
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-outline:hover { background: var(--navy); color: var(--white); }
+    .btn-primary {
+      background: var(--navy);
+      border: 2px solid var(--navy);
+      color: var(--white);
+      border-radius: 3px;
+      padding: 0.55rem 1.1rem;
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover { background: #243560; border-color: #243560; }
+    .btn-ghost {
+      background: transparent;
+      border: 2px solid var(--navy);
+      color: var(--navy);
+      border-radius: 3px;
+      padding: 0.55rem 1.1rem;
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-ghost:hover { background: var(--navy); color: var(--white); }
+
+    /* ── Result ── */
+    .result-box {
+      border-radius: 4px;
+      border-left: 6px solid;
+      padding: 1.75rem;
+      margin-top: 1.5rem;
+    }
+    .result-box.low      { background: var(--low-bg);      border-color: var(--low);      }
+    .result-box.moderate { background: var(--moderate-bg); border-color: var(--moderate); }
+    .result-box.high     { background: var(--high-bg);     border-color: var(--high);     }
+    .result-box.critical { background: var(--critical-bg); border-color: var(--critical); }
+
+    .result-level {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    .result-box.low      .result-level { color: var(--low);      }
+    .result-box.moderate .result-level { color: var(--moderate); }
+    .result-box.high     .result-level { color: var(--high);     }
+    .result-box.critical .result-level { color: var(--critical); }
+
+    .result-score {
+      font-size: 0.85rem;
+      color: var(--gray-600);
+      margin-bottom: 1rem;
+      letter-spacing: 0.04em;
+    }
+    .score-bar-wrap { margin-bottom: 1.25rem; }
+    .score-bar-track {
+      background: rgba(0,0,0,0.08);
+      border-radius: 99px;
+      height: 10px;
+      width: 100%;
+      overflow: hidden;
+    }
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.6s ease;
+    }
+    .result-box.low      .score-bar-fill { background: var(--low);      }
+    .result-box.moderate .score-bar-fill { background: var(--moderate); }
+    .result-box.high     .score-bar-fill { background: var(--high);     }
+    .result-box.critical .score-bar-fill { background: var(--critical); }
+
+    .result-section-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gray-400);
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      margin-top: 1rem;
+    }
+    .result-narrative {
+      font-size: 0.95rem;
+      color: var(--gray-800);
+      line-height: 1.7;
+      margin-bottom: 0.5rem;
+    }
+    .care-tiein {
+      font-size: 0.93rem;
+      color: var(--gray-800);
+      line-height: 1.65;
+      padding: 0.85rem 1rem;
+      background: rgba(255,255,255,0.65);
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      margin-bottom: 1.25rem;
+    }
+    .duration-note {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #111;
+      line-height: 1.6;
+      padding: 0.85rem 1rem;
+      background: rgba(255,255,255,0.8);
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      margin-bottom: 1rem;
+    }
+
+    /* ── Severity nested sections ── */
+    .severity-nested { margin-top: 0.75rem; }
+    .severity-note {
+      font-size: 0.82rem;
+      color: var(--gray-600);
+      font-style: italic;
+      margin-bottom: 0.85rem;
+      line-height: 1.5;
+    }
+    .severity-progress {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+    .severity-chip {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      background: var(--gray-100);
+      color: var(--gray-400);
+      font-weight: 600;
+    }
+    .severity-chip.done {
+      background: #d8f3dc;
+      border-color: var(--low);
+      color: var(--low);
+    }
+    .severity-chip.error {
+      background: #fde8e8;
+      border-color: var(--high);
+      color: var(--high);
+    }
+    .severity-chip.error::after {
+      content: ' — Selection required.';
+      font-weight: 400;
+    }
+
+    /* ── Completion meter ── */
+    .completion-meter {
+      margin-bottom: 1.5rem;
+      padding: 0.85rem 1rem;
+      background: var(--gray-100);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+    }
+    .completion-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--gray-400);
+      margin-bottom: 0.4rem;
+    }
+    .completion-track {
+      background: var(--gray-200);
+      border-radius: 99px;
+      height: 8px;
+      width: 100%;
+      overflow: hidden;
+      margin-bottom: 0.35rem;
+    }
+    .completion-bar {
+      height: 100%;
+      border-radius: 99px;
+      background: var(--gold);
+      transition: width 0.4s ease, background 0.3s;
+    }
+    .completion-bar.complete { background: var(--low); }
+    .completion-bar.error    { background: var(--high); }
+    .completion-text {
+      font-size: 0.8rem;
+      color: var(--gray-600);
+      font-weight: 600;
+    }
+    .completion-text.error { color: var(--high); }
+
+    /* ── Validation error ── */
+    .validation-msg {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 3px;
+      padding: 0.75rem 1rem;
+      font-size: 0.88rem;
+      color: #856404;
+      margin-top: 0.75rem;
+      display: none;
+    }
+
+    .hidden { display: none !important; }
+
+    /* ── Explainer page ── */
+    #explainerPage {
+      max-width: 680px;
+      margin: 3rem auto;
+      padding: 0 1.5rem 4rem;
+    }
+    .explainer-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-top: 4px solid var(--gold);
+      border-radius: 4px;
+      box-shadow: var(--shadow);
+      padding: 2.5rem 2rem;
+    }
+    .explainer-card h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.35rem;
+      color: var(--navy);
+      margin-bottom: 1.25rem;
+      line-height: 1.3;
+    }
+    .explainer-card p {
+      font-size: 0.95rem;
+      color: var(--gray-600);
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+    .explainer-card ul {
+      margin: 0.25rem 0 1rem 1.25rem;
+      font-size: 0.93rem;
+      color: var(--gray-600);
+      line-height: 1.8;
+    }
+    .explainer-important {
+      background: var(--gray-100);
+      border-left: 3px solid var(--gold);
+      padding: 0.85rem 1rem;
+      border-radius: 0 3px 3px 0;
+      margin: 1.25rem 0;
+    }
+    .explainer-important p {
+      margin-bottom: 0;
+      font-size: 0.88rem;
+    }
+    .explainer-important ul {
+      margin: 0.25rem 0 0 1.1rem;
+      font-size: 0.88rem;
+    }
+    .explainer-closing {
+      font-size: 0.9rem;
+      color: var(--gray-600);
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+    .explainer-btn {
+      display: inline-block;
+      margin-top: 1.25rem;
+      background: var(--gold);
+      color: var(--navy);
+      border: none;
+      border-radius: 3px;
+      padding: 0.8rem 2rem;
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .explainer-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+    /* ── Case Reference block ── */
+    .case-reference-block {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--gold);
+      border-radius: 4px;
+      padding: 1.25rem 1.5rem 1rem;
+      margin-bottom: 0;
+    }
+    .case-reference-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.98rem;
+      color: var(--navy);
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+    .case-reference-desc {
+      font-size: 0.82rem;
+      color: var(--gray-400);
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+    .case-reference-fields {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.75rem;
+    }
+    .case-reference-fields .field { margin-bottom: 0; }
+    .case-reference-fields input[type="text"],
+    .case-reference-fields input[type="date"] {
+      width: 100%;
+      padding: 0.45rem 0.65rem;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.88rem;
+      color: var(--gray-800);
+      background: var(--white);
+    }
+    .case-reference-fields input:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
+    .case-reference-helper {
+      font-size: 0.78rem;
+      color: var(--gray-400);
+      font-style: italic;
+      margin-top: 0.85rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
+    }
+    .case-ref-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 1.25rem 0;
+    }
+
+    /* ── Print styles ── */
+    @media print {
+      header, .completion-meter, .btn-outline, .calc-btn, .accordion-header,
+      #caseTypeSection, #disabilityPlaceholder, #explainerPage { display: none !important; }
+      .case-reference-block { display: block !important; border: 1px solid #ccc; }
+      .result-box { break-inside: avoid; }
+    }
+
+    /* ── Report case reference header ── */
+    .report-case-header {
+      background: rgba(255,255,255,0.6);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1.25rem;
+    }
+    .report-case-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.35rem;
+    }
+    .report-case-line {
+      font-size: 0.88rem;
+      color: var(--gray-800);
+      line-height: 1.6;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem 1rem;
+      font-size: 0.78rem;
+      color: var(--gray-400);
+      border-top: 1px solid var(--border);
+    }
+    footer strong { color: var(--gray-600); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Reconcile Care Management Services™</div>
+  <h1>Recovery Risk <span>Forecaster™</span></h1>
+  <p class="tagline">
+    Select the case type to load the appropriate risk engine.
+  </p>
+  <span class="badge">Clinical Tool — Attorney &amp; RN Use</span>
+</header>
+
+<!-- ══════════════════════════════════════════
+     EXPLAINER PAGE
+═══════════════════════════════════════════ -->
+<div id="explainerPage">
+  <div class="explainer-card">
+    <h2>Before You Begin — How the Recovery Risk Forecaster™ Works</h2>
+
+    <p>The Recovery Risk Forecaster™ is a forensic, evidence-based evaluation tool designed to help attorneys identify the real-world barriers that influence recovery timelines, treatment consistency, and overall case outcomes.</p>
+
+    <p>Rather than providing medical advice, this tool evaluates population-level risk factors, occupational exposures, and injury-specific variables known to affect recovery progression.</p>
+
+    <p>You will be guided through a structured series of inputs. Each section represents a category of risk that may influence recovery stability and treatment outcomes.</p>
+
+    <p>Your responses generate a data-driven recovery forecast that can support:</p>
+    <ul>
+      <li>Case planning</li>
+      <li>Negotiation strategy</li>
+      <li>Client communication</li>
+      <li>Early identification of recovery barriers</li>
+    </ul>
+
+    <div class="explainer-important">
+      <p><strong>Important</strong></p>
+      <ul>
+        <li>This tool is intended for attorney use only.</li>
+        <li>Limited case reference information may be entered to help identify forecasts associated with a specific matter.</li>
+        <li>No medical records or protected health information are collected.</li>
+        <li>All responses are used only to generate the forecast report.</li>
+      </ul>
+    </div>
+
+    <p class="explainer-closing">To begin the evaluation, please complete the brief access form.</p>
+    <button class="explainer-btn" onclick="startForecaster()">Continue to Access Form →</button>
+  </div>
+</div>
+
+<main id="forecasterMain" class="hidden">
+
+  <!-- ── Case Type Selection ── -->
+  <div id="caseTypeSection" class="card">
+    <div class="card-title">Select Case Type</div>
+    <p class="intro-text">
+      Select the client's case type to load the appropriate recovery risk evaluation engine.
+      Each pathway is calibrated to the real-world barriers most predictive of recovery
+      disruption within that claim category.
+    </p>
+    <div class="type-grid">
+      <button class="type-btn" onclick="selectCaseType('PI')">
+        <span class="btn-label">Personal Injury</span>
+        <span class="btn-sub">Motor Vehicle &amp; General Liability</span>
+      </button>
+      <button class="type-btn" onclick="selectCaseType('WC')">
+        <span class="btn-label">Workers' Compensation</span>
+        <span class="btn-sub">Occupational Injury &amp; Illness</span>
+      </button>
+      <button class="type-btn coming-soon" disabled>
+        <span class="btn-label">Disability</span>
+        <span class="btn-sub">Coming Soon</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Disability Placeholder ── -->
+  <div id="disabilityPlaceholder" class="card hidden">
+    <div class="card-title">Disability Module — Coming Soon</div>
+    <p class="dis-intro">
+      The Disability pathway of the Recovery Risk Forecaster™ is currently in development.
+      This module will evaluate:
+    </p>
+    <ul>
+      <li>Functional capacity</li>
+      <li>Chronic condition burden</li>
+      <li>Long-term medical complexity</li>
+      <li>Fixed-income instability</li>
+      <li>Treatment access barriers</li>
+      <li>Behavioral and psychosocial derailment patterns</li>
+      <li>Medication access and affordability</li>
+      <li>Mobility limitations</li>
+      <li>Cognitive load and executive functioning barriers</li>
+    </ul>
+    <p class="dis-intro" style="margin-top:0.75rem;">This module will support:</p>
+    <ul>
+      <li>Social Security Disability</li>
+      <li>Long-Term Disability</li>
+      <li>Short-Term Disability</li>
+      <li>ERISA-governed claims</li>
+    </ul>
+    <p class="dis-intro" style="margin-top:0.75rem;">
+      This module will be released in a future update. Please select
+      <strong>Personal Injury</strong> or <strong>Workers' Compensation</strong> to continue.
+    </p>
+    <div class="dis-actions">
+      <button class="btn-outline" onclick="resetTool()">← Return to Case Type Selection</button>
+      <button class="btn-primary" onclick="selectCaseType('PI')">Start Personal Injury Evaluation</button>
+      <button class="btn-primary" onclick="selectCaseType('WC')">Start Workers' Compensation Evaluation</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       PERSONAL INJURY FORM
+  ═══════════════════════════════════════════ -->
+  <div id="piForm" class="hidden">
+    <div class="card">
+      <div class="card-title">Personal Injury — Recovery Risk Inputs</div>
+      <div style="margin-bottom:1.25rem;">
+        <button class="btn-outline" onclick="resetTool()">← Back to Case Type Selection</button>
+      </div>
+
+      <!-- Case Reference Block -->
+      <div class="case-reference-block">
+        <div class="case-reference-title">Case Reference (For Your Records Only)</div>
+        <div class="case-reference-desc">Optional information to help you identify which case this forecast belongs to. This information appears on the final report but is not used in the risk calculation.</div>
+        <div class="case-reference-fields">
+          <div class="field">
+            <label>Client Name</label>
+            <input type="text" id="pi_clientName" placeholder="Enter client name" />
+          </div>
+          <div class="field">
+            <label>Date of Injury / Date of Loss</label>
+            <input type="date" id="pi_doi" />
+          </div>
+          <div class="field">
+            <label>Matter / Case Reference <span style="font-weight:400;color:var(--gray-400);">(Optional)</span></label>
+            <input type="text" id="pi_caseRef" placeholder="File number or matter name" />
+          </div>
+        </div>
+        <div class="case-reference-helper">This information is for reference only and does not affect the recovery risk calculation.</div>
+      </div>
+      <hr class="case-ref-divider" />
+
+      <!-- Global Completion Meter -->
+      <div id="pi_completion_meter" class="completion-meter">
+        <div class="completion-label">Form Completion</div>
+        <div class="completion-track"><div id="pi_completion_bar" class="completion-bar" style="width:0%"></div></div>
+        <div id="pi_completion_text" class="completion-text">0 of 8 sections complete</div>
+      </div>
+
+      <!-- 1. Transportation Instability -->
+      <div class="accordion" data-section="pi_transport">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <span class="accordion-title">1. Transportation Instability</span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="field">
+            <label>Was the client's vehicle damaged and/or unavailable?</label>
+            <select id="pi_vehicleDamaged">
+              <option value="">— Select one —</option>
+              <option value="0">No</option>
+              <option value="10">Yes</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Does the client have liability-only insurance?</label>
+            <select id="pi_liabilityOnly">
+              <option value="">— Select one —</option>
+              <option value="0">No</option>
+              <option value="10">Yes</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Is the client waiting for the other driver's insurer?</label>
+            <select id="pi_waitingOtherInsurer">
+              <option value="">— Select one —</option>
+              <option value="0">No</option>
+              <option value="10">Yes</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Does the client have reliable alternative transportation?</label>
+            <select id="pi_altTransport">
+              <option value="">— Select one —</option>
+              <option value="0">Yes — reliable alternative available</option>
+              <option value="10">No — no reliable alternative</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Income & Employment -->
+      <div class="accordion" data-section="pi_income">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <span class="accordion-title">2. Income &amp; Employment</span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="field">
+            <label>Approximate annual household income</label>
+            <select id="pi_income">
+              <option value="">— Select one —</option>
+              <option value="15">Less than $30,000</option>
+              <option value="10">$30,000 – $60,000</option>
+              <option value="6">$60,000 – $90,000</option>
+              <option value="3">$90,000 – $100,000</option>
+              <option value="1">$100,000 – $130,000</option>
+              <option value="0">$130,000+</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Does the client have financial dependents?</label>
+            <select id="pi_dependents">
+              <option value="">— Select one —</option>
+              <option value="0">No</option>
+              <option value="5">Yes</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Is the client hourly (no guaranteed salary or paid time off)?</label>
+            <select id="pi_hourly">
+              <option value="">— Select one —</option>
+              <option value="0">No — salaried with benefits</option>
+              <option value="5">Yes — hourly or gig-economy</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Has the client been in their job less than 12 months?</label>
+            <select id="pi_tenure">
+              <option value="">— Select one —</option>
+              <option value="0">No — 12 months or more</option>
+              <option value="10">Yes — less than 12 months</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Household Instability -->
+      <div class="accordion" data-section="pi_household">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <span class="accordion-title">3. Household Instability</span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="field">
+            <label>Is the client a single parent or primary household provider?</label>
+            <select id="pi_singleParent">
+              <option value="">— Select one —</option>
+              <option value="0">No</option>
+              <option value="10">Yes</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Does the client have significant caregiving responsibilities?</label>
+            <select id="pi_caregiving">
+              <option value="">— Select one —</option>
+              <option value="0">No</option>
+              <option value="10">Yes</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Treatment Access Friction -->
+      <div class="accordion" data-section="pi_friction">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <span class="accordion-title">4. Treatment Access Friction</span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="field">
+            <label>How much friction is there in accessing treatment?</label>
+            <select id="pi_accessFriction">
+              <option value="">— Select one —</option>
+              <option value="0">None — treatment is moving smoothly</option>
+              <option value="2">Mild — occasional delays</option>
+              <option value="4">Moderate — noticeable delays or authorization issues</option>
+              <option value="6">High — repeated delays, denials, or insurance barriers</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Intrinsic Factors -->
+      <div class="accordion" data-section="pi_intrinsic">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <span class="accordion-title">5. Intrinsic Factors</span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="field">
+            <label>Physical instability — pain, fatigue, or mobility limitations</label>
+            <select id="pi_physical">
+              <option value="">— Select one —</option>
+              <option value="0">Minimal</option>
+              <option value="5">Moderate</option>
+              <option value="10">Significant</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Psychological instability — anxiety, depression, overwhelm, avoidance</label>
+            <select id="pi_psych">
+              <option value="">— Select one —</option>
+              <option value="0">Minimal</option>
+              <option value="8">Moderate</option>
+              <option value="15">Significant</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Behavioral Signals -->
+      <div class="accordion" data-section="pi_behavioral">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <span class="accordion-title">6. Behavioral Signals</span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="field">
+            <label>Communication patterns with care team or legal team</label>
+            <select id="pi_comm">
+              <option value="">— Select one —</option>
+              <option value="0">Consistent</option>
+              <option value="4">Occasionally delayed</option>
+              <option value="7.5">Frequently delayed or avoidant</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Follow-through on treatment — appointments, imaging, referrals</label>
+            <select id="pi_follow">
+              <option value="">— Select one —</option>
+              <option value="0">Consistent</option>
+              <option value="4">Some missed</option>
+              <option value="7.5">Repeated missed</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. Mechanism of Injury Severity — Standalone -->
+      <div class="accordion" data-section="pi_mechanism_section">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <span class="accordion-title">7. Mechanism of Injury Severity (Force or Stressor Impact)</span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="field">
+            <label>Mechanism of injury</label>
+            <p class="severity-note">Describes the type and level of force or stressor involved in the injury event. Higher-energy mechanisms produce longer recovery times due to greater tissue disruption and multi-region involvement.</p>
+            <select id="pi_mechanism" onchange="handleMechanismChange('pi', this.value)">
+              <option value="">— Select one —</option>
+              <option value="1.00">Caught In/Between (also crush/crushing)</option>
+              <option value="1.10">Cumulative Trauma / Repetitive Stress</option>
+              <option value="1.10">Exposure (Environmental / Chemical / Electrical)</option>
+              <option value="1.10">Falls, Slips, and Trips</option>
+              <option value="1.50">Mental / Psychiatric Injury</option>
+              <option value="1.00">Miscellaneous (NOC)</option>
+              <option value="1.20">Motor Vehicle Incident</option>
+              <option value="1.15">Overexertion / Body Stressing</option>
+              <option value="1.20">Struck By / Struck Against</option>
+              <option value="1.35">Transportation Incidents (Non-Motor Vehicle)</option>
+            </select>
+          </div>
+          <!-- Psychiatric sub-dropdown removed per spec: Mental/Psychiatric behaves like all other mechanism categories -->
+        </div>
+      </div>
+
+      <!-- 8. Severity Modifiers (Treatment Duration Only) -->
+      <div class="accordion" data-section="pi_severity_section">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <span class="accordion-title">8. Severity Modifiers (Treatment Duration Only)</span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-body">
+          <p class="severity-note">Select every severity domain that applies to this case. Some cases involve only one domain, while others involve several. Choose all domains that are relevant to the client's presentation — the tool will calculate treatment duration based on every domain you select.</p>
+
+          <!-- Domain progress tracker -->
+          <div id="pi_severity_progress" class="severity-progress"></div>
+          <div class="field">
+            <label>Select Severity Domain</label>
+            <select id="pi_severityDomain" onchange="loadSeverityDomain('pi', this.value)">
+              <option value="">— Select one —</option>
+              <option value="structural">1. Structural Severity</option>
+              <option value="neuro">2. Neurological Involvement</option>
+              <option value="regions">3. Multi-Region Involvement</option>
+              <option value="surgical">4. Surgical Pathway</option>
+              <option value="chronic">5. Chronic Condition Overlay</option>
+              <option value="healing">6. Complicated Healing Patterns</option>
+            </select>
+          </div>
+
+          <!-- Single dynamic container — only ONE nested dropdown exists here at a time -->
+          <div id="pi_severity_container"></div>
+
+        </div>
+      </div>
+
+      <button class="calc-btn" onclick="calculatePI()">Calculate PI Risk →</button>
+      <div class="validation-msg" id="piValidation">Please complete all fields. All seven severity domains must be completed before calculating.</div>
+      <div id="piResult" class="hidden"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       WORKERS' COMP FORM
+  ═══════════════════════════════════════════ -->
+  <div id="wcForm" class="hidden">
+    <div class="card">
+      <div class="card-title">Workers' Compensation — Recovery Risk Inputs</div>
+      <div style="margin-bottom:1.25rem;">
+        <button class="btn-outline" onclick="resetTool()">← Back to Case Type Selection</button>
+      </div>
+
+      <!-- Case Reference Block -->
+      <div class="case-reference-block">
+        <div class="case-reference-title">Case Reference (For Your Records Only)</div>
+        <div class="case-reference-desc">Optional information to help you identify which case this forecast belongs to. This information appears on the final report but is not used in the risk calculation.</div>
+        <div class="case-reference-fields">
+          <div class="field">
+            <label>Client Name</label>
+            <input type="text" id="wc_clientName" placeholder="Enter client name" />
+          </div>
+          <div class="field">
+            <label>Date of Injury / Date of Loss</label>
+            <input type="date" id="wc_doi" />
+          </div>
+          <div class="field">
+            <label>Matter / Case Reference <span style="font-weight:400;color:var(--gray-400);">(Optional)</span></label>
+            <input type="text" id="wc_caseRef" placeholder="File number or matter name" />
+          </div>
+        </div>
+        <div class="case-reference-helper">This information is for reference only and does not affect the recovery risk calculation.</div>
+      </div>
+      <hr class="case-ref-divider" />
+
+      <!-- Global Completion Meter -->
+      <div id="wc_completion_meter" class="completion-meter">
+        <div class="completion-label">Form Completion</div>
+        <div class="completion-track"><div id="wc_completion_bar" class="completion-bar" style="width:0%"></div></div>
+        <div id="wc_completion_text" class="completion-text">0 of 8 sections complete</div>
+      </div>
+
+      <!-- 1. Occupation & Industry -->
+      <div class="accordion" data-section="wc_industry_section">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <span class="accordion-title">1. Occupation &amp; Industry</span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="field">
+            <label>Occupation</label>
+            <select id="wc_occupation">
+              <option value="">— Select one —</option>
+              <option value="agriculture">Agriculture, Forestry &amp; Fishing</option>
+              <option value="construction">Construction Trades</option>
+              <option value="education">Education &amp; Training</option>
+              <option value="healthcare">Healthcare &amp; Social Assistance</option>
+              <option value="laborers">Laborers &amp; Process Workers</option>
+              <option value="manufacturing">Manufacturing &amp; Production</option>
+              <option value="public_safety">Public Administration &amp; Safety (Police/Fire/Corrections)</option>
+              <option value="transportation">Transportation &amp; Warehousing</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Industry Risk Category</label>
+            <select id="wc_industry">
+              <option value="">— Select one —</option>
+              <option value="20">High-risk — construction, public safety, heavy labor</option>
+              <option value="10">Mid-risk — manufacturing, healthcare support, technicians</option>
+              <option value="0">Low-risk — administrative, clerical, professional services</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Job Tenure & Wage Loss -->
+      <div class="accordion" data-section="wc_tenure_section">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <span class="accordion-title">2. Job Tenure &amp; Wage Loss</span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="field">
+            <label>Has the worker been in this position less than 12 months?</label>
+            <select id="wc_tenure">
+              <option value="">— Select one —</option>
+              <option value="0">No — 12 months or more</option>
+              <option value="10">Yes — less than 12 months</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Has the worker experienced reduced hours or wage loss?</label>
+            <select id="wc_wageLoss">
+              <option value="">— Select one —</option>
+              <option value="0">No significant wage impact</option>
+              <option value="5">Some reduction in hours or overtime</option>
+              <option value="10">Significant or total wage loss</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Chronic Conditions & Employer Behavior -->
+      <div class="accordion" data-section="wc_chronic_section">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <span class="accordion-title">3. Chronic Conditions &amp; Employer Behavior</span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="field">
+            <label>Does the worker have chronic conditions (diabetes, hypertension, heart disease, etc.)?</label>
+            <select id="wc_chronic">
+              <option value="">— Select one —</option>
+              <option value="0">No significant chronic conditions</option>
+              <option value="5">Yes — stable and well-managed</option>
+              <option value="10">Yes — destabilized or at risk</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Employer response to the injury</label>
+            <select id="wc_lightDuty">
+              <option value="">— Select one —</option>
+              <option value="0">Appropriate light duty offered</option>
+              <option value="5">Limited or unclear light duty</option>
+              <option value="10">No light duty / retaliatory behavior / pressure to return</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Treatment Access Friction -->
+      <div class="accordion" data-section="wc_friction_section">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <span class="accordion-title">4. Treatment Access Friction</span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="field">
+            <label>How much friction is there in accessing treatment?</label>
+            <select id="wc_accessFriction">
+              <option value="">— Select one —</option>
+              <option value="0">None — treatment is moving smoothly</option>
+              <option value="2">Mild — occasional delays</option>
+              <option value="4">Moderate — noticeable delays or authorization issues</option>
+              <option value="6">High — repeated delays, denials, or insurance barriers</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Intrinsic Factors -->
+      <div class="accordion" data-section="wc_intrinsic_section">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <span class="accordion-title">5. Intrinsic Factors</span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="field">
+            <label>Physical instability — pain, fatigue, or mobility limitations</label>
+            <select id="wc_physical">
+              <option value="">— Select one —</option>
+              <option value="0">Minimal</option>
+              <option value="5">Moderate</option>
+              <option value="10">Significant</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Psychological instability — anxiety, depression, overwhelm, avoidance</label>
+            <select id="wc_psych">
+              <option value="">— Select one —</option>
+              <option value="0">Minimal</option>
+              <option value="8">Moderate</option>
+              <option value="15">Significant</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Behavioral Signals -->
+      <div class="accordion" data-section="wc_behavioral_section">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <span class="accordion-title">6. Behavioral Signals</span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="field">
+            <label>Communication patterns with care team, adjuster, or legal team</label>
+            <select id="wc_comm">
+              <option value="">— Select one —</option>
+              <option value="0">Consistent</option>
+              <option value="4">Occasionally delayed</option>
+              <option value="7.5">Frequently delayed or avoidant</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Follow-through on treatment — appointments, imaging, referrals</label>
+            <select id="wc_follow">
+              <option value="">— Select one —</option>
+              <option value="0">Consistent</option>
+              <option value="4">Some missed</option>
+              <option value="7.5">Repeated missed</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. Mechanism of Injury Severity — Standalone -->
+      <div class="accordion" data-section="wc_mechanism_section">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <span class="accordion-title">7. Mechanism of Injury Severity (Force or Stressor Impact)</span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="field">
+            <label>Mechanism of injury</label>
+            <p class="severity-note">Describes the type and level of force or stressor involved in the injury event. Higher-energy mechanisms produce longer recovery times due to greater tissue disruption and multi-region involvement.</p>
+            <select id="wc_mechanism" onchange="handleMechanismChange('wc', this.value)">
+              <option value="">— Select one —</option>
+              <option value="1.00">Caught In/Between (also crush/crushing)</option>
+              <option value="1.10">Cumulative Trauma / Repetitive Stress</option>
+              <option value="1.10">Exposure (Environmental / Chemical / Electrical)</option>
+              <option value="1.10">Falls, Slips, and Trips</option>
+              <option value="1.50">Mental / Psychiatric Injury</option>
+              <option value="1.00">Miscellaneous (NOC)</option>
+              <option value="1.20">Motor Vehicle Incident</option>
+              <option value="1.15">Overexertion / Body Stressing</option>
+              <option value="1.20">Struck By / Struck Against</option>
+              <option value="1.35">Transportation Incidents (Non-Motor Vehicle)</option>
+            </select>
+          </div>
+          <!-- Psychiatric sub-dropdown removed per spec: Mental/Psychiatric behaves like all other mechanism categories -->
+        </div>
+      </div>
+
+      <!-- 8. Severity Modifiers (Treatment Duration Only) -->
+      <div class="accordion" data-section="wc_severity_section">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <span class="accordion-title">8. Severity Modifiers (Treatment Duration Only)</span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-body">
+          <p class="severity-note">Select every severity domain that applies to this case. Some cases involve only one domain, while others involve several. Choose all domains that are relevant to the client's presentation — the tool will calculate treatment duration based on every domain you select.</p>
+
+          <!-- Domain progress tracker -->
+          <div id="wc_severity_progress" class="severity-progress"></div>
+
+          <!-- Primary domain selector -->
+          <div class="field">
+            <label>Select Severity Domain</label>
+            <select id="wc_severityDomain" onchange="loadSeverityDomain('wc', this.value)">
+              <option value="">— Select one —</option>
+              <option value="structural">1. Structural Severity</option>
+              <option value="neuro">2. Neurological Involvement</option>
+              <option value="regions">3. Multi-Region Involvement</option>
+              <option value="surgical">4. Surgical Pathway</option>
+              <option value="chronic">5. Chronic Condition Overlay</option>
+              <option value="healing">6. Complicated Healing Patterns</option>
+            </select>
+          </div>
+
+          <!-- Single dynamic container — only ONE nested dropdown exists here at a time -->
+          <div id="wc_severity_container"></div>
+
+        </div>
+      </div>
+
+      <button class="calc-btn" onclick="calculateWC()">Calculate WC Risk →</button>
+      <div class="validation-msg" id="wcValidation">Please complete all required fields before calculating.</div>
+      <div id="wcResult" class="hidden"></div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <strong>Reconcile Care Management Services™</strong> &nbsp;|&nbsp;
+  Recovery Risk Forecaster™ &nbsp;|&nbsp;
+  For clinical and legal professional use only. Not a substitute for clinical judgment.
+</footer>
+
+<script>
+
+  // Read case type from portal launch URL (?caseType=active|closed) or session after auth
+  const caseType = new URLSearchParams(window.location.search).get('caseType') || sessionStorage.getItem('tool_caseType') || 'active';
+
+  /* ── Explainer → Forecaster flow ── */
+  function startForecaster() {
+    document.getElementById('explainerPage').classList.add('hidden');
+    document.getElementById('forecasterMain').classList.remove('hidden');
+  }
+
+  /* ── Navigation ── */
+  function resetViews() {
+    ['piForm','wcForm','disabilityPlaceholder'].forEach(id =>
+      document.getElementById(id).classList.add('hidden'));
+  }
+  function resetTool() {
+    resetViews();
+    document.getElementById('caseTypeSection').classList.remove('hidden');
+    // Clear all stored severity values
+    severityValues.pi = {};
+    severityValues.wc = {};
+    // Reset completion meters
+    updateCompletionMeter('pi');
+    updateCompletionMeter('wc');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ── Mechanism change handler ── */
+  function handleMechanismChange(prefix, value) {
+    updateCompletionMeter(prefix);
+  }
+
+  /* ── Completion meter ── */
+  // Map of section key → array of select IDs that must all be non-empty
+  const piSectionMap = {
+    pi_transport:         ['pi_vehicleDamaged','pi_liabilityOnly','pi_waitingOtherInsurer','pi_altTransport'],
+    pi_income:            ['pi_income','pi_dependents','pi_hourly','pi_tenure'],
+    pi_household:         ['pi_singleParent','pi_caregiving'],
+    pi_friction:          ['pi_accessFriction'],
+    pi_intrinsic:         ['pi_physical','pi_psych'],
+    pi_behavioral:        ['pi_comm','pi_follow'],
+    pi_mechanism_section: ['pi_mechanism'],
+    pi_severity_section:  [] // checked separately via allSeverityComplete
+  };
+  const wcSectionMap = {
+    wc_industry_section:  ['wc_occupation','wc_industry'],
+    wc_tenure_section:    ['wc_tenure','wc_wageLoss'],
+    wc_chronic_section:   ['wc_chronic','wc_lightDuty'],
+    wc_friction_section:  ['wc_accessFriction'],
+    wc_intrinsic_section: ['wc_physical','wc_psych'],
+    wc_behavioral_section:['wc_comm','wc_follow'],
+    wc_mechanism_section: ['wc_mechanism'],
+    wc_severity_section:  []
+  };
+
+  function isSectionComplete(prefix, sectionKey, ids) {
+    if (ids.length === 0) {
+      // severity section — at least one domain must be selected
+      return anySeveritySelected(prefix);
+    }
+    return ids.every(id => {
+      const el = document.getElementById(id);
+      return el && el.value !== '';
+    });
+  }
+
+  function updateCompletionMeter(prefix) {
+    const map = prefix === 'pi' ? piSectionMap : wcSectionMap;
+    const keys = Object.keys(map);
+    let complete = 0;
+    keys.forEach(key => {
+      const done = isSectionComplete(prefix, key, map[key]);
+      if (done) complete++;
+      // Find the accordion with matching data-section and toggle its header class
+      const acc = document.querySelector(`[data-section="${key}"]`);
+      if (acc) {
+        const header = acc.querySelector('.accordion-header');
+        if (header) {
+          if (done) {
+            header.classList.add('section-complete');
+          } else {
+            header.classList.remove('section-complete');
+          }
+        }
+      }
+    });
+    const total = keys.length;
+    const pct = Math.round((complete / total) * 100);
+    const bar = document.getElementById(prefix + '_completion_bar');
+    const txt = document.getElementById(prefix + '_completion_text');
+    if (!bar || !txt) return;
+    bar.style.width = pct + '%';
+    bar.className = 'completion-bar' + (pct === 100 ? ' complete' : '');
+    txt.textContent = complete + ' of ' + total + ' sections complete';
+    txt.className = 'completion-text';
+  }
+
+  function markMeterError(prefix) {
+    const bar = document.getElementById(prefix + '_completion_bar');
+    const txt = document.getElementById(prefix + '_completion_text');
+    if (bar) bar.className = 'completion-bar error';
+    if (txt) { txt.textContent = 'Please complete all sections before calculating.'; txt.className = 'completion-text error'; }
+  }
+  function selectCaseType(type) {
+    document.getElementById('caseTypeSection').classList.add('hidden');
+    resetViews();
+    if (type === 'PI')  document.getElementById('piForm').classList.remove('hidden');
+    if (type === 'WC')  document.getElementById('wcForm').classList.remove('hidden');
+    if (type === 'DIS') document.getElementById('disabilityPlaceholder').classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ── Accordion ── */
+  function toggleAccordion(header) {
+    const body = header.nextElementSibling;
+    const icon = header.querySelector('.accordion-icon');
+    body.classList.toggle('open');
+    icon.classList.toggle('open');
+  }
+
+  /* ══════════════════════════════════════════
+     SEVERITY MATRIX — DYNAMIC DOM INJECTION
+     Only ONE nested dropdown exists in the DOM at any time.
+     All values are stored in severityValues[prefix][domain].
+     The calculation reads from stored values, not DOM elements.
+  ═══════════════════════════════════════════ */
+
+  const severityDomainKeys = ['structural','neuro','regions','surgical','chronic','healing'];
+
+  const severityDomainData = {
+    structural: {
+      label: 'Structural severity (tissue damage level)',
+      note: null,
+      options: [
+        { label: 'Soft-tissue only',              value: '1'    },
+        { label: 'Soft-tissue + imaging findings', value: '1.15' },
+        { label: 'Simple fracture',                value: '1.25' },
+        { label: 'Complex fracture',               value: '1.40' },
+        { label: 'Catastrophic injury',            value: '1.60' }
+      ]
+    },
+    neuro: {
+      label: 'Neurological involvement (nerve impact)',
+      note: null,
+      options: [
+        { label: 'None',                                   value: '1'    },
+        { label: 'Mild (radiculopathy, paresthesia)',       value: '1.10' },
+        { label: 'Moderate (confirmed nerve compression)', value: '1.20' },
+        { label: 'Severe (motor deficit, neuropathy)',     value: '1.35' }
+      ]
+    },
+    regions: {
+      label: 'Number of regions involved',
+      note: null,
+      options: [
+        { label: 'Single region', value: '1'    },
+        { label: 'Two regions',   value: '1.10' },
+        { label: 'Three regions', value: '1.20' },
+        { label: 'Multi-system',  value: '1.30' }
+      ]
+    },
+    surgical: {
+      label: 'Surgical pathway status',
+      note: null,
+      options: [
+        { label: 'No surgery expected', value: '1'    },
+        { label: 'Possible surgery',    value: '1.20' },
+        { label: 'Post-surgical',       value: '1.40' },
+        { label: 'Delayed surgery',     value: '1.50' }
+      ]
+    },
+    chronic: {
+      label: 'Chronic condition impact on healing',
+      note: null,
+      options: [
+        { label: 'None',                                          value: '1'    },
+        { label: 'Mild (controlled conditions)',                  value: '1.10' },
+        { label: 'Moderate (obesity, uncontrolled diabetes)',     value: '1.20' },
+        { label: 'Severe (autoimmune, cardiac, multi-morbidity)', value: '1.35' }
+      ]
+    },
+    healing: {
+      label: 'Complicated healing patterns',
+      note: null,
+      options: [
+        { label: 'None',                     value: '1'    },
+        { label: 'Adhesive capsulitis risk', value: '1.15' },
+        { label: 'CRPS risk',               value: '1.25' },
+        { label: 'Failed conservative care', value: '1.40' }
+      ]
+    }
+  };
+
+  // Stored severity values per prefix — this is what the calculation reads
+  const severityValues = { pi: {}, wc: {} };
+
+  function loadSeverityDomain(prefix, domain) {
+    const container = document.getElementById(prefix + '_severity_container');
+    // Clear the container — remove any previously injected dropdown from the DOM
+    container.innerHTML = '';
+
+    if (!domain) return; // nothing selected, leave empty
+
+    const data = severityDomainData[domain];
+    if (!data) return;
+
+    // Build the dropdown HTML and inject it — this is the ONLY nested dropdown in the DOM
+    const savedValue = severityValues[prefix][domain] || '';
+    let optionsHTML = '<option value="">— Select one —</option>';
+    data.options.forEach(opt => {
+      const selected = opt.value === savedValue ? ' selected' : '';
+      optionsHTML += `<option value="${opt.value}"${selected}>${opt.label}</option>`;
+    });
+
+    const noteHTML = data.note
+      ? `<p class="severity-note" style="margin-top:0.25rem;">${data.note}</p>`
+      : '';
+
+    container.innerHTML = `
+      <div class="severity-nested">
+        <div class="field">
+          <label>${data.label}</label>
+          ${noteHTML}
+          <select id="${prefix}_severity_active" onchange="saveSeverityValue('${prefix}', '${domain}', this.value)">
+            ${optionsHTML}
+          </select>
+        </div>
+      </div>
+    `;
+
+    updateSeverityProgress(prefix);
+  }
+
+  function saveSeverityValue(prefix, domain, value) {
+    severityValues[prefix][domain] = value;
+    updateSeverityProgress(prefix);
+    updateCompletionMeter(prefix);
+  }
+
+  const domainLabels = {
+    structural: 'Structural', neuro: 'Neurological', regions: 'Multi-Region',
+    surgical: 'Surgical', chronic: 'Chronic Condition', healing: 'Healing'
+  };
+
+  function updateSeverityProgress(prefix, showErrors) {
+    const el = document.getElementById(prefix + '_severity_progress');
+    if (!el) return;
+    let html = '';
+    const noneSelected = showErrors && !anySeveritySelected(prefix);
+    severityDomainKeys.forEach(key => {
+      const done = severityValues[prefix][key] && severityValues[prefix][key] !== '';
+      // Only show error state if NOTHING has been selected at all
+      const isError = noneSelected && !done;
+      let cls = 'severity-chip';
+      if (done) cls += ' done';
+      else if (isError) cls += ' error';
+      html += `<span class="${cls}">${done ? '✓' : '○'} ${domainLabels[key]}</span>`;
+    });
+    el.innerHTML = html;
+  }
+
+  function getSeverityMultiplier(prefix) {
+    // Reads from stored values only — never touches DOM severity elements
+    let mult = 1;
+    severityDomainKeys.forEach(key => {
+      const val = parseFloat(severityValues[prefix][key]);
+      if (!isNaN(val)) mult *= val;
+    });
+    return mult;
+  }
+
+  function anySeveritySelected(prefix) {
+    return severityDomainKeys.some(key =>
+      severityValues[prefix][key] && severityValues[prefix][key] !== ''
+    );
+  }
+
+  /* ── Validation ── */
+  function validateFields(ids, msgId) {
+    let valid = true;
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (el.value === '') {
+        el.classList.add('error');
+        // Open parent accordion if collapsed
+        const body = el.closest('.accordion-body');
+        if (body && !body.classList.contains('open')) {
+          body.classList.add('open');
+          body.previousElementSibling.querySelector('.accordion-icon').classList.add('open');
+        }
+        // If inside a severity-nested, show it and update the domain selector
+        const nested = el.closest('.severity-nested');
+        if (nested) {
+          nested.classList.remove('hidden');
+          // figure out domain key from nested id e.g. pi_domain_neuro → neuro
+          const domainKey = nested.id.split('_domain_')[1];
+          const prefix = nested.id.split('_domain_')[0];
+          const domainSelector = document.getElementById(prefix + '_severityDomain');
+          if (domainSelector) domainSelector.value = domainKey;
+        }
+        valid = false;
+      } else {
+        el.classList.remove('error');
+      }
+    });
+    const msgEl = document.getElementById(msgId);
+    if (!valid) {
+      msgEl.style.display = 'block';
+      const firstError = document.querySelector('.field select.error');
+      if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      msgEl.style.display = 'none';
+    }
+    return valid;
+  }
+
+  /* ── Risk classification ── */
+  function categorize(score) {
+    if (score < 25) return 'Low';
+    if (score < 50) return 'Moderate';
+    if (score < 75) return 'High';
+    return 'Critical';
+  }
+  function riskClass(level) {
+    return { Low:'low', Moderate:'moderate', High:'high', Critical:'critical' }[level];
+  }
+
+  /* ── C.A.R.E. tie-in ── */
+  function careTieIn(level) {
+    if (level === 'Low')
+      return 'C.A.R.E. maintains proactive communication and monitors for emerging instability so small issues do not escalate.';
+    if (level === 'Moderate')
+      return 'C.A.R.E. stabilizes early friction points — transportation gaps, income strain, childcare conflicts, or early chronic condition changes — before they disrupt treatment.';
+    if (level === 'High')
+      return 'C.A.R.E. intervenes directly to stabilize the client\'s environment, coordinate care around real-world limitations, and prevent treatment collapse.';
+    return 'C.A.R.E. provides immediate, trauma-informed stabilization for clients in crisis, preventing treatment dropout and significant case devaluation.';
+  }
+
+  /* ── PI Narratives ── */
+  function piNarrative(level) {
+    const n = {
+      Low: 'This client presents with a low recovery risk profile. While barriers exist in virtually every case, the combination of factors evaluated here does not indicate a high probability of treatment disruption at this time. Continued proactive engagement is appropriate to monitor for emerging instability.',
+      Moderate: 'This client presents with a moderate and clinically meaningful recovery risk. One or more friction points — transportation instability, financial pressure, caregiving demands, or early behavioral signals — are present and likely to compound over time without intervention. Motor vehicle injury clients at this level frequently underestimate the cumulative weight of barriers on treatment consistency.',
+      High: 'This client presents with a high recovery risk. Multiple reinforcing barriers are simultaneously active across transportation, income, psychological stability, and behavioral follow-through. Without direct clinical intervention and barrier stabilization, treatment disruption is probable and case value is at significant risk.',
+      Critical: 'This client presents with a critical recovery risk. The convergence of structural, psychological, and behavioral barriers creates a high probability of near-term treatment collapse. Immediate RN intervention, attorney coordination, and a formal care stabilization plan are clinically indicated to prevent case devaluation.'
+    };
+    return n[level];
+  }
+
+  /* ── WC Narratives ── */
+  function wcNarrative(level) {
+    const n = {
+      Low: 'This worker presents with a low recovery risk profile. Workplace conditions, financial stability, and behavioral patterns do not indicate significant disruption risk at this time. Standard monitoring and proactive communication are sufficient.',
+      Moderate: 'This worker presents with a moderate recovery risk. Wage loss, employer pressure, or early behavioral signals are creating friction that, if unaddressed, can disrupt treatment consistency. Workers at this level frequently express a desire to return to work prematurely as financial and occupational pressure mounts — a pattern that reflects survival-driven decision-making, not non-compliance.',
+      High: 'This worker presents with a high recovery risk. Employer behavior, wage loss, or significant psychological instability are actively undermining treatment engagement. Workers facing retaliatory workplace environments or total wage loss are among the highest-risk populations for abrupt care disengagement. Direct clinical intervention is indicated.',
+      Critical: 'This worker presents with a critical recovery risk. A convergence of occupational, financial, and psychosocial pressures is creating conditions where continued treatment engagement is unsustainable without immediate external stabilization. RN-led intervention, attorney coordination, and barrier removal are clinically required.'
+    };
+    return n[level];
+  }
+
+  /* ── Normalize helper ── */
+  function norm(raw, max, weight) {
+    return (raw / max) * weight;
+  }
+
+  /* ── PI Calculation ── */
+  function calculatePI() {
+    const piFields = [
+      'pi_vehicleDamaged','pi_liabilityOnly','pi_waitingOtherInsurer','pi_altTransport',
+      'pi_income','pi_dependents','pi_hourly','pi_tenure',
+      'pi_singleParent','pi_caregiving',
+      'pi_accessFriction',
+      'pi_physical','pi_psych',
+      'pi_comm','pi_follow',
+      'pi_mechanism'
+    ];
+    if (!validateFields(piFields, 'piValidation')) { markMeterError('pi'); return; }
+
+    // Check all 6 severity domains are stored
+    if (!anySeveritySelected('pi')) {
+      markMeterError('pi');
+      updateSeverityProgress('pi', true);
+      const msgEl = document.getElementById('piValidation');
+      msgEl.style.display = 'block';
+      msgEl.textContent = 'Please select at least one severity domain in section 8 before calculating.';
+      const severityAccordions = document.querySelectorAll('#piForm .accordion');
+      severityAccordions.forEach(acc => {
+        if (acc.querySelector('#pi_severityDomain')) {
+          const body = acc.querySelector('.accordion-body');
+          const icon = acc.querySelector('.accordion-icon');
+          if (body && !body.classList.contains('open')) {
+            body.classList.add('open');
+            icon.classList.add('open');
+          }
+          acc.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+      return;
+    }
+    document.getElementById('piValidation').style.display = 'none';
+
+    const v = id => Number(document.getElementById(id).value);
+
+    // Extrinsic (60 pts)
+    const transportRaw  = v('pi_vehicleDamaged') + v('pi_liabilityOnly') + v('pi_waitingOtherInsurer') + v('pi_altTransport');
+    const incomeRaw     = v('pi_income') + v('pi_dependents') + v('pi_hourly') + v('pi_tenure');
+    const householdRaw  = v('pi_singleParent') + v('pi_caregiving');
+    const frictionRaw   = v('pi_accessFriction');
+    const extrinsicRaw  = transportRaw + incomeRaw + householdRaw + frictionRaw;
+    const extrinsicMax  = 40 + 30 + 20 + 6; // 96
+    const extrinsicScore = norm(extrinsicRaw, extrinsicMax, 60);
+
+    // Intrinsic (25 pts)
+    const intrinsicRaw   = v('pi_physical') + v('pi_psych');
+    const intrinsicScore = norm(intrinsicRaw, 25, 25);
+
+    // Behavioral (15 pts)
+    const behavioralRaw   = v('pi_comm') + v('pi_follow');
+    const behavioralScore = norm(behavioralRaw, 15, 15);
+
+    const total = Math.min(100, Math.round(extrinsicScore + intrinsicScore + behavioralScore));
+    const level = categorize(total);
+
+    // Duration — 6-domain severity matrix × standalone mechanism multiplier
+    const durationMult = getSeverityMultiplier('pi') * Number(document.getElementById('pi_mechanism').value);
+    const baseDuration = 180;
+    const predicted = Math.round(baseDuration * durationMult);
+
+    const clientName = document.getElementById('pi_clientName').value.trim();
+    const doi = document.getElementById('pi_doi').value;
+    const caseRef = document.getElementById('pi_caseRef').value.trim();
+    const doiFormatted = doi ? new Date(doi + 'T00:00:00').toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'}) : '';
+
+    let caseHeaderHTML = '';
+    if (clientName || doi || caseRef) {
+      caseHeaderHTML = `<div class="report-case-header">
+        <div class="report-case-title">Recovery Risk Forecast</div>
+        ${clientName ? `<div class="report-case-line"><strong>Client:</strong> ${clientName}</div>` : ''}
+        ${doiFormatted ? `<div class="report-case-line"><strong>Date of Injury:</strong> ${doiFormatted}</div>` : ''}
+        ${caseRef ? `<div class="report-case-line"><strong>Matter:</strong> ${caseRef}</div>` : ''}
+      </div>`;
+    }
+
+    const resultDiv = document.getElementById('piResult');
+    resultDiv.className = `result-box ${riskClass(level)}`;
+    resultDiv.innerHTML = `
+      ${caseHeaderHTML}
+      <div class="result-level">Recovery Risk: ${level}</div>
+      <div class="result-score">Score: ${total} / 100 &nbsp;|&nbsp; Personal Injury</div>
+      <div class="score-bar-wrap">
+        <div class="score-bar-track"><div class="score-bar-fill" style="width:${total}%"></div></div>
+      </div>
+      <div class="result-section-label">Clinical Assessment</div>
+      <p class="result-narrative">${piNarrative(level)}</p>
+      <div class="result-section-label">Estimated Treatment Duration</div>
+      <div class="duration-note">Based on severity modifiers — approximately <strong>${predicted} days</strong>.<br><span style="font-size:0.82rem;font-weight:400;color:#555;">Severity modifiers reflect structural damage, neurological involvement, multi-region injury, surgical pathway, chronic conditions, mechanism severity, and complicated healing patterns. This is an illustrative estimate and does not account for individual variability.</span></div>
+      <div class="result-section-label">C.A.R.E. Tie-In</div>
+      <div class="care-tiein">${careTieIn(level)}</div>
+      <div style="display: flex; gap: 16px; justify-content: center; margin-top: 40px;">
+    <button onclick="returnToDashboard()" class="btn-ghost">
+        ← Return to Dashboard
+    </button>
+    <button onclick="goToNext()" class="btn-primary">
+        Complete & Return to Dashboard →
+    </button>
+</div>
+    `;
+    resultDiv.classList.remove('hidden');
+
+    // Notify Case Clarity portal that RRF is fully complete for the selected case type
+    if (window.opener && !window.opener.closed) {
+      window.opener.postMessage(
+        { type: 'INSTRUMENT_COMPLETE', instrument: 'RRF', caseType },
+        '*'
+      );
+    }
+
+    resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  /* ── WC Calculation ── */
+  function calculateWC() {
+    const wcFields = [
+      'wc_occupation','wc_industry',
+      'wc_tenure','wc_wageLoss',
+      'wc_chronic','wc_lightDuty',
+      'wc_accessFriction',
+      'wc_physical','wc_psych',
+      'wc_comm','wc_follow',
+      'wc_mechanism'
+    ];
+    if (!validateFields(wcFields, 'wcValidation')) { markMeterError('wc'); return; }
+
+    // Check all 6 severity domains are stored
+    if (!anySeveritySelected('wc')) {
+      markMeterError('wc');
+      updateSeverityProgress('wc', true);
+      const msgEl = document.getElementById('wcValidation');
+      msgEl.style.display = 'block';
+      msgEl.textContent = 'Please select at least one severity domain in section 8 before calculating.';
+      const severityAccordions = document.querySelectorAll('#wcForm .accordion');
+      severityAccordions.forEach(acc => {
+        if (acc.querySelector('#wc_severityDomain')) {
+          const body = acc.querySelector('.accordion-body');
+          const icon = acc.querySelector('.accordion-icon');
+          if (body && !body.classList.contains('open')) {
+            body.classList.add('open');
+            icon.classList.add('open');
+          }
+          acc.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+      return;
+    }
+    document.getElementById('wcValidation').style.display = 'none';
+
+    const v = id => Number(document.getElementById(id).value);
+
+    // Extrinsic (60 pts)
+    const extrinsicRaw  = v('wc_industry') + v('wc_tenure') + v('wc_wageLoss')
+                        + v('wc_chronic') + v('wc_lightDuty') + v('wc_accessFriction');
+    const extrinsicMax  = 20 + 10 + 10 + 10 + 10 + 6; // 66
+    const extrinsicScore = norm(extrinsicRaw, extrinsicMax, 60);
+
+    // Intrinsic (25 pts)
+    const intrinsicRaw   = v('wc_physical') + v('wc_psych');
+    const intrinsicScore = norm(intrinsicRaw, 25, 25);
+
+    // Behavioral (15 pts)
+    const behavioralRaw   = v('wc_comm') + v('wc_follow');
+    const behavioralScore = norm(behavioralRaw, 15, 15);
+
+    const total = Math.min(100, Math.round(extrinsicScore + intrinsicScore + behavioralScore));
+    const level = categorize(total);
+
+    // Duration — 6-domain severity matrix × standalone mechanism multiplier
+    const durationMult = getSeverityMultiplier('wc') * Number(document.getElementById('wc_mechanism').value);
+    const baseDuration = 94;
+    const predicted = Math.round(baseDuration * durationMult);
+
+    const clientName = document.getElementById('wc_clientName').value.trim();
+    const doi = document.getElementById('wc_doi').value;
+    const caseRef = document.getElementById('wc_caseRef').value.trim();
+    const doiFormatted = doi ? new Date(doi + 'T00:00:00').toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'}) : '';
+
+    let caseHeaderHTML = '';
+    if (clientName || doi || caseRef) {
+      caseHeaderHTML = `<div class="report-case-header">
+        <div class="report-case-title">Recovery Risk Forecast</div>
+        ${clientName ? `<div class="report-case-line"><strong>Client:</strong> ${clientName}</div>` : ''}
+        ${doiFormatted ? `<div class="report-case-line"><strong>Date of Injury:</strong> ${doiFormatted}</div>` : ''}
+        ${caseRef ? `<div class="report-case-line"><strong>Matter:</strong> ${caseRef}</div>` : ''}
+      </div>`;
+    }
+
+    const resultDiv = document.getElementById('wcResult');
+    resultDiv.className = `result-box ${riskClass(level)}`;
+    resultDiv.innerHTML = `
+      ${caseHeaderHTML}
+      <div class="result-level">Recovery Risk: ${level}</div>
+      <div class="result-score">Score: ${total} / 100 &nbsp;|&nbsp; Workers' Compensation</div>
+      <div class="score-bar-wrap">
+        <div class="score-bar-track"><div class="score-bar-fill" style="width:${total}%"></div></div>
+      </div>
+      <div class="result-section-label">Clinical Assessment</div>
+      <p class="result-narrative">${wcNarrative(level)}</p>
+      <div class="result-section-label">Estimated Treatment Duration</div>
+      <div class="duration-note">Based on severity modifiers — approximately <strong>${predicted} days</strong>.<br><span style="font-size:0.82rem;font-weight:400;color:#555;">Severity modifiers reflect structural damage, neurological involvement, multi-region injury, surgical pathway, chronic conditions, mechanism severity, and complicated healing patterns. This is an illustrative estimate and does not account for individual variability.</span></div>
+      <div class="result-section-label">C.A.R.E. Tie-In</div>
+      <div class="care-tiein">${careTieIn(level)}</div>
+      <div style="display: flex; gap: 16px; justify-content: center; margin-top: 40px;">
+    <button onclick="returnToDashboard()" class="btn-ghost">
+        ← Return to Dashboard
+    </button>
+    <button onclick="goToNext()" class="btn-primary">
+        Complete & Return to Dashboard →
+    </button>
+</div>
+    `;
+    resultDiv.classList.remove('hidden');
+
+    // Notify Case Clarity portal that RRF is fully complete for the selected case type
+    if (window.opener && !window.opener.closed) {
+      window.opener.postMessage(
+        { type: 'INSTRUMENT_COMPLETE', instrument: 'RRF', caseType },
+        '*'
+      );
+    }
+
+    resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  /* ── Global select listener for completion meter ── */
+  document.addEventListener('change', function(e) {
+    if (e.target.tagName !== 'SELECT') return;
+    const id = e.target.id || '';
+    if (id.startsWith('pi_')) updateCompletionMeter('pi');
+    if (id.startsWith('wc_')) updateCompletionMeter('wc');
+  });
+
+</script>
+<script>
+function goToNext() {
+    localStorage.setItem('tool_complete_' + window.location.pathname, 'true');
+    if (window.location.pathname.includes('tool1')) {
+        window.location.href = 'tool2-csa.html';
+    } else if (window.location.pathname.includes('tool2')) {
+        window.location.href = 'tool3-caf.html';
+    } else if (window.location.pathname.includes('tool3')) {
+        window.location.href = 'tool4-hsi.html';
+    } else if (window.location.pathname.includes('tool4')) {
+        window.location.href = 'tool5-fci.html';
+    } else if (window.location.pathname.includes('tool5')) {
+        window.location.href = 'tool6-rrf.html';
+    } else if (window.location.pathname.includes('tool6')) {
+        window.location.href = 'dashboard.html?allComplete=true';
+    }
+}
+
+function returnToDashboard() {
+    window.location.href = 'dashboard.html';
+}
+</script>
+</body>
+</html>

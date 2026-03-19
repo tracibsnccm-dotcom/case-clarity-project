@@ -1,0 +1,2173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Holistic Stability Index™ | Powered by the 4Ps of Wellness</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Jost:wght@300;400;500;600;700&family=Source+Code+Pro:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════════════ */
+:root {
+  --gold:       #b09837;
+  --gold-lt:    #c8ae52;
+  --gold-pale:  #faf7ee;
+  --gold-dim:   rgba(176,152,55,0.10);
+  --gold-ring:  rgba(176,152,55,0.30);
+  --ink:        #111111;
+  --ink-mid:    #3a3a3a;
+  --ink-soft:   #666666;
+  --white:      #ffffff;
+  --surface:    #f8f8f6;
+  --border:     #e4e4e2;
+  --border-md:  #d0d0ce;
+  --shadow-xs:  0 1px 3px rgba(0,0,0,0.05);
+  --shadow-sm:  0 2px 12px rgba(0,0,0,0.06);
+  --shadow-md:  0 6px 28px rgba(0,0,0,0.09);
+  --r:          3px;
+  --fd: 'Cormorant Garamond', Georgia, serif;
+  --fb: 'Jost', 'Helvetica Neue', sans-serif;
+}
+
+/* ═══════════════════════════════════════════════════
+   BASE
+═══════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--fb);
+  background:var(--white);
+  color:var(--ink);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+  line-height:1.6;
+}
+button{cursor:pointer;font-family:var(--fb)}
+canvas{display:block}
+
+/* ═══════════════════════════════════════════════════
+   SCREEN ROUTER
+═══════════════════════════════════════════════════ */
+.screen{display:none;flex-direction:column;min-height:100vh}
+.screen.active{display:flex}
+
+/* ═══════════════════════════════════════════════════
+   NAV BAR
+═══════════════════════════════════════════════════ */
+.nav{
+  height:60px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 48px;
+  background:var(--white);
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:300;
+  flex-shrink:0;
+}
+.nav-brand{
+  font-family:var(--fd);
+  font-size:17px;
+  font-weight:600;
+  letter-spacing:0.02em;
+  color:var(--ink);
+}
+.nav-brand .g{color:var(--gold)}
+.nav-pill{
+  font-size:10px;font-weight:600;
+  letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--gold);
+  border:1px solid var(--gold-ring);
+  border-radius:20px;
+  padding:4px 14px;
+}
+
+/* ═══════════════════════════════════════════════════
+   TYPOGRAPHY HELPERS
+═══════════════════════════════════════════════════ */
+.eyebrow{
+  font-size:10px;font-weight:600;
+  letter-spacing:0.22em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:14px;
+}
+.rule{width:36px;height:2px;background:var(--gold);margin:18px 0}
+.rule.c{margin:18px auto}
+
+/* ═══════════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════════ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  border:none;border-radius:var(--r);
+  font-family:var(--fb);font-size:12px;font-weight:600;
+  letter-spacing:0.13em;text-transform:uppercase;
+  transition:all .2s ease;
+  padding:0 30px;height:48px;
+}
+.btn-dark{background:var(--ink);color:var(--white)}
+.btn-dark:hover{background:var(--gold)}
+.btn-outline{
+  background:transparent;color:var(--ink-soft);
+  border:1.5px solid var(--border-md);
+}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+.btn-plan{
+  display:block;width:100%;height:44px;
+  background:var(--gold);color:var(--white);
+  border:none;border-radius:var(--r);
+  font-family:var(--fb);font-size:11px;font-weight:600;
+  letter-spacing:0.13em;text-transform:uppercase;
+  cursor:pointer;transition:background .2s;
+  margin-top:auto;
+}
+.btn-plan:hover{background:var(--gold-lt)}
+.btn-ghost{
+  background:transparent;border:none;
+  font-family:var(--fb);font-size:11px;font-weight:600;
+  letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--ink-soft);cursor:pointer;
+  padding:0;transition:color .2s;
+}
+.btn-ghost:hover{color:var(--gold)}
+.btn-primary{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--gold);color:var(--white);
+  border:none;border-radius:var(--r);
+  font-family:var(--fb);font-size:12px;font-weight:600;
+  letter-spacing:0.13em;text-transform:uppercase;
+  padding:0 30px;height:48px;cursor:pointer;transition:background .2s;
+}
+.btn-primary:hover{background:var(--gold-lt)}
+
+/* ═══════════════════════════════════════════════════
+   ── INTRO SCREEN ──
+═══════════════════════════════════════════════════ */
+#sc-intro{background:var(--white)}
+.intro-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  flex:1;
+}
+.intro-l{
+  padding:88px 72px 88px 80px;
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;justify-content:center;
+}
+.intro-r{
+  background:var(--surface);
+  padding:88px 80px 88px 72px;
+  display:flex;flex-direction:column;justify-content:center;
+}
+.hero-h{
+  font-family:var(--fd);
+  font-size:62px;font-weight:600;
+  line-height:1.0;letter-spacing:-0.01em;
+  color:var(--ink);margin-bottom:6px;
+}
+.hero-h sup{font-size:20px;vertical-align:super;font-weight:400}
+.hero-sub{
+  font-size:11px;font-weight:500;
+  letter-spacing:0.22em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:32px;
+}
+.hero-body{
+  font-size:15px;line-height:1.85;
+  color:var(--ink-soft);max-width:420px;margin-bottom:44px;
+}
+.hero-body p+p{margin-top:14px}
+.hero-cta{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.hero-time{
+  font-size:11px;font-weight:500;
+  letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--ink-soft);margin-top:4px;
+}
+.hero-note{
+  font-size:12px;color:#999;
+  font-style:italic;max-width:380px;line-height:1.65;
+}
+
+/* Right panel */
+.r-section{margin-bottom:36px}
+.r-section:last-child{margin-bottom:0}
+.r-time-note{
+  font-size:12px;color:#aaa;
+  margin-top:12px;font-style:italic;
+  letter-spacing:0.02em;
+}
+.r-title{
+  font-size:10px;font-weight:700;
+  letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--ink);border-bottom:1px solid var(--border);
+  padding-bottom:10px;margin-bottom:16px;
+}
+.r-list{list-style:none;display:flex;flex-direction:column;gap:11px}
+.r-list li{
+  display:flex;align-items:flex-start;gap:12px;
+  font-size:14px;color:var(--ink-soft);line-height:1.5;
+}
+.dot{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--gold);flex-shrink:0;margin-top:6px;
+}
+
+/* Mini slab preview */
+.slab-preview{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--r);padding:22px 24px 18px;
+  box-shadow:0 2px 14px rgba(0,0,0,0.08);margin-top:8px;
+  transition:box-shadow .25s ease, transform .25s ease, filter .25s ease;
+}
+.slab-preview:hover{
+  box-shadow:0 6px 28px rgba(0,0,0,0.13);
+  transform:translateY(-1.5px);
+  filter:brightness(1.04);
+}
+.slab-preview-divider{
+  height:1px;background:var(--gold);opacity:0.35;
+  margin-bottom:16px;
+}
+.slab-preview-lbl{
+  font-size:9px;font-weight:700;
+  letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:12px;
+}
+#cvMini{width:100%;height:140px}
+.slab-preview-caption{
+  font-size:12px;line-height:1.65;
+  color:#999;text-align:center;
+  margin-top:12px;font-style:italic;
+  max-width:320px;margin-left:auto;margin-right:auto;
+}
+
+/* ═══════════════════════════════════════════════════
+   ── ASSESSMENT SCREEN ──
+═══════════════════════════════════════════════════ */
+#sc-assess{background:var(--white)}
+.assess-layout{
+  display:grid;
+  grid-template-columns:264px 1fr;
+  flex:1;
+}
+
+/* Sidebar */
+.sidebar{
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  padding:44px 28px;
+  position:sticky;top:60px;
+  align-self:start;
+  max-height:calc(100vh - 60px);
+  overflow-y:auto;
+}
+.sb-heading{
+  font-size:9px;font-weight:700;
+  letter-spacing:0.2em;text-transform:uppercase;
+  color:#bbb;margin-bottom:18px;
+}
+.sb-step{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 12px;border-radius:var(--r);
+  font-size:13px;color:#aaa;
+  font-weight:400;transition:all .2s;
+  margin-bottom:2px;
+}
+.sb-step.active{background:var(--gold-pale);color:var(--gold);font-weight:600}
+.sb-step.done{color:var(--ink-soft)}
+.sb-pip{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--border-md);flex-shrink:0;
+  transition:background .2s;
+}
+.sb-step.active .sb-pip{background:var(--gold)}
+.sb-step.done .sb-pip{background:#ccc}
+
+/* Main */
+.assess-main{padding:56px 68px 80px;max-width:740px}
+
+/* Domain header */
+.d-header{margin-bottom:40px}
+.d-badge{
+  display:inline-block;
+  background:var(--gold);color:var(--white);
+  font-size:9px;font-weight:700;
+  letter-spacing:0.2em;text-transform:uppercase;
+  padding:5px 14px;border-radius:var(--r);
+  margin-bottom:18px;
+}
+.d-title{
+  font-family:var(--fd);font-size:40px;font-weight:600;
+  color:var(--ink);margin-bottom:10px;line-height:1.1;
+}
+.d-progress{
+  display:flex;align-items:center;gap:10px;
+  font-size:12px;color:#aaa;font-weight:500;letter-spacing:.05em;
+}
+.d-pbar{
+  height:2px;background:var(--border);
+  border-radius:1px;width:100px;overflow:hidden;
+}
+.d-pfill{
+  height:100%;background:var(--gold);
+  border-radius:1px;transition:width .3s ease;
+}
+
+/* Safeguard */
+.safeguard{
+  background:var(--gold-pale);
+  border-left:3px solid var(--gold);
+  border-radius:0 var(--r) var(--r) 0;
+  padding:16px 22px;margin-bottom:32px;
+  font-size:13px;line-height:1.7;
+  color:var(--ink-mid);font-style:italic;
+}
+
+/* Question view */
+.q-view{animation:fadeUp .28s ease}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(8px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.q-num{
+  font-size:10px;font-weight:600;
+  letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:12px;
+}
+.q-title{
+  font-size:14px;font-weight:600;
+  color:var(--ink);letter-spacing:0.03em;
+  text-transform:uppercase;margin-bottom:6px;
+}
+.q-text{
+  font-family:var(--fd);font-size:20px;font-weight:500;
+  color:var(--ink);line-height:1.45;
+  margin-bottom:30px;max-width:580px;
+}
+
+/* Stage options */
+.stage-opts{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+.stage-opt{
+  border:1.5px solid var(--border);
+  border-radius:var(--r);
+  display:flex;align-items:center;
+  cursor:pointer;background:var(--white);
+  transition:border-color .18s,box-shadow .18s;
+  overflow:hidden;
+}
+.stage-opt:hover{border-color:var(--gold-ring);box-shadow:0 2px 10px var(--gold-dim)}
+.stage-opt.sel{border-color:var(--gold);box-shadow:0 2px 14px var(--gold-dim)}
+.stage-num{
+  width:52px;height:56px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fd);font-size:26px;font-weight:700;
+  color:#d0d0ce;background:var(--surface);
+  border-right:1px solid var(--border);
+  flex-shrink:0;transition:all .18s;
+}
+.stage-opt.sel .stage-num{
+  color:var(--gold);background:var(--gold-pale);
+  border-right-color:var(--gold-ring);
+}
+.stage-lbl{
+  padding:14px 18px;font-size:14px;font-weight:500;
+  color:var(--ink-mid);flex:1;line-height:1.4;
+  transition:color .18s;
+}
+.stage-opt.sel .stage-lbl{color:var(--gold);font-weight:600}
+.stage-radio{
+  width:48px;height:56px;
+  display:flex;align-items:center;justify-content:center;
+  border-left:1px solid var(--border);flex-shrink:0;
+  transition:border-color .18s;
+}
+.stage-opt.sel .stage-radio{border-left-color:var(--gold-ring)}
+.radio-ring{
+  width:18px;height:18px;border-radius:50%;
+  border:2px solid var(--border-md);
+  display:flex;align-items:center;justify-content:center;
+  transition:border-color .18s;
+}
+.stage-opt.sel .radio-ring{border-color:var(--gold)}
+.radio-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--gold);opacity:0;transition:opacity .18s;
+}
+.stage-opt.sel .radio-dot{opacity:1}
+
+/* Per-stage info icon */
+.stage-info-btn{
+  width:28px;height:28px;border-radius:50%;
+  border:1.5px solid var(--border-md);
+  background:var(--white);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;
+  font-size:11px;font-weight:700;color:var(--ink-soft);
+  font-family:var(--fb);font-style:normal;
+  margin-right:12px;
+  transition:all .18s;
+  position:relative;
+  z-index:2;
+}
+.stage-info-btn:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-pale)}
+.stage-info-btn.active{border-color:var(--gold);color:var(--white);background:var(--gold)}
+.stage-inline-desc{
+  display:none;
+  background:var(--gold-pale);
+  border-top:1px solid var(--gold-ring);
+  padding:12px 18px 12px 68px;
+  animation:fadeUp .2s ease;
+}
+.stage-inline-desc.open{display:block}
+.stage-inline-desc ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+.stage-inline-desc ul li{
+  font-size:12px;line-height:1.6;color:var(--ink-mid);
+  display:flex;gap:8px;
+}
+.stage-inline-desc ul li::before{content:'•';color:var(--gold);font-weight:700;flex-shrink:0}
+
+/* View Stage Descriptions toggle */
+.desc-toggle-wrap{margin-bottom:32px}
+.desc-toggle{
+  display:inline-flex;align-items:center;gap:6px;
+  background:none;border:none;
+  font-family:var(--fb);font-size:11px;font-weight:600;
+  letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--ink-soft);cursor:pointer;
+  padding:0;transition:color .2s;
+}
+.desc-toggle:hover{color:var(--gold)}
+.desc-toggle .arr{font-size:9px;transition:transform .2s}
+.desc-toggle.open .arr{transform:rotate(180deg)}
+.desc-panel{
+  display:none;margin-top:14px;
+  border:1px solid var(--border);border-radius:var(--r);
+  overflow:hidden;
+}
+.desc-panel.open{display:block}
+.desc-row{
+  padding:16px 20px;
+  border-bottom:1px solid var(--border);
+  display:grid;grid-template-columns:48px 1fr;gap:0;
+}
+.desc-row:last-child{border-bottom:none}
+.desc-score{
+  font-family:var(--fd);font-size:22px;font-weight:700;
+  color:var(--gold);padding-top:2px;
+}
+.desc-content{}
+.desc-stage-title{
+  font-size:13px;font-weight:600;color:var(--ink);
+  margin-bottom:8px;
+}
+.desc-bullets{list-style:none;display:flex;flex-direction:column;gap:5px}
+.desc-bullets li{
+  font-size:12px;line-height:1.6;color:var(--ink-soft);
+  display:flex;gap:8px;
+}
+.desc-bullets li::before{
+  content:'•';color:var(--gold);flex-shrink:0;font-weight:700;
+}
+
+/* Nav */
+.assess-nav{
+  display:flex;justify-content:space-between;align-items:center;
+  padding-top:28px;border-top:1px solid var(--border);
+  margin-top:8px;
+}
+
+/* ═══════════════════════════════════════════════════
+   SOCIAL DRIVERS (reuses assess layout)
+═══════════════════════════════════════════════════ */
+.drivers-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:14px;
+  margin-bottom:36px;
+}
+.driver-card{
+  background:var(--white);border:1.5px solid var(--border);
+  border-radius:var(--r);padding:18px 20px;
+  box-shadow:var(--shadow-xs);transition:border-color .2s;
+}
+.driver-card:hover{border-color:var(--gold-ring)}
+.driver-card.answered{border-color:rgba(176,152,55,0.22)}
+.driver-name{
+  font-size:12px;font-weight:700;
+  letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--ink);margin-bottom:12px;
+}
+.driver-btns{display:flex;gap:6px}
+.driver-btn{
+  flex:1;height:38px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  font-family:var(--fd);font-size:17px;font-weight:700;
+  color:#c8c8c6;cursor:pointer;
+  transition:all .16s;
+}
+.driver-btn:hover{border-color:var(--gold-ring);color:var(--gold);background:var(--gold-pale)}
+.driver-btn.sel{background:var(--gold-pale);border-color:var(--gold);color:var(--gold)}
+
+/* ═══════════════════════════════════════════════════
+   DESTABILIZERS (within assess flow step 5)
+═══════════════════════════════════════════════════ */
+.destab-cards{display:flex;flex-direction:column;gap:16px;margin-bottom:36px}
+
+/* ═══════════════════════════════════════════════════
+   ── RESULTS SCREEN ──
+═══════════════════════════════════════════════════ */
+#sc-results{background:var(--surface)}
+.results-wrap{
+  max-width:880px;margin:0 auto;
+  padding:64px 48px 80px;flex:1;
+}
+.results-hdr{margin-bottom:36px}
+.results-title{
+  font-family:var(--fd);font-size:46px;font-weight:600;
+  color:var(--ink);margin-bottom:4px;line-height:1.05;
+}
+.results-sub{
+  font-size:11px;font-weight:600;
+  letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:16px;
+}
+
+/* Severity badge */
+.severity-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  border:1.5px solid;border-radius:20px;
+  padding:6px 18px;
+  font-size:10px;font-weight:700;
+  letter-spacing:0.18em;text-transform:uppercase;
+  margin-top:8px;
+}
+.severity-badge.sev-strong{
+  border-color:#4a9e6e;color:#3d8a5e;background:#f0faf5;
+}
+.severity-badge.sev-vulnerable{
+  border-color:var(--gold);color:#8a6e1a;background:#faf8ee;
+}
+.severity-badge.sev-significant{
+  border-color:#d4882a;color:#b06018;background:#fff8f0;
+}
+.severity-badge.sev-critical{
+  border-color:#c85040;color:#a02828;background:#fff5f4;
+}
+.severity-badge .sev-dot{
+  width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;
+}
+
+/* Score cards */
+.score-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:28px}
+.score-card{
+  background:var(--white);border:1px solid var(--border);
+  border-top:3px solid var(--gold);
+  border-radius:var(--r);padding:32px 36px;
+  box-shadow:var(--shadow-xs);
+}
+.sc-label{
+  font-size:9px;font-weight:700;
+  letter-spacing:0.22em;text-transform:uppercase;
+  color:#888;margin-bottom:14px;
+}
+.sc-value{
+  font-family:'Source Code Pro','Courier New',monospace;
+  font-size:54px;font-weight:700;
+  color:var(--ink);line-height:1;margin-bottom:14px;
+  letter-spacing:0.06em;
+}
+.sc-desc{
+  font-size:13px;font-weight:500;
+  color:var(--ink-mid);
+  line-height:1.5;
+}
+
+/* Guide */
+.guide{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px 24px;
+  margin-bottom:20px;
+  font-size:13px;color:var(--ink-soft);
+  text-align:center;font-style:italic;
+  box-shadow:var(--shadow-xs);
+}
+.guide strong{color:var(--ink);font-style:normal}
+
+/* Level meaning key */
+.level-key{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--r);padding:20px 28px;
+  margin-bottom:32px;box-shadow:var(--shadow-xs);
+}
+.level-key-title{
+  font-size:9px;font-weight:700;
+  letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:14px;
+}
+.level-key-grid{
+  display:grid;grid-template-columns:repeat(5,1fr);
+  gap:8px;
+}
+.lk-item{
+  text-align:center;
+  padding:10px 6px;
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  background:var(--surface);
+}
+.lk-score{
+  font-family:'Source Code Pro',monospace,var(--fd);
+  font-size:22px;font-weight:700;
+  color:var(--ink);line-height:1;margin-bottom:4px;
+}
+.lk-label{
+  font-size:10px;font-weight:600;letter-spacing:0.08em;
+  text-transform:uppercase;margin-bottom:3px;
+}
+.lk-desc{font-size:11px;color:var(--ink-soft);line-height:1.4;font-style:italic}
+.lk-item[data-v="5"]{border-top:2px solid #4a9e6e}
+.lk-item[data-v="5"] .lk-label{color:#3d8a5e}
+.lk-item[data-v="4"]{border-top:2px solid #7aaa6e}
+.lk-item[data-v="4"] .lk-label{color:#5a9250}
+.lk-item[data-v="3"]{border-top:2px solid var(--gold)}
+.lk-item[data-v="3"] .lk-label{color:var(--gold)}
+.lk-item[data-v="2"]{border-top:2px solid #d4882a}
+.lk-item[data-v="2"] .lk-label{color:#b87020}
+.lk-item[data-v="1"]{border-top:2px solid #c85040}
+.lk-item[data-v="1"] .lk-label{color:#b03828}
+.lk-note{
+  font-size:12px;color:var(--ink-soft);font-style:italic;
+  margin-top:12px;padding-top:12px;
+  border-top:1px solid var(--border);
+  text-align:center;
+}
+@media(max-width:660px){.level-key-grid{grid-template-columns:repeat(3,1fr)}}
+
+/* Slab card */
+.slab-card{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--r);padding:44px 44px 36px;
+  margin-bottom:22px;box-shadow:var(--shadow-xs);
+}
+.slab-title{
+  font-family:var(--fd);font-size:24px;font-weight:600;
+  color:var(--ink);margin-bottom:4px;
+}
+.slab-title sup{font-size:11px;font-family:var(--fb);vertical-align:super}
+#cvSlab{width:100%;height:380px;margin:0 auto}
+.slab-caption{display:none} /* replaced by slab-key */
+.slab-key{
+  max-width:600px;margin:24px auto 0;
+  padding-top:22px;
+  border-top:1px solid var(--border);
+}
+.slab-key-title{
+  font-size:9px;font-weight:700;
+  letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--gold);text-align:center;
+  margin-bottom:18px;
+}
+.slab-key-items{display:flex;flex-direction:column;gap:14px}
+.slab-key-item{
+  display:grid;grid-template-columns:28px 1fr;
+  gap:12px;align-items:start;
+}
+.ski-num{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--gold);color:var(--white);
+  font-size:12px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:1px;
+}
+.ski-body{}
+.ski-heading{
+  font-size:13px;font-weight:700;
+  color:var(--ink);margin-bottom:3px;
+  letter-spacing:0.02em;
+}
+.ski-text{
+  font-size:13px;line-height:1.75;
+  color:var(--ink-mid);
+}
+
+/* Destab result */
+.destab-card-r{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--r);padding:32px 44px;
+  margin-bottom:22px;box-shadow:var(--shadow-xs);
+}
+.section-eye{
+  font-size:9px;font-weight:700;
+  letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:20px;
+}
+.destab-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:14px;margin-bottom:18px;
+}
+.destab-item{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:24px 16px;text-align:center;
+}
+.di-name{
+  font-size:10px;font-weight:700;
+  letter-spacing:0.14em;text-transform:uppercase;
+  color:#999;margin-bottom:12px;
+}
+.di-score{
+  font-family:'Source Code Pro','Courier New',monospace;
+  font-size:52px;font-weight:700;
+  color:var(--ink);line-height:1;margin-bottom:10px;
+  letter-spacing:0.02em;
+}
+.di-lbl{
+  font-size:11px;font-weight:700;
+  letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--ink-soft);
+}
+.destab-alert{
+  background:#fffdf5;
+  border-left:3px solid var(--gold);
+  border-radius:0 var(--r) var(--r) 0;
+  padding:16px 22px;font-size:13px;
+  line-height:1.8;color:var(--ink-mid);
+  text-align:center;
+}
+.destab-alert p{margin-bottom:6px}
+.destab-alert p:last-child{margin-bottom:0;font-size:12px;color:var(--ink-soft);font-style:italic}
+
+/* Recovery Risk Signal */
+.risk-signal-card{
+  background:var(--white);border:1px solid var(--border);
+  border-top:3px solid var(--ink);
+  border-radius:var(--r);padding:24px 32px;
+  margin-bottom:16px;box-shadow:var(--shadow-xs);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:16px;
+}
+.rsc-title{
+  font-size:9px;font-weight:700;
+  letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--ink-soft);margin-bottom:6px;
+}
+.rsc-signal-row{display:flex;align-items:center;gap:12px}
+.rsc-signal-label{
+  font-size:11px;font-weight:600;
+  letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--ink-soft);
+}
+.rsc-code{
+  font-family:'Source Code Pro','Courier New',monospace;
+  font-size:26px;font-weight:700;
+  color:var(--ink);letter-spacing:0.06em;
+}
+
+/* Interpretation */
+.interp-card{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--r);padding:36px 44px;
+  margin-bottom:28px;box-shadow:var(--shadow-xs);
+}
+.interp-title{
+  font-family:var(--fd);font-size:22px;font-weight:600;
+  color:var(--ink);margin-bottom:18px;
+}
+.score-code{
+  font-family:'Source Code Pro','Courier New',monospace;
+  font-weight:700;letter-spacing:0.05em;
+  color:var(--ink);
+}
+.interp-body p{
+  font-size:15px;line-height:1.85;color:var(--ink-soft);
+  margin-bottom:14px;
+}
+.interp-body p:last-child{margin-bottom:0}
+
+/* CTA */
+.results-cta{
+  text-align:center;
+  padding:36px 0 0;
+  border-top:1px solid var(--border);
+}
+.results-cta p{font-size:13px;color:#bbb;margin-bottom:18px;font-style:italic}
+
+/* ═══════════════════════════════════════════════════
+   ── UPGRADE SCREEN ──
+═══════════════════════════════════════════════════ */
+#sc-upgrade{background:var(--surface)}
+.upgrade-wrap{
+  max-width:1040px;margin:0 auto;
+  padding:80px 48px;flex:1;
+}
+.upgrade-hdr{text-align:center;margin-bottom:56px}
+.upgrade-title{
+  font-family:var(--fd);font-size:46px;font-weight:600;
+  color:var(--ink);margin-bottom:14px;line-height:1.1;
+}
+.upgrade-body{
+  font-size:15px;color:var(--ink-soft);
+  max-width:460px;margin:0 auto;line-height:1.7;
+}
+.plans-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:14px;align-items:start;
+}
+.plan-card{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--r);padding:32px 24px 28px;
+  position:relative;box-shadow:var(--shadow-xs);
+  transition:box-shadow .2s,border-color .2s;
+  display:flex;flex-direction:column;
+}
+.plan-card:hover{box-shadow:var(--shadow-md);border-color:var(--gold-ring)}
+.plan-card.pop{
+  border:2px solid var(--gold);
+  box-shadow:var(--shadow-md);
+  padding-top:44px;margin-top:-10px;
+}
+.plan-badge{
+  position:absolute;top:-12px;left:50%;transform:translateX(-50%);
+  background:var(--gold);color:var(--white);
+  font-size:9px;font-weight:700;
+  letter-spacing:0.16em;text-transform:uppercase;
+  padding:4px 16px;border-radius:20px;white-space:nowrap;
+}
+.plan-name{
+  font-size:10px;font-weight:700;
+  letter-spacing:0.18em;text-transform:uppercase;
+  color:#bbb;margin-bottom:16px;
+}
+.plan-price{
+  font-family:var(--fd);font-size:42px;font-weight:700;
+  color:var(--ink);line-height:1;margin-bottom:4px;
+}
+.plan-per{font-size:12px;color:#bbb;font-style:italic;margin-bottom:18px;letter-spacing:.03em}
+.plan-divider{height:1px;background:var(--border);margin-bottom:16px}
+.plan-feat{font-size:13px;color:var(--ink-soft);line-height:1.65;margin-bottom:20px;flex:1}
+.upgrade-back{text-align:center;margin-top:36px}
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════ */
+@media(max-width:1080px){
+  .intro-grid{grid-template-columns:1fr}
+  .intro-l{border-right:none;border-bottom:1px solid var(--border);padding:56px 48px}
+  .intro-r{padding:56px 48px}
+  .hero-h{font-size:48px}
+  .assess-layout{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .assess-main{padding:40px 36px 64px;max-width:100%}
+  .plans-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:660px){
+  .nav{padding:0 20px}
+  .intro-l,.intro-r{padding:40px 20px}
+  .hero-h{font-size:38px}
+  .assess-main{padding:28px 18px 56px}
+  .results-wrap,.upgrade-wrap{padding:36px 18px 56px}
+  .score-row{grid-template-columns:1fr}
+  .drivers-grid{grid-template-columns:1fr}
+  .plans-grid{grid-template-columns:1fr}
+  .destab-grid{grid-template-columns:1fr}
+  .slab-card{padding:24px 16px}
+  .destab-card-r,.interp-card{padding:24px 18px}
+}
+  /* ── Collapsible domain sections ── */
+  .domain-section {
+    border: 1.5px solid var(--border);
+    border-radius: var(--r);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .domain-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    cursor: pointer;
+    background: var(--white);
+    user-select: none;
+  }
+  .domain-section-header:hover { background: var(--gold-pale); }
+  .domain-section-header.open { border-bottom: 1.5px solid var(--border); }
+  .domain-section-title {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--black);
+  }
+  .domain-section-badge {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gray-mid);
+  }
+  .domain-section-status {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 99px;
+    background: var(--surf-line);
+    color: var(--gray-mid);
+  }
+  .domain-section-status.complete {
+    background: #e6f4ea;
+    color: #1a6e2e;
+  }
+  .domain-section-arrow {
+    font-size: 12px;
+    color: var(--gray-mid);
+    transition: transform 0.2s;
+  }
+  .domain-section-arrow.open { transform: rotate(180deg); }
+  .domain-section-body {
+    display: none;
+    padding: 20px;
+    background: var(--surface);
+  }
+  .domain-section-body.open { display: block; }
+
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     INTRO
+══════════════════════════════════════════ -->
+<div id="sc-intro" class="screen active">
+  <nav class="nav">
+    <div class="nav-brand">Holistic Stability Index<span class="g">™</span></div>
+    <div class="nav-pill">Clinical Assessment</div>
+  </nav>
+  <div class="intro-grid">
+    <div class="intro-l">
+      <div class="eyebrow">Personal Injury &amp; Workers' Compensation</div>
+      <h1 class="hero-h">Holistic<br>Stability<br>Index<sup>™</sup></h1>
+      <p class="hero-sub">Powered by the 4Ps of Wellness</p>
+      <div class="rule"></div>
+      <div class="hero-body">
+        <p>Recovery outcomes are influenced by more than medical treatment alone. Internal stability and environmental pressures interact to either support or destabilize recovery.</p>
+        <p>The Holistic Stability Index™ evaluates these structural forces to help identify hidden pressures affecting recovery progress and case outcomes.</p>
+      </div>
+      <div class="hero-cta">
+        <button class="btn btn-dark" onclick="startAssessment()">Start Assessment →</button>
+        <p class="hero-time">⏱ Estimated time: 3–5 minutes</p>
+        <p class="hero-note">Medical records are not required. Please answer based on the most accurate and current information available.</p>
+      </div>
+    </div>
+    <div class="intro-r">
+      <div class="r-section">
+        <div class="r-title">What This Evaluates</div>
+        <ul class="r-list">
+          <li><span class="dot"></span>Physical wellness and injury-related functional capacity</li>
+          <li><span class="dot"></span>Psychological stability and behavioral health impact</li>
+          <li><span class="dot"></span>Psychosocial barriers and environmental pressures</li>
+          <li><span class="dot"></span>Professional role stability and vocational outlook</li>
+          <li><span class="dot"></span>Social drivers of health affecting recovery</li>
+        </ul>
+        <p class="r-time-note">Estimated completion time: 3–5 minutes</p>
+      </div>
+      <div class="r-section">
+        <div class="r-title">What You Will Receive</div>
+        <ul class="r-list">
+          <li><span class="dot"></span>Holistic Stability Index™ score</li>
+          <li><span class="dot"></span>Foundation Stability Model™ visualization</li>
+          <li><span class="dot"></span>Primary vulnerability domain identification</li>
+          <li><span class="dot"></span>Clinical Destabilizer Profile (Pain, Depression, Anxiety indicators)</li>
+        </ul>
+      </div>
+      <div class="slab-preview">
+        <div class="slab-preview-divider"></div>
+        <div class="slab-preview-lbl">Foundation Stability Model™ Preview</div>
+        <canvas id="cvMini"></canvas>
+        <p class="slab-preview-caption">The model visualizes how intrinsic stability and external pressures interact to influence recovery outcomes.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ASSESSMENT
+══════════════════════════════════════════ -->
+<div id="sc-assess" class="screen">
+  <nav class="nav">
+    <div class="nav-brand">Holistic Stability Index<span class="g">™</span></div>
+    <div class="nav-pill" id="assessPill">P1 of 4</div>
+  </nav>
+  <div class="assess-layout">
+    <aside class="sidebar">
+      <div class="sb-heading">Assessment Progress</div>
+      <div id="sbSteps"></div>
+    </aside>
+    <main class="assess-main">
+      <div id="assessContent"></div>
+      <div class="assess-nav">
+        <button class="btn btn-outline" onclick="navBack()">← Back</button>
+        <button class="btn btn-dark" id="btnNext" onclick="navNext()">Continue →</button>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     RESULTS
+══════════════════════════════════════════ -->
+<div id="sc-results" class="screen">
+  <nav class="nav">
+    <div class="nav-brand">Holistic Stability Index<span class="g">™</span></div>
+    <div class="nav-pill">Results</div>
+  </nav>
+  <div class="results-wrap">
+    <div class="results-hdr">
+      <div class="eyebrow">Assessment Complete</div>
+      <div class="results-title">Foundation Stability Report</div>
+      <div class="results-sub">Holistic Stability Index™</div>
+      <div id="rSeverityBadge" class="severity-badge" style="display:none">
+        <span class="sev-dot"></span>
+        <span id="rSeverityText">—</span>
+      </div>
+    </div>
+
+    <div class="score-row">
+      <div class="score-card">
+        <div class="sc-label">Intrinsic Viability</div>
+        <div class="sc-value" id="rIntrinsic">—</div>
+        <div class="sc-desc" id="rIntrinsicDesc">—</div>
+      </div>
+      <div class="score-card">
+        <div class="sc-label">Extrinsic Stability</div>
+        <div class="sc-value" id="rExtrinsic">—</div>
+        <div class="sc-desc" id="rExtrinsicDesc">—</div>
+      </div>
+    </div>
+
+    <div class="guide">
+      <strong>How to read this model:</strong> Height = overall stability &nbsp;•&nbsp; Tilt = structural imbalance
+    </div>
+
+    <div class="level-key">
+      <div class="level-key-title">Stability Level Reference</div>
+      <div class="level-key-grid">
+        <div class="lk-item" data-v="5">
+          <div class="lk-score">5</div>
+          <div class="lk-label">Highest</div>
+          <div class="lk-desc">Highest stability. Full functioning, no significant barriers.</div>
+        </div>
+        <div class="lk-item" data-v="4">
+          <div class="lk-score">4</div>
+          <div class="lk-label">Stable</div>
+          <div class="lk-desc">Stable with limited disruption. Manageable conditions present.</div>
+        </div>
+        <div class="lk-item" data-v="3">
+          <div class="lk-score">3</div>
+          <div class="lk-label">Moderate</div>
+          <div class="lk-desc">Moderate instability. Recovery is vulnerable to setbacks.</div>
+        </div>
+        <div class="lk-item" data-v="2">
+          <div class="lk-score">2</div>
+          <div class="lk-label">Significant</div>
+          <div class="lk-desc">Significant instability. Functioning substantially impaired.</div>
+        </div>
+        <div class="lk-item" data-v="1">
+          <div class="lk-score">1</div>
+          <div class="lk-label">Critical</div>
+          <div class="lk-desc">Critical instability. Requires immediate stabilization.</div>
+        </div>
+      </div>
+      <div class="lk-note">Equal scores on both sides can still reflect poor overall stability when both values are low. A level slab at height 2–2 is not stable — it indicates structural risk on both sides.</div>
+    </div>
+
+    <div class="slab-card">
+      <div class="slab-title">Foundation Stability Model<sup>™</sup></div>
+      <div class="rule" style="margin:14px 0 22px"></div>
+      <canvas id="cvSlab"></canvas>
+      <div class="slab-key">
+        <div class="slab-key-title">How to Read the Foundation Stability Model</div>
+        <div class="slab-key-items">
+          <div class="slab-key-item">
+            <div class="ski-num">1</div>
+            <div class="ski-body">
+              <div class="ski-heading">Height = Overall Stability</div>
+              <div class="ski-text">Higher foundations indicate stronger overall recovery stability. Lower foundations indicate greater clinical vulnerability.</div>
+            </div>
+          </div>
+          <div class="slab-key-item">
+            <div class="ski-num">2</div>
+            <div class="ski-body">
+              <div class="ski-heading">Tilt = Structural Imbalance</div>
+              <div class="ski-text">The tilt reveals the imbalance between intrinsic capacity and extrinsic pressures affecting recovery.</div>
+            </div>
+          </div>
+          <div class="slab-key-item">
+            <div class="ski-num">3</div>
+            <div class="ski-body">
+              <div class="ski-heading">Level Does Not Always Mean Stable</div>
+              <div class="ski-text">Even when both sides are level, a low foundation height may indicate overall instability affecting recovery.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="destab-card-r">
+      <div class="section-eye">Clinical Destabilizers</div>
+      <div class="destab-grid" id="rDestabGrid"></div>
+      <div class="destab-alert" id="rDestabAlert" style="display:none">
+        <p>Low destabilizer scores (Critical–Unstable) may place additional strain on the recovery structure and increase the risk of delayed recovery or setbacks.</p>
+        <p>Lower scores indicate greater destabilizing pressure.</p>
+      </div>
+    </div>
+
+    <div class="risk-signal-card" id="rRiskSignal">
+      <div>
+        <div class="rsc-title">Recovery Risk Signal</div>
+        <div class="rsc-signal-row">
+          <div class="rsc-signal-label">Structural Stability Signal:</div>
+          <div class="rsc-code" id="rSignalCode">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="interp-card">
+      <div class="interp-title">Recovery Stability Interpretation</div>
+      <div class="interp-body" id="rInterp"></div>
+    </div>
+
+    <div style="display: flex; gap: 16px; justify-content: center; margin-top: 40px;">
+    <button onclick="returnToDashboard()" class="btn-ghost">
+        ← Return to Dashboard
+    </button>
+    <button onclick="goToNext()" class="btn-primary">
+        Continue to Next Assessment →
+    </button>
+</div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════ -->
+<script>
+'use strict';
+
+// Read case type from portal launch URL (?caseType=active|closed)
+const caseType = new URLSearchParams(window.location.search).get('caseType') || 'active';
+
+/* ─────────────────────────────────────────────────────────
+   DATA — PI/WC Aligned 4Ps Stages (exact text, no changes)
+───────────────────────────────────────────────────────── */
+
+const STAGES = {
+  P1: [
+    {
+      v:5, label:'Medically Stable With No Functional Restrictions',
+      bullets:[
+        'Injury or condition is fully resolved or well-controlled.',
+        'No functional limitations impacting work, ADLs, or recovery trajectory.',
+        'Engages in routine preventive care and adheres to treatment without issue.',
+        'No current risk factors for delayed recovery.'
+      ]
+    },
+    {
+      v:4, label:'Stable Condition With Predictable, Low-Impact Limitations',
+      bullets:[
+        'Injury or chronic condition is present but well-managed with minimal disruption.',
+        'Occasional symptoms but no significant interference with work duties or ADLs.',
+        'Requires routine follow-ups but no escalations in care.',
+        'Low risk for exacerbation or regression.'
+      ]
+    },
+    {
+      v:3, label:'Active Injury or Condition With Intermittent Functional Impact',
+      bullets:[
+        'Injury or illness causes moderate, variable limitations affecting work tolerance.',
+        'Requires ongoing treatment, therapy adjustments, or short-term restrictions.',
+        'Recovery is progressing but vulnerable to setbacks.',
+        'May require modified duty or temporary accommodations.'
+      ]
+    },
+    {
+      v:2, label:'Significant Injury-Related Impairment Affecting Daily Functioning',
+      bullets:[
+        'Severe symptoms or instability that limit ability to perform essential job tasks.',
+        'Frequent medical visits, ER utilization, or difficulty accessing needed care.',
+        'Prolonged recovery expected; high risk for complications or regression.',
+        'ADLs may be impaired; requires structured support.'
+      ]
+    },
+    {
+      v:1, label:'Critical Physical Instability or End-Stage Impairment',
+      bullets:[
+        'Condition results in complete or near-complete functional dependence.',
+        'Requires intensive medical intervention, palliative care, or long-term support.',
+        'Unable to perform work of any kind.',
+        'High-risk, high-acuity status requiring immediate attention.'
+      ]
+    }
+  ],
+  P2: [
+    {
+      v:5, label:'Psychologically Stable With Effective Coping',
+      bullets:[
+        'No diagnosed behavioral health condition or condition is fully stable.',
+        'Demonstrates consistent emotional regulation and resilience.',
+        'No psychological barriers to recovery or return-to-work.'
+      ]
+    },
+    {
+      v:4, label:'Well-Managed Behavioral Health Condition',
+      bullets:[
+        'Diagnosed condition is controlled with therapy/medication.',
+        'Minimal exacerbations; maintains daily functioning and work capacity.',
+        'Uses coping strategies effectively; adheres to treatment.'
+      ]
+    },
+    {
+      v:3, label:'Moderate Psychological Symptoms Affecting Recovery Pace',
+      bullets:[
+        'Behavioral health condition with intermittent exacerbations.',
+        'Symptoms may temporarily affect concentration, stamina, or work tolerance.',
+        'Requires periodic treatment adjustments.',
+        'Stress or injury-related triggers may cause fluctuations.'
+      ]
+    },
+    {
+      v:2, label:'Severe Psychological Instability Impacting Work and ADLs',
+      bullets:[
+        'Frequent exacerbations, crises, or hospitalizations.',
+        'Symptoms significantly impair ability to manage responsibilities.',
+        'High risk for treatment non-adherence or decompensation.',
+        'May present with suicidal ideation or acute distress.'
+      ]
+    },
+    {
+      v:1, label:'Critical Psychological Crisis With Major Social Barriers',
+      bullets:[
+        'Severe, untreated, or unstable mental illness compounded by SDOH barriers.',
+        'Homelessness, domestic violence, or extreme instability present.',
+        'Unable to engage in treatment or maintain safety without intervention.',
+        'Fully unable to work or participate in recovery planning.'
+      ]
+    }
+  ],
+  P3: [
+    {
+      v:5, label:'Strong Social Stability Supporting Recovery',
+      bullets:[
+        'Reliable housing, transportation, and support systems.',
+        'Engaged in community, relationships, and personal development.',
+        'No psychosocial barriers to treatment adherence or work participation.'
+      ]
+    },
+    {
+      v:4, label:'Stable Environment With Manageable Stressors',
+      bullets:[
+        'Consistent housing, income, and support.',
+        'Occasional stressors but overall stability.',
+        'Able to maintain appointments, follow care plans, and manage responsibilities.'
+      ]
+    },
+    {
+      v:3, label:'Generally Stable With Emerging Barriers',
+      bullets:[
+        'Employment and relationships are stable but stressors are increasing.',
+        'May experience financial strain, limited support, or inconsistent transportation.',
+        'Barriers may begin to affect treatment adherence or work performance.'
+      ]
+    },
+    {
+      v:2, label:'Significant Psychosocial Barriers Hindering Recovery',
+      bullets:[
+        'Housing instability, food insecurity, or limited access to healthcare.',
+        'Experiences discrimination, abuse, or isolation.',
+        'Transportation or childcare barriers disrupt appointments and work.',
+        'High risk for missed care, delayed recovery, or claim complications.'
+      ]
+    },
+    {
+      v:1, label:'Crisis-Level Instability',
+      bullets:[
+        'Homelessness, extreme poverty, or ongoing violence.',
+        'Severe SDOH barriers preventing engagement in care or work.',
+        'Requires immediate stabilization before recovery can progress.'
+      ]
+    }
+  ],
+  P4: [
+    {
+      v:5, label:'Full Work Capacity and Career Stability',
+      bullets:[
+        'High job satisfaction, financial independence, and strong work performance.',
+        'No vocational barriers to recovery or RTW.',
+        'Engages in professional development and long-term planning.'
+      ]
+    },
+    {
+      v:4, label:'Stable Employment With Growth Potential',
+      bullets:[
+        'Secure job with predictable income and benefits.',
+        'Able to adjust duties or pivot roles if needed.',
+        'Injury may require temporary modifications but not long-term restrictions.'
+      ]
+    },
+    {
+      v:3, label:'Employment With Uncertainty or Early-Career Vulnerability',
+      bullets:[
+        'Job instability, workplace stress, or financial strain present.',
+        'Injury may jeopardize job security or performance.',
+        'May require accommodations, modified duty, or vocational support.'
+      ]
+    },
+    {
+      v:2, label:'Significant Vocational Barriers Affecting Recovery',
+      bullets:[
+        'Underemployment, discrimination, or low-wage work with minimal benefits.',
+        'Limited access to education or advancement.',
+        'Injury significantly impacts ability to maintain employment.'
+      ]
+    },
+    {
+      v:1, label:'Severe Employment Instability or No Work Capacity',
+      bullets:[
+        'Chronic unemployment, survival-based work, or major financial crisis.',
+        'Systemic barriers (disability, immigration status, literacy) impede employment.',
+        'Injury fully prevents participation in the workforce.'
+      ]
+    }
+  ]
+};
+
+const DOMAINS = [
+  {
+    code:'P1', key:'P1',
+    badge:'P1 — Physical Wellness',
+    title:'Physical Wellness',
+    sbLabel:'P1 — Physical Wellness',
+    questions:[
+      { title:'Current Physical Function',
+        text:'How much does the injury or medical condition limit the individual\'s ability to perform normal daily activities?' },
+      { title:'Medical Stability',
+        text:'How stable is the individual\'s physical condition, including the predictability of symptoms and risk of exacerbation?' },
+      { title:'Treatment Intensity & Adjustments',
+        text:'How intensive and frequently adjusted is the medical care required to manage the individual\'s condition or injury?' },
+      { title:'Recovery Progress',
+        text:'How consistently is the individual progressing toward physical recovery without significant setbacks?' },
+      { title:'Work-Related Physical Capacity',
+        text:'To what extent can the individual safely perform essential work-related physical tasks (lifting, standing, walking, stamina, etc.)?' }
+    ]
+  },
+  {
+    code:'P2', key:'P2',
+    badge:'P2 — Psychological Wellness',
+    title:'Psychological Wellness',
+    sbLabel:'P2 — Psychological Wellness',
+    questions:[
+      { title:'Emotional Stability',
+        text:'How stable is the individual\'s emotional state in relation to the injury or illness?' },
+      { title:'Coping Capacity',
+        text:'How effectively is the individual coping with stress related to the injury, treatment, or claim process?' },
+      { title:'Behavioral Health Impact on Function',
+        text:'To what extent do psychological symptoms interfere with the individual\'s daily functioning or work tolerance?' },
+      { title:'Access to Behavioral Health Support',
+        text:'How accessible is appropriate psychological or behavioral health support if the individual needs it?' },
+      { title:'Psychological Barriers to Recovery',
+        text:'To what extent do psychological factors interfere with recovery or return-to-work progress?' }
+    ]
+  },
+  {
+    code:'P3', key:'P3',
+    badge:'P3 — Psychosocial Wellness',
+    title:'Psychosocial Wellness',
+    sbLabel:'P3 — Psychosocial Wellness',
+    questions:[
+      { title:'Housing Stability',
+        text:'How stable and secure is the individual\'s current living situation?' },
+      { title:'Social Support Reliability',
+        text:'How reliable and available is the individual\'s support system during recovery?' },
+      { title:'Transportation & Access to Care',
+        text:'How easily can the individual access medical appointments, treatment, and necessary services?' },
+      { title:'Financial Barriers to Recovery',
+        text:'To what extent is financial strain limiting the individual\'s ability to access care or maintain stability during recovery?' },
+      { title:'Environmental & Community Stability',
+        text:'How stable and supportive is the individual\'s living and community environment for recovery and access to care?' }
+    ]
+  },
+  {
+    code:'P4', key:'P4',
+    badge:'P4 — Professional Wellness',
+    title:'Professional Wellness',
+    sbLabel:'P4 — Professional Wellness',
+    questions:[
+      { title:'Pre-Injury Work Stability',
+        text:'How stable and secure was the individual\'s employment and income before the injury occurred?' },
+      { title:'Current Work Capacity',
+        text:'To what extent does the injury affect the individual\'s ability to perform essential job duties?' },
+      { title:'Workplace Accommodation Likelihood',
+        text:'How likely is the employer to provide modified duties or reasonable accommodations that support recovery?' },
+      { title:'Vocational Security During Recovery',
+        text:'How secure is the individual\'s ability to maintain employment or remain attached to the workforce during recovery?' },
+      { title:'Long-Term Vocational Outlook',
+        text:'How likely is the individual to resume stable and sustainable employment following recovery?' }
+    ]
+  }
+];
+
+const SOCIAL_DRIVERS = [
+  'Housing Stability','Food Security','Transportation',
+  'Insurance Coverage','Financial Resources','Employment Status',
+  'Social Support Network','Safety & Security','Healthcare Access'
+];
+const DESTABILIZERS = ['Pain','Depression','Anxiety'];
+const SCORE_LABELS  = {5:'Strong',4:'Stable',3:'Struggling',2:'Unstable',1:'Critical'};
+const DOMAIN_DESCS  = {P1:'physical wellness',P2:'psychological wellness',P3:'psychosocial wellness',P4:'professional wellness'};
+
+/* ─────────────────────────────────────────────────────────
+   STATE
+   Steps 0–3: P domains (each has 5 questions, one per view)
+   Step  4:   Social Drivers
+   Step  5:   Clinical Destabilizers
+───────────────────────────────────────────────────────── */
+let step = 0;   // 0–5
+let qIdx = 0;   // 0–4 within a P domain
+
+// answers[stepIdx][qIdx] = value
+const A = {0:{},1:{},2:{},3:{},4:{},5:{}};
+
+/* ─────────────────────────────────────────────────────────
+   SCREEN MANAGEMENT
+───────────────────────────────────────────────────────── */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ─────────────────────────────────────────────────────────
+   START
+───────────────────────────────────────────────────────── */
+function startAssessment() {
+  step=0; qIdx=0;
+  showScreen('sc-assess');
+  render();
+}
+
+/* ─────────────────────────────────────────────────────────
+   NAVIGATION
+───────────────────────────────────────────────────────── */
+function navNext() {
+  if (step<=3) {
+    // All 4 domains shown at once — validate ALL before advancing
+    for (let di = 0; di < DOMAINS.length; di++) {
+      const unanswered = DOMAINS[di].questions.findIndex((_, qi) => A[di][qi] === undefined);
+      if (unanswered !== -1) {
+        toast(`Please answer all questions for ${DOMAINS[di].title} before continuing.`);
+        // Auto-open that domain section
+        const body  = document.getElementById(`dom-body-${di}`);
+        const arrow = document.getElementById(`dom-arrow-${di}`);
+        if (body && !body.classList.contains('open')) {
+          body.classList.add('open');
+          if (arrow) arrow.style.transform = 'rotate(180deg)';
+        }
+        return;
+      }
+    }
+    step = 4; // Jump straight to Social Drivers
+  } else if (step===4) {
+    for (let i=0;i<SOCIAL_DRIVERS.length;i++) {
+      if (A[4][i]===undefined) { toast('Please rate all Social Drivers before continuing.'); return; }
+    }
+    step++;
+  } else if (step===5) {
+    for (let i=0;i<DESTABILIZERS.length;i++) {
+      if (A[5][i]===undefined) { toast('Please rate all Clinical Destabilizers before continuing.'); return; }
+    }
+    buildResults(); return;
+  }
+  render();
+  window.scrollTo({top:0});
+}
+
+function navBack() {
+  if (step===0) { showScreen('sc-intro'); return; }
+  if (step<=3) { step = 0; } // stay on domains screen
+  else if (step===4) { step = 0; } // back to all domains
+  else if (step===5) { step = 4; }
+  render();
+  window.scrollTo({top:0});
+}
+
+function toast(msg) {
+  let el = document.getElementById('_toast');
+  if (el) el.remove();
+  el = document.createElement('div');
+  el.id='_toast';
+  el.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:11px 22px;border-radius:3px;font-size:13px;font-family:var(--fb);font-weight:500;letter-spacing:.06em;z-index:9999;box-shadow:0 8px 28px rgba(0,0,0,.18)';
+  el.textContent=msg;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),2800);
+}
+
+/* ─────────────────────────────────────────────────────────
+   RENDER DISPATCHER
+───────────────────────────────────────────────────────── */
+function render() {
+  updateSidebar();
+  updatePill();
+  const isLast = step===5;
+  document.getElementById('btnNext').textContent = isLast ? 'View Results →' : 'Continue →';
+
+  if      (step<=3) renderAllDomains();
+  else if (step===4) renderDrivers();
+  else              renderDestab();
+}
+
+/* Sidebar */
+function updateSidebar() {
+  const labels=['4Ps of Wellness','Social Drivers of Health','Clinical Destabilizers'];
+  const stepIdx = step <= 3 ? 0 : step - 3;
+  document.getElementById('sbSteps').innerHTML = labels.map((l,i)=>`
+    <div class="sb-step ${i===stepIdx?'active':i<stepIdx?'done':''}">
+      <span class="sb-pip"></span>${l}
+    </div>`).join('');
+}
+
+function updatePill() {
+  const labels = ['4Ps Assessment', '4Ps Assessment', '4Ps Assessment', '4Ps Assessment', 'Social Drivers', 'Destabilizers'];
+  document.getElementById('assessPill').textContent = labels[step] || '';
+}ers','Destabilizers'];
+  document.getElementById('assessPill').textContent = labels[step]||'';
+}
+
+/* ─────────────────────────────────────────────────────────
+   RENDER DOMAIN — all questions grouped under one P section
+───────────────────────────────────────────────────────── */
+function renderQuestion() {
+  renderAllDomains();
+}
+
+function renderAllDomains() {
+  const sectionsHtml = DOMAINS.map((dom, di) => {
+    const stg = STAGES[dom.key];
+    const allAnswered = dom.questions.every((_, qi) => A[di][qi] !== undefined);
+    const anyAnswered = dom.questions.some((_, qi) => A[di][qi] !== undefined);
+    const isOpen = !allAnswered; // start open if not yet complete
+
+    const questionsHtml = dom.questions.map((q, qi) => {
+      const saved = A[di][qi];
+      const optsHtml = stg.map(s => {
+        const buls = s.bullets.map(b => `<li>${b}</li>`).join('');
+        return `
+        <div class="stage-opt${saved === s.v ? ' sel' : ''}"
+             onclick="pickDomainStage(${s.v}, this, ${di}, ${qi})">
+          <div class="stage-num">${s.v}</div>
+          <div class="stage-lbl">${s.label}</div>
+          <button class="stage-info-btn" onclick="toggleStageDesc(event,'sid-${di}-${qi}-${s.v}')" title="View stage description">i</button>
+          <div class="stage-radio"><div class="radio-ring"><div class="radio-dot"></div></div></div>
+        </div>
+        <div class="stage-inline-desc" id="sid-${di}-${qi}-${s.v}">
+          <ul>${buls}</ul>
+        </div>`;
+      }).join('');
+
+      return `
+      <div class="q-view" style="margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid var(--surf-line);">
+        <div class="q-num">Question ${qi + 1} of ${dom.questions.length}</div>
+        <div class="q-title">${q.title}</div>
+        <div class="q-text">${q.text}</div>
+        <div class="stage-opts" id="domOpts-${di}-${qi}">${optsHtml}</div>
+      </div>`;
+    }).join('');
+
+    return `
+    <div class="domain-section" id="dom-section-${di}">
+      <div class="domain-section-header${isOpen ? '' : '' }" onclick="toggleDomainSection(${di})">
+        <div>
+          <div class="domain-section-badge">${dom.badge}</div>
+          <div class="domain-section-title">${dom.title}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="domain-section-status${allAnswered ? ' complete' : ''}">${allAnswered ? 'Complete' : anyAnswered ? 'In Progress' : 'Not Started'}</div>
+          <span class="domain-section-arrow${isOpen ? '' : ''}" id="dom-arrow-${di}">▾</span>
+        </div>
+      </div>
+      <div class="domain-section-body${isOpen ? ' open' : ''}" id="dom-body-${di}">
+        ${di === 0 ? '<div class="safeguard">If more than one stage appears applicable, select the lowest stage that reflects the individual's current condition. The lowest domain score determines overall intrinsic stability.</div>' : ''}
+        ${questionsHtml}
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('assessContent').innerHTML = `
+    <div class="d-header" style="margin-bottom:24px;">
+      <div class="d-badge">4Ps of Wellness Assessment</div>
+      <div class="d-title">Rate each domain below</div>
+      <div style="font-size:13px;color:var(--gray-mid);margin-top:4px;">Expand each section, answer all questions, then click Continue.</div>
+    </div>
+    ${sectionsHtml}`;
+}
+
+function toggleDomainSection(di) {
+  const body  = document.getElementById(`dom-body-${di}`);
+  const arrow = document.getElementById(`dom-arrow-${di}`);
+  if (!body) return;
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  if (arrow) arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
+}
+
+function pickDomainStage(val, el, di, qi) {
+  A[di][qi] = val;
+  const opts = document.getElementById(`domOpts-${di}-${qi}`);
+  if (opts) opts.querySelectorAll('.stage-opt').forEach(o => o.classList.remove('sel'));
+  const opt = el.closest('.stage-opt') || el;
+  opt.classList.add('sel');
+  // Update section status
+  const dom = DOMAINS[di];
+  const allAnswered = dom.questions.every((_, q) => A[di][q] !== undefined);
+  const anyAnswered = dom.questions.some((_, q) => A[di][q] !== undefined);
+  const statusEl = document.querySelector(`#dom-section-${di} .domain-section-status`);
+  if (statusEl) {
+    statusEl.textContent = allAnswered ? 'Complete' : anyAnswered ? 'In Progress' : 'Not Started';
+    statusEl.className = 'domain-section-status' + (allAnswered ? ' complete' : '');
+    if (allAnswered) {
+      // Auto-collapse completed section and open next if available
+      const body = document.getElementById(`dom-body-${di}`);
+      const arrow = document.getElementById(`dom-arrow-${di}`);
+      if (body) body.classList.remove('open');
+      if (arrow) arrow.style.transform = '';
+      if (di < DOMAINS.length - 1) {
+        const nextBody  = document.getElementById(`dom-body-${di + 1}`);
+        const nextArrow = document.getElementById(`dom-arrow-${di + 1}`);
+        if (nextBody) nextBody.classList.add('open');
+        if (nextArrow) nextArrow.style.transform = 'rotate(180deg)';
+      }
+    }
+  }
+}
+
+function pickStageGrouped(val, el, qi) {
+  A[step][qi] = val;
+  const opts = el.closest(`#stageOpts-${qi}`) || el.parentElement;
+  if (opts) opts.querySelectorAll('.stage-opt').forEach(o => o.classList.remove('sel'));
+  const opt = el.closest('.stage-opt') || el;
+  opt.classList.add('sel');
+}
+
+function toggleStageDesc(e, id) {
+  e.stopPropagation();
+  const panel = document.getElementById(id);
+  const btn   = e.currentTarget;
+  const isOpen = panel.classList.contains('open');
+  // Close all others first
+  document.querySelectorAll('.stage-inline-desc.open').forEach(p=>p.classList.remove('open'));
+  document.querySelectorAll('.stage-info-btn.active').forEach(b=>b.classList.remove('active'));
+  if(!isOpen){
+    panel.classList.add('open');
+    btn.classList.add('active');
+  }
+}
+
+function toggleDescPanel() {
+  const panel = document.getElementById('descPanel');
+  const btn   = document.getElementById('descToggleBtn');
+  const open  = panel.classList.toggle('open');
+  btn.classList.toggle('open', open);
+}
+
+/* ─────────────────────────────────────────────────────────
+   RENDER SOCIAL DRIVERS
+───────────────────────────────────────────────────────── */
+function renderDrivers() {
+  const cards = SOCIAL_DRIVERS.map((name,i)=>{
+    const saved = A[4][i];
+    const btns = [5,4,3,2,1].map(v=>`
+      <button class="driver-btn${saved===v?' sel':''}"
+              onclick="pickDriver(${i},${v},this)"
+              title="${SCORE_LABELS[v]}">${v}</button>`).join('');
+    return `<div class="driver-card${saved!==undefined?' answered':''}" id="dc${i}">
+      <div class="driver-name">${name}</div>
+      <div class="driver-btns">${btns}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('assessContent').innerHTML = `
+    <div class="d-header">
+      <div class="d-badge">Social Drivers of Health</div>
+      <div class="d-title">Social Drivers</div>
+      <div class="d-progress">
+        <span>Rate all 9 factors</span>
+        <div class="d-pbar"><div class="d-pfill" style="width:${getDriverPct()}%"></div></div>
+        <span>Final Step</span>
+      </div>
+    </div>
+    <div class="safeguard">Rate each Social Driver on the same 1–5 scale. Select the lower rating if uncertain.</div>
+    <div class="drivers-grid">${cards}</div>`;
+}
+
+function getDriverPct() {
+  return Math.round(Object.keys(A[4]).length / SOCIAL_DRIVERS.length * 100);
+}
+
+function pickDriver(idx, val, btn) {
+  A[4][idx]=val;
+  const card = document.getElementById('dc'+idx);
+  card.querySelectorAll('.driver-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  card.classList.add('answered');
+  const fill = document.querySelector('.d-pfill');
+  if (fill) fill.style.width = getDriverPct()+'%';
+}
+
+/* ─────────────────────────────────────────────────────────
+   RENDER DESTABILIZERS
+───────────────────────────────────────────────────────── */
+function renderDestab() {
+  const cards = DESTABILIZERS.map((name,i)=>{
+    const saved = A[5][i];
+    const btns = [5,4,3,2,1].map(v=>`
+      <button class="driver-btn${saved===v?' sel':''}"
+              onclick="pickDestab(${i},${v},this)"
+              title="${SCORE_LABELS[v]}">${v}</button>`).join('');
+    return `<div class="driver-card${saved!==undefined?' answered':''}" id="dd${i}">
+      <div class="driver-name">${name}</div>
+      <div class="driver-btns">${btns}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('assessContent').innerHTML = `
+    <div class="d-header">
+      <div class="d-badge">Clinical Destabilizers</div>
+      <div class="d-title">Clinical Destabilizers</div>
+      <div class="d-progress">
+        <span>Rate all 3 factors</span>
+        <div class="d-pbar"><div class="d-pfill" style="width:100%"></div></div>
+        <span>Step 6 of 6</span>
+      </div>
+    </div>
+    <div class="safeguard">These ratings are stand-alone contextual factors and do not affect the Intrinsic or Extrinsic scores. They are included in the final report to identify additional pressures on recovery.</div>
+    <div class="destab-cards">${cards}</div>`;
+}
+
+function pickDestab(idx, val, btn) {
+  A[5][idx]=val;
+  document.getElementById('dd'+idx).querySelectorAll('.driver-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  document.getElementById('dd'+idx).classList.add('answered');
+}
+
+/* ─────────────────────────────────────────────────────────
+   SCORING
+───────────────────────────────────────────────────────── */
+function score() {
+  // Domain scores: lowest answer per domain
+  const ds = DOMAINS.map((_,di)=>{
+    const vals=Object.values(A[di]);
+    return vals.length ? Math.min(...vals) : 5;
+  });
+
+  // Intrinsic: lowest domain score; P1 priority on tie
+  const minD = Math.min(...ds);
+  const pIdx = ds.findIndex(s=>s===minD); // P1→P2→P3→P4 natural priority
+
+  // Extrinsic: floor(avg of 9 drivers)
+  const sdVals = Object.values(A[4]);
+  const extr   = Math.floor(sdVals.reduce((a,b)=>a+b,0) / sdVals.length);
+
+  const destab = DESTABILIZERS.map((_,i)=>A[5][i]??3);
+
+  return { ds, intrinsic:minD, pCode:`P${pIdx+1}`, extrinsic:extr, destab };
+}
+
+/* ─────────────────────────────────────────────────────────
+   BUILD RESULTS
+───────────────────────────────────────────────────────── */
+function buildResults() {
+  const { intrinsic, pCode, extrinsic, destab } = score();
+
+  showScreen('sc-results');
+
+  document.getElementById('rIntrinsic').textContent    = `${intrinsic}${pCode}`;
+  document.getElementById('rIntrinsicDesc').textContent = `${SCORE_LABELS[intrinsic]} — ${DOMAIN_DESCS[pCode]}`;
+  document.getElementById('rExtrinsic').textContent    = extrinsic;
+  document.getElementById('rExtrinsicDesc').textContent = `${SCORE_LABELS[extrinsic]} — Social Drivers of Health`;
+  document.getElementById('rSignalCode').textContent   = `${intrinsic}${pCode}`;
+
+  // Severity badge
+  (function(){
+    const b = document.getElementById('rSeverityBadge');
+    const t = document.getElementById('rSeverityText');
+    b.className = 'severity-badge';
+    b.style.display = 'inline-flex';
+    if(intrinsic>=4 && extrinsic>=4){
+      b.classList.add('sev-strong'); t.textContent='Strong Stability';
+    } else if(intrinsic===1 || extrinsic===1){
+      b.classList.add('sev-critical'); t.textContent='Critical Instability';
+    } else if(intrinsic===2 || extrinsic===2){
+      b.classList.add('sev-significant'); t.textContent='Significant Instability';
+    } else {
+      b.classList.add('sev-vulnerable'); t.textContent='Vulnerable Stability';
+    }
+  })();
+
+  requestAnimationFrame(()=>{
+    drawMainSlab(intrinsic, extrinsic);
+    buildDestabResult(destab);
+    buildInterp(intrinsic, pCode, extrinsic, destab);
+
+    if (typeof window.markAssessmentComplete === 'function') {
+      window.markAssessmentComplete({
+        tool: 'HSI',
+        intrinsic,
+        extrinsic,
+        pCode,
+        destab,
+        completedAt: new Date().toISOString()
+      });
+    }
+  });
+}
+
+/* ─────────────────────────────────────────────────────────
+   DESTABILIZER RESULT
+───────────────────────────────────────────────────────── */
+function buildDestabResult(destab) {
+  let anyLow=false;
+  document.getElementById('rDestabGrid').innerHTML = DESTABILIZERS.map((name,i)=>{
+    const s=destab[i];
+    if(s<=2) anyLow=true;
+    return `<div class="destab-item">
+      <div class="di-name">${name}</div>
+      <div class="di-score">${s}</div>
+      <div class="di-lbl">${SCORE_LABELS[s]||''}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('rDestabAlert').style.display = anyLow?'block':'none';
+}
+
+/* ─────────────────────────────────────────────────────────
+   INTERPRETATION
+───────────────────────────────────────────────────────── */
+function buildInterp(intrinsic, pCode, extrinsic, destab) {
+  const iLbl  = (SCORE_LABELS[intrinsic]||'').toLowerCase();
+  const eLbl  = (SCORE_LABELS[extrinsic]||'').toLowerCase();
+  const dDesc = DOMAIN_DESCS[pCode];
+  const anyLow= destab.some(v=>v<=2);
+
+  document.getElementById('rInterp').innerHTML = `
+    <p>Intrinsic stability is assessed at <strong class="score-code">${intrinsic}${pCode}</strong>, indicating ${iLbl} conditions with the primary vulnerability within the <strong>${dDesc}</strong> domain.</p>
+    <p>Extrinsic stability is assessed at <strong class="score-code">${extrinsic}</strong>, reflecting ${eLbl} environmental pressures influencing recovery.</p>
+    <p>When intrinsic and extrinsic conditions become uneven, the structural foundation supporting recovery may become unstable, increasing the likelihood of setbacks or delayed progress.</p>
+    ${anyLow?'<p><em>Low destabilizer scores (Critical–Unstable) may place additional strain on the recovery structure and increase the risk of delayed recovery or setbacks.</em></p>':''}`;
+}
+
+/* ─────────────────────────────────────────────────────────
+   SLAB DRAWING ENGINE
+───────────────────────────────────────────────────────── */
+function drawSlab(canvasEl, intrinsic, extrinsic, opts={}) {
+  const mini   = opts.mini||false;
+  const dpr    = Math.min(window.devicePixelRatio||1, 2);
+  const W      = canvasEl.offsetWidth || (mini?360:700);
+  const H      = mini?148:380;
+
+  canvasEl.width  = W*dpr;
+  canvasEl.height = H*dpr;
+  canvasEl.style.width  = W+'px';
+  canvasEl.style.height = H+'px';
+
+  const ctx = canvasEl.getContext('2d');
+  ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,W,H);
+
+  const GOLD = '#b09837';
+  const sW   = mini ? 0 : 68;
+  const padT = mini ? 10 : 36;
+  const padB = mini ? 22 : 54;
+  const bodyW= W - sW*2 - (mini?36:0);
+  const lx   = sW + (mini?18:0);
+  const rx   = lx + bodyW;
+  const floor= H - padB;
+  const maxH = H - padT - padB - 4;
+  const thick= mini?12:30;
+  const persp= mini?7:19;
+
+  // Non-linear lift: low stays near ground, high lifts strongly
+  const liftFrac = v => Math.pow((v-1)/4, 0.68);
+  const lLift = liftFrac(intrinsic) * maxH;
+  const rLift = liftFrac(extrinsic) * maxH;
+  const lTop  = floor - lLift;
+  const rTop  = floor - rLift;
+  const lBot  = lTop + thick;
+  const rBot  = rTop + thick;
+  const diff  = Math.abs(intrinsic - extrinsic);
+
+  // Background
+  if(!mini){
+    const bg=ctx.createLinearGradient(0,0,0,H);
+    bg.addColorStop(0,'#f4f3f0');bg.addColorStop(1,'#eceae5');
+    ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  }
+
+  // Ground plane — darker for contrast
+  if(!mini){
+    ctx.fillStyle='#ccc9bf';ctx.fillRect(0,floor,W,H-floor);
+    // Ground texture lines
+    ctx.strokeStyle='rgba(0,0,0,0.05)';ctx.lineWidth=1;
+    for(let xi=0;xi<W;xi+=18){
+      ctx.beginPath();ctx.moveTo(xi,floor);ctx.lineTo(xi,H);ctx.stroke();
+    }
+    ctx.setLineDash([]);
+  }
+
+  // Shadow — elongated toward low side (Change 9)
+  if(!mini){
+    const lowSide  = lLift < rLift ? lx : rx;
+    const highSide = lLift < rLift ? rx : lx;
+    const cx       = W/2;
+    // Shift shadow center toward low side
+    const shadowShift = diff>=3 ? (lLift<rLift ? -bodyW*0.08 : bodyW*0.08) : 0;
+    const shadowIntensity = diff>=3 ? 0.28 : 0.20;
+    const sg=ctx.createRadialGradient(cx+shadowShift,floor+2,0,cx+shadowShift,floor+2,bodyW*.52);
+    sg.addColorStop(0,`rgba(0,0,0,${shadowIntensity})`);
+    sg.addColorStop(0.45,'rgba(0,0,0,0.09)');
+    sg.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=sg;
+    ctx.beginPath();
+    const sxW = diff>=3 ? bodyW*.5 : bodyW*.44;
+    ctx.ellipse(cx+shadowShift,floor+5,sxW,18,0,0,Math.PI*2);
+    ctx.fill();
+    // Extra shadow on low side for diff>=3
+    if(diff>=3){
+      const lsX = lLift<rLift ? lx : rx;
+      const lsg = ctx.createRadialGradient(lsX,floor+2,0,lsX,floor+2,bodyW*0.2);
+      lsg.addColorStop(0,'rgba(0,0,0,0.18)');
+      lsg.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=lsg;
+      ctx.beginPath();ctx.ellipse(lsX,floor+6,bodyW*0.2,14,0,0,Math.PI*2);ctx.fill();
+    }
+  }
+
+  // Ground line — solid, darker
+  ctx.strokeStyle=mini?'#bbb8b0':'#9c9890';ctx.lineWidth=mini?1:2.5;
+  ctx.beginPath();ctx.moveTo(mini?lx-8:0,floor);ctx.lineTo(mini?rx+8:W,floor);ctx.stroke();
+
+  // Dashed vertical supports (distance indicators)
+  if(!mini){
+    ctx.lineWidth=1;ctx.setLineDash([4,4]);
+    [[lx,lBot],[rx,rBot]].forEach(([x,y])=>{
+      const dist=floor-y;
+      if(dist>4){
+        ctx.strokeStyle='rgba(140,135,128,0.55)';
+        ctx.beginPath();ctx.moveTo(x,y+2);ctx.lineTo(x,floor-2);ctx.stroke();
+      }
+    });
+    ctx.setLineDash([]);
+  }
+
+  // Bottom underside face
+  ctx.beginPath();
+  ctx.moveTo(lx,lBot);ctx.lineTo(rx,rBot);
+  ctx.lineTo(rx,rBot+persp*.8);ctx.lineTo(lx,lBot+persp*.8);
+  ctx.closePath();
+  ctx.fillStyle='#52504a';ctx.fill();
+  // Underside edge line
+  ctx.strokeStyle='#3a3836';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(lx,lBot);ctx.lineTo(rx,rBot);ctx.stroke();
+
+  // Front face
+  ctx.beginPath();
+  ctx.moveTo(lx,lTop);ctx.lineTo(rx,rTop);ctx.lineTo(rx,rBot);ctx.lineTo(lx,lBot);ctx.closePath();
+  const fg=ctx.createLinearGradient(lx,0,rx,0);
+  fg.addColorStop(0,'#a0998f');fg.addColorStop(.38,'#b8b2a8');fg.addColorStop(1,'#989188');
+  ctx.fillStyle=fg;ctx.fill();
+  // Front face border lines for clarity
+  ctx.strokeStyle='#7a756e';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(lx,lTop);ctx.lineTo(lx,lBot);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(rx,rTop);ctx.lineTo(rx,rBot);ctx.stroke();
+
+  // Vertical grain
+  ctx.lineWidth=1;
+  for(let t=0.12;t<1;t+=.15){
+    const xi=lx+t*(rx-lx), yi=lTop+t*(rTop-lTop);
+    ctx.strokeStyle=`rgba(255,255,255,${0.05+t*0.04})`;
+    ctx.beginPath();ctx.moveTo(xi,yi);ctx.lineTo(xi,yi+thick);ctx.stroke();
+  }
+  // Horizontal grain
+  ctx.strokeStyle='rgba(0,0,0,0.04)';ctx.lineWidth=1;
+  for(let h=0.3;h<1;h+=0.35){
+    ctx.beginPath();
+    ctx.moveTo(lx,lTop+h*(lBot-lTop));
+    ctx.lineTo(rx,rTop+h*(rBot-rTop));ctx.stroke();
+  }
+
+  // Top face
+  ctx.beginPath();
+  ctx.moveTo(lx,lTop);ctx.lineTo(rx,rTop);
+  ctx.lineTo(rx-persp*.65,rTop-persp*1.2);ctx.lineTo(lx+persp*.65,lTop-persp*1.2);
+  ctx.closePath();
+  const tg=ctx.createLinearGradient(lx,lTop,rx,rTop);
+  tg.addColorStop(0,'#c8c4bc');tg.addColorStop(.4,'#dad6ce');tg.addColorStop(1,'#bfbbb3');
+  ctx.fillStyle=tg;ctx.fill();
+  // Top face border for clarity
+  ctx.strokeStyle='#9e9990';ctx.lineWidth=1;
+  ctx.beginPath();
+  ctx.moveTo(lx,lTop);ctx.lineTo(rx-persp*.65,rTop-persp*1.2);
+  ctx.moveTo(rx,rTop);ctx.lineTo(rx-persp*.65,rTop-persp*1.2);
+  ctx.stroke();
+
+  // Gold leading edge — bright
+  ctx.beginPath();ctx.moveTo(lx,lTop);ctx.lineTo(rx,rTop);
+  ctx.strokeStyle=GOLD;ctx.lineWidth=mini?2.5:5;ctx.stroke();
+
+  // Right side face
+  ctx.beginPath();
+  ctx.moveTo(rx,rTop);ctx.lineTo(rx-persp*.65,rTop-persp*1.2);
+  ctx.lineTo(rx-persp*.65,rBot-persp*.5);ctx.lineTo(rx,rBot);
+  ctx.closePath();ctx.fillStyle='#807870';ctx.fill();
+  ctx.strokeStyle='#6a6460';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(rx,rTop);ctx.lineTo(rx,rBot);ctx.stroke();
+
+  if(!mini){
+    // Scale labels
+    const sl=['Critical','Unstable','Struggling','Stable','Strong'];
+    const scaleColors=['#c85040','#d4882a','#b09837','#5a9250','#3d8a5e'];
+    ctx.font='600 11px Jost,sans-serif';
+    for(let i=0;i<5;i++){
+      const v=i+1, frac=liftFrac(v), y=floor-frac*maxH;
+      ctx.textAlign='right';
+      ctx.fillStyle='#777';ctx.fillText(v,lx-12,y+4);
+      ctx.fillStyle=scaleColors[i];ctx.fillText(sl[i],lx-26,y+4);
+      ctx.strokeStyle='rgba(0,0,0,0.18)';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(lx-9,y);ctx.lineTo(lx-3,y);ctx.stroke();
+      ctx.textAlign='left';
+      ctx.fillStyle='#777';ctx.fillText(v,rx+12,y+4);
+      ctx.fillStyle=scaleColors[i];ctx.fillText(sl[i],rx+26,y+4);
+      ctx.beginPath();ctx.moveTo(rx+3,y);ctx.lineTo(rx+9,y);ctx.stroke();
+    }
+
+    // Axis labels
+    ctx.font='700 11px Jost,sans-serif';ctx.textAlign='center';ctx.fillStyle=GOLD;
+    ctx.fillText('INTRINSIC',lx,floor+36);ctx.fillText('EXTRINSIC',rx,floor+36);
+
+    // Score markers — larger (Change 8)
+    [[lx,lLift,intrinsic],[rx,rLift,extrinsic]].forEach(([x,l,v])=>{
+      const y=floor-l;
+      ctx.strokeStyle='rgba(176,152,55,0.4)';ctx.lineWidth=2.5;
+      ctx.beginPath();ctx.arc(x,y,15,0,Math.PI*2);ctx.stroke();
+      ctx.fillStyle=GOLD;ctx.beginPath();ctx.arc(x,y,11,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#fff';
+      ctx.font='700 11px "Source Code Pro",monospace';
+      ctx.textAlign='center';
+      ctx.fillText(v,x,y+4);
+    });
+
+    // Structural stress indicator (Change 9) — only when diff >= 3
+    if(diff>=3){
+      const midY = floor;
+      const stressX = W/2;
+      // Pressure arc beneath slab
+      const arcR = bodyW * 0.28;
+      const lo = lLift < rLift;  // which side is lower
+      const arcCenter = lo ? lx + bodyW*0.25 : rx - bodyW*0.25;
+      ctx.save();
+      ctx.strokeStyle='rgba(180,60,40,0.18)';ctx.lineWidth=3;
+      ctx.setLineDash([6,5]);
+      ctx.beginPath();
+      ctx.arc(arcCenter, floor-2, arcR*0.6, 0.1*Math.PI, 0.9*Math.PI, false);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      // Stress arrows
+      const arrowX = arcCenter;
+      ctx.strokeStyle='rgba(180,60,40,0.20)';ctx.lineWidth=1.5;
+      for(let ox=-16;ox<=16;ox+=16){
+        ctx.beginPath();
+        ctx.moveTo(arrowX+ox, floor-arcR*0.5);
+        ctx.lineTo(arrowX+ox, floor-2);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    // Tilt indicator arc
+    if(diff > 0){
+      const aRad = Math.atan2(rLift-lLift, rx-lx);
+      ctx.strokeStyle='rgba(176,152,55,0.35)';ctx.lineWidth=1.5;
+      ctx.beginPath();
+      ctx.arc(W/2,floor,32,Math.PI,Math.PI-aRad*2,aRad<0);
+      ctx.stroke();
+    }
+
+  } else {
+    // Mini: slightly darker labels for change 10
+    ctx.font='700 10px Jost,sans-serif';ctx.textAlign='center';
+    ctx.fillStyle='#8a7820';
+    ctx.fillText('INTRINSIC',lx+24,floor+17);
+    ctx.fillText('EXTRINSIC',rx-24,floor+17);
+    [[lx,lLift,intrinsic],[rx,rLift,extrinsic]].forEach(([x,l,v])=>{
+      const y=floor-l;
+      ctx.fillStyle='#8a7820';ctx.beginPath();ctx.arc(x,y,6,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#fff';ctx.font='700 8px Jost,sans-serif';ctx.textAlign='center';
+      ctx.fillText(v,x,y+3);
+    });
+  }
+}
+
+function drawMainSlab(i,e){
+  drawSlab(document.getElementById('cvSlab'),i,e,{mini:false});
+}
+function drawMiniSlab(){
+  const cv=document.getElementById('cvMini');
+  if(cv&&cv.offsetWidth>0) drawSlab(cv,3,5,{mini:true});
+}
+
+/* ─────────────────────────────────────────────────────────
+   RESIZE
+───────────────────────────────────────────────────────── */
+let rt;
+window.addEventListener('resize',()=>{
+  clearTimeout(rt);rt=setTimeout(()=>{
+    drawMiniSlab();
+    if(document.getElementById('sc-results').classList.contains('active')){
+      const iv=parseInt(document.getElementById('rIntrinsic').textContent);
+      const ev=parseInt(document.getElementById('rExtrinsic').textContent);
+      if(!isNaN(iv)&&!isNaN(ev)) drawMainSlab(iv,ev);
+    }
+  },120);
+});
+
+/* ─────────────────────────────────────────────────────────
+   INIT
+───────────────────────────────────────────────────────── */
+window.addEventListener('load',()=>{
+  requestAnimationFrame(()=>requestAnimationFrame(drawMiniSlab));
+});
+
+</script>
+<script>
+function goToNext() {
+    localStorage.setItem('tool_complete_' + window.location.pathname, 'true');
+    if (window.location.pathname.includes('tool1')) {
+        window.location.href = 'tool2-csa.html';
+    } else if (window.location.pathname.includes('tool2')) {
+        window.location.href = 'tool3-caf.html';
+    } else if (window.location.pathname.includes('tool3')) {
+        window.location.href = 'tool4-hsi.html';
+    } else if (window.location.pathname.includes('tool4')) {
+        window.location.href = 'tool5-fci.html';
+    } else if (window.location.pathname.includes('tool5')) {
+        window.location.href = 'tool6-rrf.html';
+    } else if (window.location.pathname.includes('tool6')) {
+        window.location.href = 'dashboard.html?allComplete=true';
+    }
+}
+
+function returnToDashboard() {
+    window.location.href = 'dashboard.html';
+}
+</script>
+</body>
+</html>

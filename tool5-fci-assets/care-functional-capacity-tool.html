@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Functional Capacity Index | Reconcile Care Management Services</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: #f6f3ed;
+      color: #0e1c2e;
+    }
+    select { -webkit-appearance: none; appearance: none; }
+    input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: pointer; }
+
+    /* ── Print styles ─────────────────────────────────────────────────── */
+    .no-print { }
+    .print-footer { display: none; }
+
+    @media print {
+      .no-print { display: none !important; }
+      body { background: #fff !important; }
+      .print-root { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+      .print-card { box-shadow: none !important; border: 1px solid #ccc !important; break-inside: avoid; page-break-inside: avoid; }
+      .print-body-text { color: #111 !important; }
+      .print-badge { background: #fff !important; border: 1px solid #555 !important; color: #111 !important; }
+      .print-bar-fill { background-color: #333 !important; }
+      .print-bar-fill-weak { background-color: #000 !important; }
+      .print-summary-tile { background: #fff !important; border: 1px solid #aaa !important; border-top: 3px solid #333 !important; }
+      .print-bullet { color: #333 !important; }
+      .print-footer { display: block !important; }
+      @page { margin: 0.75in 0.75in 0.85in 0.75in; size: letter portrait; }
+    }
+
+    /* ── Layout helpers ───────────────────────────────────────────────── */
+    .app-header {
+      background: #0c1c34;
+      color: #e8e2d4;
+      padding: 0 48px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 3px solid #b8922a;
+    }
+    .app-header-left { display: flex; align-items: baseline; gap: 20px; }
+    .app-header-brand { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #b8922a; }
+    .app-header-title { font-size: 15px; letter-spacing: 0.04em; }
+    .app-header-right { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #6a8aaa; }
+    .app-header-div { color: #3a5070; }
+
+    .container { max-width: 860px; margin: 0 auto; padding: 48px 32px 80px; }
+
+    .card {
+      background: #fff;
+      border: 1px solid #d6d0c4;
+      border-top: 3px solid #0c1c34;
+      padding: 44px 52px;
+      box-shadow: 0 2px 12px rgba(12,28,52,0.06);
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #b8922a;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .section-title {
+      font-size: 26px;
+      font-weight: normal;
+      color: #0c1c34;
+      margin: 0 0 8px;
+      letter-spacing: 0.02em;
+    }
+    .subtitle {
+      font-size: 15px;
+      color: #3a4a5a;
+      margin: 0 0 32px;
+      line-height: 1.7;
+    }
+    .field-label {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #6a7a8a;
+      display: block;
+      margin-bottom: 6px;
+    }
+    .field-label .req { color: #b8922a; margin-left: 4px; }
+    .field-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #d6d0c4;
+      background: #faf8f4;
+      font-size: 14px;
+      color: #0e1c2e;
+      font-family: 'Georgia', 'Times New Roman', serif;
+      outline: none;
+    }
+    .field-input.error { border-color: #c0392b; }
+    .field-note { font-size: 11px; color: #9aabb8; margin: 5px 0 0; font-style: italic; }
+    .field-error { font-size: 12px; color: #c0392b; margin: 5px 0 0; white-space: pre-line; }
+    .field-wrap { margin-bottom: 20px; }
+
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: '';
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0; height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid #6a7a8a;
+      pointer-events: none;
+    }
+    .field-input.select-el { padding-right: 36px; cursor: pointer; }
+
+    .btn-primary {
+      background: #0c1c34;
+      color: #e8e2d4;
+      border: none;
+      padding: 14px 40px;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      cursor: pointer;
+      font-family: 'Georgia', 'Times New Roman', serif;
+    }
+    .btn-primary:disabled { background: #c0bbad; color: #8a9aaa; cursor: not-allowed; }
+    .btn-ghost {
+      background: transparent;
+      color: #6a7a8a;
+      border: 1px solid #d6d0c4;
+      padding: 12px 28px;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      cursor: pointer;
+      font-family: 'Georgia', 'Times New Roman', serif;
+    }
+
+    .nav-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 40px;
+      padding-top: 28px;
+      border-top: 1px solid #e8e3d8;
+    }
+    .nav-status { font-size: 11px; color: #9aabb8; letter-spacing: 0.06em; }
+
+    .progress-bar { display: flex; gap: 4px; margin-bottom: 40px; }
+    .progress-bar .seg { flex: 1; height: 3px; background: #e8e3d8; }
+    .progress-bar .seg.done { background: #b8922a; }
+    .progress-bar .seg.active { background: #0c1c34; }
+
+    .callout {
+      background: #faf8f4;
+      border: 1px solid #e8e3d8;
+      border-left: 3px solid #b8922a;
+      padding: 16px 20px;
+    }
+    .callout-label {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #b8922a;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    /* Domain level cards */
+    .level-card {
+      border: 1px solid #d6d0c4;
+      background: #fff;
+      padding: 20px 26px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+      transition: border 0.15s, background 0.15s;
+    }
+    .level-card.active {
+      border: 2px solid #0c1c34;
+      background: #eef3fb;
+      box-shadow: 0 0 0 1px #0c1c34;
+    }
+    .level-num {
+      min-width: 34px;
+      height: 34px;
+      background: #e8e3d8;
+      color: #6a7a8a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .level-num.active { background: #0c1c34; color: #b8922a; }
+    .level-title {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #3a4a5a;
+      margin: 0 0 5px;
+    }
+    .level-title.active { color: #0c1c34; }
+    .level-desc { font-size: 13px; line-height: 1.75; color: #3a4a5a; margin: 0; }
+
+    /* Horizontal scale */
+    .hscale-row { display: flex; gap: 8px; margin-bottom: 14px; }
+    .hscale-btn {
+      flex: 1;
+      padding: 14px 8px;
+      border: 1px solid #d6d0c4;
+      background: #faf8f4;
+      color: #3a4a5a;
+      cursor: pointer;
+      font-family: 'Georgia', 'Times New Roman', serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+    .hscale-btn.active { border: 2px solid #0c1c34; background: #0c1c34; color: #b8922a; }
+    .hscale-score { font-size: 20px; line-height: 1; }
+    .hscale-label { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #9aabb8; }
+    .hscale-label.active { color: #d4ac4a; }
+    .hscale-detail {
+      background: #faf8f4;
+      border: 1px solid #e8e3d8;
+      border-left: 3px solid #b8922a;
+      padding: 14px 20px;
+      margin-bottom: 14px;
+    }
+    .hscale-detail-title { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #0c1c34; margin: 0 0 4px; }
+    .hscale-detail-desc { font-size: 13px; color: #3a4a5a; line-height: 1.7; margin: 0; }
+
+    /* Grid helpers */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 24px; }
+    .grid-4p { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 0 36px; }
+    .grid-tiles-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    .grid-tiles-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
+    .grid-context-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .grid-context-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+
+    /* 4P card */
+    .fourp-card { background: #0c1c34; padding: 16px 20px; border-left: 3px solid #b8922a; }
+    .fourp-label { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #b8922a; display: block; margin-bottom: 5px; }
+    .fourp-desc { font-size: 13px; color: #c8d8e8; }
+
+    /* Summary tile */
+    .summary-tile {
+      border-top: 4px solid;
+      padding: 28px 20px;
+      text-align: center;
+    }
+    .summary-tile-label { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #9aabb8; display: block; margin-bottom: 10px; }
+    .summary-tile-score { font-size: 56px; line-height: 1; margin-bottom: 6px; }
+    .summary-tile-status { font-size: 15px; font-style: italic; margin: 0 0 6px; }
+    .summary-tile-sub { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #9aabb8; }
+    .summary-tile-fvi { font-size: 28px; line-height: 1.2; letter-spacing: 0.02em; margin-bottom: 6px; }
+    .summary-tile-fvi-sub { font-size: 11px; margin: 0 0 6px; }
+    .summary-tile-primary { font-size: 15px; line-height: 1.4; margin-bottom: 4px; }
+
+    /* Score bar row */
+    .score-row { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
+    .score-row-label { font-size: 13px; color: #0e1c2e; width: 180px; flex-shrink: 0; }
+    .score-bar-track { flex: 1; height: 8px; background: #e8e3d8; border: 1px solid #ccc; }
+    .score-bar-fill { height: 100%; }
+    .score-num { font-size: 15px; width: 24px; text-align: right; flex-shrink: 0; }
+    .score-badge { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 10px; width: 148px; text-align: center; flex-shrink: 0; }
+
+    /* Context data cells */
+    .data-cell { background: #faf8f4; padding: 14px 18px; border: 1px solid #e8e3d8; }
+    .data-cell-label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #9aabb8; display: block; margin-bottom: 5px; }
+    .data-cell-value { font-size: 13px; color: #0e1c2e; }
+
+    /* Section divider label */
+    .section-label { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #9aabb8; display: block; margin-bottom: 16px; }
+    .section-sublabel { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #9aabb8; display: block; margin-bottom: 12px; }
+
+    /* Interpretation / reassessment */
+    .interp-block { background: #fff; border: 1px solid #d6d0c4; padding: 32px 40px; margin-bottom: 24px; }
+    .interp-para { font-size: 14px; color: #3a4a5a; line-height: 1.9; margin: 0 0 18px; }
+
+    .reassess-block { background: #fff; border: 1px solid #d6d0c4; padding: 32px 40px; margin-bottom: 24px; }
+    .reassess-list { margin: 0; padding: 0; list-style: none; }
+    .reassess-item { display: flex; align-items: baseline; gap: 10px; font-size: 13px; color: #3a4a5a; padding: 8px 0; border-bottom: 1px solid #e8e3d8; }
+    .reassess-bullet { color: #b8922a; font-size: 10px; flex-shrink: 0; }
+
+    .disclaimer-block { background: #faf8f4; border: 1px solid #e8e3d8; padding: 22px 32px; margin-bottom: 24px; }
+    .disclaimer-text { font-size: 12px; color: #9aabb8; line-height: 1.8; font-style: italic; margin: 0; }
+
+    /* Report header */
+    .report-header { background: #0c1c34; padding: 36px 44px; margin-bottom: 24px; border-bottom: 3px solid #b8922a; }
+    .report-header-inner { display: flex; justify-content: space-between; align-items: flex-start; }
+    .report-brand { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #b8922a; display: block; margin-bottom: 8px; }
+    .report-title { font-size: 24px; font-weight: normal; color: #f0ece3; margin: 0 0 20px; letter-spacing: 0.03em; }
+    .report-meta { display: flex; flex-direction: column; gap: 6px; }
+    .report-meta-row { display: flex; gap: 8px; align-items: baseline; }
+    .report-meta-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #6a8aaa; min-width: 100px; }
+    .report-meta-value { font-size: 13px; color: #c8d8e8; }
+    .report-right { text-align: right; }
+    .report-right-label { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #6a8aaa; display: block; margin-bottom: 4px; }
+    .report-right-sub { font-size: 11px; color: #5a7a9a; }
+
+    /* Pricing card */
+    .price-card { padding: 24px 20px; position: relative; }
+    .price-featured { border: 2px solid #b8922a !important; box-shadow: 0 4px 16px rgba(12,28,52,0.14); }
+    .price-popular-badge {
+      position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
+      background: #b8922a; color: #0c1c34;
+      font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+      padding: 3px 10px; white-space: nowrap;
+    }
+    .price-label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; display: block; margin-bottom: 10px; }
+    .price-amount-row { display: flex; align-items: baseline; gap: 2px; margin-bottom: 6px; }
+    .price-amount { font-size: 24px; }
+    .price-unit { font-size: 11px; }
+    .price-reports { font-size: 12px; margin: 0 0 16px; }
+    .price-cta { padding-top: 10px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; }
+
+    /* Usage panel */
+    .usage-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+
+    /* Print footer */
+    .print-footer-text { font-size: 11px; color: #666; font-style: italic; margin: 0; text-align: center; }
+
+    /* Vuln section separator */
+    .vuln-section-label { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #9aabb8; display: block; margin-bottom: 18px; }
+    .vuln-indicator-label { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #0c1c34; display: block; margin-bottom: 12px; }
+
+    /* Back nav bar on final screen */
+    .final-nav-bar {
+      background: #fff;
+      border-bottom: 1px solid #e8e3d8;
+      padding: 12px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .final-nav-hint { font-size: 12px; color: #9aabb8; }
+
+    hr.light { border: none; border-top: 1px solid #e8e3d8; }
+
+    @media (max-width: 700px) {
+      .app-header { padding: 0 20px; }
+      .container { padding: 28px 16px 60px; }
+      .card { padding: 24px 20px; }
+      .grid-2, .grid-3, .grid-4p, .grid-tiles-3, .grid-tiles-4, .grid-context-3, .grid-context-2 { grid-template-columns: 1fr; }
+      .score-row { flex-wrap: wrap; }
+      .score-badge { width: auto; }
+      .report-header-inner { flex-direction: column; gap: 16px; }
+      .report-header { padding: 24px 20px; }
+      .final-nav-bar { padding: 12px 20px; flex-direction: column; gap: 10px; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────────────────────────────────────
+const FONT = "'Georgia','Times New Roman',serif";
+
+const DOMAINS = [
+  { id:"physical", label:"Physical Wellness",
+    subtitle:"Evaluates the client's physical health, functional mobility, pain levels, and medical stability as they relate to daily functioning and work capacity.",
+    levels:[
+      {score:5,title:"Stable / Fully Functional",description:"The client demonstrates no significant physical limitations attributable to the injury. Pain, if present, is well-managed and does not restrict daily functioning. Medical conditions are stable and do not interfere with activities of daily living (ADLs), work, or social participation. No active treatment is required for injury-related conditions."},
+      {score:4,title:"Mild Physical Disruption",description:"The client experiences mild physical symptoms or intermittent pain that occasionally limit activities. ADLs are mostly maintained with minimal assistance. The client may require periodic medical follow-up but remains largely independent in daily functioning. Modifications to activity may be recommended but are manageable."},
+      {score:3,title:"Moderate Physical Disruption",description:"The client has noticeable physical limitations that consistently affect one or more ADLs or work-related activities. Ongoing treatment is required. Pain or physical symptoms are frequently present and may limit mobility, stamina, or participation in normal routines. Some assistance or accommodation may be needed."},
+      {score:2,title:"Severe Physical Disruption",description:"The client has significant physical impairment that substantially restricts ADLs and functional independence. Consistent medical management, assistive devices, or caregiver support may be required. Physical symptoms are chronic, severe, or poorly controlled. Participation in work or major daily activities is markedly compromised."},
+      {score:1,title:"Critical Physical Instability",description:"The client is in a state of critical physical instability. Functioning is severely compromised across most ADLs. The client requires intensive medical management, may be non-ambulatory, or is experiencing an acute or uncontrolled medical crisis affecting all areas of daily life. Independent functioning is not currently possible."}
+    ]
+  },
+  { id:"psychological", label:"Psychological Wellness",
+    subtitle:"Evaluates the client's emotional regulation, mental health status, cognitive functioning, and psychological stability in the context of their injury and circumstances.",
+    levels:[
+      {score:5,title:"Stable / Psychologically Intact",description:"The client demonstrates strong psychological functioning with effective coping strategies. Emotional regulation is intact. No significant anxiety, depression, or cognitive disruption attributable to the injury is present. The client engages with care management and legal processes without notable psychological interference."},
+      {score:4,title:"Mild Psychological Disruption",description:"The client experiences mild anxiety, mood variability, or emotional strain related to their injury or circumstances. Coping capacity is generally maintained. Minor interference with concentration, sleep, or decision-making may occur, but the client remains engaged and largely functional in daily activities."},
+      {score:3,title:"Moderate Psychological Disruption",description:"The client shows consistent signs of psychological stress including persistent anxiety, depressive symptoms, sleep disturbance, or emotional dysregulation. These symptoms noticeably impact daily functioning, relationships, or the ability to engage fully in treatment or legal proceedings. Mental health support is indicated."},
+      {score:2,title:"Severe Psychological Disruption",description:"The client is experiencing significant psychological impairment. Symptoms may include major depressive disorder, PTSD, severe anxiety, trauma responses, or substantial cognitive disruption. Daily functioning is substantially compromised. The client requires intensive mental health support, and capacity for independent decision-making may be affected."},
+      {score:1,title:"Critical Psychological Instability",description:"The client is in a state of acute psychological crisis. This may include active suicidal ideation, psychotic symptoms, severe dissociation, complete emotional collapse, or a mental health emergency. Immediate clinical intervention is required. All other functional domains are severely impacted by the current psychological instability."}
+    ]
+  },
+  { id:"psychosocial", label:"Psychosocial Wellness",
+    subtitle:"Evaluates the client's social support network, community integration, relational functioning, and environmental stability as they relate to recovery and daily life.",
+    levels:[
+      {score:5,title:"Stable / Well-Supported",description:"The client has a strong, reliable support network. Family, social, and community relationships are intact and provide meaningful support. Living environment is stable and safe. The client demonstrates healthy social integration and does not experience significant isolation, relational conflict, or social role disruption attributable to the injury."},
+      {score:4,title:"Mild Psychosocial Disruption",description:"The client has some strain in social relationships or support systems, but maintains a generally functional support network. Minor relational stress, social withdrawal, or role adjustment may be present. Housing and living environment are stable, though some external stressors related to the injury exist."},
+      {score:3,title:"Moderate Psychosocial Disruption",description:"The client's support network is strained or inconsistent. Relational conflict, social isolation, or role disruption within the family unit may be present. Housing stability or community engagement may be compromised. External social support services may be needed to supplement diminished natural supports."},
+      {score:2,title:"Severe Psychosocial Disruption",description:"The client has significant breakdown in social support and relational functioning. Isolation, family dysfunction, caregiver burden, or loss of key relationships is occurring. Environmental instability — including housing insecurity or unsafe living conditions — may compound other functional deficits and impede recovery."},
+      {score:1,title:"Critical Psychosocial Instability",description:"The client is socially isolated with no functional support network. Severe relational breakdown, homelessness, domestic instability, or complete loss of community connection is present. The absence of psychosocial support is actively worsening all other functional domains and creating significant barriers to treatment and recovery."}
+    ]
+  },
+  { id:"professional", label:"Professional Wellness",
+    subtitle:"Evaluates the client's occupational functioning, work capacity, role sustainability, income disruption, financial stability, and the pressures associated with resuming or maintaining professional responsibilities.",
+    levels:[
+      {score:5,title:"Stable / Fully Occupationally Functional",description:"The client is employed and functioning fully in their professional role, or is engaged in meaningful productive activity consistent with their pre-injury occupational status. Financial stability is maintained. Professional identity and purpose are intact. There is no current pressure to resume or modify work responsibilities due to injury-related limitations."},
+      {score:4,title:"Mild Professional Disruption",description:"The client has experienced minor occupational disruption, such as modified duty, reduced hours, or a temporary leave of absence. Financial strain is limited and manageable. The client anticipates returning to full professional functioning. Some pressure to maintain work responsibilities may exist but does not yet constitute a significant barrier to recovery."},
+      {score:3,title:"Moderate Professional Disruption",description:"The client is unable to perform their pre-injury job duties and is currently on extended leave, receiving disability benefits, or working in a significantly reduced capacity. Financial stress is present and growing. Career trajectory or professional identity is uncertain. Pressure to resume work prematurely — due to financial or role obligations — may be present and should be documented."},
+      {score:2,title:"Severe Professional Disruption",description:"The client has experienced significant occupational loss. Employment may be terminated or career trajectory substantially altered. Financial instability is creating compounding stress across other domains. The client may be experiencing pressure to return to work before being medically cleared, creating risk of re-injury or delayed recovery. Return to prior professional functioning is uncertain in the near term."},
+      {score:1,title:"Critical Professional Instability",description:"The client has complete occupational incapacity. Employment has been lost, vocational rehabilitation may be required, and financial crisis is present or imminent. Role sustainability is no longer possible in the current condition. Severe pressure to resume responsibilities — driven by financial desperation, dependent obligations, or role expectations — creates immediate risk of premature return to work or abandonment of necessary treatment. Long-term prognosis in this domain is guarded."}
+    ]
+  }
+];
+
+const VULN_INDICATORS = [
+  { id:"pain", label:"A. Pain Related to Injury",
+    intro:"Pain levels may increase the risk of reinjury or disrupt recovery trajectory, particularly if financial or employment pressures lead the client to return to work before full recovery or medical clearance.",
+    levels:[
+      {score:5,title:"Minimal or no pain affecting daily activity",description:"The client reports little to no ongoing pain. Daily activities and normal movement are not significantly affected."},
+      {score:4,title:"Mild pain with minor activity limitations",description:"Pain is present but generally manageable. Daily activities are mostly maintained with occasional discomfort or minor limitation."},
+      {score:3,title:"Moderate pain affecting some daily function",description:"Pain is consistently present and interferes with certain activities, endurance, or physical tasks."},
+      {score:2,title:"Significant pain affecting daily functioning",description:"Pain frequently interferes with normal activity and may limit mobility, endurance, or work-related tasks."},
+      {score:1,title:"Severe or persistent pain significantly limiting activity",description:"Pain is severe, persistent, or disabling and substantially limits daily functioning or ability to sustain normal activity."}
+    ]
+  },
+  { id:"psych", label:"B. Psychological Stress (Depression / Anxiety)",
+    intro:"Psychological distress may affect coping capacity, decision-making, and recovery stability. When psychological distress is accompanied by moderate to severe pain, the risk of reinjury or disruption to the recovery trajectory may increase, particularly if financial or employment pressures lead the client to return to work before full recovery or medical clearance.",
+    levels:[
+      {score:5,title:"Minimal emotional distress affecting daily function",description:"The client reports little to no emotional distress related to the injury. Coping ability and daily functioning remain stable."},
+      {score:4,title:"Mild emotional distress with limited functional impact",description:"Some stress, worry, or frustration related to the injury is present but daily functioning and coping remain largely intact."},
+      {score:3,title:"Moderate distress affecting some daily activities",description:"Emotional strain is noticeable and may interfere with concentration, motivation, or daily activities at times."},
+      {score:2,title:"Significant distress affecting daily functioning",description:"Depression, anxiety, or emotional strain regularly interferes with daily functioning, coping, or recovery stability."},
+      {score:1,title:"Severe distress significantly limiting coping or functioning",description:"Psychological distress is severe and substantially limits coping ability, decision-making, or normal daily functioning."}
+    ]
+  }
+];
+
+const FCI_CLASS = {
+  5:{label:"Stable",text:"#1e5c3a",bg:"#edf7f1",border:"#a8d5b8"},
+  4:{label:"Mild Disruption",text:"#3d5c1e",bg:"#f3f7ed",border:"#b8d5a8"},
+  3:{label:"Moderate Disruption",text:"#6b4a10",bg:"#fdf5e6",border:"#e8c97a"},
+  2:{label:"Severe Disruption",text:"#7a2e10",bg:"#fdf0ea",border:"#e8a87a"},
+  1:{label:"Critical Instability",text:"#7a1010",bg:"#fdf0f0",border:"#e87a7a"}
+};
+const FVI_COLOR = {
+  High:{text:"#7a1010",bg:"#fdf0f0",border:"#e87a7a"},
+  Moderate:{text:"#6b4a10",bg:"#fdf5e6",border:"#e8c97a"},
+  Low:{text:"#1e5c3a",bg:"#edf7f1",border:"#a8d5b8"}
+};
+
+const INCOME_RANGES = [
+  {value:"",label:"Select income range"},
+  {value:"under30",label:"Under $30,000"},
+  {value:"30to50",label:"$30,000 – $50,000"},
+  {value:"50to75",label:"$50,000 – $75,000"},
+  {value:"75to100",label:"$75,000 – $100,000"},
+  {value:"100to150",label:"$100,000 – $150,000"},
+  {value:"over150",label:"Over $150,000"},
+  {value:"prefer",label:"Prefer not to answer"}
+];
+const YES_NO = [
+  {value:"",label:"Select"},
+  {value:"yes",label:"Yes"},
+  {value:"no",label:"No"},
+  {value:"prefer",label:"Prefer not to answer"}
+];
+const INJURY_TYPES = [
+  {value:"",label:"Select injury type (optional)"},
+  {value:"mvc",label:"Motor Vehicle Collision"},
+  {value:"workplace",label:"Workplace Injury"},
+  {value:"slip",label:"Slip / Fall"},
+  {value:"assault",label:"Assault / Trauma"},
+  {value:"medical",label:"Medical Complication"},
+  {value:"other",label:"Other"}
+];
+const PRICING = [
+  {id:"individual",label:"Individual Analysis",price:"$295",unit:"per analysis",reports:"Single use",featured:false},
+  {id:"basic",label:"Basic Plan",price:"$495",unit:"/month",reports:"Up to 5 analyses",featured:false},
+  {id:"pro",label:"Professional Plan",price:"$895",unit:"/month",reports:"Up to 20 analyses",featured:true},
+  {id:"enterprise",label:"Enterprise Plan",price:"$1,795",unit:"/month",reports:"Unlimited analyses",featured:false}
+];
+const BLOCKED = ["gmail.com","yahoo.com","hotmail.com","outlook.com","icloud.com","aol.com","proton.me","protonmail.com","mail.com","gmx.com","msn.com","live.com","me.com","att.net","comcast.net","verizon.net","sbcglobal.net","ymail.com"];
+const FREE_LIMIT = 3;
+const USAGE_STORE = {};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────────────────────────────────────
+function isPersonalEmail(e){ return BLOCKED.includes((e.trim().toLowerCase().split("@")[1]||"")); }
+function isValidEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim()); }
+function getUsage(e){ return USAGE_STORE[e.trim().toLowerCase()]||0; }
+function incUsage(e){ const k=e.trim().toLowerCase(); USAGE_STORE[k]=(USAGE_STORE[k]||0)+1; return USAGE_STORE[k]; }
+function fmtDate(d){ const mm=String(d.getMonth()+1).padStart(2,"0"),dd=String(d.getDate()).padStart(2,"0"); return mm+"/"+dd+"/"+d.getFullYear(); }
+function buildPreparedFor(a,f){
+  const at=(a||"").trim(),ft=(f||"").trim();
+  if(at&&ft) return at+", "+ft; if(at) return at; if(ft) return ft; return "Registered User";
+}
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+function computeFVI({incomeRange,hasDependents,isSoleEarner,painScore,psychScore}){
+  const dep=hasDependents==="yes", sole=isSoleEarner==="yes";
+  const unknown=hasDependents==="prefer"||isSoleEarner==="prefer";
+  const u30=incomeRange==="under30", u50=(incomeRange==="under30"||incomeRange==="30to50");
+  const uunk=!incomeRange||incomeRange==="prefer";
+  const pain=painScore||5, psych=psychScore||5;
+  const sev=pain<=2||psych<=2, mod=pain<=3||psych<=3;
+  if(u30&&dep) return "High"; if(sole&&dep) return "High"; if(u50&&dep&&sole) return "High";
+  if(sev&&(dep||sole||u50)) return "High";
+  if(u50&&!dep) return "Moderate"; if(dep&&!sole) return "Moderate"; if(sole&&!dep) return "Moderate";
+  if(uunk&&(dep||sole||unknown)) return "Moderate"; if(mod&&(dep||sole||u50)) return "Moderate";
+  return "Low";
+}
+
+function buildInterp({fciScore,primaryDomains,fvi,painScore,psychScore}){
+  const prim=primaryDomains.join(" and ");
+  const opening="The Functional Capacity Index Analysis provides a structured snapshot of the client's current functional stability across the four domains of the 4Ps of Wellness: Physical, Psychological, Psychosocial, and Professional.";
+  const fciP={
+    5:"Based on the information entered, the client's current Functional Capacity Index indicates stable functional status, with no domain currently reflecting significant instability. At the time of analysis, the client appears able to maintain functional capacity across the assessed domains without substantial disruption to normal activity or role expectations.",
+    4:"Based on the information entered, the client's current Functional Capacity Index indicates mild disruption in functional stability, with the primary area of instability identified in the "+prim+" domain. This may suggest emerging difficulty in maintaining full stability across all areas of functioning, although the client may still retain substantial capacity in daily or occupational roles.",
+    3:"Based on the information entered, the client's current Functional Capacity Index indicates moderate disruption in functional stability, with the primary area of instability identified in the "+prim+" domain. This may suggest noticeable difficulty sustaining normal activity, role expectations, or occupational functioning during the current stage of recovery.",
+    2:"Based on the information entered, the client's current Functional Capacity Index indicates significant disruption in functional stability, with the primary area of instability identified in the "+prim+" domain. This may suggest substantial limitation in the client's ability to maintain normal activity, work responsibilities, or consistent day-to-day functioning during the current stage of recovery.",
+    1:"Based on the information entered, the client's current Functional Capacity Index indicates severe disruption in functional stability, with the primary area of instability identified in the "+prim+" domain. This may suggest profound limitation in the client's ability to sustain normal activity, occupational functioning, or other structured life responsibilities at the time of analysis."
+  };
+  const fviP={
+    Low:"Current vulnerability indicators do not suggest elevated external pressure likely to destabilize recovery trajectory at this time. Continued monitoring may still be appropriate if work status, pain levels, or psychosocial stressors change.",
+    Moderate:"Current vulnerability indicators suggest moderate external pressure that may affect recovery stability or increase the likelihood of functional strain during the course of the case. Monitoring may be beneficial if work demands, financial pressures, or symptom severity increase.",
+    High:"Current vulnerability indicators suggest elevated external pressure that may affect recovery stability or increase the likelihood of premature return to work, reinjury, or disruption to recovery trajectory. This is particularly important when role demands, financial pressures, and ongoing symptoms are present."
+  };
+  const showSym=(painScore!==null&&painScore<=2)||(psychScore!==null&&psychScore<=2);
+  const symP="The presence of elevated pain and/or psychological stress may further affect the client's ability to maintain consistent functional stability. When these factors occur alongside employment or financial pressures, there may be increased risk of premature return to work or disruption to recovery trajectory.";
+  const docP="Documenting these functional changes over time may help illustrate how an injury has affected a client's ability to maintain normal activity, employment, and overall stability during the course of a case.";
+  const closing="This interpretation reflects the client's status at the time the analysis was completed and should be considered within the broader context of medical evaluation, treatment progress, and ongoing case developments.";
+  const paras=[opening, fciP[fciScore]||fciP[1], fviP[fvi]||fviP["Low"]];
+  if(showSym) paras.push(symP);
+  paras.push(docP,closing);
+  return paras;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────────────────────
+const S = {
+  screen:"gate",
+  gate:{attorneyName:"",firmName:"",email:""},
+  emailError:"",
+  ctx:{clientRef:"",doi:"",injuryType:""},
+  fviFields:{incomeRange:"",hasDependents:"",isSoleEarner:""},
+  vulnScores:{pain:null,psych:null},
+  scores:{physical:null,psychological:null,psychosocial:null,professional:null},
+  analysisDate:"",
+  usageCount:0
+};
+
+function setState(patch){ Object.assign(S,patch); render(); }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HTML BUILDERS
+// ─────────────────────────────────────────────────────────────────────────────
+function appHeader(){ return `<header class="app-header no-print"><div class="app-header-left"><span class="app-header-brand">Reconcile Care Management Services</span><span class="app-header-div">|</span><span class="app-header-title">Functional Capacity Index</span></div><span class="app-header-right">Care Management Assessment Tool</span></header>`; }
+
+const PROGRESS_STEPS=["intro","context","vuln-intro","vuln","domain-0","domain-1","domain-2","domain-3"];
+function progressBar(screen){
+  const idx=PROGRESS_STEPS.indexOf(screen);
+  if(idx<0) return "";
+  return `<div class="progress-bar no-print">`+PROGRESS_STEPS.map((_,i)=>`<div class="seg ${i<idx?"done":i===idx?"active":""}"></div>`).join("")+`</div>`;
+}
+
+function fieldWrap(label,req,inner,note,err){
+  return `<div class="field-wrap"><label class="field-label">${esc(label)}${req?`<span class="req">*</span>`:""}</label>${inner}${err?`<p class="field-error">${esc(err)}</p>`:note?`<p class="field-note">${esc(note)}</p>`:""}</div>`;
+}
+function textInput(id,val,ph,type="text"){
+  return `<input class="field-input" type="${type}" id="${id}" value="${esc(val)}" placeholder="${esc(ph)}" autocomplete="off" />`;
+}
+function selectInput(id,val,opts){
+  return `<div class="select-wrap"><select class="field-input select-el" id="${id}">`+opts.map(o=>`<option value="${esc(o.value)}"${o.value===val?" selected":""}>${esc(o.label)}</option>`).join("")+`</select></div>`;
+}
+function dateInput(id,val){
+  return `<input class="field-input" type="date" id="${id}" value="${esc(val)}" />`;
+}
+
+function interpBlock(paras){
+  return `<div class="interp-block print-card"><span class="section-label">Professional Interpretation</span>`+paras.map(p=>`<p class="interp-para print-body-text">${esc(p)}</p>`).join("")+`</div>`;
+}
+function reassessBlock(){
+  return `<div class="reassess-block print-card"><span class="section-label">Why Reassessment Matters</span><p class="interp-para print-body-text">This analysis reflects the client's condition at the time it is completed. Repeated Functional Capacity Index Analyses can help document changes in wellness, stability, and role sustainability over the life of a case.</p><span class="section-sublabel">Recommended Reassessment Points</span><ul class="reassess-list">`+["After a major treatment change","After work status changes","Before mediation or settlement","When new instability develops"].map(i=>`<li class="reassess-item"><span class="reassess-bullet print-bullet">&#9670;</span><span class="print-body-text">${esc(i)}</span></li>`).join("")+`</ul></div>`;
+}
+function disclaimerBlock(){
+  return `<div class="disclaimer-block print-card"><p class="disclaimer-text">The Functional Capacity Index is a structured care management assessment framework developed by Reconcile Care Management Services. It is not a scientific, diagnostic, or clinical instrument and does not replace medical evaluation, clinical judgment, psychological assessment, or legal analysis. Results are intended to support care management documentation and case support purposes only. All assessments should be interpreted by a qualified care management professional in the appropriate clinical and legal context.</p></div>`;
+}
+
+function scoreBarRow(d,s,isWeakest){
+  const cl=FCI_CLASS[s];
+  return `<div class="score-row"><span class="score-row-label print-body-text">${esc(d.label)}</span><div class="score-bar-track"><div class="score-bar-fill ${isWeakest?"print-bar-fill-weak":"print-bar-fill"}" style="width:${(s/5)*100}%;background:${isWeakest?"#7a2e10":"#0c1c34"}"></div></div><span class="score-num print-body-text" style="color:${isWeakest?"#7a2e10":"#0c1c34"};font-weight:${isWeakest?"bold":"normal"}">${s}</span><span class="score-badge print-badge" style="color:${cl.text};background:${cl.bg};border:1px solid ${cl.border}">${esc(cl.label)}</span></div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SCREEN RENDERERS
+// ─────────────────────────────────────────────────────────────────────────────
+function screenGate(){
+  return appHeader()+`<div class="container"><span class="eyebrow">Access Registration</span><h2 class="section-title">Professional Information</h2><p class="subtitle">This tool is available to licensed attorneys and their authorized staff. Please provide your professional contact information to access the assessment. A company or firm email address is required.</p><div class="card">`+
+    fieldWrap("Attorney Name",true,textInput("gate-name",S.gate.attorneyName,"Full name"))+
+    fieldWrap("Firm Name",true,textInput("gate-firm",S.gate.firmName,"Law firm or organization name"))+
+    fieldWrap("Professional / Firm Email Address",true,textInput("gate-email",S.gate.email,"name@yourfirm.com","email"),"A professional or firm email address is required. Personal email accounts are not accepted.",S.emailError)+
+    `<div class="callout" style="margin-top:8px;margin-bottom:24px"><p style="font-size:13px;color:#3a4a5a;line-height:1.7;margin:0">This tool includes <strong>3 complimentary Functional Capacity Index Analyses</strong> per registered email address. Subscription plans are available for ongoing access.</p></div>
+    <div class="field-wrap" style="margin-bottom:24px"><label class="field-label" style="display:flex;align-items:flex-start;gap:10px;font-weight:normal;cursor:pointer"><input type="checkbox" id="gate-terms" style="margin-top:3px;flex-shrink:0" /> I confirm that I am a legal professional or member of a law firm and that the information provided is accurate.</label></div>
+    <div style="display:flex;justify-content:flex-end"><button type="button" class="btn-primary" id="gate-submit" ${!(S.gate.attorneyName.trim()&&S.gate.firmName.trim()&&S.gate.email.trim())?"disabled":""}>Continue &rarr;</button></div></div></div>`;
+}
+
+function screenIntro(){
+  return appHeader()+`<div class="container">`+progressBar("intro")+`<div class="card"><span class="eyebrow">Care Management Assessment Tool</span><h1 style="font-size:34px;font-weight:normal;color:#0c1c34;margin:0 0 6px;letter-spacing:0.01em">Functional Capacity Index</h1><p style="font-size:17px;color:#3a4a5a;margin:0 0 32px;line-height:1.6">A structured evaluation of holistic wellness across the 4Ps of Wellness</p><hr class="light" style="margin:0 0 32px"><p style="font-size:15px;line-height:1.85;color:#0e1c2e;margin:0 0 18px">The <strong>Functional Capacity Index (FCI)</strong> is a structured care management assessment tool developed by Reconcile Care Management Services. This analysis evaluates how a client's current condition across the 4Ps of Wellness may affect their ability to sustain work or continue in a professional or occupational role.</p><p style="font-size:15px;line-height:1.85;color:#0e1c2e;margin:0 0 32px">This assessment is designed to be completed thoughtfully. The value of this analysis depends on responses that reflect what is actually being experienced — not what is desired or hoped for. Estimated completion time: approximately 8–10 minutes.</p><div class="grid-4p">`+
+    [{p:"Physical",d:"Functional mobility, pain, and medical stability"},{p:"Psychological",d:"Emotional regulation, mental health, and cognitive functioning"},{p:"Psychosocial",d:"Support systems, relationships, and environmental stability"},{p:"Professional",d:"Occupational functioning, work capacity, and financial stability"}].map(x=>`<div class="fourp-card"><span class="fourp-label">${x.p} Wellness</span><span class="fourp-desc">${x.d}</span></div>`).join("")+
+    `</div><div class="callout" style="margin-bottom:32px"><span class="callout-label">Framework Notice</span><p style="font-size:13px;color:#3a4a5a;line-height:1.8;margin:0">The Functional Capacity Index is a structured care management assessment framework. It is not a scientific, diagnostic, or clinical instrument and does not replace medical evaluation, clinical judgment, or legal analysis. Results support care management documentation and case support purposes only.</p></div>
+    <div class="nav-row no-print"><button type="button" class="btn-ghost" id="intro-back">&larr; Back</button><button type="button" class="btn-primary" id="intro-next">Begin Analysis &rarr;</button></div></div></div>`;
+}
+
+function screenContext(){
+  return appHeader()+`<div class="container">`+progressBar("context")+`<span class="eyebrow">Step 1 of 8 — Client Context</span><h2 class="section-title">Client / Case Context</h2><div style="margin-bottom:32px"><p style="font-size:15px;color:#3a4a5a;line-height:1.75;margin:0 0 14px">The following information provides contextual factors that may influence the client's functional stability and recovery environment. These factors may contribute to the Functional Vulnerability Indicator but do not change the Functional Capacity Index score.</p><p style="font-size:15px;color:#3a4a5a;line-height:1.75;margin:0">This information helps identify circumstances that may increase pressure on recovery or influence return-to-work decisions during the course of a case.</p></div><div class="card"><div class="grid-2">`+
+    fieldWrap("Client Reference (Optional)",false,textInput("ctx-ref",S.ctx.clientRef,"Initials, file number, or case ID"),"Do not enter full name or SSN.")+
+    `<div class="field-wrap"><label class="field-label">Date of Injury</label>${dateInput("ctx-doi",S.ctx.doi)}</div>`+
+    fieldWrap("Injury Type (Optional)",false,selectInput("ctx-injury",S.ctx.injuryType,INJURY_TYPES))+
+    `</div><div class="nav-row no-print"><button type="button" class="btn-ghost" id="ctx-back">&larr; Back</button><span class="nav-status">No required fields on this page</span><button type="button" class="btn-primary" id="ctx-next">Next &rarr;</button></div></div></div>`;
+}
+
+function screenVulnIntro(){
+  return appHeader()+`<div class="container">`+progressBar("vuln-intro")+`<span class="eyebrow">Step 2 of 8 — Vulnerability Overview</span><h2 class="section-title">Functional Vulnerability Indicator</h2><div class="card"><p style="font-size:15px;color:#3a4a5a;line-height:1.85;margin:0 0 20px">The Functional Vulnerability Indicator identifies contextual factors that may increase pressure on a client's recovery trajectory or increase the likelihood of premature return to work before full recovery or medical clearance.</p><p style="font-size:15px;color:#3a4a5a;line-height:1.85;margin:0 0 20px">This portion of the analysis considers factors such as income level, dependent responsibilities, sole income earner status, pain related to injury, and psychological stress. These factors may increase vulnerability during recovery and may affect the client's ability to maintain stability over the life of a case.</p><p style="font-size:15px;color:#3a4a5a;line-height:1.85;margin:0 0 32px">These indicators help inform the Functional Vulnerability Indicator but <strong>do not</strong> change the Functional Capacity Index score.</p><div class="callout" style="margin-bottom:32px"><span class="callout-label">Indicators Covered</span><ul style="margin:0;padding:0;list-style:none">`+
+    ["Pre-Injury Annual Income Range","Dependent Responsibilities","Sole Income Earner Status","Pain Related to Injury","Psychological Stress (Depression / Anxiety)"].map(i=>`<li style="display:flex;align-items:baseline;gap:10px;font-size:13px;color:#3a4a5a;padding:7px 0;border-bottom:1px solid #e8e3d8"><span style="color:#b8922a;font-size:10px;flex-shrink:0">&#9670;</span>${esc(i)}</li>`).join("")+
+    `</ul></div><div class="nav-row no-print"><button type="button" class="btn-ghost" id="vi-back">&larr; Back</button><button type="button" class="btn-primary" id="vi-next">Continue to Vulnerability Indicators &rarr;</button></div></div></div>`;
+}
+
+function screenVuln(){
+  const can=S.fviFields.incomeRange!==""&&S.fviFields.hasDependents!==""&&S.fviFields.isSoleEarner!==""&&S.vulnScores.pain!==null&&S.vulnScores.psych!==null;
+  const shortL={5:"Minimal",4:"Mild",3:"Moderate",2:"Significant",1:"Severe"};
+  let html=appHeader()+`<div class="container">`+progressBar("vuln")+`<span class="eyebrow">Step 3 of 8 — Vulnerability Indicators</span><h2 class="section-title">Functional Vulnerability Indicators</h2><p class="subtitle">These indicators help identify factors that may increase vulnerability during recovery. They may influence the Functional Vulnerability Indicator but <span style="font-style:normal">do not</span> change the Functional Capacity Index score.</p><div class="card"><div style="margin-bottom:28px;padding-bottom:28px;border-bottom:1px solid #e8e3d8"><span class="vuln-section-label">Financial &amp; Household Context</span><div class="grid-3">`+
+    fieldWrap("Pre-Injury Annual Income Range",true,selectInput("fvi-income",S.fviFields.incomeRange,INCOME_RANGES),"Used to calculate the Functional Vulnerability Indicator.")+
+    fieldWrap("Dependents",true,selectInput("fvi-dep",S.fviFields.hasDependents,YES_NO),"Does the client have financial dependents?")+
+    fieldWrap("Sole Income Earner",true,selectInput("fvi-sole",S.fviFields.isSoleEarner,YES_NO),"Is the client the primary or sole household income earner?")+
+    `</div></div>`;
+  VULN_INDICATORS.forEach((ind,i)=>{
+    if(i>0) html+=`<hr class="light" style="margin:8px 0 24px">`;
+    html+=`<span class="vuln-indicator-label">${esc(ind.label)}</span><p style="font-size:13px;color:#3a4a5a;line-height:1.75;margin:0 0 14px">${esc(ind.intro)}</p><div class="hscale-row">`;
+    [5,4,3,2,1].forEach(sc=>{
+      const active=S.vulnScores[ind.id]===sc;
+      html+=`<button type="button" class="hscale-btn${active?" active":""}" data-ind="${ind.id}" data-sc="${sc}"><span class="hscale-score">${sc}</span><span class="hscale-label${active?" active":""}">${shortL[sc]}</span></button>`;
+    });
+    html+=`</div>`;
+    const sel=ind.levels.find(l=>l.score===S.vulnScores[ind.id]);
+    if(sel) html+=`<div class="hscale-detail"><p class="hscale-detail-title">${esc(sel.title)}</p><p class="hscale-detail-desc">${esc(sel.description)}</p></div>`;
+  });
+  html+=`<div class="nav-row no-print"><button type="button" class="btn-ghost" id="vuln-back">&larr; Back</button><span class="nav-status">${can?"All indicators complete":"Complete all fields to continue"}</span><button type="button" class="btn-primary" id="vuln-next" ${can?"":"disabled"}>Begin Assessment &rarr;</button></div></div></div>`;
+  return html;
+}
+
+function screenDomain(idx){
+  const dom=DOMAINS[idx];
+  const cur=S.scores[dom.id];
+  const stepNum=idx+5;
+  const shortL={5:"Minimal",4:"Mild",3:"Moderate",2:"Significant",1:"Severe"};
+  let html=appHeader()+`<div class="container">`+progressBar("domain-"+idx)+`<span class="eyebrow">Step ${stepNum} of 8 — Domain Assessment</span><h2 class="section-title">${esc(dom.label)}</h2><p class="subtitle">${esc(dom.subtitle)}</p><div style="font-size:14px;color:#0e1c2e;margin-bottom:22px;padding:14px 20px;background:#faf8f4;border:1px solid #e8e3d8;border-left:3px solid #b8922a;line-height:1.7">Select the level that most accurately reflects the client's current situation in this domain. Choose the <strong>lowest level</strong> that accurately applies.</div>`;
+  dom.levels.slice().sort((a,b)=>b.score-a.score).forEach(lv=>{
+    const active=cur===lv.score;
+    html+=`<div class="level-card${active?" active":""}" data-domain="${dom.id}" data-score="${lv.score}"><div class="level-num${active?" active":""}">${lv.score}</div><div><p class="level-title${active?" active":""}">${esc(lv.title)}</p><p class="level-desc">${esc(lv.description)}</p></div></div>`;
+  });
+  const last=idx===DOMAINS.length-1;
+  html+=`<div class="nav-row no-print"><button type="button" class="btn-ghost" id="dom-back">&larr; Back</button><span class="nav-status">${cur?"Level "+cur+" selected":"No level selected"}</span><button type="button" class="btn-primary" id="dom-next" ${cur?"":"disabled"}>${last?"Review Analysis &rarr;":"Next Domain &rarr;"}</button></div></div>`;
+  return html;
+}
+
+function screenReview(){
+  const sv=DOMAINS.map(d=>S.scores[d.id]).filter(Boolean);
+  const minS=sv.length===4?Math.min(...sv):null;
+  const weak=minS?DOMAINS.filter(d=>S.scores[d.id]===minS).map(d=>d.label):[];
+  const fvi=computeFVI({...S.fviFields,painScore:S.vulnScores.pain,psychScore:S.vulnScores.psych});
+  const paras=buildInterp({fciScore:minS,primaryDomains:weak,fvi,painScore:S.vulnScores.pain,psychScore:S.vulnScores.psych});
+  const doiDisp=S.ctx.doi?fmtDate(new Date(S.ctx.doi+"T12:00:00")):null;
+
+  let html=appHeader()+`<div class="container"><span class="eyebrow">Analysis Review</span><h2 class="section-title">Review Before Generating Final Analysis</h2><p style="font-size:15px;color:#3a4a5a;line-height:1.7;margin:0 0 32px">Review the interpretation and input summary below. When ready, click <strong>Review and Print Analysis</strong> to generate the final Functional Capacity Index Analysis.</p>`;
+  html+=interpBlock(paras)+reassessBlock();
+  html+=`<div class="card print-card" style="margin-bottom:24px"><span class="section-label">Summary of Inputs</span><span class="section-sublabel">4Ps Domain Scores</span>`;
+  DOMAINS.forEach(d=>{ const s=S.scores[d.id]; html+=scoreBarRow(d,s,s===minS); });
+  html+=`<div style="border-top:1px solid #e8e3d8;padding-top:18px;margin-top:18px"><span class="section-sublabel">Vulnerability Indicators</span><div class="grid-context-2">`;
+  VULN_INDICATORS.forEach(ind=>{ const s=S.vulnScores[ind.id]; const t=ind.levels.find(l=>l.score===s)?.title||"—"; html+=`<div class="data-cell"><span class="data-cell-label">${esc(ind.label)}</span><span class="data-cell-value">${s} — ${esc(t)}</span></div>`; });
+  html+=`</div></div><div style="border-top:1px solid #e8e3d8;padding-top:18px;margin-top:18px"><span class="section-sublabel">Financial &amp; Household Context</span><div class="grid-context-3">`;
+  [[S.fviFields.incomeRange,INCOME_RANGES,"Income Range"],[S.fviFields.hasDependents,YES_NO,"Dependents"],[S.fviFields.isSoleEarner,YES_NO,"Sole Income Earner"]].forEach(([v,opts,lbl])=>{
+    const disp=(opts.find(o=>o.value===v)||{label:"—"}).label;
+    html+=`<div class="data-cell"><span class="data-cell-label">${esc(lbl)}</span><span class="data-cell-value">${esc(disp)}</span></div>`;
+  });
+  html+=`</div></div>`;
+  if(S.ctx.clientRef||doiDisp||S.ctx.injuryType){
+    html+=`<div style="border-top:1px solid #e8e3d8;padding-top:16px;margin-top:16px;display:flex;gap:32px;flex-wrap:wrap">`;
+    if(S.ctx.clientRef) html+=`<div><span class="data-cell-label">Client Reference</span><span class="data-cell-value">${esc(S.ctx.clientRef)}</span></div>`;
+    if(doiDisp) html+=`<div><span class="data-cell-label">Date of Injury</span><span class="data-cell-value">${esc(doiDisp)}</span></div>`;
+    if(S.ctx.injuryType){ const t=(INJURY_TYPES.find(x=>x.value===S.ctx.injuryType)||{label:S.ctx.injuryType}).label; html+=`<div><span class="data-cell-label">Injury Type</span><span class="data-cell-value">${esc(t)}</span></div>`; }
+    html+=`</div>`;
+  }
+  html+=`</div><div class="nav-row no-print"><button type="button" class="btn-ghost" id="rev-back">&larr; Back to Assessment</button><button type="button" class="btn-primary" id="rev-next">Review and Print Analysis &rarr;</button></div></div>`;
+  return html;
+}
+
+function screenFinal(){
+  const sv=DOMAINS.map(d=>S.scores[d.id]).filter(Boolean);
+  const minS=Math.min(...sv);
+  const weak=DOMAINS.filter(d=>S.scores[d.id]===minS).map(d=>d.label);
+  const fci=FCI_CLASS[minS];
+  const fvi=computeFVI({...S.fviFields,painScore:S.vulnScores.pain,psychScore:S.vulnScores.psych});
+  const fviC=FVI_COLOR[fvi];
+  const paras=buildInterp({fciScore:minS,primaryDomains:weak,fvi,painScore:S.vulnScores.pain,psychScore:S.vulnScores.psych});
+  const prepFor=buildPreparedFor(S.gate.attorneyName,S.gate.firmName);
+  const doiDisp=S.ctx.doi?fmtDate(new Date(S.ctx.doi+"T12:00:00")):null;
+  const used=S.usageCount, rem=Math.max(0,FREE_LIMIT-used), lim=used>=FREE_LIMIT;
+
+  let html=appHeader();
+  html+=`<div class="final-nav-bar no-print"><button type="button" class="btn-ghost" id="fin-back">&larr; Back to Review</button><span class="final-nav-hint">Use the Print Analysis button below to save or print this document.</span></div>`;
+  html+=`<div class="print-root" style="max-width:860px;margin:0 auto;padding:48px 32px 80px">`;
+
+  // Report header
+  html+=`<div class="report-header print-card"><div class="report-header-inner"><div><span class="report-brand">Reconcile Care Management Services</span><h1 class="report-title">Functional Capacity Index Analysis</h1><div class="report-meta">`;
+  [["Prepared for",prepFor],["Prepared by","Reconcile Care Management Services"],["Analysis Date",S.analysisDate]].forEach(([l,v])=>{
+    html+=`<div class="report-meta-row"><span class="report-meta-label">${esc(l)}</span><span class="report-meta-value">${esc(v)}</span></div>`;
+  });
+  if(S.ctx.clientRef) html+=`<div class="report-meta-row"><span class="report-meta-label">Client Ref</span><span class="report-meta-value">${esc(S.ctx.clientRef)}</span></div>`;
+  if(doiDisp) html+=`<div class="report-meta-row"><span class="report-meta-label">Date of Injury</span><span class="report-meta-value">${esc(doiDisp)}</span></div>`;
+  html+=`</div></div><div class="report-right"><span class="report-right-label">4Ps of Wellness</span><span class="report-right-sub">Care Management Assessment Tool</span></div></div></div>`;
+
+  // FCI / FVI / Primary tiles
+  html+=`<div class="grid-tiles-3">`;
+  html+=`<div class="summary-tile print-summary-tile" style="background:${fci.bg};border:1px solid ${fci.border};border-top-color:${fci.text}"><span class="summary-tile-label">Functional Capacity Index</span><div class="summary-tile-score" style="color:${fci.text}">${minS}</div><div class="summary-tile-status" style="color:${fci.text}">${esc(fci.label)}</div><div class="summary-tile-sub">Score: ${minS} / 5 — Lowest Domain</div></div>`;
+  html+=`<div class="summary-tile print-summary-tile" style="background:${fviC.bg};border:1px solid ${fviC.border};border-top-color:${fviC.text}"><span class="summary-tile-label">Functional Vulnerability Indicator</span><div class="summary-tile-fvi" style="color:${fviC.text}">${esc(fvi)}</div><div class="summary-tile-fvi-sub" style="color:${fviC.text}">Vulnerability Pressure Level</div><div class="summary-tile-sub">Contextual &middot; Does Not Affect FCI</div></div>`;
+  html+=`<div class="summary-tile print-summary-tile" style="background:#fdf0ea;border:1px solid #e8b89a;border-top-color:#7a2e10"><span class="summary-tile-label">Primary Instability Domain</span>${weak.map((d,i)=>`<div class="summary-tile-primary" style="font-size:${i===0?"15px":"13px"};color:#4a1a0a">${esc(d)}</div>`).join("")}<div class="summary-tile-sub" style="margin-top:10px">Lowest Scoring Domain</div></div>`;
+  html+=`</div>`;
+
+  // Domain score summary
+  html+=`<div class="card print-card" style="margin-bottom:24px"><span class="section-label">Domain Score Summary — 4Ps of Wellness</span>`;
+  DOMAINS.forEach(d=>{ html+=scoreBarRow(d,S.scores[d.id],S.scores[d.id]===minS); });
+  html+=`</div>`;
+
+  // Vulnerability context
+  html+=`<div class="card print-card" style="margin-bottom:24px"><span class="section-label">Functional Vulnerability Context</span><div class="grid-context-3">`;
+  [[S.fviFields.incomeRange,INCOME_RANGES,"Income Range"],[S.fviFields.hasDependents,YES_NO,"Dependents"],[S.fviFields.isSoleEarner,YES_NO,"Sole Income Earner"]].forEach(([v,opts,lbl])=>{
+    const disp=(opts.find(o=>o.value===v)||{label:"—"}).label;
+    html+=`<div class="data-cell"><span class="data-cell-label">${esc(lbl)}</span><span class="data-cell-value print-body-text">${esc(disp)}</span></div>`;
+  });
+  html+=`</div><div class="grid-context-2" style="margin-top:12px">`;
+  VULN_INDICATORS.forEach(ind=>{ const s=S.vulnScores[ind.id]; const t=ind.levels.find(l=>l.score===s)?.title||"—"; html+=`<div class="data-cell"><span class="data-cell-label">${esc(ind.label)}</span><span class="data-cell-value print-body-text">${s} — ${esc(t)}</span></div>`; });
+  html+=`</div><p class="print-body-text" style="font-size:13px;color:#3a4a5a;line-height:1.8;margin:16px 0 0">The Functional Vulnerability Indicator identifies circumstances that may create pressure to return to work or resume responsibilities before full recovery or medical release. It does not change the Functional Capacity Index score.</p></div>`;
+
+  html+=interpBlock(paras)+reassessBlock()+disclaimerBlock();
+
+  // Print footer (print only)
+  html+=`<div class="print-footer" style="border-top:1px solid #ccc;padding-top:12px;margin-top:8px"><p class="print-footer-text">Functional Capacity Index Analysis generated by Reconcile Care Management Services</p></div>`;
+
+  // UI-only block
+  html+=`<div class="no-print">`;
+  // Print button
+  html+=`<div style="background:#fff;border:1px solid #d6d0c4;padding:24px 40px;margin-top:24px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center"><div><span style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#9aabb8;display:block;margin-bottom:4px">Document Options</span><p style="font-size:13px;color:#3a4a5a;margin:0">Use your browser's print function to save this analysis as a PDF or printed document.</p></div><button type="button" id="print-btn" class="btn-primary">Print Analysis</button></div>`;
+  // Usage
+  html+=`<div style="background:#fff;border:1px solid #d6d0c4;padding:28px 40px;margin-bottom:20px"><span style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#9aabb8;display:block;margin-bottom:18px">Complimentary Access Status</span><div class="usage-grid"><div class="data-cell"><span class="data-cell-label">Complimentary Analyses Used</span><span style="font-size:20px;color:#0c1c34">${used} of ${FREE_LIMIT}</span></div><div class="data-cell" style="${lim?"background:#fdf0f0;border-color:#e87a7a":""}"><span class="data-cell-label">Complimentary Analyses Remaining</span><span style="font-size:20px;color:${lim?"#7a1010":"#0c1c34"}">${rem}</span></div></div>`;
+  if(lim){
+    html+=`<div style="background:#fdf0f0;border:1px solid #e8c0c0;padding:20px 24px"><p style="font-size:13px;font-weight:bold;color:#7a1010;margin:0 0 8px">Free Analyses Limit Reached</p><p style="font-size:13px;color:#7a1010;margin:0;line-height:1.65">You have used the three complimentary Functional Capacity Index Analyses available for this tool. If you would like to purchase additional analyses, an upgrade to a subscription plan is required.</p></div>`;
+  } else {
+    html+=`<div style="display:flex;align-items:center;gap:16px"><button type="button" class="btn-primary" id="new-analysis">Start New Analysis &rarr;</button><span style="font-size:12px;color:#9aabb8">${rem} complimentary ${rem===1?"analysis":"analyses"} remaining</span></div>`;
+  }
+  html+=`</div>`;
+  // Pricing
+  html+=`<div style="margin-bottom:20px"><span style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#9aabb8;display:block;margin-bottom:6px">Subscription Access</span><h3 style="font-size:18px;font-weight:normal;color:#0c1c34;margin:0 0 6px">Ongoing Access Plans</h3><p style="font-size:13px;color:#6a7a8a;margin:0 0 16px">Subscribe to run additional Functional Capacity Index Analyses and document changes over the life of the case.</p><div class="grid-tiles-4">`;
+  PRICING.forEach(t=>{
+    html+=`<div class="price-card${t.featured?" price-featured":""}" style="background:${t.featured?"#0c1c34":"#fff"};border:${t.featured?"2px solid #b8922a":"1px solid #d6d0c4"}">`;
+    if(t.featured) html+=`<div class="price-popular-badge">Most Popular</div>`;
+    const ctaLabel=t.id==="individual"?"Purchase":"Subscribe";
+    html+=`<div style="margin-top:${t.featured?"8px":"0"}"><span class="price-label" style="color:${t.featured?"#b8922a":"#9aabb8"}">${esc(t.label)}</span><div class="price-amount-row"><span class="price-amount" style="color:${t.featured?"#f0ece3":"#0c1c34"}">${esc(t.price)}</span><span class="price-unit" style="color:${t.featured?"#8aaccc":"#6a7a8a"}">${esc(t.unit)}</span></div><p class="price-reports" style="color:${t.featured?"#c8d8e8":"#3a4a5a"}">${esc(t.reports)}</p><div class="price-cta" style="border-top:1px solid ${t.featured?"#1e3a60":"#e8e3d8"}"><button type="button" onclick="startFciCheckout('${t.id}')" style="width:100%;padding:9px 0;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;font-family:'Georgia','Times New Roman',serif;background:${t.featured?"#b8922a":"#0c1c34"};color:${t.featured?"#0c1c34":"#e8e2d4"};border:none">${ctaLabel}</button></div></div></div>`;
+  });
+  html+=`</div><p style="font-size:11px;color:#9aabb8;margin:12px 0 0;font-style:italic">Contact Reconcile Care Management Services to set up a subscription plan.</p></div>`;
+  html+=`</div>`; // end no-print
+  html+=`</div>`; // end print-root
+  return html;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RENDER + EVENT BINDING
+// ─────────────────────────────────────────────────────────────────────────────
+function render(){
+  const app=document.getElementById("app");
+  const sc=S.screen;
+  let html="";
+
+  if(sc==="gate") html=screenGate();
+  else if(sc==="intro") html=screenIntro();
+  else if(sc==="context") html=screenContext();
+  else if(sc==="vuln-intro") html=screenVulnIntro();
+  else if(sc==="vuln") html=screenVuln();
+  else if(sc.startsWith("domain-")) html=screenDomain(parseInt(sc.split("-")[1]));
+  else if(sc==="review") html=screenReview();
+  else if(sc==="final") html=screenFinal();
+
+  app.innerHTML=html;
+  bindEvents();
+  window.scrollTo(0,0);
+}
+
+function bindEvents(){
+  const sc=S.screen;
+
+  // Live input sync helpers
+  function live(id,fn){ const el=document.getElementById(id); if(el) el.addEventListener(el.tagName==="SELECT"?"change":"input",fn); }
+
+  if(sc==="gate"){
+    live("gate-name",e=>{ S.gate.attorneyName=e.target.value; updateGateBtn(); });
+    live("gate-firm",e=>{ S.gate.firmName=e.target.value; updateGateBtn(); });
+    live("gate-email",e=>{ S.gate.email=e.target.value; S.emailError=""; updateGateBtn(); });
+    bind("gate-submit",()=>handleGate());
+  }
+  if(sc==="intro"){
+    bind("intro-back",()=>setState({screen:"gate"}));
+    bind("intro-next",()=>setState({screen:"context"}));
+  }
+  if(sc==="context"){
+    live("ctx-ref",e=>{ S.ctx.clientRef=e.target.value; });
+    live("ctx-doi",e=>{ S.ctx.doi=e.target.value; });
+    live("ctx-injury",e=>{ S.ctx.injuryType=e.target.value; });
+    bind("ctx-back",()=>setState({screen:"intro"}));
+    bind("ctx-next",()=>setState({screen:"vuln-intro"}));
+  }
+  if(sc==="vuln-intro"){
+    bind("vi-back",()=>setState({screen:"context"}));
+    bind("vi-next",()=>setState({screen:"vuln"}));
+  }
+  if(sc==="vuln"){
+    live("fvi-income",e=>{ S.fviFields.incomeRange=e.target.value; render(); });
+    live("fvi-dep",e=>{ S.fviFields.hasDependents=e.target.value; render(); });
+    live("fvi-sole",e=>{ S.fviFields.isSoleEarner=e.target.value; render(); });
+    document.querySelectorAll(".hscale-btn").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        const ind=btn.dataset.ind, sc2=parseInt(btn.dataset.sc);
+        S.vulnScores={...S.vulnScores,[ind]:sc2};
+        render();
+      });
+    });
+    bind("vuln-back",()=>setState({screen:"vuln-intro"}));
+    bind("vuln-next",()=>setState({screen:"domain-0"}));
+  }
+  if(sc.startsWith("domain-")){
+    const idx=parseInt(sc.split("-")[1]);
+    const dom=DOMAINS[idx];
+    document.querySelectorAll(".level-card").forEach(card=>{
+      card.addEventListener("click",()=>{
+        S.scores={...S.scores,[card.dataset.domain]:parseInt(card.dataset.score)};
+        render();
+      });
+    });
+    bind("dom-back",()=>{ if(idx===0) setState({screen:"vuln"}); else setState({screen:"domain-"+(idx-1)}); });
+    bind("dom-next",()=>{ if(idx<DOMAINS.length-1) setState({screen:"domain-"+(idx+1)}); else setState({screen:"review"}); });
+  }
+  if(sc==="review"){
+    bind("rev-back",()=>setState({screen:"domain-"+(DOMAINS.length-1)}));
+    bind("rev-next",()=>{
+      S.analysisDate=fmtDate(new Date());
+      S.usageCount=incUsage(S.gate.email);
+      setState({screen:"final"});
+    });
+  }
+  if(sc==="final"){
+    bind("fin-back",()=>setState({screen:"review"}));
+    const pb=document.getElementById("print-btn");
+    if(pb) pb.addEventListener("click",()=>{ window.print(); });
+    bind("new-analysis",()=>{
+      S.scores={physical:null,psychological:null,psychosocial:null,professional:null};
+      S.vulnScores={pain:null,psych:null};
+      S.ctx={clientRef:"",doi:"",injuryType:""};
+      S.fviFields={incomeRange:"",hasDependents:"",isSoleEarner:""};
+      setState({screen:"context"});
+    });
+  }
+}
+
+function bind(id,fn){ const el=document.getElementById(id); if(el) el.addEventListener("click",fn); }
+
+function updateGateBtn(){
+  const btn=document.getElementById("gate-submit");
+  if(!btn) return;
+  const ok=S.gate.attorneyName.trim()&&S.gate.firmName.trim()&&S.gate.email.trim();
+  btn.disabled=!ok;
+}
+
+function handleGate(){
+  S.emailError="";
+  const email=S.gate.email.trim();
+  if(!isValidEmail(email)){ S.emailError="Please enter a valid email address."; render(); return; }
+  if(isPersonalEmail(email)){ S.emailError="Access is available only to verified professional or firm email addresses.\nPlease enter your law firm or company email to continue."; render(); return; }
+  S.usageCount=getUsage(email);
+  setState({screen:"intro"});
+}
+
+function startFciCheckout(plan){
+  // Wire to your checkout (e.g. Supabase Edge Function) when ready.
+  console.log("startFciCheckout", plan);
+}
+window.startFciCheckout = startFciCheckout;
+
+// Initial render
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C.A.R.E. Clinical Sequencing Auditor™ | Educational Overview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #0f2a44;
+      --navy-hover: #163566;
+      --gold: #b09837;
+      --gold-subtle: rgba(176, 152, 55, 0.25);
+      --off-white: #f8f7f4;
+      --near-black: #1a1a1a;
+      --text-muted: #4a4a4a;
+      --white: #ffffff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--off-white);
+      color: var(--near-black);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    /* ── HEADER ── */
+    .header-band {
+      background: var(--navy);
+      padding: 0;
+      border-bottom: 5px solid var(--gold);
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: stretch;
+      min-height: 160px;
+    }
+
+    .header-accent-bar {
+      width: 6px;
+      background: var(--gold);
+      flex-shrink: 0;
+      margin-right: 40px;
+    }
+
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 40px 32px 40px 0;
+      flex: 1;
+    }
+
+    .header-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 10px;
+      opacity: 0.9;
+    }
+
+    .title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(24px, 3.5vw, 36px);
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+    .title .tm {
+      font-size: 11px;
+      vertical-align: super;
+      opacity: 0.85;
+    }
+    .subtitle {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.78);
+      font-weight: 400;
+      max-width: 580px;
+      line-height: 1.55;
+    }
+
+    /* ── INTRO BAND ── */
+    .intro-band {
+      background: #122d48;
+      border-bottom: 1px solid rgba(176, 152, 55, 0.3);
+      padding: 22px 0;
+    }
+
+    .intro-inner {
+      display: flex;
+      align-items: center;
+      gap: 48px;
+      flex-wrap: wrap;
+    }
+
+    .intro-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--gold);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .intro-pills {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      background: rgba(176, 152, 55, 0.15);
+      border: 1px solid rgba(176, 152, 55, 0.4);
+      color: rgba(255,255,255,0.88);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 16px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    /* ── MAIN ── */
+    main {
+      padding: 48px 0 60px;
+    }
+
+    .cards-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(18px, 2.2vw, 22px);
+      font-weight: 700;
+      color: var(--near-black);
+      margin-bottom: 24px;
+    }
+
+    /* ── HORIZONTAL ROW CARDS ── */
+    .cards-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 44px;
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid #e5dfcf;
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      align-items: stretch;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+      transition: all 0.25s ease;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(10, 37, 64, 0.1);
+      border-color: var(--gold);
+    }
+
+    .card-label-col {
+      width: 220px;
+      min-width: 220px;
+      background: var(--navy);
+      border-right: 4px solid var(--gold);
+      padding: 28px 24px;
+      display: flex;
+      align-items: center;
+    }
+
+    .card-header {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--white);
+      line-height: 1.45;
+    }
+
+    .card-content-col {
+      flex: 1;
+      padding: 28px 36px;
+      display: flex;
+      gap: 40px;
+      align-items: flex-start;
+    }
+
+    .card-col {
+      flex: 1;
+    }
+
+    .card p {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--near-black);
+      margin-bottom: 10px;
+      line-height: 1.65;
+    }
+    .card p:last-child { margin-bottom: 0; }
+
+    .attorney-list {
+      list-style: none;
+      margin-bottom: 10px;
+    }
+    .attorney-list li {
+      position: relative;
+      padding-left: 16px;
+      margin-bottom: 4px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    .attorney-list li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--gold);
+    }
+
+    .dash-list {
+      list-style: none;
+      margin: 8px 0 10px;
+    }
+    .dash-list li {
+      position: relative;
+      padding-left: 1.4em;
+      margin-bottom: 5px;
+      font-size: 14px;
+      color: var(--near-black);
+    }
+    .dash-list li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--gold);
+    }
+
+    .bullet-list {
+      list-style: none;
+      margin: 8px 0 10px;
+    }
+    .bullet-list li {
+      position: relative;
+      padding-left: 1.4em;
+      margin-bottom: 5px;
+      font-size: 14px;
+      color: var(--near-black);
+    }
+    .bullet-list li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--gold);
+    }
+
+    .card-tagline {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--navy);
+      letter-spacing: 0.03em;
+    }
+
+    /* ── DIVIDER ── */
+    .divider-gold {
+      width: 100%;
+      height: 1px;
+      background: var(--gold);
+      margin: 36px 0;
+      opacity: 0.5;
+    }
+
+    /* ── CREDIBILITY + CTA ── */
+    .credibility-strip {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .credibility-strip .sep {
+      color: var(--gold);
+      margin: 0 0.5em;
+    }
+
+    .cta-wrap { text-align: center; }
+
+    .cta-btn {
+      display: inline-block;
+      background: var(--navy);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 15px 32px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .cta-btn:hover {
+      background: var(--navy-hover);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 720px) {
+      .card {
+        flex-direction: column;
+      }
+      .card-label-col {
+        width: 100%;
+        min-width: unset;
+        border-right: none;
+        border-bottom: 4px solid var(--gold);
+        padding: 16px 24px;
+      }
+      .card-content-col {
+        flex-direction: column;
+        gap: 16px;
+        padding: 20px 24px;
+      }
+      .header-accent-bar {
+        display: none;
+      }
+      .header-content {
+        padding: 32px 24px;
+      }
+      .intro-inner {
+        gap: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── HEADER ── -->
+  <header class="header-band">
+    <div class="container">
+      <div class="header-inner">
+        <div class="header-accent-bar"></div>
+        <div class="header-content">
+          <p class="header-eyebrow">Forensic Care Management<sup style="font-size:8px;">™</sup> in Action</p>
+          <h1 class="title">C.A.R.E. Clinical Sequencing Auditor<span class="tm">™</span></h1>
+          <p class="subtitle">A structured clinical methodology for injury care sequencing and defensible case strategy.</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── INTRO BAND ── -->
+  <div class="intro-band">
+    <div class="container">
+      <div class="intro-inner">
+        <span class="intro-label">Designed exclusively for:</span>
+        <div class="intro-pills">
+          <span class="pill">Personal Injury</span>
+          <span class="pill">Workers' Compensation</span>
+          <span class="pill">Disability Litigation</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <div class="container">
+
+      <h2 class="cards-title">At a glance</h2>
+
+      <div class="cards-stack">
+
+        <!-- ROW 1: WHO IT'S FOR -->
+        <div class="card">
+          <div class="card-label-col">
+            <span class="card-header">Who It's For</span>
+          </div>
+          <div class="card-content-col">
+            <div class="card-col">
+              <p>Designed exclusively for attorneys who specialize in:</p>
+              <ul class="attorney-list">
+                <li>Personal Injury</li>
+                <li>Workers' Compensation</li>
+                <li>Disability Litigation</li>
+              </ul>
+            </div>
+            <div class="card-col">
+              <p>The C.A.R.E. Clinical Sequencing Auditor applies structured clinical review methods within a legal-clinical framework to assess how injury care is sequenced, documented, and positioned.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 2: WHY THIS MATTERS -->
+        <div class="card">
+          <div class="card-label-col">
+            <span class="card-header">Why This Matters</span>
+          </div>
+          <div class="card-content-col">
+            <div class="card-col">
+              <p>Personal injury, workers' compensation, and disability cases weaken when care is:</p>
+              <ul class="dash-list">
+                <li>Poorly sequenced</li>
+                <li>Improperly escalated</li>
+                <li>Weakly documented</li>
+                <li>Lacking treatment authority</li>
+                <li>Misaligned with recognized standards</li>
+              </ul>
+            </div>
+            <div class="card-col">
+              <p>The C.A.R.E. Auditor identifies sequencing gaps, documentation vulnerabilities, escalation risks, and treatment misalignment that weaken the structural foundation of care.</p>
+              <p>When care falls outside recognized payer and guideline expectations, defensible case positioning is compromised.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 3: WHAT THE AUDITOR EVALUATES -->
+        <div class="card">
+          <div class="card-label-col">
+            <span class="card-header">What the Auditor Evaluates</span>
+          </div>
+          <div class="card-content-col">
+            <div class="card-col">
+              <p>The C.A.R.E. Clinical Sequencing Auditor assesses:</p>
+              <ul class="bullet-list">
+                <li>Treatment sequencing progression</li>
+                <li>Escalation timing and clinical justification</li>
+                <li>Documentation sufficiency</li>
+                <li>Alignment with recognized payer and treatment expectations</li>
+                <li>Structural vulnerabilities in case presentation</li>
+              </ul>
+            </div>
+            <div class="card-col">
+              <p>The evaluation identifies where documentation fails to clearly connect symptoms, findings, functional limitation, and treatment intensity. It also highlights where sequencing gaps or unsupported escalation may create vulnerability under scrutiny.</p>
+              <p>This is not a review of outcomes. It is an analysis of structure, justification, and defensibility.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 4: WHAT YOU RECEIVE -->
+        <div class="card">
+          <div class="card-label-col">
+            <span class="card-header">What You Receive</span>
+          </div>
+          <div class="card-content-col">
+            <div class="card-col">
+              <p>After completion, the Auditor provides:</p>
+              <ul class="bullet-list">
+                <li>A sequencing risk profile</li>
+                <li>Identified documentation vulnerabilities</li>
+                <li>Areas of treatment misalignment</li>
+                <li>Strategic insight into defensible case positioning</li>
+              </ul>
+            </div>
+            <div class="card-col">
+              <p>The output does not merely list issues — it organizes identified vulnerabilities into a coherent sequencing profile that clarifies where structural weaknesses exist.</p>
+              <p>To understand how the sequence reads under review. To identify where reinforcement may be necessary. To recognize where defensibility is strong — and where it is not.</p>
+              <p class="card-tagline">Clear. Structured. Defensible.</p>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /cards-stack -->
+
+      <div class="divider-gold"></div>
+
+      <!-- CREDIBILITY STRIP -->
+      <p class="credibility-strip">
+        Established 2009<span class="sep">•</span>25+ Years Clinical Experience<span class="sep">•</span>Litigation-Focused Care Analysis
+      </p>
+
+      <!-- CTA — link to actual auditor app, passing portal params -->
+      <div class="cta-wrap">
+        <a id="begin-cta" href="index.html?skipLanding=true" class="cta-btn" rel="noopener">Begin the C.A.R.E. Clinical Sequencing Audit</a>
+      </div>
+
+    </div>
+  </main>
+
+<script>
+// Pass through caseType and instrument from portal launch URL
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const caseType   = params.get('caseType');
+  const instrument = params.get('instrument');
+  const btn = document.getElementById('begin-cta');
+  if (btn) {
+    const dest = new URLSearchParams({ skipLanding: 'true' });
+    if (caseType)   dest.set('caseType',   caseType);
+    if (instrument) dest.set('instrument', instrument);
+    btn.href = 'index.html?' + dest.toString();
+  }
+})();
+</script>
+
+</body>
+</html>
