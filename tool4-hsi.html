@@ -234,7 +234,7 @@ canvas{display:block}
   letter-spacing:0.2em;text-transform:uppercase;
   color:var(--gold);margin-bottom:12px;
 }
-#cvMini{width:100%;height:140px}
+#cvMini{display:block;width:100%;min-height:140px;height:140px;max-width:100%}
 .slab-preview-caption{
   font-size:12px;line-height:1.65;
   color:#999;text-align:center;
@@ -954,7 +954,7 @@ canvas{display:block}
         <p>The Holistic Stability Index™ evaluates these structural forces to help identify hidden pressures affecting recovery progress and case outcomes.</p>
       </div>
       <div class="hero-cta">
-        <button class="btn btn-dark" onclick="startAssessment()">Start Assessment →</button>
+        <button type="button" class="btn btn-dark" onclick="window.startAssessment()">Start Assessment →</button>
         <p class="hero-time">⏱ Estimated time: 3–5 minutes</p>
         <p class="hero-note">Medical records are not required. Please answer based on the most accurate and current information available.</p>
       </div>
@@ -1338,6 +1338,9 @@ function startAssessment() {
   step=0; qIdx=0;
   showScreen('sc-assess');
   render();
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){ drawMiniSlab(); });
+  });
 }
 window.startAssessment = startAssessment;
 
@@ -1479,7 +1482,7 @@ function renderAllDomains() {
         </div>
       </div>
       <div class="domain-section-body${isOpen ? ' open' : ''}" id="dom-body-${di}">
-        ${di === 0 ? '<div class="safeguard">If more than one stage appears applicable, select the lowest stage that reflects the individual's current condition. The lowest domain score determines overall intrinsic stability.</div>' : ''}
+        ${di === 0 ? '<div class="safeguard">If more than one stage appears applicable, select the lowest stage that reflects the individual\'s current condition. The lowest domain score determines overall intrinsic stability.</div>' : ''}
         ${questionsHtml}
       </div>
     </div>`;
@@ -1967,7 +1970,12 @@ window.addEventListener('resize',()=>{
    INIT
 ───────────────────────────────────────────────────────── */
 window.addEventListener('load',()=>{
-  requestAnimationFrame(()=>requestAnimationFrame(drawMiniSlab));
+  function kick(){
+    drawMiniSlab();
+  }
+  requestAnimationFrame(()=>requestAnimationFrame(kick));
+  setTimeout(kick, 80);
+  setTimeout(kick, 400);
 });
 
 </script>

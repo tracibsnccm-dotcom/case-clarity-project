@@ -221,7 +221,10 @@
                     localStorage.setItem('assessment_id', assessmentId);
                     localStorage.setItem('session_id', session.id);
                     localStorage.setItem('user_logged_in', 'true');
-                    
+                    if (!localStorage.getItem('trial_start_at')) {
+                        localStorage.setItem('trial_start_at', new Date().toISOString());
+                    }
+
                     // Redirect to dashboard
                     window.location.href = 'dashboard.html';
                     

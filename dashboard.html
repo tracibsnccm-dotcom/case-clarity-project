@@ -217,8 +217,9 @@
             color: #b8922a;
         }
         .status-complete {
-            background: #0c1c34;
-            color: #b8922a;
+            background: #1e5c3a;
+            color: #e8f5ec;
+            letter-spacing: 0.06em;
         }
         .btn-launch {
             width: 100%;
@@ -912,6 +913,30 @@
             }
         };
 
+        const TOOL_LOCAL_INDEX = { CCI: 1, CSA: 2, CAF: 3, HSI: 4, FCI: 5, RRF: 6 };
+        function isLocalToolComplete(toolKey) {
+            var idx = TOOL_LOCAL_INDEX[toolKey];
+            if (!idx) return false;
+            return !!localStorage.getItem('tool' + idx + '_complete');
+        }
+        function countLocalToolsComplete() {
+            var n = 0;
+            for (var i = 1; i <= 6; i++) {
+                if (localStorage.getItem('tool' + i + '_complete')) n++;
+            }
+            return n;
+        }
+        function computeTrialDaysRemaining() {
+            var raw = localStorage.getItem('trial_start_at');
+            if (!raw) return 7;
+            var startDate = new Date(raw);
+            var now = new Date();
+            var sd = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+            var nd = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            var daysPassed = Math.floor((nd - sd) / 86400000);
+            return 7 - daysPassed;
+        }
+
         document.getElementById('assessment-id-display').textContent = assessmentId;
 
         window.toggleSection = function (sectionId) {
@@ -980,13 +1005,8 @@
                 const activeAllDone = activeComplete === 6;
                 const retroAllDone = retroComplete === 6;
 
-                // Calculate time remaining
-                const expiresAt = new Date(session.expires_at);
-                const now = new Date();
-                const daysLeft = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
-
-                // Render dashboard
-                renderDashboard(session, activeComplete, retroComplete, activeAllDone, retroAllDone, daysLeft);
+                // Render dashboard (trial countdown uses localStorage trial_start_at)
+                renderDashboard(session, activeComplete, retroComplete, activeAllDone, retroAllDone);
 
             } catch (err) {
                 console.error('Error loading dashboard:', err);
@@ -998,10 +1018,19 @@
             return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
         }
 
-        function renderDashboard(session, activeComplete, retroComplete, activeAllDone, retroAllDone, daysLeft) {
+        function renderDashboard(session, activeComplete, retroComplete, activeAllDone, retroAllDone) {
             const container = document.getElementById('dashboard-content');
-            
-            const timerClass = daysLeft <= 2 ? 'timer-warning' : '';
+
+            if (!localStorage.getItem('trial_start_at')) {
+                localStorage.setItem('trial_start_at', new Date().toISOString());
+            }
+            var trialDaysRemaining = computeTrialDaysRemaining();
+            var trialExpired = trialDaysRemaining < 0;
+            var localN = countLocalToolsComplete();
+
+            var timerLabel = trialExpired ? 'Trial access' : 'Trial time remaining';
+            var timerClass = trialExpired ? 'timer-warning' : (trialDaysRemaining <= 2 && trialDaysRemaining >= 0 ? 'timer-warning' : '');
+            var timerValue = trialExpired ? 'Trial expired' : (trialDaysRemaining === 0 ? 'Final day' : (trialDaysRemaining + ' day' + (trialDaysRemaining === 1 ? '' : 's')));
             const ac = session.active_case || {};
             const rc = session.retrospective_case || {};
             const acName = escapeAttr(ac.name_case_id || ac.reference || '');
@@ -1013,16 +1042,19 @@
             const rcMech = escapeAttr(rc.mechanism || '');
             const rcType = rc.case_type === 'PI' || rc.case_type === 'WC' || rc.case_type === 'Disability' ? rc.case_type : '';
             const sel = function (cur, val) { return cur === val ? ' selected' : ''; };
-            const activeCaptured = Object.keys(window.reportData.active || {}).length;
-            const retroCaptured = Object.keys(window.reportData.retro || {}).length;
-            const activePrintReady = activeCaptured === 6;
-            const retroPrintReady = retroCaptured === 6;
+            const activePrintReady = localN === 6;
+            const retroPrintReady = localN === 6;
+            var trialRetroLocked = !trialExpired && localN < 6;
 
             let html = `
                 <div class="timer-card">
-                    <span class="timer-label">Time Remaining</span>
-                    <span class="timer-value ${timerClass}">${daysLeft} days</span>
+                    <div>
+                        <span class="timer-label">${timerLabel}</span>
+                        <div style="font-size:12px;color:#6a7a8a;margin-top:8px;max-width:520px;line-height:1.5;">7-day trial from first login on this device. Portal session may differ; tools lock when the trial ends.</div>
+                    </div>
+                    <span class="timer-value ${timerClass}">${timerValue}</span>
                 </div>
+                ${trialExpired ? '<div style="background:#fdf0f0;border:1px solid #e8b4b4;border-left:4px solid #c0392b;padding:16px 20px;margin-bottom:24px;font-size:14px;color:#5c2a2a;"><strong>Trial expired.</strong> Your 7-day instrument access from first login has ended. Launching assessments is disabled.</div>' : ''}
 
                 <!-- ORIENTATION SECTION -->
                 <div style="background: #f9f7f2; border: 1px solid #d6d0c4; border-left: 3px solid #b8922a; padding: 24px; margin-bottom: 32px;">
@@ -1156,7 +1188,7 @@
                 html += getToolCard(toolKey, tool, status, 'active', {
                     displayName: ACTIVE_NUMBERED_TITLES[toolKey],
                     cardClass: 'tool-card-active',
-                    launchDisabled: status === 'complete',
+                    trialExpired: trialExpired,
                     lockedBySequence: false
                 });
             });
@@ -1165,9 +1197,9 @@
                     <div class="inline-reports-card">
                       <h4 style="font-size: 15px; color: #0c1c34; margin-bottom: 12px;">Active Case Reports</h4>
                       <p style="font-size: 14px; color: #4a5568; margin-bottom: 10px; line-height: 1.5;">Reports available when all 6 Active assessments are complete.</p>
-                      <p style="font-size: 14px; color: #b8922a; margin-bottom: 8px;">Progress: <span id="active-assessment-report-progress">${activeComplete}</span>/6</p>
-                      <p id="report-active-capture" style="font-size: 12px; color: #6a7a8a; margin-bottom: 14px; line-height: 1.4;">${activePrintReady ? '✓ Print data captured from all 6 tools' : 'Print/download uses data from tools opened from this page: ' + activeCaptured + '/6 captured'}</p>
-                      <button type="button" class="btn-report" data-report-btn="active" id="btn-download-active-all" ${activeAllDone ? '' : 'disabled'} onclick="printActiveReports()">Download All Active Reports</button>
+                      <p style="font-size: 14px; color: #b8922a; margin-bottom: 8px;">Progress: <span id="active-assessment-report-progress">${localN}</span>/6</p>
+                      <p id="report-active-capture" style="font-size: 12px; color: #6a7a8a; margin-bottom: 14px; line-height: 1.4;">${activePrintReady ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localN + '/6. Complete all six to unlock downloads.')}</p>
+                      <button type="button" class="btn-report" data-report-btn="active" id="btn-download-active-all" ${(localN === 6 && !trialExpired) ? '' : 'disabled'} onclick="printActiveReports()">Download All Active Reports</button>
                     </div>
                       </div>
                     </div>
@@ -1182,7 +1214,7 @@
                       <div class="collapsible-header" onclick="toggleSection('retro-tools')">
                         <span style="display: flex; align-items: center; gap: 12px;">
                           <span class="arrow" id="arrow-retro">▶</span>
-                          <span>Retrospective Case Tools (<span id="retro-progress">${retroComplete}/6</span> completed)</span>
+                          <span>Retrospective Case Tools (<span id="retro-progress">${localN}/6</span> completed)</span>
                         </span>
                       </div>
                       <div id="retro-preview" class="tool-preview" style="margin: 4px 0 8px 24px; font-size: 13px; color: #8a9aa8;">
@@ -1196,12 +1228,12 @@
             TOOL_ORDER.forEach(toolKey => {
                 const tool = TOOL_INFO[toolKey];
                 const status = retroAssessments[toolKey]?.status || 'not_started';
-                const retroLocked = !activeAllDone;
+                const retroLocked = trialRetroLocked;
                 html += getToolCard(toolKey, tool, status, 'retrospective', {
                     displayName: tool.name,
                     cardClass: 'tool-card-retro',
-                    launchDisabled: status === 'complete' || retroLocked,
-                    lockedBySequence: retroLocked && status !== 'complete'
+                    trialExpired: trialExpired,
+                    lockedBySequence: retroLocked
                 });
             });
 
@@ -1209,9 +1241,9 @@
                     <div class="inline-reports-card">
                       <h4 style="font-size: 15px; color: #0c1c34; margin-bottom: 12px;">Retrospective Case Reports</h4>
                       <p style="font-size: 14px; color: #4a5568; margin-bottom: 10px; line-height: 1.5;">Reports available when all 6 Retrospective assessments are complete.</p>
-                      <p style="font-size: 14px; color: #b8922a; margin-bottom: 8px;">Progress: <span id="retro-assessment-report-progress">${retroComplete}</span>/6</p>
-                      <p id="report-retro-capture" style="font-size: 12px; color: #6a7a8a; margin-bottom: 14px; line-height: 1.4;">${retroPrintReady ? '✓ Print data captured from all 6 tools' : 'Print/download uses data from tools opened from this page: ' + retroCaptured + '/6 captured'}</p>
-                      <button type="button" class="btn-report" data-report-btn="retro" id="btn-download-retro-all" ${retroAllDone ? '' : 'disabled'} onclick="printRetroReports()">Download All Retro Reports</button>
+                      <p style="font-size: 14px; color: #b8922a; margin-bottom: 8px;">Progress: <span id="retro-assessment-report-progress">${localN}</span>/6</p>
+                      <p id="report-retro-capture" style="font-size: 12px; color: #6a7a8a; margin-bottom: 14px; line-height: 1.4;">${retroPrintReady ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localN + '/6. Complete all six to unlock downloads.')}</p>
+                      <button type="button" class="btn-report" data-report-btn="retro" id="btn-download-retro-all" ${(localN === 6 && !trialExpired) ? '' : 'disabled'} onclick="printRetroReports()">Download All Retro Reports</button>
                     </div>
                       </div>
                     </div>
@@ -1221,7 +1253,7 @@
 
             document.getElementById('save-case-info').addEventListener('click', saveCaseInfo);
             updateReportUI();
-            updateCollapsibleProgress(activeComplete, retroComplete);
+            updateCollapsibleProgress(localN, localN);
             syncCollapsiblePreview('retro-tools');
             syncCollapsiblePreview('active-tools');
 
@@ -1284,21 +1316,32 @@
             opts = opts || {};
             const displayName = opts.displayName || tool.name;
             const cardExtra = opts.cardClass ? ' ' + opts.cardClass : '';
+            const trialExpired = !!opts.trialExpired;
             const lockedClass = opts.lockedBySequence ? ' tool-card-locked' : '';
+            const localDone = isLocalToolComplete(toolKey);
+            const sessionDone = status === 'complete';
+            const effectiveDone = localDone || sessionDone;
+
             let statusClass = 'status-not-started';
             let statusText = 'NOT STARTED';
-            
-            if (status === 'in_progress') {
-                statusClass = 'status-in-progress';
-                statusText = 'IN PROGRESS';
-            } else if (status === 'complete') {
+            if (effectiveDone) {
                 statusClass = 'status-complete';
-                statusText = 'COMPLETE';
+                statusText = '✓ COMPLETED';
+            }
+
+            let launchDisabled = trialExpired || effectiveDone;
+            if (caseType === 'retrospective' && opts.lockedBySequence && !effectiveDone) {
+                launchDisabled = true;
             }
 
             let btnLabel = 'Launch Assessment';
-            if (status === 'complete') btnLabel = 'Completed';
-            else if (opts.lockedBySequence) btnLabel = caseType === 'active' ? 'Complete previous step first' : 'Complete Active Case first';
+            if (trialExpired) {
+                btnLabel = 'Trial expired';
+            } else if (effectiveDone) {
+                btnLabel = 'Completed';
+            } else if (opts.lockedBySequence) {
+                btnLabel = caseType === 'active' ? 'Complete previous step first' : 'Complete Active Case first';
+            }
 
             return `
                 <div class="tool-card${cardExtra}${lockedClass}">
@@ -1307,7 +1350,7 @@
                     <div class="tool-status ${statusClass}">${statusText}</div>
                     <button class="btn-launch" 
                             onclick="launchTool('${toolKey}', '${caseType}')"
-                            ${opts.launchDisabled ? 'disabled' : ''}>
+                            ${launchDisabled ? 'disabled' : ''}>
                         ${btnLabel}
                     </button>
                 </div>
@@ -1315,6 +1358,10 @@
         }
 
         window.launchTool = function(toolKey, caseType) {
+            if (computeTrialDaysRemaining() < 0) {
+                alert('Trial expired. Your 7-day access from first login on this device has ended.');
+                return;
+            }
             const sessionId = localStorage.getItem('session_id');
             const assessmentId = localStorage.getItem('assessment_id');
             const tool = TOOL_INFO[toolKey];
