@@ -2149,19 +2149,40 @@ window.addEventListener('load',()=>{
 </script>
 <script>
 function goToNext() {
-    localStorage.setItem('tool_complete_' + window.location.pathname, 'true');
-    if (window.location.pathname.includes('tool1')) {
+    console.log("Navigation button clicked");
+
+    // Get current page filename
+    const currentPage = window.location.pathname.split('/').pop();
+    console.log("Current page:", currentPage);
+
+    // Simple if/else based on filename
+    if (currentPage === 'tool1-cci.html' || currentPage.includes('tool1')) {
+        console.log("Navigating to tool2-csa.html");
         window.location.href = 'tool2-csa.html';
-    } else if (window.location.pathname.includes('tool2')) {
+    }
+    else if (currentPage === 'tool2-csa.html' || currentPage.includes('tool2')) {
+        console.log("Navigating to tool3-caf.html");
         window.location.href = 'tool3-caf.html';
-    } else if (window.location.pathname.includes('tool3')) {
+    }
+    else if (currentPage === 'tool3-caf.html' || currentPage.includes('tool3')) {
+        console.log("Navigating to tool4-hsi.html");
         window.location.href = 'tool4-hsi.html';
-    } else if (window.location.pathname.includes('tool4')) {
+    }
+    else if (currentPage === 'tool4-hsi.html' || currentPage.includes('tool4')) {
+        console.log("Navigating to tool5-fci.html");
         window.location.href = 'tool5-fci.html';
-    } else if (window.location.pathname.includes('tool5')) {
+    }
+    else if (currentPage === 'tool5-fci.html' || currentPage.includes('tool5')) {
+        console.log("Navigating to tool6-rrf.html");
         window.location.href = 'tool6-rrf.html';
-    } else if (window.location.pathname.includes('tool6')) {
-        window.location.href = 'dashboard.html?allComplete=true';
+    }
+    else if (currentPage === 'tool6-rrf.html' || currentPage.includes('tool6')) {
+        console.log("Navigating to dashboard (sequence complete)");
+        window.location.href = 'dashboard.html?complete=true';
+    }
+    else {
+        console.log("Unknown page, going to dashboard");
+        window.location.href = 'dashboard.html';
     }
 }
 

@@ -1101,38 +1101,40 @@ function resetAll(){
 </script>
 <script>
 function goToNext() {
-    console.log("Button clicked");
-    try {
-        localStorage.setItem('tool_complete_' + window.location.pathname, 'true');
-    } catch (e) {}
+    console.log("Navigation button clicked");
 
-    var href = (window.location.href || '').toLowerCase();
-    var path = (window.location.pathname || '').replace(/\\/g, '/').toLowerCase();
-    var blob = href + ' ' + path;
+    // Get current page filename
+    const currentPage = window.location.pathname.split('/').pop();
+    console.log("Current page:", currentPage);
 
-    if (blob.indexOf('tool6') !== -1 || /tool6-rrf\.html/.test(blob)) {
-        window.location.href = 'dashboard.html?allComplete=true';
-        return;
-    }
-    if (blob.indexOf('tool5') !== -1 || /tool5-fci\.html/.test(blob)) {
-        window.location.href = 'tool6-rrf.html';
-        return;
-    }
-    if (blob.indexOf('tool4') !== -1 || /tool4-hsi\.html/.test(blob)) {
-        window.location.href = 'tool5-fci.html';
-        return;
-    }
-    if (blob.indexOf('tool3') !== -1 || /tool3-caf\.html/.test(blob)) {
-        window.location.href = 'tool4-hsi.html';
-        return;
-    }
-    if (blob.indexOf('tool2') !== -1 || /tool2-csa\.html/.test(blob)) {
-        window.location.href = 'tool3-caf.html';
-        return;
-    }
-    if (blob.indexOf('tool1') !== -1 || /tool1-cci\.html/.test(blob)) {
+    // Simple if/else based on filename
+    if (currentPage === 'tool1-cci.html' || currentPage.includes('tool1')) {
+        console.log("Navigating to tool2-csa.html");
         window.location.href = 'tool2-csa.html';
-        return;
+    }
+    else if (currentPage === 'tool2-csa.html' || currentPage.includes('tool2')) {
+        console.log("Navigating to tool3-caf.html");
+        window.location.href = 'tool3-caf.html';
+    }
+    else if (currentPage === 'tool3-caf.html' || currentPage.includes('tool3')) {
+        console.log("Navigating to tool4-hsi.html");
+        window.location.href = 'tool4-hsi.html';
+    }
+    else if (currentPage === 'tool4-hsi.html' || currentPage.includes('tool4')) {
+        console.log("Navigating to tool5-fci.html");
+        window.location.href = 'tool5-fci.html';
+    }
+    else if (currentPage === 'tool5-fci.html' || currentPage.includes('tool5')) {
+        console.log("Navigating to tool6-rrf.html");
+        window.location.href = 'tool6-rrf.html';
+    }
+    else if (currentPage === 'tool6-rrf.html' || currentPage.includes('tool6')) {
+        console.log("Navigating to dashboard (sequence complete)");
+        window.location.href = 'dashboard.html?complete=true';
+    }
+    else {
+        console.log("Unknown page, going to dashboard");
+        window.location.href = 'dashboard.html';
     }
 }
 
