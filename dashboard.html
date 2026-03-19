@@ -33,6 +33,10 @@
         .arrow.expanded {
             transform: rotate(90deg);
         }
+        .tool-preview {
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Georgia', 'Times New Roman', serif;
@@ -556,9 +560,21 @@
         window.toggleSection = function (sectionId) {
             var content = document.getElementById(sectionId);
             var arrow = document.getElementById('arrow-' + sectionId.split('-')[0]);
+            var preview = document.getElementById(sectionId.split('-')[0] + '-preview');
             if (content) content.classList.toggle('expanded');
             if (arrow) arrow.classList.toggle('expanded');
+            if (preview && content) {
+                preview.style.display = content.classList.contains('expanded') ? 'none' : 'block';
+            }
         };
+
+        function syncCollapsiblePreview(sectionId) {
+            var content = document.getElementById(sectionId);
+            var preview = document.getElementById(sectionId.split('-')[0] + '-preview');
+            if (preview && content) {
+                preview.style.display = content.classList.contains('expanded') ? 'none' : 'block';
+            }
+        }
 
         window.updateCollapsibleProgress = function (activeComplete, retroComplete) {
             var ap = document.getElementById('active-progress');
@@ -796,6 +812,9 @@
                           <span>Retrospective Case Tools (<span id="retro-progress">${retroComplete}/6</span> completed)</span>
                         </span>
                       </div>
+                      <div id="retro-preview" class="tool-preview" style="margin: 4px 0 8px 24px; font-size: 13px; color: #8a9aa8;">
+                        CCI · CSA · CAF · HSI · FCI · RRF
+                      </div>
                       <div class="collapsible-content" id="retro-tools">
                     <div class="tools-grid">
             `;
@@ -830,6 +849,8 @@
             document.getElementById('save-case-info').addEventListener('click', saveCaseInfo);
             updateReportUI();
             updateCollapsibleProgress(activeComplete, retroComplete);
+            syncCollapsiblePreview('retro-tools');
+            syncCollapsiblePreview('active-tools');
         }
 
         async function saveCaseInfo() {
