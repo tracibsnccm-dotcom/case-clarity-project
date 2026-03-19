@@ -1580,6 +1580,13 @@ function selectSub(ri, qi, value) {
   if (allAnswered) {
     submitWrap.style.display = 'block';
     const assessmentData = buildAssessmentData();
+    const toolData = {
+      completed: true,
+      timestamp: new Date().toISOString(),
+      data: assessmentData
+    };
+    localStorage.setItem('tool2_data', JSON.stringify(toolData));
+    localStorage.setItem('tool2_complete', 'true');
     if (typeof window.markAssessmentComplete === 'function') {
       window.markAssessmentComplete(assessmentData);
     }

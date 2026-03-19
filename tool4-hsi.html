@@ -1019,132 +1019,16 @@ canvas{display:block}
 <div id="sc-results" class="screen">
   <nav class="nav">
     <div class="nav-brand">Holistic Stability Index<span class="g">™</span></div>
-    <div class="nav-pill">Results</div>
+    <div class="nav-pill">Complete</div>
   </nav>
-  <div class="results-wrap">
-    <div class="results-hdr">
-      <div class="eyebrow">Assessment Complete</div>
-      <div class="results-title">Foundation Stability Report</div>
-      <div class="results-sub">Holistic Stability Index™</div>
-      <div id="rSeverityBadge" class="severity-badge" style="display:none">
-        <span class="sev-dot"></span>
-        <span id="rSeverityText">—</span>
-      </div>
+  <div class="results-wrap" style="max-width:640px;margin:0 auto;padding:48px 24px 80px;text-align:center">
+    <div class="eyebrow">Assessment complete</div>
+    <h1 class="results-title" style="margin:12px 0 16px">Holistic Stability Index™</h1>
+    <p class="results-sub" style="margin:0 auto;max-width:520px;line-height:1.65;color:var(--muted,#555)">Your responses have been saved. A detailed stability report will be available on the dashboard after all six assessments are finished.</p>
+    <div style="display:flex;gap:16px;justify-content:center;margin-top:40px;flex-wrap:wrap">
+      <button type="button" onclick="returnToDashboard()" class="btn-ghost">← Return to Dashboard</button>
+      <button type="button" onclick="goToNext()" class="btn-primary">Continue to Next Assessment →</button>
     </div>
-
-    <div class="score-row">
-      <div class="score-card">
-        <div class="sc-label">Intrinsic Viability</div>
-        <div class="sc-value" id="rIntrinsic">—</div>
-        <div class="sc-desc" id="rIntrinsicDesc">—</div>
-      </div>
-      <div class="score-card">
-        <div class="sc-label">Extrinsic Stability</div>
-        <div class="sc-value" id="rExtrinsic">—</div>
-        <div class="sc-desc" id="rExtrinsicDesc">—</div>
-      </div>
-    </div>
-
-    <div class="guide">
-      <strong>How to read this model:</strong> Height = overall stability &nbsp;•&nbsp; Tilt = structural imbalance
-    </div>
-
-    <div class="level-key">
-      <div class="level-key-title">Stability Level Reference</div>
-      <div class="level-key-grid">
-        <div class="lk-item" data-v="5">
-          <div class="lk-score">5</div>
-          <div class="lk-label">Highest</div>
-          <div class="lk-desc">Highest stability. Full functioning, no significant barriers.</div>
-        </div>
-        <div class="lk-item" data-v="4">
-          <div class="lk-score">4</div>
-          <div class="lk-label">Stable</div>
-          <div class="lk-desc">Stable with limited disruption. Manageable conditions present.</div>
-        </div>
-        <div class="lk-item" data-v="3">
-          <div class="lk-score">3</div>
-          <div class="lk-label">Moderate</div>
-          <div class="lk-desc">Moderate instability. Recovery is vulnerable to setbacks.</div>
-        </div>
-        <div class="lk-item" data-v="2">
-          <div class="lk-score">2</div>
-          <div class="lk-label">Significant</div>
-          <div class="lk-desc">Significant instability. Functioning substantially impaired.</div>
-        </div>
-        <div class="lk-item" data-v="1">
-          <div class="lk-score">1</div>
-          <div class="lk-label">Critical</div>
-          <div class="lk-desc">Critical instability. Requires immediate stabilization.</div>
-        </div>
-      </div>
-      <div class="lk-note">Equal scores on both sides can still reflect poor overall stability when both values are low. A level slab at height 2–2 is not stable — it indicates structural risk on both sides.</div>
-    </div>
-
-    <div class="slab-card">
-      <div class="slab-title">Foundation Stability Model<sup>™</sup></div>
-      <div class="rule" style="margin:14px 0 22px"></div>
-      <canvas id="cvSlab"></canvas>
-      <div class="slab-key">
-        <div class="slab-key-title">How to Read the Foundation Stability Model</div>
-        <div class="slab-key-items">
-          <div class="slab-key-item">
-            <div class="ski-num">1</div>
-            <div class="ski-body">
-              <div class="ski-heading">Height = Overall Stability</div>
-              <div class="ski-text">Higher foundations indicate stronger overall recovery stability. Lower foundations indicate greater clinical vulnerability.</div>
-            </div>
-          </div>
-          <div class="slab-key-item">
-            <div class="ski-num">2</div>
-            <div class="ski-body">
-              <div class="ski-heading">Tilt = Structural Imbalance</div>
-              <div class="ski-text">The tilt reveals the imbalance between intrinsic capacity and extrinsic pressures affecting recovery.</div>
-            </div>
-          </div>
-          <div class="slab-key-item">
-            <div class="ski-num">3</div>
-            <div class="ski-body">
-              <div class="ski-heading">Level Does Not Always Mean Stable</div>
-              <div class="ski-text">Even when both sides are level, a low foundation height may indicate overall instability affecting recovery.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="destab-card-r">
-      <div class="section-eye">Clinical Destabilizers</div>
-      <div class="destab-grid" id="rDestabGrid"></div>
-      <div class="destab-alert" id="rDestabAlert" style="display:none">
-        <p>Low destabilizer scores (Critical–Unstable) may place additional strain on the recovery structure and increase the risk of delayed recovery or setbacks.</p>
-        <p>Lower scores indicate greater destabilizing pressure.</p>
-      </div>
-    </div>
-
-    <div class="risk-signal-card" id="rRiskSignal">
-      <div>
-        <div class="rsc-title">Recovery Risk Signal</div>
-        <div class="rsc-signal-row">
-          <div class="rsc-signal-label">Structural Stability Signal:</div>
-          <div class="rsc-code" id="rSignalCode">—</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="interp-card">
-      <div class="interp-title">Recovery Stability Interpretation</div>
-      <div class="interp-body" id="rInterp"></div>
-    </div>
-
-    <div style="display: flex; gap: 16px; justify-content: center; margin-top: 40px;">
-    <button onclick="returnToDashboard()" class="btn-ghost">
-        ← Return to Dashboard
-    </button>
-    <button onclick="goToNext()" class="btn-primary">
-        Continue to Next Assessment →
-    </button>
-</div>
   </div>
 </div>
 
@@ -1455,6 +1339,7 @@ function startAssessment() {
   showScreen('sc-assess');
   render();
 }
+window.startAssessment = startAssessment;
 
 /* ─────────────────────────────────────────────────────────
    NAVIGATION
@@ -1539,8 +1424,6 @@ function updateSidebar() {
 function updatePill() {
   const labels = ['4Ps Assessment', '4Ps Assessment', '4Ps Assessment', '4Ps Assessment', 'Social Drivers', 'Destabilizers'];
   document.getElementById('assessPill').textContent = labels[step] || '';
-}ers','Destabilizers'];
-  document.getElementById('assessPill').textContent = labels[step]||'';
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -1787,82 +1670,30 @@ function score() {
    BUILD RESULTS
 ───────────────────────────────────────────────────────── */
 function buildResults() {
-  const { intrinsic, pCode, extrinsic, destab } = score();
+  const scored = score();
+  const toolData = {
+    completed: true,
+    timestamp: new Date().toISOString(),
+    caseType,
+    ...scored,
+    answers: JSON.parse(JSON.stringify(A))
+  };
+  localStorage.setItem('tool4_data', JSON.stringify(toolData));
+  localStorage.setItem('tool4_complete', 'true');
 
   showScreen('sc-results');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  document.getElementById('rIntrinsic').textContent    = `${intrinsic}${pCode}`;
-  document.getElementById('rIntrinsicDesc').textContent = `${SCORE_LABELS[intrinsic]} — ${DOMAIN_DESCS[pCode]}`;
-  document.getElementById('rExtrinsic').textContent    = extrinsic;
-  document.getElementById('rExtrinsicDesc').textContent = `${SCORE_LABELS[extrinsic]} — Social Drivers of Health`;
-  document.getElementById('rSignalCode').textContent   = `${intrinsic}${pCode}`;
-
-  // Severity badge
-  (function(){
-    const b = document.getElementById('rSeverityBadge');
-    const t = document.getElementById('rSeverityText');
-    b.className = 'severity-badge';
-    b.style.display = 'inline-flex';
-    if(intrinsic>=4 && extrinsic>=4){
-      b.classList.add('sev-strong'); t.textContent='Strong Stability';
-    } else if(intrinsic===1 || extrinsic===1){
-      b.classList.add('sev-critical'); t.textContent='Critical Instability';
-    } else if(intrinsic===2 || extrinsic===2){
-      b.classList.add('sev-significant'); t.textContent='Significant Instability';
-    } else {
-      b.classList.add('sev-vulnerable'); t.textContent='Vulnerable Stability';
-    }
-  })();
-
-  requestAnimationFrame(()=>{
-    drawMainSlab(intrinsic, extrinsic);
-    buildDestabResult(destab);
-    buildInterp(intrinsic, pCode, extrinsic, destab);
-
-    if (typeof window.markAssessmentComplete === 'function') {
-      window.markAssessmentComplete({
-        tool: 'HSI',
-        intrinsic,
-        extrinsic,
-        pCode,
-        destab,
-        completedAt: new Date().toISOString()
-      });
-    }
-  });
-}
-
-/* ─────────────────────────────────────────────────────────
-   DESTABILIZER RESULT
-───────────────────────────────────────────────────────── */
-function buildDestabResult(destab) {
-  let anyLow=false;
-  document.getElementById('rDestabGrid').innerHTML = DESTABILIZERS.map((name,i)=>{
-    const s=destab[i];
-    if(s<=2) anyLow=true;
-    return `<div class="destab-item">
-      <div class="di-name">${name}</div>
-      <div class="di-score">${s}</div>
-      <div class="di-lbl">${SCORE_LABELS[s]||''}</div>
-    </div>`;
-  }).join('');
-  document.getElementById('rDestabAlert').style.display = anyLow?'block':'none';
-}
-
-/* ─────────────────────────────────────────────────────────
-   INTERPRETATION
-───────────────────────────────────────────────────────── */
-function buildInterp(intrinsic, pCode, extrinsic, destab) {
-  const iLbl  = (SCORE_LABELS[intrinsic]||'').toLowerCase();
-  const eLbl  = (SCORE_LABELS[extrinsic]||'').toLowerCase();
-  const dDesc = DOMAIN_DESCS[pCode];
-  const anyLow= destab.some(v=>v<=2);
-
-  document.getElementById('rInterp').innerHTML = `
-    <p>Intrinsic stability is assessed at <strong class="score-code">${intrinsic}${pCode}</strong>, indicating ${iLbl} conditions with the primary vulnerability within the <strong>${dDesc}</strong> domain.</p>
-    <p>Extrinsic stability is assessed at <strong class="score-code">${extrinsic}</strong>, reflecting ${eLbl} environmental pressures influencing recovery.</p>
-    <p>When intrinsic and extrinsic conditions become uneven, the structural foundation supporting recovery may become unstable, increasing the likelihood of setbacks or delayed progress.</p>
-    ${anyLow?'<p><em>Low destabilizer scores (Critical–Unstable) may place additional strain on the recovery structure and increase the risk of delayed recovery or setbacks.</em></p>':''}`;
+  if (typeof window.markAssessmentComplete === 'function') {
+    window.markAssessmentComplete({
+      tool: 'HSI',
+      intrinsic: scored.intrinsic,
+      extrinsic: scored.extrinsic,
+      pCode: scored.pCode,
+      destab: scored.destab,
+      completedAt: new Date().toISOString()
+    });
+  }
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -2116,12 +1947,10 @@ function drawSlab(canvasEl, intrinsic, extrinsic, opts={}) {
   }
 }
 
-function drawMainSlab(i,e){
-  drawSlab(document.getElementById('cvSlab'),i,e,{mini:false});
-}
 function drawMiniSlab(){
   const cv=document.getElementById('cvMini');
-  if(cv&&cv.offsetWidth>0) drawSlab(cv,3,5,{mini:true});
+  if(!cv) return;
+  drawSlab(cv,3,5,{mini:true});
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -2131,11 +1960,6 @@ let rt;
 window.addEventListener('resize',()=>{
   clearTimeout(rt);rt=setTimeout(()=>{
     drawMiniSlab();
-    if(document.getElementById('sc-results').classList.contains('active')){
-      const iv=parseInt(document.getElementById('rIntrinsic').textContent);
-      const ev=parseInt(document.getElementById('rExtrinsic').textContent);
-      if(!isNaN(iv)&&!isNaN(ev)) drawMainSlab(iv,ev);
-    }
   },120);
 });
 

@@ -102,7 +102,7 @@ input[type=text]::placeholder{color:#bbb}
 .calc-btn:hover{background:#9a8430}
 
 /* ── REPORT ─────────────────────────────────────────── */
-#report-view{display:none;font-family:'Segoe UI',Arial,sans-serif;padding:0 1rem 4rem}
+#trial-complete{display:none;font-family:'Segoe UI',Arial,sans-serif;padding:0 1rem 4rem}
 .report-wrap{max-width:900px;margin:0 auto}
 
 /* Report Header */
@@ -583,193 +583,15 @@ input[type=text]::placeholder{color:#bbb}
 </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════
-     REPORT VIEW (shown after calculate, form hidden)
-═══════════════════════════════════════════════════ -->
-<div id="report-view">
-<div class="report-wrap">
-
-  <!-- 1. Report Header -->
-  <div class="rpt-header">
-    <div class="rpt-header-title">Case Complexity Index™ Report</div>
-    <div class="rpt-header-meta">
-      <span id="rpt-date"></span>
-      <span style="color:#555;font-size:10px">Reconcile Care Management Services</span>
+<div id="trial-complete" style="display:none">
+  <div style="max-width:720px;margin:0 auto;text-align:center;padding:2rem 0 3rem">
+    <h2 style="color:#1a1a1a;font-weight:600;margin:0 0 12px">Assessment complete</h2>
+    <p style="color:#555;line-height:1.65;margin:0;font-size:15px">Your Case Complexity Index™ responses have been saved. A full report will be available on your dashboard after you finish all six assessments.</p>
+    <div style="display:flex;gap:16px;justify-content:center;margin-top:40px;flex-wrap:wrap">
+      <button type="button" onclick="returnToDashboard()" class="btn-ghost">← Return to Dashboard</button>
+      <button type="button" onclick="goToNext()" class="btn-primary">Continue to Next Assessment →</button>
     </div>
   </div>
-
-  <!-- 2. Complexity Meter -->
-  <div class="rpt-meter">
-    <div class="rpt-meter-label">Complexity Level</div>
-    <div class="rpt-meter-track">
-      <div class="rpt-meter-seg" id="ms1"></div>
-      <div class="rpt-meter-seg" id="ms2"></div>
-      <div class="rpt-meter-seg" id="ms3"></div>
-      <div class="rpt-meter-seg" id="ms4"></div>
-    </div>
-    <div class="rpt-meter-ticks">
-      <span class="rpt-meter-tick" id="mt1">Stable</span>
-      <span class="rpt-meter-tick" id="mt2">Moderate</span>
-      <span class="rpt-meter-tick" id="mt3">Significant</span>
-      <span class="rpt-meter-tick" id="mt4">Extreme</span>
-    </div>
-  </div>
-
-  <!-- 3. Banner + 5. Review Interval -->
-  <div class="rpt-banner">
-    <div class="rpt-banner-level" id="r-level-name">—</div>
-    <div class="rpt-banner-sub" id="r-level-sub"></div>
-    <div class="rpt-banner-interval">
-      <span class="rpt-banner-interval-label">Recommended Review Interval</span>
-      <span class="rpt-banner-interval-badge" id="banner-interval">—</span>
-    </div>
-  </div>
-
-  <!-- Clinical Interpretation — open by default -->
-  <div class="rpt-section">
-    <div class="rpt-section-head" onclick="toggleRptSection('rpt-interp')">
-      <span class="rpt-section-label">Clinical Interpretation</span>
-      <span class="rpt-section-chev" id="chev-rpt-interp">▼</span>
-    </div>
-    <div class="rpt-section-body" id="rpt-interp">
-      <div class="r-interp" id="r-interp"></div>
-    </div>
-  </div>
-
-  <!-- Case Management Guidance -->
-  <div class="rpt-section">
-    <div class="rpt-section-head" onclick="toggleRptSection('rpt-cmg')">
-      <span class="rpt-section-label">Case Management Guidance</span>
-      <span class="rpt-section-chev" id="chev-rpt-cmg">▼</span>
-    </div>
-    <div class="rpt-section-body" id="rpt-cmg">
-      <div class="cmg-sub-label">Oversight Guidance</div>
-      <ul class="cmg-list" id="cmg-guidance"></ul>
-      <div class="priority-box">
-        <div class="priority-box-label">Priority Action This Week</div>
-        <p id="priority-action"></p>
-      </div>
-      <div class="cmg-sub-label">Documentation Focus</div>
-      <p style="font-size:13px;color:#444;line-height:1.65;margin-bottom:0.85rem" id="doc-focus"></p>
-      <div class="cmg-sub-label" style="margin-top:0">Reassessment Triggers &amp; Escalation Indicators</div>
-      <div class="r-two-col" style="margin-top:0.4rem">
-        <div class="r-list-box">
-          <div class="r-list-box-label">Reassessment Triggers</div>
-          <div class="r-list-box-intro">Re-run CCI if any of the following occur:</div>
-          <ul class="r-plain-list">
-            <li>Surgery or invasive procedures</li>
-            <li>A new specialist becomes involved</li>
-            <li>Treatment delays exceed 30 days</li>
-            <li>New symptoms or complications emerge</li>
-            <li>Return-to-work expectations change</li>
-            <li>Insurance denies or delays authorized treatment</li>
-          </ul>
-        </div>
-        <div class="r-list-box">
-          <div class="r-list-box-label">Complexity Escalation Indicators</div>
-          <div class="r-list-box-intro">Reevaluate case complexity if any of the following occur:</div>
-          <ul class="r-plain-list">
-            <li>Unexpected treatment delays</li>
-            <li>Multiple specialist referrals</li>
-            <li>Care coordination breakdowns</li>
-            <li>Insurance authorization barriers</li>
-            <li>Decline in cognitive function or ADLs</li>
-            <li>Family or caregiver burnout reported</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Recommended Next Assessments -->
-  <div class="rpt-section">
-    <div class="rpt-section-head" onclick="toggleRptSection('rpt-next')">
-      <span class="rpt-section-label">Recommended Next Assessments</span>
-      <span class="rpt-section-chev" id="chev-rpt-next">▼</span>
-    </div>
-    <div class="rpt-section-body" id="rpt-next">
-      <div class="next-grid">
-        <div class="next-card">
-          <div class="next-card-title">Clinical Sequencing Auditor</div>
-          <div class="next-card-desc">Verify treatment alignment across providers and the 7 Rights of Injury Care Management.</div>
-        </div>
-        <div class="next-card">
-          <div class="next-card-title">C.A.R.E. Access Friction Score</div>
-          <div class="next-card-desc">Identify insurance authorization or referral barriers affecting care access.</div>
-        </div>
-        <div class="next-card">
-          <div class="next-card-title">Holistic Stability Index</div>
-          <div class="next-card-desc">Evaluate whether psychosocial or environmental instability could derail recovery.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Care Coordination Demands -->
-  <div class="rpt-section">
-    <div class="rpt-section-head" onclick="toggleRptSection('rpt-coord')">
-      <span class="rpt-section-label">Care Coordination Demands</span>
-      <span class="rpt-section-chev" id="chev-rpt-coord">▼</span>
-    </div>
-    <div class="rpt-section-body" id="rpt-coord">
-      <div class="coord-grid">
-        <div class="coord-stat"><div class="coord-stat-label">Specialty Physicians</div><div class="coord-stat-value" id="coord-spec">—</div></div>
-        <div class="coord-stat"><div class="coord-stat-label">Authorization Risk Level</div><div class="coord-stat-value" id="coord-auth">—</div></div>
-        <div class="coord-stat"><div class="coord-stat-label">Referral Chain Complexity</div><div class="coord-stat-value" id="coord-ref">—</div></div>
-        <div class="coord-stat"><div class="coord-stat-label">Treatment Horizon</div><div class="coord-stat-value" id="coord-dur">—</div></div>
-      </div>
-      <div class="coord-impact" id="coord-impact"></div>
-    </div>
-  </div>
-
-  <!-- Primary Complexity Drivers -->
-  <div class="rpt-section">
-    <div class="rpt-section-head" onclick="toggleRptSection('rpt-drivers')">
-      <span class="rpt-section-label">Primary Complexity Drivers</span>
-      <span class="rpt-section-chev" id="chev-rpt-drivers">▼</span>
-    </div>
-    <div class="rpt-section-body" id="rpt-drivers">
-      <div class="r-cards">
-        <div class="r-card"><div class="r-card-label">Injury Severity</div><div id="r-card-d1"></div></div>
-        <div class="r-card"><div class="r-card-label">Functional System Disruption</div><div id="r-card-d2"></div></div>
-        <div class="r-card"><div class="r-card-label">Medical &amp; Care Coordination</div><div id="r-card-d3"></div></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Assessment Input Summary -->
-  <div class="rpt-section">
-    <div class="rpt-section-head" onclick="toggleRptSection('rpt-summary')">
-      <span class="rpt-section-label">Assessment Input Summary</span>
-      <span class="rpt-section-chev" id="chev-rpt-summary">▼</span>
-    </div>
-    <div class="rpt-section-body" id="rpt-summary">
-      <div class="summary-grid" id="summary-grid"></div>
-    </div>
-  </div>
-
-  <!-- Assessment Scope -->
-  <div class="rpt-section" style="border-bottom:none">
-    <div class="rpt-section-head" onclick="toggleRptSection('rpt-scope')" style="background:#f5f5f5;border-radius:0 0 8px 8px">
-      <span class="rpt-section-label" style="border-bottom-color:#888;color:#555">Assessment Scope</span>
-      <span class="rpt-section-chev" id="chev-rpt-scope" style="color:#888">▼</span>
-    </div>
-    <div class="rpt-section-body" id="rpt-scope" style="background:#f5f5f5;border-radius:0 0 8px 8px">
-      <p style="font-size:12px;color:#777;line-height:1.65">This report represents a point-in-time evaluation of case complexity based on the information provided during the assessment. Subsequent changes in medical condition, treatment progression, provider involvement, or healthcare access conditions will influence future case complexity evaluations.</p>
-    </div>
-  </div>
-
-  <div style="display: flex; gap: 16px; justify-content: center; margin-top: 40px;">
-    <button type="button" onclick="returnToDashboard()" class="btn-ghost">
-        ← Return to Dashboard
-    </button>
-    <button type="button" onclick="goToNext()" class="btn-primary">
-        Continue to Next Assessment →
-    </button>
-</div>
-
-</div>
-</div>
 </div>
 
 <script>
@@ -777,14 +599,6 @@ input[type=text]::placeholder{color:#bbb}
 // Read case type from portal launch URL (?caseType=active|closed)
 const caseType = new URLSearchParams(window.location.search).get('caseType') || 'active';
 
-// ── Report section accordion ──────────────────────────
-function toggleRptSection(id){
-  const body=document.getElementById(id);
-  const chev=document.getElementById('chev-'+id);
-  const isOpen=body.classList.contains('open');
-  body.classList.toggle('open',!isOpen);
-  chev.classList.toggle('open',!isOpen);
-}
 // ── Accordion ─────────────────────────────────────────
 function toggleStep(id){
   const body=document.getElementById('body-'+id);
@@ -936,55 +750,11 @@ function calculate(){
   const tierCap={1:1,2:2,3:3,4:4,5:4}[d1Tier];
   const level=d1Tier===1?1:Math.max(rawLevel,tierCap);
 
-  // HIDE FORM, SHOW REPORT
-  document.getElementById('assessment').style.display='none';
-  document.getElementById('report-view').style.display='block';
-  window.scrollTo({top:0,behavior:'smooth'});
-
-  // Notify Case Clarity portal that CCI is fully complete
-  if (window.opener && !window.opener.closed) {
-    // Notify Case Clarity portal that CCI is fully complete for the selected case type
-    window.opener.postMessage(
-      { type: 'INSTRUMENT_COMPLETE', instrument: 'CCI', caseType },
-      '*'
-    );
-  }
-
-  // LABELS
   const levelNames={1:'Extreme Case Complexity',2:'Severe Case Complexity',3:'Significant Case Complexity',4:'Moderate Case Complexity',5:'Stable Case Complexity'};
   const levelSubs={1:'Level 1 — Catastrophic injury and multi-system disruption identified.',2:'Level 2 — Severe injury with significant functional and coordination demands.',3:'Level 3 — Multiple interacting complexity factors identified across domains.',4:'Level 4 — Moderate complexity with manageable coordination requirements.',5:'Level 5 — Lower complexity profile identified. Standard monitoring indicated.'};
-
-  // METER — only active segment highlighted
-  const meterConfig={
-    1:{seg:4,color:'#c0392b',textColor:'#c0392b'},
-    2:{seg:3,color:'#c0392b',textColor:'#c0392b'},
-    3:{seg:3,color:'#b09837',textColor:'#b09837'},
-    4:{seg:2,color:'#b09837',textColor:'#b09837'},
-    5:{seg:1,color:'#666',textColor:'#999'}
-  };
-  const mc=meterConfig[level];
-  const tickLabels=['Stable','Moderate','Significant','Extreme'];
-  const activeTickIdx={1:3,2:3,3:2,4:1,5:0}[level];
-  for(let i=1;i<=4;i++){
-    const seg=document.getElementById('ms'+i);
-    const tick=document.getElementById('mt'+i);
-    // Only the single active segment is lit — all others muted
-    if(i===mc.seg){
-      seg.style.background=mc.color;
-      tick.style.color=mc.textColor;
-      tick.style.fontWeight='700';
-    } else {
-      seg.style.background='#2a2a2a';
-      tick.style.color='#444';
-      tick.style.fontWeight='400';
-    }
-  }
-
-  // BANNER + INTERVAL
-  document.getElementById('rpt-date').textContent='Generated: '+new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
-  document.getElementById('r-level-name').textContent=levelNames[level];
-  document.getElementById('r-level-sub').textContent=levelSubs[level];
-
+  const refLabels={0:'—',1:'Single provider',2:'Limited referrals',3:'Multi-step chain',4:'Multidisciplinary'};
+  const durLabels={0:'—',1:'Short-term',2:'Moderate course',3:'Extended rehab',4:'Long-term management',5:'Lifelong coordination'};
+  const authRisk=alignCount>=3?'HIGH':alignCount>=1?'MODERATE':'LOW';
   const cmgData={
     1:{interval:'Every 2–7 days',guidance:['Intensive case monitoring recommended','Frequent review of treatment sequencing and provider coordination','Monitor closely for treatment delays, authorization issues, and referral barriers','Early intervention may be required if recovery progression stalls'],priority:'Confirm all specialists have received records and are aligned on the treatment plan. Identify any pending authorizations and escalate immediately.',docFocus:'Establish baseline documentation for all catastrophic indicators. Document all provider communications, authorization requests, and treatment milestones from the outset.'},
     2:{interval:'Weekly',guidance:['Monitor provider coordination and treatment progression','Watch for emerging access barriers or referral delays','Track treatment milestones closely to prevent disruption of recovery progress'],priority:'Verify all active referrals are scheduled and confirm no authorization barriers are pending with the insurer.',docFocus:'Document all specialist referrals, treatment responses, and any payer communications. Note any deviations from the expected treatment pathway.'},
@@ -993,87 +763,49 @@ function calculate(){
     5:{interval:'Every 21–30 days',guidance:['Standard monitoring of treatment progression','Reassess complexity if treatment delays occur','Increase monitoring if new providers become involved or complications develop'],priority:'Confirm current treatment is progressing and that no new providers or complications have been introduced since the last review.',docFocus:'Keep standard treatment documentation current. Flag any new providers, complications, or payer activity for the next review cycle.'}
   };
   const cmg=cmgData[level];
-  document.getElementById('banner-interval').textContent=cmg.interval;
-
-  // DRIVER CARDS
-  function cardHTML(drivers){
-    if(!drivers.length) return '<div class="r-card-empty">No significant indicators identified.</div>';
-    return drivers.slice(0,3).map(d=>`<div class="driver-item"><div class="driver-dot"></div><span>${d}</span></div>`).join('');
-  }
-  document.getElementById('r-card-d1').innerHTML=cardHTML(d1Drivers);
-  document.getElementById('r-card-d2').innerHTML=cardHTML(d2Drivers);
-  document.getElementById('r-card-d3').innerHTML=cardHTML(d3Drivers);
-
-  // COORDINATION SUMMARY
-  const refLabels={0:'—',1:'Single provider',2:'Limited referrals',3:'Multi-step chain',4:'Multidisciplinary'};
-  const durLabels={0:'—',1:'Short-term',2:'Moderate course',3:'Extended rehab',4:'Long-term management',5:'Lifelong coordination'};
-  const authRisk=alignCount>=3?'HIGH':alignCount>=1?'MODERATE':'LOW';
-  const authClass=alignCount>=3?'risk-high':alignCount>=1?'risk-mod':'risk-low';
-  document.getElementById('coord-spec').textContent=specCount>0?specCount+' specialist'+(specCount>1?'s':''):'None identified';
-  const authEl=document.getElementById('coord-auth');
-  authEl.textContent=authRisk; authEl.className='coord-stat-value '+authClass;
-  document.getElementById('coord-ref').textContent=refLabels[refVal]||'—';
-  document.getElementById('coord-dur').textContent=durLabels[durVal]||'—';
-  const impactMap={1:'This case will require dedicated, high-frequency staff attention. Assign a single point of contact for care coordination and establish a structured monitoring schedule immediately.',2:'This case requires active staff coordination and frequent provider communication. Establish clear escalation protocols and a dedicated coordination contact.',3:'This case requires structured monitoring with regular check-ins. Assign coordination responsibility and track treatment milestones proactively.',4:'This case can be managed with standard coordination protocols. Periodic check-ins and timely communication with the treatment team are sufficient.',5:'Standard case monitoring protocols are appropriate. Reassess if treatment complexity increases.'};
-  document.getElementById('coord-impact').textContent=impactMap[level];
-
-  // CLINICAL INTERPRETATION
-  const s1Map={1:'This case demonstrates catastrophic injury severity with indicators consistent with profound physiologic compromise.',2:'This case presents severe injury with significant acute indicators that elevate the overall complexity profile.',3:'This case reflects significant injury with multiple factors affecting recovery trajectory and clinical management.',4:'This case involves moderate injury complexity with recovery indicators requiring coordinated follow-through.',5:'This case presents a stable injury profile with manageable clinical demands at this time.'};
-  let s2='';
-  if(psAffected>=3) s2='Disruption across '+(psAffected===4?'all four':'multiple')+' functional life domains significantly increases the burden on recovery and long-term care planning.';
-  else if(psAffected===2) s2='Impact across two functional life domains adds measurable complexity to care coordination and recovery management.';
-  else if(psAffected===1) s2='Functional system impact is present in one life domain and should be monitored for expansion during recovery.';
-  else s2='No significant functional system disruption was identified at this time.';
-  let s3='';
-  if(d3Pts>=10) s3='Sustained multidisciplinary coordination demands, evidence-based treatment barriers, and'+(phPreExisting.length>=2?' complicating pre-existing medical conditions further elevate':'')+' care management complexity.';
-  else if(d3Pts>=6) s3='Care coordination requirements are elevated, with'+(phPreExisting.length>=1?' pre-existing medical conditions and':'')+' active referral management needed across the treatment team.';
-  else if(phPreExisting.length>=1) s3='Pre-existing medical conditions are present and should be factored into care planning and recovery timelines.';
-  else s3='Care coordination demands appear manageable within standard case management protocols.';
-  const s4Map={1:'Cases at this level require structured oversight, immediate prioritization, multidisciplinary coordination, and continuous monitoring.',2:'Cases at this level require structured oversight, close interdisciplinary coordination, and proactive barrier resolution.',3:'Cases at this level require consistent monitoring, coordinated follow-through, and attention to emerging barriers to prevent deterioration.',4:'Cases at this level are manageable with regular follow-through, timely communication, and standard care coordination protocols.',5:'Continued monitoring is appropriate with escalation protocols in place should clinical or functional status change.'};
-  document.getElementById('r-interp').innerHTML=[s1Map[level],s2,s3,s4Map[level]].filter(Boolean).map(s=>`<p>${s}</p>`).join('');
-
-  // CMG
-  document.getElementById('cmg-guidance').innerHTML=cmg.guidance.map(g=>`<li>${g}</li>`).join('');
-  document.getElementById('priority-action').textContent=cmg.priority;
-  document.getElementById('doc-focus').textContent=cmg.docFocus;
-
-  // ASSESSMENT INPUT SUMMARY
-  const durTextMap={0:'Not specified',1:'Short-term episode',2:'Moderate treatment course',3:'Extended rehabilitation',4:'Long-term medical management',5:'Lifelong care coordination'};
-  const refTextMap={0:'Not specified',1:'Single provider care',2:'Limited referrals',3:'Multi-step referral chain',4:'Ongoing multidisciplinary referrals'};
-  function makeSummaryItem(label, value){
-    return`<div class="summary-item"><div class="summary-item-label">${label}</div><div class="summary-item-value">${value}</div></div>`;
-  }
-  function makeSummaryTags(label, items){
-    if(!items.length) return makeSummaryItem(label,'None selected');
-    const tags=items.map(v=>`<span class="summary-tag">${v}</span>`).join('');
-    return`<div class="summary-item"><div class="summary-item-label">${label}</div><div class="summary-tags">${tags}</div></div>`;
-  }
-  let summaryHTML='';
-  summaryHTML+=makeSummaryItem('Primary Injury',(regionText&&specificVal)?regionText+' — '+specificVal:regionText||specificVal||'Not specified');
-  summaryHTML+=makeSummaryItem('Catastrophic Indicators Selected', catAll.length>0?catAll.length+' indicator'+(catAll.length>1?'s':''):'None');
-  summaryHTML+=makeSummaryItem('Recovery Impact Indicators', recAll.length>0?recAll.length+' indicator'+(recAll.length>1?'s':''):'None');
-  summaryHTML+=makeSummaryItem('Functional Domains Affected', psAffected>0?psAffected+' of 4 life domains':'None');
-  summaryHTML+=makeSummaryTags('Specialty Physicians', specAll.map(c=>c.value));
-  summaryHTML+=makeSummaryTags('Rehabilitation Providers', rehabAll.map(c=>c.value));
-  summaryHTML+=makeSummaryItem('Referral Chain Depth', refTextMap[refVal]);
-  summaryHTML+=makeSummaryItem('Treatment Duration', durTextMap[durVal]);
-  if(alignCount>0) summaryHTML+=makeSummaryTags('Treatment Alignment Issues', alignAll.map(c=>c.value));
-  if(phPreExisting.length>0) summaryHTML+=makeSummaryTags('Pre-Existing Conditions', phPreExisting.map(c=>c.value));
-  document.getElementById('summary-grid').innerHTML=summaryHTML;
-
-  // Notify portal that this assessment is complete with full report data
-  const assessmentData = {
+  const assessmentData={
     level,
-    levelName: levelNames[level],
-    levelSub: levelSubs[level],
-    interval: cmg.interval,
-    drivers: { injury: d1Drivers, functional: d2Drivers, coordination: d3Drivers },
-    priorityAction: cmg.priority,
-    docFocus: cmg.docFocus,
-    coord: { specCount, authRisk, ref: refLabels[refVal], dur: durLabels[durVal] },
-    generatedAt: new Date().toISOString()
+    levelName:levelNames[level],
+    levelSub:levelSubs[level],
+    interval:cmg.interval,
+    drivers:{injury:d1Drivers,functional:d2Drivers,coordination:d3Drivers},
+    priorityAction:cmg.priority,
+    docFocus:cmg.docFocus,
+    coord:{specCount,authRisk,ref:refLabels[refVal],dur:durLabels[durVal]},
+    generatedAt:new Date().toISOString()
   };
-  if (typeof window.markAssessmentComplete === 'function') {
+  const toolData={
+    completed:true,
+    timestamp:new Date().toISOString(),
+    caseType,
+    level,
+    d1Tier,d2Tier,d3Tier,
+    composite,
+    rawLevel,
+    primaryRegion:regionText,
+    specificInjury:specificVal,
+    catastrophicSelections:catAll.map(c=>c.value),
+    recoverySelections:recAll.map(c=>c.value),
+    specialtySelections:specAll.map(c=>c.value),
+    rehabSelections:rehabAll.map(c=>c.value),
+    alignmentSelections:alignAll.map(c=>c.value),
+    preExistingSelections:phPreExisting.map(c=>c.value),
+    referralDepth:refVal,
+    treatmentDuration:durVal,
+    psAffected,
+    assessmentData
+  };
+  localStorage.setItem('tool1_data',JSON.stringify(toolData));
+  localStorage.setItem('tool1_complete','true');
+
+  document.getElementById('assessment').style.display='none';
+  document.getElementById('trial-complete').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+
+  if(window.opener&&!window.opener.closed){
+    window.opener.postMessage({type:'INSTRUMENT_COMPLETE',instrument:'CCI',caseType},'*');
+  }
+  if(typeof window.markAssessmentComplete==='function'){
     window.markAssessmentComplete(assessmentData);
   }
 }
@@ -1091,7 +823,7 @@ function resetAll(){
     document.getElementById('body-'+id).classList.remove('open');
     document.getElementById('chevron-'+id).classList.remove('open');
   });
-  document.getElementById('report-view').style.display='none';
+  document.getElementById('trial-complete').style.display='none';
   document.getElementById('assessment').style.display='none';
   document.getElementById('explainer').style.display='block';
   window.scrollTo({top:0,behavior:'smooth'});

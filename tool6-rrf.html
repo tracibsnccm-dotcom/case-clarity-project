@@ -758,28 +758,6 @@
         <button class="btn-outline" onclick="resetTool()">← Back to Case Type Selection</button>
       </div>
 
-      <!-- Case Reference Block -->
-      <div class="case-reference-block">
-        <div class="case-reference-title">Case Reference (For Your Records Only)</div>
-        <div class="case-reference-desc">Optional information to help you identify which case this forecast belongs to. This information appears on the final report but is not used in the risk calculation.</div>
-        <div class="case-reference-fields">
-          <div class="field">
-            <label>Client Name</label>
-            <input type="text" id="pi_clientName" placeholder="Enter client name" />
-          </div>
-          <div class="field">
-            <label>Date of Injury / Date of Loss</label>
-            <input type="date" id="pi_doi" />
-          </div>
-          <div class="field">
-            <label>Matter / Case Reference <span style="font-weight:400;color:var(--gray-400);">(Optional)</span></label>
-            <input type="text" id="pi_caseRef" placeholder="File number or matter name" />
-          </div>
-        </div>
-        <div class="case-reference-helper">This information is for reference only and does not affect the recovery risk calculation.</div>
-      </div>
-      <hr class="case-ref-divider" />
-
       <!-- Global Completion Meter -->
       <div id="pi_completion_meter" class="completion-meter">
         <div class="completion-label">Form Completion</div>
@@ -1050,28 +1028,6 @@
       <div style="margin-bottom:1.25rem;">
         <button class="btn-outline" onclick="resetTool()">← Back to Case Type Selection</button>
       </div>
-
-      <!-- Case Reference Block -->
-      <div class="case-reference-block">
-        <div class="case-reference-title">Case Reference (For Your Records Only)</div>
-        <div class="case-reference-desc">Optional information to help you identify which case this forecast belongs to. This information appears on the final report but is not used in the risk calculation.</div>
-        <div class="case-reference-fields">
-          <div class="field">
-            <label>Client Name</label>
-            <input type="text" id="wc_clientName" placeholder="Enter client name" />
-          </div>
-          <div class="field">
-            <label>Date of Injury / Date of Loss</label>
-            <input type="date" id="wc_doi" />
-          </div>
-          <div class="field">
-            <label>Matter / Case Reference <span style="font-weight:400;color:var(--gray-400);">(Optional)</span></label>
-            <input type="text" id="wc_caseRef" placeholder="File number or matter name" />
-          </div>
-        </div>
-        <div class="case-reference-helper">This information is for reference only and does not affect the recovery risk calculation.</div>
-      </div>
-      <hr class="case-ref-divider" />
 
       <!-- Global Completion Meter -->
       <div id="wc_completion_meter" class="completion-meter">
@@ -1748,48 +1704,25 @@
     const baseDuration = 180;
     const predicted = Math.round(baseDuration * durationMult);
 
-    const clientName = document.getElementById('pi_clientName').value.trim();
-    const doi = document.getElementById('pi_doi').value;
-    const caseRef = document.getElementById('pi_caseRef').value.trim();
-    const doiFormatted = doi ? new Date(doi + 'T00:00:00').toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'}) : '';
+    const toolData = {
+      completed: true,
+      timestamp: new Date().toISOString(),
+      branch: 'PI',
+      caseType,
+      total,
+      level,
+      predictedDays: predicted,
+      durationMult,
+      extrinsicRaw,
+      intrinsicRaw,
+      behavioralRaw,
+      extrinsicScore,
+      intrinsicScore,
+      behavioralScore
+    };
+    localStorage.setItem('tool6_data', JSON.stringify(toolData));
+    localStorage.setItem('tool6_complete', 'true');
 
-    let caseHeaderHTML = '';
-    if (clientName || doi || caseRef) {
-      caseHeaderHTML = `<div class="report-case-header">
-        <div class="report-case-title">Recovery Risk Forecast</div>
-        ${clientName ? `<div class="report-case-line"><strong>Client:</strong> ${clientName}</div>` : ''}
-        ${doiFormatted ? `<div class="report-case-line"><strong>Date of Injury:</strong> ${doiFormatted}</div>` : ''}
-        ${caseRef ? `<div class="report-case-line"><strong>Matter:</strong> ${caseRef}</div>` : ''}
-      </div>`;
-    }
-
-    const resultDiv = document.getElementById('piResult');
-    resultDiv.className = `result-box ${riskClass(level)}`;
-    resultDiv.innerHTML = `
-      ${caseHeaderHTML}
-      <div class="result-level">Recovery Risk: ${level}</div>
-      <div class="result-score">Score: ${total} / 100 &nbsp;|&nbsp; Personal Injury</div>
-      <div class="score-bar-wrap">
-        <div class="score-bar-track"><div class="score-bar-fill" style="width:${total}%"></div></div>
-      </div>
-      <div class="result-section-label">Clinical Assessment</div>
-      <p class="result-narrative">${piNarrative(level)}</p>
-      <div class="result-section-label">Estimated Treatment Duration</div>
-      <div class="duration-note">Based on severity modifiers — approximately <strong>${predicted} days</strong>.<br><span style="font-size:0.82rem;font-weight:400;color:#555;">Severity modifiers reflect structural damage, neurological involvement, multi-region injury, surgical pathway, chronic conditions, mechanism severity, and complicated healing patterns. This is an illustrative estimate and does not account for individual variability.</span></div>
-      <div class="result-section-label">C.A.R.E. Tie-In</div>
-      <div class="care-tiein">${careTieIn(level)}</div>
-      <div style="display: flex; gap: 16px; justify-content: center; margin-top: 40px;">
-    <button onclick="returnToDashboard()" class="btn-ghost">
-        ← Return to Dashboard
-    </button>
-    <button onclick="goToNext()" class="btn-primary">
-        Complete & Return to Dashboard →
-    </button>
-</div>
-    `;
-    resultDiv.classList.remove('hidden');
-
-    // Notify Case Clarity portal that RRF is fully complete for the selected case type
     if (window.opener && !window.opener.closed) {
       window.opener.postMessage(
         { type: 'INSTRUMENT_COMPLETE', instrument: 'RRF', caseType },
@@ -1797,7 +1730,7 @@
       );
     }
 
-    resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    window.location.href = 'dashboard.html?complete=true';
   }
 
   /* ── WC Calculation ── */
@@ -1860,48 +1793,25 @@
     const baseDuration = 94;
     const predicted = Math.round(baseDuration * durationMult);
 
-    const clientName = document.getElementById('wc_clientName').value.trim();
-    const doi = document.getElementById('wc_doi').value;
-    const caseRef = document.getElementById('wc_caseRef').value.trim();
-    const doiFormatted = doi ? new Date(doi + 'T00:00:00').toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'}) : '';
+    const toolData = {
+      completed: true,
+      timestamp: new Date().toISOString(),
+      branch: 'WC',
+      caseType,
+      total,
+      level,
+      predictedDays: predicted,
+      durationMult,
+      extrinsicRaw,
+      intrinsicRaw,
+      behavioralRaw,
+      extrinsicScore,
+      intrinsicScore,
+      behavioralScore
+    };
+    localStorage.setItem('tool6_data', JSON.stringify(toolData));
+    localStorage.setItem('tool6_complete', 'true');
 
-    let caseHeaderHTML = '';
-    if (clientName || doi || caseRef) {
-      caseHeaderHTML = `<div class="report-case-header">
-        <div class="report-case-title">Recovery Risk Forecast</div>
-        ${clientName ? `<div class="report-case-line"><strong>Client:</strong> ${clientName}</div>` : ''}
-        ${doiFormatted ? `<div class="report-case-line"><strong>Date of Injury:</strong> ${doiFormatted}</div>` : ''}
-        ${caseRef ? `<div class="report-case-line"><strong>Matter:</strong> ${caseRef}</div>` : ''}
-      </div>`;
-    }
-
-    const resultDiv = document.getElementById('wcResult');
-    resultDiv.className = `result-box ${riskClass(level)}`;
-    resultDiv.innerHTML = `
-      ${caseHeaderHTML}
-      <div class="result-level">Recovery Risk: ${level}</div>
-      <div class="result-score">Score: ${total} / 100 &nbsp;|&nbsp; Workers' Compensation</div>
-      <div class="score-bar-wrap">
-        <div class="score-bar-track"><div class="score-bar-fill" style="width:${total}%"></div></div>
-      </div>
-      <div class="result-section-label">Clinical Assessment</div>
-      <p class="result-narrative">${wcNarrative(level)}</p>
-      <div class="result-section-label">Estimated Treatment Duration</div>
-      <div class="duration-note">Based on severity modifiers — approximately <strong>${predicted} days</strong>.<br><span style="font-size:0.82rem;font-weight:400;color:#555;">Severity modifiers reflect structural damage, neurological involvement, multi-region injury, surgical pathway, chronic conditions, mechanism severity, and complicated healing patterns. This is an illustrative estimate and does not account for individual variability.</span></div>
-      <div class="result-section-label">C.A.R.E. Tie-In</div>
-      <div class="care-tiein">${careTieIn(level)}</div>
-      <div style="display: flex; gap: 16px; justify-content: center; margin-top: 40px;">
-    <button onclick="returnToDashboard()" class="btn-ghost">
-        ← Return to Dashboard
-    </button>
-    <button onclick="goToNext()" class="btn-primary">
-        Complete & Return to Dashboard →
-    </button>
-</div>
-    `;
-    resultDiv.classList.remove('hidden');
-
-    // Notify Case Clarity portal that RRF is fully complete for the selected case type
     if (window.opener && !window.opener.closed) {
       window.opener.postMessage(
         { type: 'INSTRUMENT_COMPLETE', instrument: 'RRF', caseType },
@@ -1909,7 +1819,7 @@
       );
     }
 
-    resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    window.location.href = 'dashboard.html?complete=true';
   }
   /* ── Global select listener for completion meter ── */
   document.addEventListener('change', function(e) {

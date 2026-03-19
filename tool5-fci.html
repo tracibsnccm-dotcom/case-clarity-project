@@ -548,7 +548,7 @@ function setState(patch){ Object.assign(S,patch); render(); }
 // ─────────────────────────────────────────────────────────────────────────────
 function appHeader(){ return `<header class="app-header no-print"><div class="app-header-left"><span class="app-header-brand">Reconcile Care Management Services</span><span class="app-header-div">|</span><span class="app-header-title">Functional Capacity Index</span></div><span class="app-header-right">Care Management Assessment Tool</span></header>`; }
 
-const PROGRESS_STEPS=["intro","context","vuln-intro","vuln","domain-0","domain-1","domain-2","domain-3"];
+const PROGRESS_STEPS=["intro","vuln-intro","vuln","domain-0","domain-1","domain-2","domain-3","complete"];
 function progressBar(screen){
   const idx=PROGRESS_STEPS.indexOf(screen);
   if(idx<0) return "";
@@ -593,16 +593,8 @@ function screenIntro(){
     <div class="nav-row no-print"><button type="button" class="btn-ghost" id="intro-back">&larr; Back</button><button type="button" class="btn-primary" id="intro-next">Begin Analysis &rarr;</button></div></div></div>`;
 }
 
-function screenContext(){
-  return appHeader()+`<div class="container">`+progressBar("context")+`<span class="eyebrow">Step 1 of 8 — Client Context</span><h2 class="section-title">Client / Case Context</h2><div style="margin-bottom:32px"><p style="font-size:15px;color:#3a4a5a;line-height:1.75;margin:0 0 14px">The following information provides contextual factors that may influence the client's functional stability and recovery environment. These factors may contribute to the Functional Vulnerability Indicator but do not change the Functional Capacity Index score.</p><p style="font-size:15px;color:#3a4a5a;line-height:1.75;margin:0">This information helps identify circumstances that may increase pressure on recovery or influence return-to-work decisions during the course of a case.</p></div><div class="card"><div class="grid-2">`+
-    fieldWrap("Client Reference (Optional)",false,textInput("ctx-ref",S.ctx.clientRef,"Initials, file number, or case ID"),"Do not enter full name or SSN.")+
-    `<div class="field-wrap"><label class="field-label">Date of Injury</label>${dateInput("ctx-doi",S.ctx.doi)}</div>`+
-    fieldWrap("Injury Type (Optional)",false,selectInput("ctx-injury",S.ctx.injuryType,INJURY_TYPES))+
-    `</div><div class="nav-row no-print"><button type="button" class="btn-ghost" id="ctx-back">&larr; Back</button><span class="nav-status">No required fields on this page</span><button type="button" class="btn-primary" id="ctx-next">Next &rarr;</button></div></div></div>`;
-}
-
 function screenVulnIntro(){
-  return appHeader()+`<div class="container">`+progressBar("vuln-intro")+`<span class="eyebrow">Step 2 of 8 — Vulnerability Overview</span><h2 class="section-title">Functional Vulnerability Indicator</h2><div class="card"><p style="font-size:15px;color:#3a4a5a;line-height:1.85;margin:0 0 20px">The Functional Vulnerability Indicator identifies contextual factors that may increase pressure on a client's recovery trajectory or increase the likelihood of premature return to work before full recovery or medical clearance.</p><p style="font-size:15px;color:#3a4a5a;line-height:1.85;margin:0 0 20px">This portion of the analysis considers factors such as income level, dependent responsibilities, sole income earner status, pain related to injury, and psychological stress. These factors may increase vulnerability during recovery and may affect the client's ability to maintain stability over the life of a case.</p><p style="font-size:15px;color:#3a4a5a;line-height:1.85;margin:0 0 32px">These indicators help inform the Functional Vulnerability Indicator but <strong>do not</strong> change the Functional Capacity Index score.</p><div class="callout" style="margin-bottom:32px"><span class="callout-label">Indicators Covered</span><ul style="margin:0;padding:0;list-style:none">`+
+  return appHeader()+`<div class="container">`+progressBar("vuln-intro")+`<span class="eyebrow">Step 1 of 7 — Vulnerability Overview</span><h2 class="section-title">Functional Vulnerability Indicator</h2><div class="card"><p style="font-size:15px;color:#3a4a5a;line-height:1.85;margin:0 0 20px">The Functional Vulnerability Indicator identifies contextual factors that may increase pressure on a client's recovery trajectory or increase the likelihood of premature return to work before full recovery or medical clearance.</p><p style="font-size:15px;color:#3a4a5a;line-height:1.85;margin:0 0 20px">This portion of the analysis considers factors such as income level, dependent responsibilities, sole income earner status, pain related to injury, and psychological stress. These factors may increase vulnerability during recovery and may affect the client's ability to maintain stability over the life of a case.</p><p style="font-size:15px;color:#3a4a5a;line-height:1.85;margin:0 0 32px">These indicators help inform the Functional Vulnerability Indicator but <strong>do not</strong> change the Functional Capacity Index score.</p><div class="callout" style="margin-bottom:32px"><span class="callout-label">Indicators Covered</span><ul style="margin:0;padding:0;list-style:none">`+
     ["Pre-Injury Annual Income Range","Dependent Responsibilities","Sole Income Earner Status","Pain Related to Injury","Psychological Stress (Depression / Anxiety)"].map(i=>`<li style="display:flex;align-items:baseline;gap:10px;font-size:13px;color:#3a4a5a;padding:7px 0;border-bottom:1px solid #e8e3d8"><span style="color:#b8922a;font-size:10px;flex-shrink:0">&#9670;</span>${esc(i)}</li>`).join("")+
     `</ul></div><div class="nav-row no-print"><button type="button" class="btn-ghost" id="vi-back">&larr; Back</button><button type="button" class="btn-primary" id="vi-next">Continue to Vulnerability Indicators &rarr;</button></div></div></div>`;
 }
@@ -610,7 +602,7 @@ function screenVulnIntro(){
 function screenVuln(){
   const can=S.fviFields.incomeRange!==""&&S.fviFields.hasDependents!==""&&S.fviFields.isSoleEarner!==""&&S.vulnScores.pain!==null&&S.vulnScores.psych!==null;
   const shortL={5:"Minimal",4:"Mild",3:"Moderate",2:"Significant",1:"Severe"};
-  let html=appHeader()+`<div class="container">`+progressBar("vuln")+`<span class="eyebrow">Step 3 of 8 — Vulnerability Indicators</span><h2 class="section-title">Functional Vulnerability Indicators</h2><p class="subtitle">These indicators help identify factors that may increase vulnerability during recovery. They may influence the Functional Vulnerability Indicator but <span style="font-style:normal">do not</span> change the Functional Capacity Index score.</p><div class="card"><div style="margin-bottom:28px;padding-bottom:28px;border-bottom:1px solid #e8e3d8"><span class="vuln-section-label">Financial &amp; Household Context</span><div class="grid-3">`+
+  let html=appHeader()+`<div class="container">`+progressBar("vuln")+`<span class="eyebrow">Step 2 of 7 — Vulnerability Indicators</span><h2 class="section-title">Functional Vulnerability Indicators</h2><p class="subtitle">These indicators help identify factors that may increase vulnerability during recovery. They may influence the Functional Vulnerability Indicator but <span style="font-style:normal">do not</span> change the Functional Capacity Index score.</p><div class="card"><div style="margin-bottom:28px;padding-bottom:28px;border-bottom:1px solid #e8e3d8"><span class="vuln-section-label">Financial &amp; Household Context</span><div class="grid-3">`+
     fieldWrap("Pre-Injury Annual Income Range",true,selectInput("fvi-income",S.fviFields.incomeRange,INCOME_RANGES),"Used to calculate the Functional Vulnerability Indicator.")+
     fieldWrap("Dependents",true,selectInput("fvi-dep",S.fviFields.hasDependents,YES_NO),"Does the client have financial dependents?")+
     fieldWrap("Sole Income Earner",true,selectInput("fvi-sole",S.fviFields.isSoleEarner,YES_NO),"Is the client the primary or sole household income earner?")+
@@ -633,108 +625,40 @@ function screenVuln(){
 function screenDomain(idx){
   const dom=DOMAINS[idx];
   const cur=S.scores[dom.id];
-  const stepNum=idx+5;
+  const stepNum=idx+3;
   const shortL={5:"Minimal",4:"Mild",3:"Moderate",2:"Significant",1:"Severe"};
-  let html=appHeader()+`<div class="container">`+progressBar("domain-"+idx)+`<span class="eyebrow">Step ${stepNum} of 8 — Domain Assessment</span><h2 class="section-title">${esc(dom.label)}</h2><p class="subtitle">${esc(dom.subtitle)}</p><div style="font-size:14px;color:#0e1c2e;margin-bottom:22px;padding:14px 20px;background:#faf8f4;border:1px solid #e8e3d8;border-left:3px solid #b8922a;line-height:1.7">Select the level that most accurately reflects the client's current situation in this domain. Choose the <strong>lowest level</strong> that accurately applies.</div>`;
+  let html=appHeader()+`<div class="container">`+progressBar("domain-"+idx)+`<span class="eyebrow">Step ${stepNum} of 7 — Domain Assessment</span><h2 class="section-title">${esc(dom.label)}</h2><p class="subtitle">${esc(dom.subtitle)}</p><div style="font-size:14px;color:#0e1c2e;margin-bottom:22px;padding:14px 20px;background:#faf8f4;border:1px solid #e8e3d8;border-left:3px solid #b8922a;line-height:1.7">Select the level that most accurately reflects the client's current situation in this domain. Choose the <strong>lowest level</strong> that accurately applies.</div>`;
   dom.levels.slice().sort((a,b)=>b.score-a.score).forEach(lv=>{
     const active=cur===lv.score;
     html+=`<div class="level-card${active?" active":""}" data-domain="${dom.id}" data-score="${lv.score}"><div class="level-num${active?" active":""}">${lv.score}</div><div><p class="level-title${active?" active":""}">${esc(lv.title)}</p><p class="level-desc">${esc(lv.description)}</p></div></div>`;
   });
   const last=idx===DOMAINS.length-1;
-  html+=`<div class="nav-row no-print"><button type="button" class="btn-ghost" id="dom-back">&larr; Back</button><span class="nav-status">${cur?"Level "+cur+" selected":"No level selected"}</span><button type="button" class="btn-primary" id="dom-next" ${cur?"":"disabled"}>${last?"Review Analysis &rarr;":"Next Domain &rarr;"}</button></div></div>`;
+  html+=`<div class="nav-row no-print"><button type="button" class="btn-ghost" id="dom-back">&larr; Back</button><span class="nav-status">${cur?"Level "+cur+" selected":"No level selected"}</span><button type="button" class="btn-primary" id="dom-next" ${cur?"":"disabled"}>${last?"Finish &rarr;":"Next Domain &rarr;"}</button></div></div>`;
   return html;
 }
 
-function screenReview(){
-  const sv=DOMAINS.map(d=>S.scores[d.id]).filter(Boolean);
-  const minS=sv.length===4?Math.min(...sv):null;
-  const weak=minS?DOMAINS.filter(d=>S.scores[d.id]===minS).map(d=>d.label):[];
-  const fvi=computeFVI({...S.fviFields,painScore:S.vulnScores.pain,psychScore:S.vulnScores.psych});
-  const paras=buildInterp({fciScore:minS,primaryDomains:weak,fvi,painScore:S.vulnScores.pain,psychScore:S.vulnScores.psych});
-  const doiDisp=S.ctx.doi?fmtDate(new Date(S.ctx.doi+"T12:00:00")):null;
-
-  let html=appHeader()+`<div class="container"><span class="eyebrow">Analysis Review</span><h2 class="section-title">Review Before Generating Final Analysis</h2><p style="font-size:15px;color:#3a4a5a;line-height:1.7;margin:0 0 32px">Review the interpretation and input summary below. When ready, click <strong>Review and Print Analysis</strong> to generate the final Functional Capacity Index Analysis.</p>`;
-  html+=interpBlock(paras)+reassessBlock();
-  html+=`<div class="card print-card" style="margin-bottom:24px"><span class="section-label">Summary of Inputs</span><span class="section-sublabel">4Ps Domain Scores</span>`;
-  DOMAINS.forEach(d=>{ const s=S.scores[d.id]; html+=scoreBarRow(d,s,s===minS); });
-  html+=`<div style="border-top:1px solid #e8e3d8;padding-top:18px;margin-top:18px"><span class="section-sublabel">Vulnerability Indicators</span><div class="grid-context-2">`;
-  VULN_INDICATORS.forEach(ind=>{ const s=S.vulnScores[ind.id]; const t=ind.levels.find(l=>l.score===s)?.title||"—"; html+=`<div class="data-cell"><span class="data-cell-label">${esc(ind.label)}</span><span class="data-cell-value">${s} — ${esc(t)}</span></div>`; });
-  html+=`</div></div><div style="border-top:1px solid #e8e3d8;padding-top:18px;margin-top:18px"><span class="section-sublabel">Financial &amp; Household Context</span><div class="grid-context-3">`;
-  [[S.fviFields.incomeRange,INCOME_RANGES,"Income Range"],[S.fviFields.hasDependents,YES_NO,"Dependents"],[S.fviFields.isSoleEarner,YES_NO,"Sole Income Earner"]].forEach(([v,opts,lbl])=>{
-    const disp=(opts.find(o=>o.value===v)||{label:"—"}).label;
-    html+=`<div class="data-cell"><span class="data-cell-label">${esc(lbl)}</span><span class="data-cell-value">${esc(disp)}</span></div>`;
-  });
-  html+=`</div></div>`;
-  if(S.ctx.clientRef||doiDisp||S.ctx.injuryType){
-    html+=`<div style="border-top:1px solid #e8e3d8;padding-top:16px;margin-top:16px;display:flex;gap:32px;flex-wrap:wrap">`;
-    if(S.ctx.clientRef) html+=`<div><span class="data-cell-label">Client Reference</span><span class="data-cell-value">${esc(S.ctx.clientRef)}</span></div>`;
-    if(doiDisp) html+=`<div><span class="data-cell-label">Date of Injury</span><span class="data-cell-value">${esc(doiDisp)}</span></div>`;
-    if(S.ctx.injuryType){ const t=(INJURY_TYPES.find(x=>x.value===S.ctx.injuryType)||{label:S.ctx.injuryType}).label; html+=`<div><span class="data-cell-label">Injury Type</span><span class="data-cell-value">${esc(t)}</span></div>`; }
-    html+=`</div>`;
-  }
-  html+=`</div><div class="nav-row no-print"><button type="button" class="btn-ghost" id="rev-back">&larr; Back to Assessment</button><button type="button" class="btn-primary" id="rev-next">Review and Print Analysis &rarr;</button></div></div>`;
-  return html;
-}
-
-function screenFinal(){
-  const sv=DOMAINS.map(d=>S.scores[d.id]).filter(Boolean);
+function saveTool5AndComplete(){
+  const sv=DOMAINS.map(d=>S.scores[d.id]).filter(v=>v!=null);
+  if(sv.length!==4) return;
   const minS=Math.min(...sv);
   const weak=DOMAINS.filter(d=>S.scores[d.id]===minS).map(d=>d.label);
-  const fci=FCI_CLASS[minS];
   const fvi=computeFVI({...S.fviFields,painScore:S.vulnScores.pain,psychScore:S.vulnScores.psych});
-  const fviC=FVI_COLOR[fvi];
-  const paras=buildInterp({fciScore:minS,primaryDomains:weak,fvi,painScore:S.vulnScores.pain,psychScore:S.vulnScores.psych});
-  const prepFor=buildPreparedFor("","");
-  const doiDisp=S.ctx.doi?fmtDate(new Date(S.ctx.doi+"T12:00:00")):null;
+  const toolData={
+    completed:true,
+    timestamp:new Date().toISOString(),
+    scores:{...S.scores},
+    vulnScores:{...S.vulnScores},
+    fviFields:{...S.fviFields},
+    fciMinScore:minS,
+    primaryInstabilityDomains:weak,
+    functionalVulnerabilityIndicator:fvi
+  };
+  localStorage.setItem('tool5_data',JSON.stringify(toolData));
+  localStorage.setItem('tool5_complete','true');
+}
 
-  let html=appHeader();
-  html+=`<div class="final-nav-bar no-print"><button type="button" class="btn-ghost" id="fin-back">&larr; Back to Review</button><span class="final-nav-hint">Use the Print Analysis button below to save or print this document.</span></div>`;
-  html+=`<div class="print-root" style="max-width:860px;margin:0 auto;padding:48px 32px 80px">`;
-
-  // Report header
-  html+=`<div class="report-header print-card"><div class="report-header-inner"><div><span class="report-brand">Reconcile Care Management Services</span><h1 class="report-title">Functional Capacity Index Analysis</h1><div class="report-meta">`;
-  [["Prepared for",prepFor],["Prepared by","Reconcile Care Management Services"],["Analysis Date",S.analysisDate]].forEach(([l,v])=>{
-    html+=`<div class="report-meta-row"><span class="report-meta-label">${esc(l)}</span><span class="report-meta-value">${esc(v)}</span></div>`;
-  });
-  if(S.ctx.clientRef) html+=`<div class="report-meta-row"><span class="report-meta-label">Client Ref</span><span class="report-meta-value">${esc(S.ctx.clientRef)}</span></div>`;
-  if(doiDisp) html+=`<div class="report-meta-row"><span class="report-meta-label">Date of Injury</span><span class="report-meta-value">${esc(doiDisp)}</span></div>`;
-  html+=`</div></div><div class="report-right"><span class="report-right-label">4Ps of Wellness</span><span class="report-right-sub">Care Management Assessment Tool</span></div></div></div>`;
-
-  // FCI / FVI / Primary tiles
-  html+=`<div class="grid-tiles-3">`;
-  html+=`<div class="summary-tile print-summary-tile" style="background:${fci.bg};border:1px solid ${fci.border};border-top-color:${fci.text}"><span class="summary-tile-label">Functional Capacity Index</span><div class="summary-tile-score" style="color:${fci.text}">${minS}</div><div class="summary-tile-status" style="color:${fci.text}">${esc(fci.label)}</div><div class="summary-tile-sub">Score: ${minS} / 5 — Lowest Domain</div></div>`;
-  html+=`<div class="summary-tile print-summary-tile" style="background:${fviC.bg};border:1px solid ${fviC.border};border-top-color:${fviC.text}"><span class="summary-tile-label">Functional Vulnerability Indicator</span><div class="summary-tile-fvi" style="color:${fviC.text}">${esc(fvi)}</div><div class="summary-tile-fvi-sub" style="color:${fviC.text}">Vulnerability Pressure Level</div><div class="summary-tile-sub">Contextual &middot; Does Not Affect FCI</div></div>`;
-  html+=`<div class="summary-tile print-summary-tile" style="background:#fdf0ea;border:1px solid #e8b89a;border-top-color:#7a2e10"><span class="summary-tile-label">Primary Instability Domain</span>${weak.map((d,i)=>`<div class="summary-tile-primary" style="font-size:${i===0?"15px":"13px"};color:#4a1a0a">${esc(d)}</div>`).join("")}<div class="summary-tile-sub" style="margin-top:10px">Lowest Scoring Domain</div></div>`;
-  html+=`</div>`;
-
-  // Domain score summary
-  html+=`<div class="card print-card" style="margin-bottom:24px"><span class="section-label">Domain Score Summary — 4Ps of Wellness</span>`;
-  DOMAINS.forEach(d=>{ html+=scoreBarRow(d,S.scores[d.id],S.scores[d.id]===minS); });
-  html+=`</div>`;
-
-  // Vulnerability context
-  html+=`<div class="card print-card" style="margin-bottom:24px"><span class="section-label">Functional Vulnerability Context</span><div class="grid-context-3">`;
-  [[S.fviFields.incomeRange,INCOME_RANGES,"Income Range"],[S.fviFields.hasDependents,YES_NO,"Dependents"],[S.fviFields.isSoleEarner,YES_NO,"Sole Income Earner"]].forEach(([v,opts,lbl])=>{
-    const disp=(opts.find(o=>o.value===v)||{label:"—"}).label;
-    html+=`<div class="data-cell"><span class="data-cell-label">${esc(lbl)}</span><span class="data-cell-value print-body-text">${esc(disp)}</span></div>`;
-  });
-  html+=`</div><div class="grid-context-2" style="margin-top:12px">`;
-  VULN_INDICATORS.forEach(ind=>{ const s=S.vulnScores[ind.id]; const t=ind.levels.find(l=>l.score===s)?.title||"—"; html+=`<div class="data-cell"><span class="data-cell-label">${esc(ind.label)}</span><span class="data-cell-value print-body-text">${s} — ${esc(t)}</span></div>`; });
-  html+=`</div><p class="print-body-text" style="font-size:13px;color:#3a4a5a;line-height:1.8;margin:16px 0 0">The Functional Vulnerability Indicator identifies circumstances that may create pressure to return to work or resume responsibilities before full recovery or medical release. It does not change the Functional Capacity Index score.</p></div>`;
-
-  html+=interpBlock(paras)+reassessBlock()+disclaimerBlock();
-
-  // Print footer (print only)
-  html+=`<div class="print-footer" style="border-top:1px solid #ccc;padding-top:12px;margin-top:8px"><p class="print-footer-text">Functional Capacity Index Analysis generated by Reconcile Care Management Services</p></div>`;
-
-  // UI-only block
-  html+=`<div class="no-print">`;
-  html+=`<div style="background:#fff;border:1px solid #d6d0c4;padding:24px 40px;margin-top:24px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center"><div><span style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#9aabb8;display:block;margin-bottom:4px">Document Options</span><p style="font-size:13px;color:#3a4a5a;margin:0">Use your browser's print function to save this analysis as a PDF or printed document.</p></div><button type="button" id="print-btn" class="btn-primary">Print Analysis</button></div>`;
-  html+=`<div style="display:flex;align-items:center;gap:16px;margin-bottom:24px"><button type="button" class="btn-primary" id="new-analysis">Start New Analysis &rarr;</button></div>`;
-  html+=`<div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:20px"><button type="button" class="btn-ghost" onclick="returnToDashboard()">&larr; Return to Dashboard</button><button type="button" class="btn-primary" onclick="goToNext()">Continue to Next Assessment &rarr;</button></div>`;
-  html+=`</div>`; // end no-print
-  html+=`</div>`; // end print-root
-  return html;
+function screenComplete(){
+  return appHeader()+`<div class="container">`+progressBar("complete")+`<div class="card" style="text-align:center;padding:40px 28px 48px"><span class="eyebrow">Assessment complete</span><h2 class="section-title" style="margin-top:12px">Functional Capacity Index</h2><p style="font-size:15px;color:#3a4a5a;line-height:1.85;margin:16px auto 0;max-width:520px">Your responses have been saved. Detailed analysis will be available on the dashboard after all assessments are complete.</p><div class="nav-row no-print" style="justify-content:center;margin-top:36px;flex-wrap:wrap;gap:16px"><button type="button" class="btn-ghost" onclick="returnToDashboard()">&larr; Return to Dashboard</button><button type="button" class="btn-primary" onclick="goToNext()">Next Assessment &rarr;</button></div></div></div>`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -746,12 +670,10 @@ function render(){
   let html="";
 
   if(sc==="intro") html=screenIntro();
-  else if(sc==="context") html=screenContext();
   else if(sc==="vuln-intro") html=screenVulnIntro();
   else if(sc==="vuln") html=screenVuln();
   else if(sc.startsWith("domain-")) html=screenDomain(parseInt(sc.split("-")[1]));
-  else if(sc==="review") html=screenReview();
-  else if(sc==="final") html=screenFinal();
+  else if(sc==="complete") html=screenComplete();
 
   app.innerHTML=html;
   bindEvents();
@@ -766,17 +688,10 @@ function bindEvents(){
 
   if(sc==="intro"){
     bind("intro-back",()=>returnToDashboard());
-    bind("intro-next",()=>setState({screen:"context"}));
-  }
-  if(sc==="context"){
-    live("ctx-ref",e=>{ S.ctx.clientRef=e.target.value; });
-    live("ctx-doi",e=>{ S.ctx.doi=e.target.value; });
-    live("ctx-injury",e=>{ S.ctx.injuryType=e.target.value; });
-    bind("ctx-back",()=>setState({screen:"intro"}));
-    bind("ctx-next",()=>setState({screen:"vuln-intro"}));
+    bind("intro-next",()=>setState({screen:"vuln-intro"}));
   }
   if(sc==="vuln-intro"){
-    bind("vi-back",()=>setState({screen:"context"}));
+    bind("vi-back",()=>setState({screen:"intro"}));
     bind("vi-next",()=>setState({screen:"vuln"}));
   }
   if(sc==="vuln"){
@@ -803,25 +718,12 @@ function bindEvents(){
       });
     });
     bind("dom-back",()=>{ if(idx===0) setState({screen:"vuln"}); else setState({screen:"domain-"+(idx-1)}); });
-    bind("dom-next",()=>{ if(idx<DOMAINS.length-1) setState({screen:"domain-"+(idx+1)}); else setState({screen:"review"}); });
-  }
-  if(sc==="review"){
-    bind("rev-back",()=>setState({screen:"domain-"+(DOMAINS.length-1)}));
-    bind("rev-next",()=>{
-      S.analysisDate=fmtDate(new Date());
-      setState({screen:"final"});
-    });
-  }
-  if(sc==="final"){
-    bind("fin-back",()=>setState({screen:"review"}));
-    const pb=document.getElementById("print-btn");
-    if(pb) pb.addEventListener("click",()=>{ window.print(); });
-    bind("new-analysis",()=>{
-      S.scores={physical:null,psychological:null,psychosocial:null,professional:null};
-      S.vulnScores={pain:null,psych:null};
-      S.ctx={clientRef:"",doi:"",injuryType:""};
-      S.fviFields={incomeRange:"",hasDependents:"",isSoleEarner:""};
-      setState({screen:"context"});
+    bind("dom-next",()=>{
+      if(idx<DOMAINS.length-1) setState({screen:"domain-"+(idx+1)});
+      else{
+        saveTool5AndComplete();
+        setState({screen:"complete"});
+      }
     });
   }
 }

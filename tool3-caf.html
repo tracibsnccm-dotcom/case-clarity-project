@@ -311,12 +311,18 @@ body{background:transparent;font-family:Georgia,'Times New Roman',serif;color:va
   <div class="doms" id="dw"></div>
 
   <div class="ar">
-    <button class="bp" onclick="gen()">Generate Report</button>
     <button class="bs" onclick="resetTool()">Reset</button>
-    <span class="an" id="an">Answer all 25 questions to generate the report.</span>
+    <span class="an" id="an">Answer all 25 questions to continue.</span>
   </div>
 
-  <div class="rpt" id="rpt"></div>
+  <div id="caf-complete" style="display:none;margin-top:1.5rem;padding:28px 20px;border:1px solid var(--bd);border-radius:12px;text-align:center;background:#fafafa">
+    <p style="margin:0 0 8px;font-size:16px;color:#0e1c2e;font-weight:600">All questions answered</p>
+    <p style="margin:0;font-size:14px;color:#555;line-height:1.6">Your responses have been saved. Reports are available on the dashboard after all six assessments are complete.</p>
+    <div style="display:flex;gap:16px;justify-content:center;margin-top:28px;flex-wrap:wrap">
+      <button type="button" class="btn-ghost" onclick="returnToDashboard()">← Return to Dashboard</button>
+      <button type="button" class="btn-primary" onclick="goToNext()">Continue to Next Assessment →</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -395,12 +401,8 @@ const DOMS=[
 
 const TIE_ORDER=['D1','D3','D5','D2','D4'];
 const SCALE=[{val:5,desc:'No barrier'},{val:4,desc:'Minor barrier'},{val:3,desc:'Moderate'},{val:2,desc:'Significant'},{val:1,desc:'Severe barrier'}];
-const LVL_LABEL={5:'Stable / Minimal Friction',4:'Minor Barrier',3:'Moderate Barrier',2:'Significant Barrier',1:'Severe Barrier'};
-const LVL_COLOR={5:'#0a5c2e',4:'#4a5e00',3:'#7a4f00',2:'#7a2200',1:'#8b1a1a'};
-const LVL_BG={5:'#e8f7ee',4:'#f4f9e0',3:'#fff8e6',2:'#fff1e8',1:'#fdf0f0'};
-const BAR_COLOR={5:'#2e8b57',4:'#7a9e00',3:'#c9a84c',2:'#c0602b',1:'#c0392b'};
-
 let ans={};
+let cafSaved=false;
 
 function domLvl(raw){return Math.floor(raw/5);}
 
@@ -435,12 +437,40 @@ function tog(idx){
 
 function onA(qid,val){ans[qid]=parseInt(val);updProg();updBadges();}
 
+function saveCafComplete(){
+  if(Object.keys(ans).length<25||cafSaved)return;
+  cafSaved=true;
+  const scores=calcAll();
+  const sorted=sortedDomains(scores);
+  const det=sorted[0];
+  const minLvl=det.lvl;
+  const flags=getFlags();
+  const toolData={
+    completed:true,
+    timestamp:new Date().toISOString(),
+    caseType,
+    answers:{...ans},
+    finalLevel:minLvl,
+    determiningDomainId:DOMS[det.di].id,
+    determiningDomainTitle:DOMS[det.di].title,
+    domainScores:scores.map((s,i)=>({domain:DOMS[i].id,title:DOMS[i].title,raw:s.raw,level:s.lvl})),
+    flags
+  };
+  localStorage.setItem('tool3_data',JSON.stringify(toolData));
+  localStorage.setItem('tool3_complete','true');
+  document.getElementById('caf-complete').style.display='block';
+  if(typeof window.markAssessmentComplete==='function'){
+    window.markAssessmentComplete({instrument:'CAF',finalLevel:minLvl,flags,domainScores:toolData.domainScores});
+  }
+  document.getElementById('caf-complete').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
 function updProg(){
   const tot=25,a=Object.keys(ans).length;
   document.getElementById('pf').style.width=(a/tot*100)+'%';
   document.getElementById('pl').textContent=a+' of '+tot+' answered';
   const n=document.getElementById('an');
-  if(a===tot){n.textContent='All questions answered. Ready to generate report.';n.style.color='#0a5c2e';}
+  if(a===tot){n.textContent='All questions answered.';n.style.color='#0a5c2e';saveCafComplete();}
   else{n.textContent=(tot-a)+' question'+(tot-a!==1?'s':'')+' remaining.';n.style.color='';}
 }
 
@@ -469,21 +499,6 @@ function getFlags(){
   return f;
 }
 
-function lvlMeta(score){
-  const labels={5:'Level 5 — Stable / Minimal Friction',4:'Level 4 — Minor Barrier',3:'Level 3 — Moderate Barrier',2:'Level 2 — Significant Barrier',1:'Level 1 — Severe Barrier'};
-  const subs={5:'The care environment is stable. No significant systemic barriers are interfering with treatment access or continuity at this time.',4:'Minor barriers are present but unlikely to materially disrupt treatment or documentation without proactive attention.',3:'Moderate systemic barriers are present. These may affect treatment consistency and documentation quality if not addressed.',2:'Significant barriers are actively interfering with care access. Attorney and clinical management attention is warranted.',1:'Critical systemic barriers are disrupting care access. Immediate intervention is required to prevent further treatment and documentation failure.'};
-  return{lbl:labels[score],sub:subs[score]};
-}
-
-function showTip(id){
-  document.querySelectorAll('.tooltip').forEach(t=>{if(t.id!=='tip-'+id)t.classList.remove('vis');});
-  const t=document.getElementById('tip-'+id);
-  if(t)t.classList.toggle('vis');
-}
-document.addEventListener('click',function(e){
-  if(!e.target.closest('.info-btn'))document.querySelectorAll('.tooltip').forEach(t=>t.classList.remove('vis'));
-});
-
 function sortedDomains(scores){
   return scores.map((s,i)=>({...s,di:i})).sort((a,b)=>{
     if(a.lvl!==b.lvl)return a.lvl-b.lvl;
@@ -491,130 +506,11 @@ function sortedDomains(scores){
   });
 }
 
-function buildNarr(finalScore,detIdx,scores,flags){
-  const ld=DOMS[detIdx];
-  const lv=lvlMeta(finalScore);
-
-  const domainContext={
-    'Provider Access':'the ability to obtain appropriate medical care',
-    'Insurance & Authorization Barriers':'the ability to obtain timely payer approval for necessary treatment',
-    'Transportation & Travel Access':'the ability to reliably attend scheduled medical appointments',
-    'Administrative & Documentation Integrity':'the accuracy and availability of administrative and clinical documentation',
-    'Care Coordination':'the ability to maintain coordinated, continuous care across treating providers'
-  };
-
-  const levelContext={
-    5:'A Level 5 result indicates the care environment is stable with minimal systemic friction. No significant access barriers have been identified at this time.',
-    4:'A Level 4 result indicates minor barriers are present. These are unlikely to materially disrupt treatment or documentation but should be monitored as the case progresses.',
-    3:'A Level 3 result indicates moderate systemic friction. In environments like this, treatment delays and documentation inconsistencies can develop if barriers are not identified and addressed early.',
-    2:'A Level 2 result indicates significant systemic friction. In environments like this, treatment delays, referral gaps, and documentation problems are commonly driven by system-level barriers rather than client behavior.',
-    1:'A Level 1 result indicates severe systemic friction. In environments like this, treatment delays, missed appointments, referral breakdowns, and documentation gaps are commonly driven by system-level barriers rather than client behavior.'
-  };
-
-  const closing={
-    5:'Continued monitoring is recommended as the case develops to ensure stability is maintained throughout the treatment progression.',
-    4:'Attorneys should monitor these areas proactively to prevent minor friction from compounding into larger treatment or documentation problems.',
-    3:'The clinical record should be interpreted within the context of these access limitations. Identifying and documenting these barriers early helps clarify why treatment progression may appear inconsistent and allows those issues to be addressed within both the clinical management strategy and the legal case narrative.',
-    2:'The clinical record should be interpreted within the context of these access limitations. Identifying and documenting these barriers early helps clarify why treatment progression may appear inconsistent and allows those issues to be addressed within both the clinical management strategy and the legal case narrative.',
-    1:'The clinical record should therefore be interpreted within the context of these access limitations. Identifying and documenting these barriers early helps clarify why treatment progression may appear inconsistent and allows those issues to be addressed within both the clinical management strategy and the legal case narrative.'
-  };
-
-  const ctx=domainContext[ld.title]||'the ability to maintain consistent treatment access';
-
-  const p1=`The C.A.R.E. Access Friction Score™ for this case is <strong>${lv.lbl}</strong>.`;
-  const p2=`The Determining Domain is <strong>${ld.title}</strong>, indicating that the most significant systemic barrier affecting this case is ${ctx}.`;
-  const p3=`Under the C.A.R.E. methodology, the overall Access Friction Level reflects the most significant barrier within the treatment environment, because system stability cannot exceed its weakest point.`;
-  const p4=levelContext[finalScore];
-  const p5=closing[finalScore];
-
-  let html=`<p>${p1}</p><p>${p2}</p><p>${p3}</p><p>${p4}</p><p>${p5}</p>`;
-
-  const p6='This assessment captures the case environment at the time of evaluation. The Access Friction profile may change as the case progresses. Attorneys should consider reassessing following significant case events — insurer actions, provider changes, authorization decisions, or transitions in treatment phase.';
-  html+=`<p>${p6}</p>`;
-
-  if(flags.length)html+=`<p>This assessment triggered <strong>${flags.length} critical barrier flag${flags.length>1?'s':''}</strong>. These conditions indicate specific access failures severe enough to warrant immediate documentation and case management response.</p>`;
-  return html;
-}
-
-function gen(){
-  if(Object.keys(ans).length<25){alert('Please answer all 25 questions before generating the report.');return;}
-  const scores=calcAll();const sorted=sortedDomains(scores);
-  const det=sorted[0];const detIdx=det.di;const minLvl=det.lvl;
-  const flags=getFlags();const lv=lvlMeta(minLvl);
-  const dateStr=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
-  let cards='';
-  sorted.forEach((r,si)=>{
-    const isDet=(si===0);const pct=Math.round((r.raw/r.max)*100);
-    const domTitle=DOMS[r.di].title;const tipId='d'+r.di;
-    const ex=r.raw+' \u00F7 5 \u2192 Level '+r.lvl+' after rounding down';
-    cards+=`<div class="dc2${isDet?' det':''}">
-      ${isDet?'<div class="det-badge">Determining Barrier</div>':''}
-      <div class="dc2-name">${domTitle}</div>
-      <div class="dc2-level-row">
-        <div>
-          <div class="dc2-level">Level ${r.lvl}</div>
-          <div class="dc2-meaning" style="color:${LVL_COLOR[r.lvl]}">${LVL_LABEL[r.lvl]}</div>
-        </div>
-        <div style="position:relative">
-          <button class="info-btn" onclick="showTip('${tipId}')" aria-label="Score detail">i</button>
-          <div class="tooltip" id="tip-${tipId}"><strong>Scoring Detail: ${r.raw} / 25</strong><br><br>Each domain contains five questions scored from 5 to 1.<br><br>The domain total is divided by five and rounded down to determine the functional level.<br><br><strong>Calculation:</strong><br>${ex}</div>
-        </div>
-      </div>
-      <div class="dbb"><div class="dbf" style="width:${pct}%;background:${BAR_COLOR[r.lvl]}"></div></div>
-    </div>`;
-  });
-  let flagHtml='';
-  if(flags.length)flagHtml=`<div class="fb"><div class="ft"><div class="fdot"></div>Critical Barrier Flags — ${flags.length} Triggered</div><ul class="fl">${flags.map(f=>`<li>${f}</li>`).join('')}</ul></div>`;
-  const el=document.getElementById('rpt');
-  el.innerHTML=`
-    <div class="rh">
-      <h2>C.A.R.E. Access Friction Score™ — Clinical Report</h2>
-      <div class="rdate">Generated ${dateStr} &nbsp;&middot;&nbsp; Reconcile C.A.R.E. Clinical Analysis Suite</div>
-      <div class="rsr"><div class="rsm"><div style="font-size:15px;color:rgba(255,255,255,0.45);font-family:Arial,sans-serif;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Access Friction Level</div><div class="rsb">${minLvl}</div></div><div class="rlp" style="background:${LVL_BG[minLvl]};color:${LVL_COLOR[minLvl]}">${lv.lbl}</div></div>
-      <div class="ri">${lv.sub}</div>
-    </div>
-    <div class="rb">
-      <div class="st">Domain Results — sorted lowest to highest</div>
-      <div class="dg">${cards}</div>
-      ${flagHtml}
-      <div class="st">Clinical Interpretation</div>
-      <div class="nr">${buildNarr(minLvl,detIdx,scores,flags)}</div>
-      <div class="st">Level Reference</div>
-      <div class="rg">
-        <div class="rc"><div class="rs" style="color:#0a5c2e">5</div><div class="rl">Stable / Minimal Friction</div></div>
-        <div class="rc"><div class="rs" style="color:#4a5e00">4</div><div class="rl">Minor Barrier</div></div>
-        <div class="rc"><div class="rs" style="color:#7a4f00">3</div><div class="rl">Moderate Barrier</div></div>
-        <div class="rc"><div class="rs" style="color:#7a2200">2</div><div class="rl">Significant Barrier</div></div>
-        <div class="rc"><div class="rs" style="color:#8b1a1a">1</div><div class="rl">Severe Barrier</div></div>
-      </div>
-      <div class="mn"><p>Scoring methodology: Each domain is converted to a whole-number functional level. The overall C.A.R.E. Access Friction Score is determined by the lowest Domain Level, because system stability cannot exceed its weakest barrier. Domains are displayed from lowest to highest, with ties resolved by clinical priority: Provider Access, Transportation &amp; Travel Access, Care Coordination, Insurance &amp; Authorization Barriers, Administrative &amp; Documentation Integrity.</p></div>
-    </div>
-    <div class="rf">C.A.R.E. Access Friction Score™ is a proprietary clinical analysis instrument developed by Reconcile Care Management Services (RCMS). This report reflects system-barrier conditions at the time of assessment and does not constitute a clinical diagnosis, treatment recommendation, or legal opinion. It is intended to support attorneys and legal teams in identifying systemic barriers that may affect treatment continuity, documentation integrity, and recovery progression within the Reconcile C.A.R.E. methodology. &copy; Reconcile C.A.R.E. / RCMS.</div>
-    <div style="display: flex; gap: 16px; justify-content: center; margin-top: 40px;">
-    <button onclick="returnToDashboard()" class="btn-ghost">
-        ← Return to Dashboard
-    </button>
-    <button onclick="goToNext()" class="btn-primary">
-        Continue to Next Assessment →
-    </button>
-</div>`;
-  el.classList.add('show');
-
-  if (typeof window.markAssessmentComplete === 'function') {
-    window.markAssessmentComplete({
-      instrument: 'CAF',
-      finalLevel: minLvl,
-      flags,
-      scores: scores.map((s, i) => ({ domain: DOMS[i].id, domainTitle: DOMS[i].title, raw: s.raw, level: s.lvl }))
-    });
-  }
-
-  el.scrollIntoView({behavior:'smooth',block:'start'});
-}
-
 function resetTool(){
   ans={};
-  document.getElementById('rpt').classList.remove('show');
+  cafSaved=false;
+  const cc=document.getElementById('caf-complete');
+  if(cc) cc.style.display='none';
   document.querySelectorAll('input[type=radio]').forEach(r=>r.checked=false);
   updProg();
   DOMS.forEach((_,di)=>{document.getElementById('b-'+di).textContent='Not scored';});
