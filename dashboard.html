@@ -688,7 +688,7 @@
         // ===== TRIAL: all 6 tools → localStorage → consolidated report =====
         function allToolsComplete() {
             for (let i = 1; i <= 6; i++) {
-                if (!localStorage.getItem('tool' + i + '_complete')) {
+                if (!localStorage.getItem(`tool${i}_complete`)) {
                     return false;
                 }
             }
