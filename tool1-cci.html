@@ -760,10 +760,10 @@ input[type=text]::placeholder{color:#bbb}
   </div>
 
   <div style="display: flex; gap: 16px; justify-content: center; margin-top: 40px;">
-    <button onclick="returnToDashboard()" class="btn-ghost">
+    <button type="button" onclick="returnToDashboard()" class="btn-ghost">
         ← Return to Dashboard
     </button>
-    <button onclick="goToNext()" class="btn-primary">
+    <button type="button" onclick="goToNext()" class="btn-primary">
         Continue to Next Assessment →
     </button>
 </div>
@@ -1101,19 +1101,38 @@ function resetAll(){
 </script>
 <script>
 function goToNext() {
-    localStorage.setItem('tool_complete_' + window.location.pathname, 'true');
-    if (window.location.pathname.includes('tool1')) {
-        window.location.href = 'tool2-csa.html';
-    } else if (window.location.pathname.includes('tool2')) {
-        window.location.href = 'tool3-caf.html';
-    } else if (window.location.pathname.includes('tool3')) {
-        window.location.href = 'tool4-hsi.html';
-    } else if (window.location.pathname.includes('tool4')) {
-        window.location.href = 'tool5-fci.html';
-    } else if (window.location.pathname.includes('tool5')) {
-        window.location.href = 'tool6-rrf.html';
-    } else if (window.location.pathname.includes('tool6')) {
+    console.log("Button clicked");
+    try {
+        localStorage.setItem('tool_complete_' + window.location.pathname, 'true');
+    } catch (e) {}
+
+    var href = (window.location.href || '').toLowerCase();
+    var path = (window.location.pathname || '').replace(/\\/g, '/').toLowerCase();
+    var blob = href + ' ' + path;
+
+    if (blob.indexOf('tool6') !== -1 || /tool6-rrf\.html/.test(blob)) {
         window.location.href = 'dashboard.html?allComplete=true';
+        return;
+    }
+    if (blob.indexOf('tool5') !== -1 || /tool5-fci\.html/.test(blob)) {
+        window.location.href = 'tool6-rrf.html';
+        return;
+    }
+    if (blob.indexOf('tool4') !== -1 || /tool4-hsi\.html/.test(blob)) {
+        window.location.href = 'tool5-fci.html';
+        return;
+    }
+    if (blob.indexOf('tool3') !== -1 || /tool3-caf\.html/.test(blob)) {
+        window.location.href = 'tool4-hsi.html';
+        return;
+    }
+    if (blob.indexOf('tool2') !== -1 || /tool2-csa\.html/.test(blob)) {
+        window.location.href = 'tool3-caf.html';
+        return;
+    }
+    if (blob.indexOf('tool1') !== -1 || /tool1-cci\.html/.test(blob)) {
+        window.location.href = 'tool2-csa.html';
+        return;
     }
 }
 
