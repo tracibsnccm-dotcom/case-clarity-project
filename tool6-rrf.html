@@ -1641,6 +1641,21 @@
     return (raw / max) * weight;
   }
 
+  function persistRrfReportHtml(toolData) {
+    const branch = toolData.branch === 'WC' ? "Workers' Compensation" : 'Personal Injury';
+    const narrative = toolData.branch === 'WC' ? wcNarrative(toolData.level) : piNarrative(toolData.level);
+    const holder = document.createElement('div');
+    holder.className = 'rrf-report risk-findings report';
+    holder.innerHTML =
+      '<h2 style="margin:0 0 16px;font-size:22px;color:#1a2744">Recovery Risk Forecaster™</h2>' +
+      '<p style="margin:0 0 8px"><strong>Recovery risk level:</strong> ' + toolData.level + '</p>' +
+      '<p style="margin:0 0 8px"><strong>Composite score:</strong> ' + toolData.total + ' / 100</p>' +
+      '<p style="margin:0 0 16px"><strong>Predicted duration (illustrative):</strong> ' + toolData.predictedDays + ' days</p>' +
+      '<p style="margin:0 0 16px"><strong>Matter branch:</strong> ' + branch + '</p>' +
+      '<p style="margin:0;line-height:1.65;color:#333">' + narrative + '</p>';
+    localStorage.setItem('tool6_report_html', holder.outerHTML);
+  }
+
   /* ── PI Calculation ── */
   function calculatePI() {
     const piFields = [
@@ -1722,6 +1737,7 @@
     };
     localStorage.setItem('tool6_data', JSON.stringify(toolData));
     localStorage.setItem('tool6_complete', 'true');
+    persistRrfReportHtml(toolData);
 
     if (window.opener && !window.opener.closed) {
       window.opener.postMessage(
@@ -1811,6 +1827,7 @@
     };
     localStorage.setItem('tool6_data', JSON.stringify(toolData));
     localStorage.setItem('tool6_complete', 'true');
+    persistRrfReportHtml(toolData);
 
     if (window.opener && !window.opener.closed) {
       window.opener.postMessage(

@@ -584,7 +584,7 @@ input[type=text]::placeholder{color:#bbb}
 </div>
 
 <div id="trial-complete" style="display:none">
-  <div style="max-width:720px;margin:0 auto;text-align:center;padding:2rem 0 3rem">
+  <div class="complexity-report report-view results-display" style="max-width:720px;margin:0 auto;text-align:center;padding:2rem 0 3rem">
     <h2 style="color:#1a1a1a;font-weight:600;margin:0 0 12px">Assessment complete</h2>
     <p style="color:#555;line-height:1.65;margin:0;font-size:15px">Your Case Complexity Index™ responses have been saved. A full report will be available on your dashboard after you finish all six assessments.</p>
     <div style="display:flex;gap:16px;justify-content:center;margin-top:40px;flex-wrap:wrap">
@@ -808,6 +808,11 @@ function calculate(){
   if(typeof window.markAssessmentComplete==='function'){
     window.markAssessmentComplete(assessmentData);
   }
+
+  setTimeout(function () {
+    var reportDiv = document.querySelector('.complexity-report, .report-view, .results-display');
+    if (reportDiv) localStorage.setItem('tool1_report_html', reportDiv.innerHTML);
+  }, 100);
 }
 
 // ── Reset ─────────────────────────────────────────────

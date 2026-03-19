@@ -655,6 +655,19 @@ function saveTool5AndComplete(){
   };
   localStorage.setItem('tool5_data',JSON.stringify(toolData));
   localStorage.setItem('tool5_complete','true');
+  var fviDisp=fvi==='Moderate'?'Medium':fvi;
+  var rows=DOMAINS.map(function(d){
+    var s=S.scores[d.id];
+    var cl=FCI_CLASS[s];
+    return '<p style="margin:8px 0"><strong>'+d.label+':</strong> '+s+(cl?' — '+cl.label:'')+'</p>';
+  }).join('');
+  var snap='<div class="fci-report vulnerability-output results">'+
+    '<h2 style="margin:0 0 16px;font-size:22px;color:#0c1c34">Functional Capacity Index™</h2>'+
+    '<p style="margin:0 0 8px"><strong>FCI minimum score:</strong> '+minS+'</p>'+
+    '<p style="margin:0 0 8px"><strong>Functional Vulnerability Indicator:</strong> '+fviDisp+'</p>'+
+    '<p style="margin:0 0 16px"><strong>Primary instability domain(s):</strong> '+weak.join('; ')+'</p>'+
+    '<div style="font-size:14px;line-height:1.6">'+rows+'</div></div>';
+  localStorage.setItem('tool5_report_html',snap);
 }
 
 function screenComplete(){

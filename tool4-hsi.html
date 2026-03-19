@@ -1016,8 +1016,8 @@ canvas{display:block}
 <!-- ══════════════════════════════════════════
      RESULTS
 ══════════════════════════════════════════ -->
-<div id="sc-results" class="screen">
-  <nav class="nav">
+<div id="sc-results" class="screen hsi-output stability-report report-container">
+  <nav class="nav no-print">
     <div class="nav-brand">Holistic Stability Index<span class="g">™</span></div>
     <div class="nav-pill">Complete</div>
   </nav>
@@ -1025,7 +1025,7 @@ canvas{display:block}
     <div class="eyebrow">Assessment complete</div>
     <h1 class="results-title" style="margin:12px 0 16px">Holistic Stability Index™</h1>
     <p class="results-sub" style="margin:0 auto;max-width:520px;line-height:1.65;color:var(--muted,#555)">Your responses have been saved. A detailed stability report will be available on the dashboard after all six assessments are finished.</p>
-    <div style="display:flex;gap:16px;justify-content:center;margin-top:40px;flex-wrap:wrap">
+    <div class="no-print" style="display:flex;gap:16px;justify-content:center;margin-top:40px;flex-wrap:wrap">
       <button type="button" onclick="returnToDashboard()" class="btn-ghost">← Return to Dashboard</button>
       <button type="button" onclick="goToNext()" class="btn-primary">Continue to Next Assessment →</button>
     </div>
@@ -1697,6 +1697,11 @@ function buildResults() {
       completedAt: new Date().toISOString()
     });
   }
+
+  setTimeout(function () {
+    var hsiResults = document.querySelector('.hsi-output, .stability-report, .report-container');
+    if (hsiResults) localStorage.setItem('tool4_report_html', hsiResults.innerHTML);
+  }, 100);
 }
 
 /* ─────────────────────────────────────────────────────────

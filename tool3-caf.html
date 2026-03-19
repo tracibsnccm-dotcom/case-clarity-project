@@ -315,7 +315,8 @@ body{background:transparent;font-family:Georgia,'Times New Roman',serif;color:va
     <span class="an" id="an">Answer all 25 questions to continue.</span>
   </div>
 
-  <div id="caf-complete" style="display:none;margin-top:1.5rem;padding:28px 20px;border:1px solid var(--bd);border-radius:12px;text-align:center;background:#fafafa">
+  <div id="caf-complete" class="caf-report findings results-display" style="display:none;margin-top:1.5rem;padding:28px 20px;border:1px solid var(--bd);border-radius:12px;text-align:center;background:#fafafa">
+    <div id="caf-report-body"></div>
     <p style="margin:0 0 8px;font-size:16px;color:#0e1c2e;font-weight:600">All questions answered</p>
     <p style="margin:0;font-size:14px;color:#555;line-height:1.6">Your responses have been saved. Reports are available on the dashboard after all six assessments are complete.</p>
     <div style="display:flex;gap:16px;justify-content:center;margin-top:28px;flex-wrap:wrap">
@@ -458,7 +459,22 @@ function saveCafComplete(){
   };
   localStorage.setItem('tool3_data',JSON.stringify(toolData));
   localStorage.setItem('tool3_complete','true');
+  var crb=document.getElementById('caf-report-body');
+  if(crb){
+    var dsRows=toolData.domainScores.map(function(s){
+      return '<p style="margin:6px 0;text-align:left"><strong>'+String(s.title).replace(/</g,'&lt;')+':</strong> Level '+s.level+' (raw '+s.raw+'/25)</p>';
+    }).join('');
+    crb.innerHTML='<div class="caf-report-inner" style="max-width:520px;margin:0 auto 20px;text-align:left">'+
+      '<h3 style="margin:0 0 12px;font-size:18px;color:#0e1c2e;text-align:center">C.A.R.E. Access Friction Score™</h3>'+
+      '<p style="margin:0 0 8px"><strong>Access friction level:</strong> '+minLvl+'</p>'+
+      '<p style="margin:0 0 12px"><strong>Determining domain:</strong> '+String(toolData.determiningDomainTitle).replace(/</g,'&lt;')+'</p>'+
+      '<div style="font-size:14px;color:#333">'+dsRows+'</div>'+
+      (flags.length?'<p style="margin-top:12px;font-size:13px"><strong>Barrier flags:</strong> '+flags.map(function(f){return String(f).replace(/</g,'&lt;');}).join('; ')+'</p>':'')+
+      '</div>';
+  }
   document.getElementById('caf-complete').style.display='block';
+  var cafReport=document.querySelector('.caf-report, .results-display, .findings');
+  if(cafReport)localStorage.setItem('tool3_report_html',cafReport.innerHTML);
   if(typeof window.markAssessmentComplete==='function'){
     window.markAssessmentComplete({instrument:'CAF',finalLevel:minLvl,flags,domainScores:toolData.domainScores});
   }

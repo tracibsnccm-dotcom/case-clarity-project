@@ -560,6 +560,22 @@
             color: #0c1c34;
         }
 
+        .comprehensive-report {
+            max-width: 900px;
+        }
+        .comprehensive-report .report-page-break {
+            margin-top: 28px;
+            padding-top: 8px;
+        }
+        .comprehensive-report .comprehensive-tool-h2 {
+            font-size: 17px;
+            color: #0c1c34;
+            margin: 0 0 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #d6d0c4;
+            font-weight: 600;
+        }
+
         @media print {
             body * { visibility: hidden; }
             .trial-print-root, .trial-print-root * { visibility: visible; }
@@ -571,8 +587,24 @@
                 padding: 0 24px 24px;
                 background: #fff;
             }
-            .no-print { display: none !important; }
+            .no-print, .trial-print-root .no-print, .trial-print-root button, .trial-print-root .toolbar {
+                display: none !important;
+            }
             .app-header { display: none !important; }
+            .trial-print-root .report-page-break,
+            .comprehensive-report .report-page-break {
+                page-break-before: always;
+                page-break-after: always;
+                page-break-inside: avoid;
+            }
+            .trial-print-root .report-page-break:first-of-type,
+            .comprehensive-report .report-page-break:first-of-type {
+                page-break-before: avoid;
+            }
+            .trial-print-root h2,
+            .trial-print-root .comprehensive-report h2 {
+                page-break-after: avoid;
+            }
         }
     </style>
 </head>
@@ -971,48 +1003,30 @@
             return '<p class="trial-note">This instrument does not have a configured narrative summary.</p>';
         }
 
-        function trialKvRow(k, v) {
-            return '<div class="trial-k">' + escTrialHtml(k) + '</div><div class="trial-v">' + escTrialHtml(v) + '</div>';
-        }
-
-        function trialCaseInfoBlock(label, c) {
-            if (!c || typeof c !== 'object') return '';
-            var has = c.nameCaseId || c.dateOfInjury || c.mechanism || c.caseType;
-            if (!has) return '';
-            var rows = '';
-            rows += trialKvRow('Name / Case ID', c.nameCaseId || '');
-            rows += trialKvRow('Date of injury / loss', c.dateOfInjury || '');
-            rows += trialKvRow('Mechanism of injury', c.mechanism || '');
-            rows += trialKvRow('Case type', c.caseType || '');
-            return '<div class="trial-tool-block"><h3>' + escTrialHtml(label) + '</h3><div class="trial-kv">' + rows + '</div></div>';
-        }
-
-        function trialToolBlock(title, innerHtml) {
-            return '<div class="trial-tool-block"><h3>' + escTrialHtml(title) + '</h3>' + innerHtml + '</div>';
-        }
-
-        function buildComprehensiveReportHTML(reportData) {
-            var spec = [
-                { key: 'tool1', abbr: 'CCI', title: '1. Case Complexity Index™' },
-                { key: 'tool2', abbr: 'CSA', title: '2. Clinical Sequencing Auditor™' },
-                { key: 'tool3', abbr: 'CAF', title: '3. C.A.R.E. Access Friction Score™' },
-                { key: 'tool4', abbr: 'HSI', title: '4. Holistic Stability Index™' },
-                { key: 'tool5', abbr: 'FCI', title: '5. Functional Capacity Index™' },
-                { key: 'tool6', abbr: 'RRF', title: '6. Recovery Risk Forecaster™' }
-            ];
-            var parts = [];
-            spec.forEach(function (s) {
-                var inner = unwrapStoredTool(s.key, reportData[s.key]);
-                var body = formatInstrumentHumanHtml(s.abbr, inner);
-                parts.push(trialToolBlock(s.title, '<div class="trial-instrument-body">' + body + '</div>'));
-            });
-
-            var html = '';
+        function buildComprehensiveReportHTML() {
+            var html = '<div class="comprehensive-report">';
             html += '<h2 style="font-size:22px;color:#0c1c34;margin:0 0 8px;padding:0;border:none;font-weight:600;">Case Clarity — Complete Assessment Report</h2>';
-            html += '<p style="font-size:13px;color:#6a7a8a;margin:0 0 24px;line-height:1.6;">Professional summary of results from all six instruments. Data reflects information saved in this browser at the time of generation.</p>';
-            html += trialCaseInfoBlock('Case information — Active case', reportData.caseActive);
-            html += trialCaseInfoBlock('Case information — Retrospective case', reportData.caseRetro);
-            html += parts.join('');
+            html += '<p style="font-size:13px;color:#6a7a8a;margin:0 0 24px;line-height:1.6;">Formatted output from each instrument (saved in this browser when you completed the tool). If a section is missing, re-open that tool once to refresh the capture.</p>';
+            html += buildDashboardCasePrintHtml('active') + buildDashboardCasePrintHtml('retro');
+            var toolNames = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
+            var storageKeys = ['tool1', 'tool2', 'tool3', 'tool4', 'tool5', 'tool6'];
+            var reportData = gatherTrialReportData();
+            for (var i = 1; i <= 6; i++) {
+                var reportHTML = localStorage.getItem('tool' + i + '_report_html');
+                if (!reportHTML) {
+                    var inner = unwrapStoredTool(storageKeys[i - 1], reportData[storageKeys[i - 1]]);
+                    if (inner) {
+                        reportHTML = '<div class="trial-instrument-body">' + formatInstrumentHumanHtml(toolNames[i - 1], inner) + '</div>';
+                    }
+                }
+                if (reportHTML) {
+                    html += '<div class="report-page-break">';
+                    html += '<h2 class="comprehensive-tool-h2" style="page-break-after: avoid;">' + toolNames[i - 1] + ' Assessment</h2>';
+                    html += reportHTML;
+                    html += '</div>';
+                }
+            }
+            html += '</div>';
             return html;
         }
 
@@ -1033,12 +1047,11 @@
             var prt = document.getElementById('btn-print-trial-report');
             if (gen) {
                 gen.onclick = function () {
-                    var reportData = gatherTrialReportData();
                     var bodyEl = document.getElementById('trial-report-body');
                     var outEl = document.getElementById('trial-report-output');
                     var metaEl = document.getElementById('trial-report-generated-at');
-                    if (bodyEl) bodyEl.innerHTML = buildComprehensiveReportHTML(reportData);
-                    if (metaEl) metaEl.textContent = 'Generated: ' + new Date(reportData.generatedAt).toLocaleString();
+                    if (bodyEl) bodyEl.innerHTML = buildComprehensiveReportHTML();
+                    if (metaEl) metaEl.textContent = 'Generated: ' + new Date().toLocaleString();
                     if (outEl) outEl.style.display = 'block';
                 };
             }
