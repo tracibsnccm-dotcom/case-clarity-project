@@ -1277,14 +1277,15 @@
             if (!idx) return false;
             return !!localStorage.getItem('tool' + idx + '_complete');
         }
-        function getTrialRemainingMs() {
-            return window.CaseClarityTrial.getRemainingMs();
-        }
-
         function computeTrialDaysRemaining() {
             var raw = localStorage.getItem('trial_start_at');
             if (!raw) return 7;
-            return getTrialRemainingMs() / 86400000;
+            var startDate = new Date(raw);
+            startDate.setHours(0, 0, 0, 0);
+            var now = new Date();
+            now.setHours(0, 0, 0, 0);
+            var daysLeft = 7 - Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+            return Math.max(0, daysLeft);
         }
 
         function updateRealCountdown() {
@@ -1300,7 +1301,8 @@
             var now = new Date();
             now.setHours(0, 0, 0, 0);
             var daysLeft = 7 - Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
-            el.innerHTML = Math.max(0, daysLeft) + ' days';
+            var remaining = Math.max(0, daysLeft);
+            el.innerHTML = remaining + (remaining === 1 ? ' day' : ' days');
         }
 
         function wireBeforeYouBeginCountdown() {
@@ -1399,7 +1401,7 @@
                 localStorage.setItem('trial_start_at', new Date().toISOString());
             }
             var trialDaysRemaining = computeTrialDaysRemaining();
-            var trialExpired = !!localStorage.getItem('trial_start_at') && getTrialRemainingMs() <= 0;
+            var trialExpired = !!localStorage.getItem('trial_start_at') && trialDaysRemaining <= 0;
             var localN = countLocalToolsComplete();
 
             var timerLabel = trialExpired ? 'Trial access' : 'Trial time remaining';
@@ -1441,7 +1443,7 @@
                     <li>Case information will be entered once and applied across all six instruments.</li>
                     <li>Each instrument typically requires approximately 10–15 minutes to complete.</li>
                     <li>Estimated total assessment time: approximately 60–90 minutes.</li>
-                    <li>Most attorneys complete the assessment over multiple sessions during the 5-day access period.</li>
+                    <li>Most attorneys complete the assessment over multiple sessions during the 7-day access period.</li>
                   </ul>
 
                   <div style="background: #1a2e3f; color: white; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: center;">
@@ -1450,7 +1452,7 @@
                   </div>
                   
                   <h4 style="margin: 20px 0 10px;">Access Window</h4>
-                  <p>Your 5-day assessment window is now active. Progress is automatically saved. You may log out and return at any time before expiration.</p>
+                  <p>Your 7-day assessment window is now active. Progress is automatically saved. You may log out and return at any time before expiration.</p>
                   
                   <h4 style="margin: 20px 0 10px;">Important Note</h4>
                   <p>The instruments do not function as simple calculators. Each tool evaluates structural elements of case progression, treatment sequencing, and recovery dynamics.</p>
@@ -1479,7 +1481,7 @@
                   <h2 style="font-size: 20px; margin-bottom: 16px;">Enter Your Case Information</h2>
                   <p style="margin-bottom: 20px;">Provide basic information for both cases. This information will be used across all six assessment instruments — you will not be asked to re-enter it within each tool.</p>
                   <div style="margin-bottom: 20px; padding: 12px; background: #f1f0eb; border-left: 3px solid #b8922a;">
-                    <p style="font-size: 14px;"><strong>Data Storage Notice:</strong> Case information entered here is stored only during the active 5-day assessment window. All case data, instrument responses, and generated reports are automatically deleted when the assessment period expires.</p>
+                    <p style="font-size: 14px;"><strong>Data Storage Notice:</strong> Case information entered here is stored only during the active 7-day assessment window. All case data, instrument responses, and generated reports are automatically deleted when the assessment period expires.</p>
                   </div>
                   <div class="case-entry-two-col">
                     <div class="case-entry-panel">
@@ -1786,7 +1788,7 @@
         }
 
         window.launchTool = function(toolKey, caseType) {
-            if (localStorage.getItem('trial_start_at') && getTrialRemainingMs() <= 0) {
+            if (localStorage.getItem('trial_start_at') && computeTrialDaysRemaining() <= 0) {
                 alert('Trial expired. Your 7-day access from first login on this device has ended.');
                 return;
             }

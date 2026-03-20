@@ -4,7 +4,10 @@
     function getTrialEndTimeMs() {
         var raw = localStorage.getItem('trial_start_at');
         if (!raw) return null;
-        return new Date(raw).getTime() + TRIAL_DURATION_MS;
+        var d = new Date(raw);
+        d.setHours(0, 0, 0, 0);
+        d.setDate(d.getDate() + 7);
+        return d.getTime();
     }
 
     function getRemainingMs() {
