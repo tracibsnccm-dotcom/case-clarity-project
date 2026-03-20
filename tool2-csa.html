@@ -1317,7 +1317,7 @@
   <!-- Checker -->
   <div id="checker-section" style="display:none;">
     <div id="cards-container"></div>
-    <div id="csa-report-for-storage" class="results-summary alignment-report report-content" aria-hidden="true" style="position:absolute;left:-9999px;top:0;width:960px;pointer-events:none;overflow:visible"></div>
+    <div id="csa-report-for-storage" class="results results-summary alignment-report report-content" aria-hidden="true" style="position:absolute;left:-9999px;top:0;width:960px;pointer-events:none;overflow:visible"></div>
     <div class="submit-wrap" id="submit-wrap">
       <div class="submit-title">Assessment Complete</div>
       <p class="submit-sub">All 7 Clinical Rights have been evaluated. Use the options below to return to the dashboard or continue to the next assessment in your sequence.</p>
@@ -1592,8 +1592,11 @@ function selectSub(ri, qi, value) {
       window.markAssessmentComplete(assessmentData);
     }
     renderCsaResultsCapture();
-    const resultsDiv = document.querySelector('.results-summary, .alignment-report, .report-content');
-    if (resultsDiv) localStorage.setItem('tool2_report_html', resultsDiv.innerHTML);
+    const reportEl = document.querySelector('.report-container, .results, .findings, .hsi-output, .fci-report, .rrf-report, .caf-report, .complexity-report');
+    if (reportEl) {
+      const clone = reportEl.cloneNode(true);
+      localStorage.setItem('tool2_report_html', clone.outerHTML);
+    }
     setTimeout(() => submitWrap.scrollIntoView({ behavior: 'smooth', block: 'center' }), 200);
   } else {
     submitWrap.style.display = 'none';

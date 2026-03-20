@@ -1770,7 +1770,9 @@ function buildResults() {
   var snapEl = document.getElementById('hsi-report-snapshot');
   if (snapEl) {
     snapEl.innerHTML = buildHsiReportSnapshotHtml(toolData);
-    localStorage.setItem('tool4_report_html', snapEl.innerHTML);
+    /* sc-results also uses .hsi-output — clone snapshot root only */
+    var clone = snapEl.cloneNode(true);
+    localStorage.setItem('tool4_report_html', clone.outerHTML);
   }
 }
 

@@ -1694,7 +1694,19 @@
       '<p style="margin:0;font-size:13px;line-height:1.7;color:#333">' + escRrf(narrative) + '</p></div>' +
       '<p style="margin:16px 0 0;font-size:11px;line-height:1.5;color:#888">Illustrative model for care documentation — not a prognosis of legal outcomes.</p></div></div>';
 
-    localStorage.setItem('tool6_report_html', html);
+    var rrfHost = document.getElementById('rrf-report-snapshot-host');
+    if (rrfHost) {
+      rrfHost.innerHTML = html;
+      var reportEl = rrfHost.querySelector('.report-container, .results, .findings, .hsi-output, .fci-report, .rrf-report, .caf-report, .complexity-report');
+      if (!reportEl) reportEl = rrfHost.firstElementChild;
+      if (reportEl) {
+        var clone = reportEl.cloneNode(true);
+        localStorage.setItem('tool6_report_html', clone.outerHTML);
+      }
+      rrfHost.innerHTML = '';
+    } else {
+      localStorage.setItem('tool6_report_html', html);
+    }
   }
 
   /* ── PI Calculation ── */
@@ -1931,5 +1943,6 @@ function returnToDashboard() {
     window.location.href = 'dashboard.html';
 }
 </script>
+<div id="rrf-report-snapshot-host" style="position:absolute;left:-9999px;top:0;width:1px;height:1px;overflow:hidden" aria-hidden="true"></div>
 </body>
 </html>

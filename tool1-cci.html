@@ -868,7 +868,11 @@ function calculate(){
   var snapEl=document.getElementById('cci-report-snapshot');
   if(snapEl){
     snapEl.innerHTML=buildCciReportSnapshotHtml(assessmentData,toolData,level,cmg);
-    localStorage.setItem('tool1_report_html',snapEl.innerHTML);
+    var reportEl=document.querySelector('.report-container, .results, .findings, .hsi-output, .fci-report, .rrf-report, .caf-report, .complexity-report');
+    if(reportEl){
+      var clone=reportEl.cloneNode(true);
+      localStorage.setItem('tool1_report_html',clone.outerHTML);
+    }
   }
 }
 

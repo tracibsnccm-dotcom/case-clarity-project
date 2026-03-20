@@ -501,7 +501,11 @@ function saveCafComplete(){
   var snap=document.getElementById('caf-report-snapshot');
   if(snap){
     snap.innerHTML=buildCafSnapshotHtml(toolData,minLvl,flags);
-    localStorage.setItem('tool3_report_html',snap.innerHTML);
+    var reportEl=document.querySelector('.report-container, .results, .findings, .hsi-output, .fci-report, .rrf-report, .caf-report, .complexity-report');
+    if(reportEl){
+      var clone=reportEl.cloneNode(true);
+      localStorage.setItem('tool3_report_html',clone.outerHTML);
+    }
   }
   document.getElementById('caf-complete').style.display='block';
   if(typeof window.markAssessmentComplete==='function'){

@@ -56,7 +56,7 @@
             justify-content: space-between;
             border-bottom: 3px solid #b8922a;
         }
-        .app-header-left { display: flex; align-items: baseline; gap: 20px; }
+        .app-header-left { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 20px; }
         .app-header-brand { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #b8922a; }
         .app-header-title { font-size: 15px; letter-spacing: 0.04em; }
         .app-header-right { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #6a8aaa; }
@@ -598,8 +598,15 @@
         }
 
         @media print {
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .badge-high, .warning-critical { background-color: #d9534f !important; color: white !important; }
+            .badge-moderate, .warning-moderate { background-color: #f0ad4e !important; color: white !important; }
+            .badge-low { background-color: #5bc0de !important; color: white !important; }
+            .badge-stable { background-color: #5cb85c !important; color: white !important; }
+
             body * { visibility: hidden; }
-            .trial-print-root, .trial-print-root * { visibility: visible; }
+            .trial-print-root, .trial-print-root *,
+            .comprehensive-report, .comprehensive-report * { visibility: visible; }
             .trial-print-root {
                 position: absolute;
                 left: 0;
@@ -608,7 +615,15 @@
                 padding: 0 24px 24px;
                 background: #fff;
             }
-            .no-print, .trial-print-root .no-print, .trial-print-root button, .trial-print-root .toolbar {
+            .comprehensive-report {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: white;
+            }
+            .no-print, .trial-print-root .no-print, .trial-print-root button, .trial-print-root .toolbar,
+            button, .toolbar, header, footer, .dashboard-header, .tool-card {
                 display: none !important;
             }
             .app-header { display: none !important; }
@@ -634,52 +649,6 @@
                 page-break-after: avoid;
             }
         }
-
-        @media print {
-            /* Ensure colors print */
-            * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color-adjust: exact !important;
-            }
-
-            /* Keep all colors and backgrounds */
-            .comprehensive-report,
-            .comprehensive-report *,
-            [class*="badge"],
-            [class*="warning"],
-            [class*="alert"],
-            [class*="status"],
-            .slab-visual,
-            .stability-slab,
-            .fci-report,
-            .rrf-report {
-                background-color: inherit !important;
-                color: inherit !important;
-                border-color: inherit !important;
-                opacity: 1 !important;
-            }
-
-            /* Preserve specific color classes */
-            .badge-high, .warning-critical { background-color: #d9534f !important; color: white !important; }
-            .badge-moderate, .warning-moderate { background-color: #f0ad4e !important; color: white !important; }
-            .badge-low { background-color: #5bc0de !important; color: white !important; }
-            .badge-stable { background-color: #5cb85c !important; color: white !important; }
-
-            /* Hide UI elements */
-            body * { visibility: hidden; }
-            .comprehensive-report, .comprehensive-report * { visibility: visible; }
-            .comprehensive-report {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                background: white;
-            }
-            .no-print, button, .toolbar, header, footer, .dashboard-header, .tool-card {
-                display: none !important;
-            }
-        }
     </style>
 </head>
 <body>
@@ -694,6 +663,10 @@
             <span class="app-header-brand">Reconcile Care Management Services</span>
             <span class="app-header-div">|</span>
             <span class="app-header-title">Case Clarity Project</span>
+            <div class="trial-timer" style="background:#f8f7f4; padding:8px 15px; border-radius:20px; border:1px solid #b09837; display:inline-block; margin-left:15px;">
+                <span style="font-weight:600;">Trial: </span>
+                <span id="trial-countdown">7 days</span> remaining
+            </div>
         </div>
         <div class="app-header-actions">
             <span class="app-header-right" id="assessment-id-display"></span>
@@ -1212,18 +1185,27 @@
 
         function updateCountdown() {
             var trialStart = localStorage.getItem('trial_start_at');
-            if (!trialStart) return;
+            var el = document.getElementById('trial-countdown');
+            if (!el) return;
+            if (!trialStart) {
+                el.textContent = '7 days';
+                return;
+            }
             var startDate = new Date(trialStart);
+            startDate.setHours(0, 0, 0, 0);
             var today = new Date();
+            today.setHours(0, 0, 0, 0);
             var daysPassed = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
             var daysRemaining = Math.max(0, 7 - daysPassed);
-            var timerEl = document.getElementById('trial-countdown');
-            if (timerEl) {
-                timerEl.textContent = daysRemaining + (daysRemaining === 1 ? ' day' : ' days');
-            }
+            el.textContent = daysRemaining + (daysRemaining === 1 ? ' day' : ' days');
         }
 
         document.getElementById('assessment-id-display').textContent = assessmentId;
+        updateCountdown();
+        if (window._trialCountdownHeaderInterval) {
+            clearInterval(window._trialCountdownHeaderInterval);
+        }
+        window._trialCountdownHeaderInterval = setInterval(updateCountdown, 60 * 60 * 1000);
 
         window.toggleSection = function (sectionId) {
             var content = document.getElementById(sectionId);
@@ -1337,7 +1319,7 @@
                         <span class="timer-label">${timerLabel}</span>
                         <div style="font-size:12px;color:#6a7a8a;margin-top:8px;max-width:520px;line-height:1.5;">7-day trial from first login on this device. Portal session may differ; tools lock when the trial ends.</div>
                     </div>
-                    <span class="timer-value ${timerClass}" id="trial-countdown"></span>
+                    <span class="timer-value ${timerClass}" aria-hidden="true"></span>
                 </div>
                 ${trialExpired ? '<div style="background:#fdf0f0;border:1px solid #e8b4b4;border-left:4px solid #c0392b;padding:16px 20px;margin-bottom:24px;font-size:14px;color:#5c2a2a;"><strong>Trial expired.</strong> Your 7-day instrument access from first login has ended. Launching assessments is disabled.</div>' : ''}
 
@@ -1537,10 +1519,6 @@
             container.innerHTML = html;
 
             updateCountdown();
-            if (window._trialCountdownInterval) {
-                clearInterval(window._trialCountdownInterval);
-            }
-            window._trialCountdownInterval = setInterval(updateCountdown, 60 * 60 * 1000);
 
             document.getElementById('save-case-info').addEventListener('click', saveCaseInfo);
             wireDashboardCaseAutoSave();

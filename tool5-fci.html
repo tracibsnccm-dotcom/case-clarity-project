@@ -369,6 +369,7 @@
 </head>
 <body>
 <div id="app"></div>
+<div id="fci-report-snapshot-host" style="position:absolute;left:-9999px;top:0;width:1px;height:1px;overflow:hidden" aria-hidden="true"></div>
 
 <script>
 // ─────────────────────────────────────────────────────────────────────────────
@@ -716,7 +717,18 @@ function saveTool5AndComplete(){
   };
   localStorage.setItem('tool5_data',JSON.stringify(toolData));
   localStorage.setItem('tool5_complete','true');
-  localStorage.setItem('tool5_report_html', buildFciDashboardSnapshot(minS, weak, fvi, toolData));
+  var fciHost=document.getElementById('fci-report-snapshot-host');
+  if(fciHost){
+    fciHost.innerHTML=buildFciDashboardSnapshot(minS, weak, fvi, toolData);
+    var reportEl=fciHost.querySelector('.report-container, .results, .findings, .hsi-output, .fci-report, .rrf-report, .caf-report, .complexity-report');
+    if(reportEl){
+      var clone=reportEl.cloneNode(true);
+      localStorage.setItem('tool5_report_html',clone.outerHTML);
+    }
+    fciHost.innerHTML='';
+  } else {
+    localStorage.setItem('tool5_report_html', buildFciDashboardSnapshot(minS, weak, fvi, toolData));
+  }
 }
 
 function screenComplete(){
