@@ -1,0 +1,123 @@
+/* Pinned trial banner: visible while scrolling and across dashboard + instrument pages */
+
+header.app-header.trial-pinned-app-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10000;
+    box-sizing: border-box;
+}
+
+body.has-trial-pinned-dashboard {
+    padding-top: 67px; /* header 64px + bottom border 3px */
+}
+
+.trial-global-pinned-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10000;
+    background: #0c1c34;
+    color: #e8e2d4;
+    border-bottom: 3px solid #b8922a;
+    font-family: Georgia, "Times New Roman", serif;
+    box-sizing: border-box;
+}
+
+.trial-global-pinned-inner {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    padding: 10px 20px;
+    min-height: 44px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.trial-global-pinned-brand {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #b8922a;
+    font-weight: 600;
+}
+
+.trial-global-pinned-sep {
+    color: #3a5070;
+    font-size: 12px;
+}
+
+.trial-global-pinned-label {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #8a9aaa;
+}
+
+.trial-global-pinned-clock {
+    background: #f8f7f4;
+    color: #0c1c34;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid #b09837;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.trial-global-pinned-bar.trial-pinned--warning .trial-global-pinned-clock {
+    border-color: #c0392b;
+    background: #fdf5f5;
+}
+
+.trial-global-pinned-bar.trial-pinned--expired .trial-global-pinned-clock {
+    border-color: #c0392b;
+    background: #fdeaea;
+    color: #8b2020;
+}
+
+.trial-global-pinned-suffix {
+    font-size: 12px;
+    font-weight: 500;
+    color: #4a5568;
+    margin-left: 4px;
+}
+
+.trial-global-pinned-dash {
+    margin-left: auto;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #e8e2d4;
+    text-decoration: none;
+    border: 1px solid rgba(232, 226, 212, 0.45);
+    padding: 7px 14px;
+    border-radius: 2px;
+    white-space: nowrap;
+}
+
+.trial-global-pinned-dash:hover {
+    border-color: #b8922a;
+    color: #fff;
+}
+
+body.has-trial-tool-banner {
+    padding-top: 50px;
+}
+
+@media print {
+    .trial-global-pinned-bar {
+        display: none !important;
+    }
+
+    header.app-header.trial-pinned-app-header {
+        display: none !important;
+    }
+
+    body.has-trial-tool-banner,
+    body.has-trial-pinned-dashboard {
+        padding-top: 0 !important;
+    }
+}

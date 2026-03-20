@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="trial-pinned-banner.css">
     <style>
         .collapsible-header {
             background: #f1f0eb;
@@ -108,6 +109,14 @@
             font-size: 24px;
             color: #0c1c34;
             font-weight: bold;
+        }
+        .trial-countdown-clock {
+            font-variant-numeric: tabular-nums;
+            font-family: ui-monospace, "Cascadia Mono", Consolas, "Segoe UI Mono", monospace;
+            font-weight: 600;
+        }
+        header .trial-countdown-clock {
+            font-size: 14px;
         }
         .timer-warning {
             color: #c0392b;
@@ -598,56 +607,11 @@
         }
 
         @media print {
+            body, .comprehensive-report, .comprehensive-report * { visibility: visible !important; display: block !important; position: relative !important; overflow: visible !important; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            .badge-high, .warning-critical { background-color: #d9534f !important; color: white !important; }
-            .badge-moderate, .warning-moderate { background-color: #f0ad4e !important; color: white !important; }
-            .badge-low { background-color: #5bc0de !important; color: white !important; }
-            .badge-stable { background-color: #5cb85c !important; color: white !important; }
-
-            body * { visibility: hidden; }
-            .trial-print-root, .trial-print-root *,
-            .comprehensive-report, .comprehensive-report * { visibility: visible; }
-            .trial-print-root {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                padding: 0 24px 24px;
-                background: #fff;
-            }
-            .comprehensive-report {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                background: white;
-            }
-            .no-print, .trial-print-root .no-print, .trial-print-root button, .trial-print-root .toolbar,
-            button, .toolbar, header, footer, .dashboard-header, .tool-card {
-                display: none !important;
-            }
-            .app-header { display: none !important; }
-            .trial-print-root .report-page-break,
-            .comprehensive-report .report-page-break,
-            .report-page-break {
-                page-break-before: always;
-                page-break-after: always;
-                page-break-inside: avoid;
-            }
-            .trial-print-root .report-page-break:first-of-type,
-            .comprehensive-report .report-page-break:first-of-type,
-            .report-page-break.report-page-break--first {
-                page-break-before: avoid;
-            }
-            .report-page-break {
-                border-top: none;
-                margin-top: 0;
-                padding-top: 20px;
-            }
-            .trial-print-root h2,
-            .trial-print-root .comprehensive-report h2 {
-                page-break-after: avoid;
-            }
+            button, .no-print, .tool-card, header:not(.comprehensive-report), .dashboard-header, .toolbar, .app-header, .logout-btn, .btn-logout { display: none !important; }
+            .report-page-break { page-break-before: always; page-break-after: always; page-break-inside: avoid; }
+            .report-page-break:first-of-type { page-break-before: avoid; }
         }
     </style>
 </head>
@@ -665,7 +629,7 @@
             <span class="app-header-title">Case Clarity Project</span>
             <div class="trial-timer" style="background:#f8f7f4; padding:8px 15px; border-radius:20px; border:1px solid #b09837; display:inline-block; margin-left:15px;">
                 <span style="font-weight:600;">Trial: </span>
-                <span id="trial-countdown">7 days</span> remaining
+                <span id="trial-countdown" class="trial-countdown-clock" aria-live="polite">7d 00h 00m 00s</span> remaining
             </div>
         </div>
         <div class="app-header-actions">
@@ -678,6 +642,7 @@
         <!-- Content loaded dynamically -->
     </div>
 
+    <script src="trial-pinned-banner.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         (function () {
@@ -759,6 +724,80 @@
             return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
 
+        function escPrintAttr(s) {
+            if (s == null || s === '') return '';
+            return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+        }
+
+        function getPrintDocumentBaseHref() {
+            try {
+                return new URL('.', window.location.href).href;
+            } catch (e) {
+                return '';
+            }
+        }
+
+        var _toolPrintStylesPromise = null;
+        var TOOL_PRINT_SOURCES = ['tool1-cci.html', 'tool2-csa.html', 'tool3-caf.html', 'tool4-hsi.html', 'tool5-fci.html', 'tool6-rrf.html'];
+
+        function extractInlineStyleBlocks(htmlText) {
+            if (!htmlText) return '';
+            var out = '';
+            var re = /<style[^>]*>([\s\S]*?)<\/style>/gi;
+            var m;
+            while ((m = re.exec(htmlText)) !== null) {
+                out += '\n' + (m[1] || '');
+            }
+            return out;
+        }
+
+        async function loadToolPrintStyles() {
+            if (_toolPrintStylesPromise) return _toolPrintStylesPromise;
+            _toolPrintStylesPromise = Promise.all(TOOL_PRINT_SOURCES.map(async function (src) {
+                try {
+                    var res = await fetch(src, { cache: 'no-store' });
+                    if (!res.ok) return '';
+                    var text = await res.text();
+                    return extractInlineStyleBlocks(text);
+                } catch (e) {
+                    return '';
+                }
+            })).then(function (chunks) {
+                return chunks.filter(Boolean).join('\n');
+            });
+            return _toolPrintStylesPromise;
+        }
+
+        function schedulePrintWhenReady(printWindow) {
+            var fired = false;
+            function go() {
+                if (fired) return;
+                fired = true;
+                try {
+                    printWindow.focus();
+                    printWindow.print();
+                } catch (e) { /* ignore */ }
+            }
+            var imgs = printWindow.document.images;
+            var n = imgs ? imgs.length : 0;
+            if (n === 0) {
+                setTimeout(go, 450);
+                return;
+            }
+            var done = 0;
+            function one() {
+                done++;
+                if (done >= n) setTimeout(go, 450);
+            }
+            for (var i = 0; i < n; i++) {
+                if (imgs[i].complete) one();
+                else {
+                    imgs[i].onload = one;
+                    imgs[i].onerror = one;
+                }
+            }
+        }
+
         function buildDashboardCasePrintHtml(printCaseKind) {
             var key = printCaseKind === 'active' ? 'dashboard_case_active' : 'dashboard_case_retro';
             var c = safeParseLocalStorage(key);
@@ -801,7 +840,7 @@
             }
         }
 
-        window.printActiveReports = function() {
+        window.printActiveReports = async function() {
             if (countLocalToolsComplete() < 6) {
                 alert('Download requires all 6 instruments to be completed in this browser. Saved: ' + countLocalToolsComplete() + '/6.');
                 return;
@@ -813,10 +852,10 @@
                 alert('Some instrument data is missing from this browser (' + missing.join(', ') + '). Re-open those tools from the dashboard and complete them again.');
                 return;
             }
-            generateAndPrintReports('active', data);
+            await generateAndPrintReports('active', data);
         };
 
-        window.printRetroReports = function() {
+        window.printRetroReports = async function() {
             if (countLocalToolsComplete() < 6) {
                 alert('Download requires all 6 instruments to be completed in this browser. Saved: ' + countLocalToolsComplete() + '/6.');
                 return;
@@ -828,17 +867,20 @@
                 alert('Some instrument data is missing from this browser (' + missing.join(', ') + '). Re-open those tools from the dashboard and complete them again.');
                 return;
             }
-            generateAndPrintReports('retro', data);
+            await generateAndPrintReports('retro', data);
         };
 
-        function generateAndPrintReports(caseType, data) {
+        async function generateAndPrintReports(caseType, data) {
             var printWindow = window.open('', '_blank');
             if (!printWindow) {
                 alert('Please allow pop-ups for this site to print reports.');
                 return;
             }
             var titleLabel = caseType === 'active' ? 'Active' : 'Retrospective';
+            var reportData = gatherTrialReportData();
+            var toolPrintCss = await loadToolPrintStyles();
             var printCss =
+                '*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}' +
                 'body{font-family:Georgia,\"Times New Roman\",serif;margin:48px 56px;color:#0e1c2e;font-size:14px;line-height:1.65;}' +
                 'h1{font-size:26px;font-weight:600;color:#0c1c34;border-bottom:3px solid #b8922a;padding-bottom:14px;margin:0 0 8px;letter-spacing:-0.02em;}' +
                 '.gen-meta{font-size:12px;color:#6a7a8a;margin:0 0 28px;}' +
@@ -859,8 +901,12 @@
                 'ul.trial-list li{margin-bottom:6px;}ul.trial-list li strong{color:#0c1c34;}' +
                 '.trial-note{margin:0;font-size:13px;color:#5a6a7a;font-style:italic;}' +
                 '.trial-tool-block h3{font-size:15px;color:#0c1c34;margin:0 0 14px;padding-bottom:10px;border-bottom:1px solid #d6d0c4;font-weight:600;}' +
-                '@media print{body{margin:0.5in;}}';
-            var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>' + titleLabel + ' Case Reports</title><style>' + printCss + '</style></head><body>' +
+                'img,svg{max-width:100%!important;height:auto!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}' +
+                '@media print{*{ -webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}body{margin:0.5in;} }' +
+                (toolPrintCss || '');
+            var baseHref = getPrintDocumentBaseHref();
+            var baseTag = baseHref ? '<base href="' + escPrintAttr(baseHref) + '">' : '';
+            var html = '<!DOCTYPE html><html><head><meta charset="utf-8">' + baseTag + '<title>' + titleLabel + ' Case Reports</title><style>' + printCss + '</style></head><body>' +
                 '<h1>' + titleLabel + ' Case Assessment Reports</h1>' +
                 '<p class="gen-meta">Generated ' + new Date().toLocaleString() + '</p>' +
                 buildDashboardCasePrintHtml(caseType);
@@ -869,22 +915,69 @@
             var toolList = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
             toolList.forEach(function (tool, idx) {
                 if (data[tool]) {
+                    var sectionBody = getStoredToolReportSectionHtml(idx + 1, tool, reportData);
+                    if (!sectionBody) {
+                        sectionBody = '<div class="trial-instrument-body">' + formatInstrumentHumanHtml(tool, data[tool].data) + '</div>';
+                    }
                     html += '<div class="report-section">' +
                         '<h2 class="sec-title">Instrument ' + (idx + 1) + ' of 6</h2>' +
                         '<h2 class="ins-name">' + toolTitles[tool] + '</h2>' +
                         '<p class="completed-line">Completed ' + new Date(data[tool].completedAt).toLocaleString() + '</p>' +
-                        '<div class="trial-tool-block">' + formatToolData(tool, data[tool].data) + '</div></div>';
+                        '<div class="trial-tool-block">' + sectionBody + '</div></div>';
                 }
             });
             html += '</body></html>';
             printWindow.document.write(html);
             printWindow.document.close();
-            printWindow.print();
+            schedulePrintWhenReady(printWindow);
         }
 
-        function formatToolData(tool, data) {
-            if (!data) return '<p class="trial-note">No data available for this section.</p>';
-            return '<div class="trial-instrument-body">' + formatInstrumentHumanHtml(tool, data) + '</div>';
+        async function printCompleteTrialReportPopup() {
+            var bodyEl = document.getElementById('trial-report-body');
+            if (!bodyEl || !String(bodyEl.innerHTML || '').trim()) {
+                alert('Please click “Generate Complete Report” first.');
+                return;
+            }
+
+            var titleLabel = 'Case Clarity — Complete Assessment Report';
+            var toolPrintCss = await loadToolPrintStyles();
+
+            var printCss =
+                '*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}' +
+                'body{font-family:Georgia,\"Times New Roman\",serif;margin:0;color:#0e1c2e;font-size:14px;line-height:1.65;}' +
+                '.comprehensive-report{padding:48px 56px 80px;}' +
+                '.report-page-break{page-break-after:always;page-break-inside:avoid;border:none;margin:0;padding:0;}' +
+                '.report-page-break:last-of-type{page-break-after:auto;}' +
+                '.report-page-break--first{page-break-before:avoid;}' +
+                'img,svg{max-width:100%!important;height:auto!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}' +
+                '@media print{*{ -webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}body{margin:0;} }' +
+                (toolPrintCss || '');
+
+            var baseHref = getPrintDocumentBaseHref();
+            var baseTag = baseHref ? '<base href="' + escPrintAttr(baseHref) + '">' : '';
+
+            var printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                alert('Please allow pop-ups for this site to print reports.');
+                return;
+            }
+
+            var bodyHtml = bodyEl.innerHTML;
+            // buildComprehensiveReportHTML returns a wrapper <div class="comprehensive-report">...</div>.
+            bodyHtml = bodyHtml.replace(/^<div class="comprehensive-report">/i, '').replace(/<\/div>\s*$/i, '');
+
+            var html =
+                '<!DOCTYPE html><html><head><meta charset="utf-8">' +
+                baseTag +
+                '<title>' + escPrintHtml(titleLabel) + '</title>' +
+                '<style>' + printCss + '</style></head><body>' +
+                '<h1 style="font-size:26px;font-weight:600;color:#0c1c34;border-bottom:3px solid #b8922a;padding-bottom:14px;margin:48px 56px 8px;letter-spacing:-0.02em;">' + escPrintHtml(titleLabel) + '</h1>' +
+                '<div class="comprehensive-report">' + bodyHtml + '</div>' +
+                '</body></html>';
+
+            printWindow.document.write(html);
+            printWindow.document.close();
+            schedulePrintWhenReady(printWindow);
         }
 
         if (document.readyState === 'loading') {
@@ -1050,34 +1143,46 @@
             return '<p class="trial-note">This instrument does not have a configured narrative summary.</p>';
         }
 
+        function getStoredToolReportSectionHtml(toolIndex, toolName, reportData) {
+            var storageKeys = ['tool1', 'tool2', 'tool3', 'tool4', 'tool5', 'tool6'];
+            var sk = storageKeys[toolIndex - 1];
+            var reportHTML = localStorage.getItem('tool' + toolIndex + '_report_html');
+            var content = reportHTML;
+            if (!content) {
+                var inner = unwrapStoredTool(sk, reportData[sk]);
+                if (inner) {
+                    var bodyClass = 'trial-instrument-body';
+                    if (toolName === 'FCI') bodyClass += ' fci-report';
+                    content = '<div class="' + bodyClass + '">' + formatInstrumentHumanHtml(toolName, inner) + '</div>';
+                }
+            }
+            return content || '';
+        }
+
         function buildComprehensiveReportHTML() {
             var html = '<div class="comprehensive-report">';
             html += '<h2 style="font-size:22px;color:#0c1c34;margin:0 0 8px;padding:0;border:none;font-weight:600;">Case Clarity — Complete Assessment Report</h2>';
             html += '<p style="font-size:13px;color:#6a7a8a;margin:0 0 24px;line-height:1.6;">Formatted output from each instrument (saved in this browser when you completed the tool). If a section is missing, re-open that tool once to refresh the capture.</p>';
             html += buildDashboardCasePrintHtml('active') + buildDashboardCasePrintHtml('retro');
             var toolNames = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
-            var storageKeys = ['tool1', 'tool2', 'tool3', 'tool4', 'tool5', 'tool6'];
             var reportData = gatherTrialReportData();
             var globalPageNumber = 1;
             for (var i = 1; i <= 6; i++) {
                 var toolName = toolNames[i - 1];
-                var reportHTML = localStorage.getItem('tool' + i + '_report_html');
-                var content = reportHTML;
-                if (!content) {
-                    var inner = unwrapStoredTool(storageKeys[i - 1], reportData[storageKeys[i - 1]]);
-                    if (inner) {
-                        var bodyClass = 'trial-instrument-body';
-                        if (toolName === 'FCI') bodyClass += ' fci-report';
-                        content = '<div class="' + bodyClass + '">' + formatInstrumentHumanHtml(toolName, inner) + '</div>';
-                    }
+                var hasReport = localStorage.getItem('tool' + i + '_report_html');
+                var breakClass = 'report-page-break' + (i === 1 ? ' report-page-break--first' : '');
+                if (!hasReport) {
+                    html += '<div class="' + breakClass + '"><h2 style="font-family:Georgia, serif; color:#1a2e3f;">' + toolName + ' Assessment</h2><div style="background:#fff3cd; padding:20px;">This report will appear after you complete the ' + toolName + ' tool. Please return to the dashboard and complete this assessment.</div></div>';
+                    globalPageNumber += 1;
+                    continue;
                 }
+                var content = getStoredToolReportSectionHtml(i, toolName, reportData);
                 if (!content) continue;
                 var estimatedPages = Math.max(1, Math.ceil((content.length || 1000) / 2500));
                 var pageLabel = toolName + '-' + globalPageNumber;
                 if (estimatedPages > 1) {
                     pageLabel += ' – ' + toolName + '-' + (globalPageNumber + estimatedPages - 1);
                 }
-                var breakClass = 'report-page-break' + (i === 1 ? ' report-page-break--first' : '');
                 html += '<div class="' + breakClass + '" data-tool="' + toolName + '" data-start="' + globalPageNumber + '">';
                 html += '<div style="text-align:right; font-size:10px; color:#666; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:5px;"><span style="font-family:monospace;">' + pageLabel + '</span></div>';
                 html += '<h2 style="page-break-after: avoid; font-family:Georgia, serif; color:#1a2e3f;">' + toolName + ' Assessment</h2>';
@@ -1085,7 +1190,7 @@
                 html += '</div>';
                 globalPageNumber += estimatedPages;
             }
-            html += '<div style="text-align:center; font-size:10px; color:#999; margin-top:30px;">Page ' + (globalPageNumber - 1) + ' total</div>';
+            html += '<div style="text-align:center; font-size:10px; color:#999; margin-top:30px;">Page ' + Math.max(0, globalPageNumber - 1) + ' total</div>';
             html += '</div>';
             return html;
         }
@@ -1117,7 +1222,7 @@
             }
             if (prt) {
                 prt.onclick = function () {
-                    window.print();
+                    printCompleteTrialReportPopup();
                 };
             }
         }
@@ -1172,40 +1277,41 @@
             if (!idx) return false;
             return !!localStorage.getItem('tool' + idx + '_complete');
         }
+        function getTrialRemainingMs() {
+            return window.CaseClarityTrial.getRemainingMs();
+        }
+
         function computeTrialDaysRemaining() {
             var raw = localStorage.getItem('trial_start_at');
             if (!raw) return 7;
-            var startDate = new Date(raw);
-            var now = new Date();
-            var sd = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-            var nd = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            var daysPassed = Math.floor((nd - sd) / 86400000);
-            return 7 - daysPassed;
+            return getTrialRemainingMs() / 86400000;
         }
 
-        function updateCountdown() {
-            var trialStart = localStorage.getItem('trial_start_at');
-            var el = document.getElementById('trial-countdown');
+        function updateRealCountdown() {
+            var el = document.getElementById('countdown-timer');
             if (!el) return;
-            if (!trialStart) {
-                el.textContent = '7 days';
+            var start = localStorage.getItem('trial_start_at');
+            if (!start) {
+                el.innerHTML = '7 days';
                 return;
             }
-            var startDate = new Date(trialStart);
+            var startDate = new Date(start);
             startDate.setHours(0, 0, 0, 0);
-            var today = new Date();
-            today.setHours(0, 0, 0, 0);
-            var daysPassed = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
-            var daysRemaining = Math.max(0, 7 - daysPassed);
-            el.textContent = daysRemaining + (daysRemaining === 1 ? ' day' : ' days');
+            var now = new Date();
+            now.setHours(0, 0, 0, 0);
+            var daysLeft = 7 - Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+            el.innerHTML = Math.max(0, daysLeft) + ' days';
+        }
+
+        function wireBeforeYouBeginCountdown() {
+            updateRealCountdown();
+            if (window._beforeYouBeginCountdownInterval) {
+                clearInterval(window._beforeYouBeginCountdownInterval);
+            }
+            window._beforeYouBeginCountdownInterval = setInterval(updateRealCountdown, 3600000);
         }
 
         document.getElementById('assessment-id-display').textContent = assessmentId;
-        updateCountdown();
-        if (window._trialCountdownHeaderInterval) {
-            clearInterval(window._trialCountdownHeaderInterval);
-        }
-        window._trialCountdownHeaderInterval = setInterval(updateCountdown, 60 * 60 * 1000);
 
         window.toggleSection = function (sectionId) {
             var content = document.getElementById(sectionId);
@@ -1293,7 +1399,7 @@
                 localStorage.setItem('trial_start_at', new Date().toISOString());
             }
             var trialDaysRemaining = computeTrialDaysRemaining();
-            var trialExpired = trialDaysRemaining < 0;
+            var trialExpired = !!localStorage.getItem('trial_start_at') && getTrialRemainingMs() <= 0;
             var localN = countLocalToolsComplete();
 
             var timerLabel = trialExpired ? 'Trial access' : 'Trial time remaining';
@@ -1319,7 +1425,7 @@
                         <span class="timer-label">${timerLabel}</span>
                         <div style="font-size:12px;color:#6a7a8a;margin-top:8px;max-width:520px;line-height:1.5;">7-day trial from first login on this device. Portal session may differ; tools lock when the trial ends.</div>
                     </div>
-                    <span class="timer-value ${timerClass}" aria-hidden="true"></span>
+                    <span id="trial-countdown-card" class="timer-value trial-countdown-clock ${timerClass}" aria-live="polite">7d 00h 00m 00s</span>
                 </div>
                 ${trialExpired ? '<div style="background:#fdf0f0;border:1px solid #e8b4b4;border-left:4px solid #c0392b;padding:16px 20px;margin-bottom:24px;font-size:14px;color:#5c2a2a;"><strong>Trial expired.</strong> Your 7-day instrument access from first login has ended. Launching assessments is disabled.</div>' : ''}
 
@@ -1331,15 +1437,20 @@
                   
                   <h4 style="margin: 20px 0 10px;">What to Expect</h4>
                   <ul style="margin-bottom: 16px; padding-left: 20px;">
-                    <li>You will complete the instruments using two cases: one active case and one previously closed case.</li>
+                    <li>We recommend you complete the instruments using two types of cases: one active and one retrospective (closed) case.</li>
                     <li>Case information will be entered once and applied across all six instruments.</li>
                     <li>Each instrument typically requires approximately 10–15 minutes to complete.</li>
                     <li>Estimated total assessment time: approximately 60–90 minutes.</li>
-                    <li>Most attorneys complete the assessment over multiple sessions during the 72-hour access period.</li>
+                    <li>Most attorneys complete the assessment over multiple sessions during the 5-day access period.</li>
                   </ul>
+
+                  <div style="background: #1a2e3f; color: white; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: center;">
+                      <div style="font-size: 14px; opacity: 0.9;">TIME REMAINING IN TRIAL</div>
+                      <div id="countdown-timer" style="font-size: 32px; font-weight: bold;">Calculating...</div>
+                  </div>
                   
                   <h4 style="margin: 20px 0 10px;">Access Window</h4>
-                  <p>Your 72-hour assessment window is now active. Progress is automatically saved. You may log out and return at any time before expiration.</p>
+                  <p>Your 5-day assessment window is now active. Progress is automatically saved. You may log out and return at any time before expiration.</p>
                   
                   <h4 style="margin: 20px 0 10px;">Important Note</h4>
                   <p>The instruments do not function as simple calculators. Each tool evaluates structural elements of case progression, treatment sequencing, and recovery dynamics.</p>
@@ -1368,7 +1479,7 @@
                   <h2 style="font-size: 20px; margin-bottom: 16px;">Enter Your Case Information</h2>
                   <p style="margin-bottom: 20px;">Provide basic information for both cases. This information will be used across all six assessment instruments — you will not be asked to re-enter it within each tool.</p>
                   <div style="margin-bottom: 20px; padding: 12px; background: #f1f0eb; border-left: 3px solid #b8922a;">
-                    <p style="font-size: 14px;"><strong>Data Storage Notice:</strong> Case information entered here is stored only during the active 72-hour assessment window. All case data, instrument responses, and generated reports are automatically deleted when the assessment period expires.</p>
+                    <p style="font-size: 14px;"><strong>Data Storage Notice:</strong> Case information entered here is stored only during the active 5-day assessment window. All case data, instrument responses, and generated reports are automatically deleted when the assessment period expires.</p>
                   </div>
                   <div class="case-entry-two-col">
                     <div class="case-entry-panel">
@@ -1518,7 +1629,10 @@
 
             container.innerHTML = html;
 
-            updateCountdown();
+            if (window.CaseClarityTrial && window.CaseClarityTrial.refreshCountdown) {
+                window.CaseClarityTrial.refreshCountdown();
+            }
+            wireBeforeYouBeginCountdown();
 
             document.getElementById('save-case-info').addEventListener('click', saveCaseInfo);
             wireDashboardCaseAutoSave();
@@ -1672,7 +1786,7 @@
         }
 
         window.launchTool = function(toolKey, caseType) {
-            if (computeTrialDaysRemaining() < 0) {
+            if (localStorage.getItem('trial_start_at') && getTrialRemainingMs() <= 0) {
                 alert('Trial expired. Your 7-day access from first login on this device has ended.');
                 return;
             }
