@@ -581,6 +581,11 @@
             font-weight: 600;
         }
 
+        /* Match FCI tool's original font */
+        .fci-report, [class*="fci-"] {
+            font-family: Georgia, 'Times New Roman', serif;
+        }
+
         @media print {
             body * { visibility: hidden; }
             .trial-print-root, .trial-print-root * { visibility: visible; }
@@ -1021,7 +1026,9 @@
                 if (!reportHTML) {
                     var inner = unwrapStoredTool(storageKeys[i - 1], reportData[storageKeys[i - 1]]);
                     if (inner) {
-                        reportHTML = '<div class="trial-instrument-body">' + formatInstrumentHumanHtml(toolNames[i - 1], inner) + '</div>';
+                        var bodyClass = 'trial-instrument-body';
+                        if (toolNames[i - 1] === 'FCI') bodyClass += ' fci-report';
+                        reportHTML = '<div class="' + bodyClass + '">' + formatInstrumentHumanHtml(toolNames[i - 1], inner) + '</div>';
                     }
                 }
                 if (reportHTML) {
