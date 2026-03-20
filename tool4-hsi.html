@@ -1771,9 +1771,11 @@ function buildResults() {
   var snapEl = document.getElementById('hsi-report-snapshot');
   if (snapEl) {
     snapEl.innerHTML = buildHsiReportSnapshotHtml(toolData);
-    /* sc-results also uses .hsi-output — clone snapshot root only */
-    var clone = snapEl.cloneNode(true);
-    localStorage.setItem('tool4_report_html', clone.outerHTML);
+    snapEl.className = 'hsi-output stability-report report-container';
+    localStorage.setItem('tool4_report_html', snapEl.outerHTML);
+    console.log('HSI report HTML saved, length:', localStorage.getItem('tool4_report_html') ? localStorage.getItem('tool4_report_html').length : 0);
+  } else {
+    console.warn('HSI: hsi-report-snapshot host missing; report HTML not saved.');
   }
 }
 

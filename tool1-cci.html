@@ -869,11 +869,11 @@ function calculate(){
   var snapEl=document.getElementById('cci-report-snapshot');
   if(snapEl){
     snapEl.innerHTML=buildCciReportSnapshotHtml(assessmentData,toolData,level,cmg);
-    var reportEl=document.querySelector('.report-container, .results, .findings, .hsi-output, .fci-report, .rrf-report, .caf-report, .complexity-report');
-    if(reportEl){
-      var clone=reportEl.cloneNode(true);
-      localStorage.setItem('tool1_report_html',clone.outerHTML);
-    }
+    snapEl.className='complexity-report report-view results-display';
+    localStorage.setItem('tool1_report_html',snapEl.outerHTML);
+    console.log('CCI report HTML saved, length:', localStorage.getItem('tool1_report_html')?localStorage.getItem('tool1_report_html').length:0);
+  } else {
+    console.warn('CCI: cci-report-snapshot host missing; report HTML not saved.');
   }
 }
 

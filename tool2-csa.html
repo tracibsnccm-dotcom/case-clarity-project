@@ -1593,10 +1593,12 @@ function selectSub(ri, qi, value) {
       window.markAssessmentComplete(assessmentData);
     }
     renderCsaResultsCapture();
-    const reportEl = document.querySelector('.report-container, .results, .findings, .hsi-output, .fci-report, .rrf-report, .caf-report, .complexity-report');
-    if (reportEl) {
-      const clone = reportEl.cloneNode(true);
-      localStorage.setItem('tool2_report_html', clone.outerHTML);
+    const csaHost = document.getElementById('csa-report-for-storage');
+    if (csaHost) {
+      localStorage.setItem('tool2_report_html', csaHost.outerHTML);
+      console.log('CSA report HTML saved, length:', localStorage.getItem('tool2_report_html') ? localStorage.getItem('tool2_report_html').length : 0);
+    } else {
+      console.warn('CSA: csa-report-for-storage host missing; report HTML not saved.');
     }
     setTimeout(() => submitWrap.scrollIntoView({ behavior: 'smooth', block: 'center' }), 200);
   } else {
