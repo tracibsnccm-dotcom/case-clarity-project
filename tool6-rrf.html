@@ -1698,16 +1698,10 @@
     var rrfHost = document.getElementById('rrf-report-snapshot-host');
     if (rrfHost) {
       rrfHost.innerHTML = html;
-      var reportEl = rrfHost.querySelector('.report-container, .results, .findings, .hsi-output, .fci-report, .rrf-report, .caf-report, .complexity-report');
-      if (!reportEl) reportEl = rrfHost.firstElementChild;
-      if (reportEl) {
-        var clone = reportEl.cloneNode(true);
-        localStorage.setItem('tool6_report_html', clone.outerHTML);
-      }
       rrfHost.innerHTML = '';
-    } else {
-      localStorage.setItem('tool6_report_html', html);
     }
+    localStorage.setItem('tool6_report_html', html);
+    console.log('RRF report HTML saved, length:', localStorage.getItem('tool6_report_html') ? localStorage.getItem('tool6_report_html').length : 0);
   }
 
   /* ── PI Calculation ── */

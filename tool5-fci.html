@@ -718,18 +718,14 @@ function saveTool5AndComplete(){
   };
   localStorage.setItem('tool5_data',JSON.stringify(toolData));
   localStorage.setItem('tool5_complete','true');
-  var fciHost=document.getElementById('fci-report-snapshot-host');
-  if(fciHost){
-    fciHost.innerHTML=buildFciDashboardSnapshot(minS, weak, fvi, toolData);
-    var reportEl=fciHost.querySelector('.report-container, .results, .findings, .hsi-output, .fci-report, .rrf-report, .caf-report, .complexity-report');
-    if(reportEl){
-      var clone=reportEl.cloneNode(true);
-      localStorage.setItem('tool5_report_html',clone.outerHTML);
-    }
-    fciHost.innerHTML='';
-  } else {
-    localStorage.setItem('tool5_report_html', buildFciDashboardSnapshot(minS, weak, fvi, toolData));
+  var snapshotHtml = buildFciDashboardSnapshot(minS, weak, fvi, toolData);
+  var fciHost = document.getElementById('fci-report-snapshot-host');
+  if (fciHost) {
+    fciHost.innerHTML = snapshotHtml;
+    fciHost.innerHTML = '';
   }
+  localStorage.setItem('tool5_report_html', snapshotHtml);
+  console.log('FCI report HTML saved, length:', localStorage.getItem('tool5_report_html') ? localStorage.getItem('tool5_report_html').length : 0);
 }
 
 function screenComplete(){
