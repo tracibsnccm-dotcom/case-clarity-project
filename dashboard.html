@@ -529,6 +529,21 @@
         .trial-instrument-body {
             margin-top: 4px;
         }
+        /* Snapshot hosts in tools use position:absolute;left:-9999px for capture; reset when embedded in reports */
+        .trial-snapshot-embed > * {
+            position: static !important;
+            left: auto !important;
+            top: auto !important;
+            right: auto !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            height: auto !important;
+            min-height: 0 !important;
+            overflow: visible !important;
+            pointer-events: auto !important;
+            clip: auto !important;
+            transform: none !important;
+        }
         .trial-tool-block .trial-lead {
             font-size: 15px;
             color: #0c1c34;
@@ -607,11 +622,61 @@
         }
 
         @media print {
-            body, .comprehensive-report, .comprehensive-report * { visibility: visible !important; display: block !important; position: relative !important; overflow: visible !important; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            button, .no-print, .tool-card, header:not(.comprehensive-report), .dashboard-header, .toolbar, .app-header, .logout-btn, .btn-logout { display: none !important; }
-            .report-page-break { page-break-before: always; page-break-after: always; page-break-inside: avoid; }
-            .report-page-break:first-of-type { page-break-before: avoid; }
+            html, body {
+                height: auto !important;
+                overflow: visible !important;
+                background: #fff !important;
+            }
+            body {
+                margin: 0.5in !important;
+            }
+            /* Hide app chrome; do NOT force display:block on report nodes (breaks tables, flex, grids). */
+            .no-print,
+            button,
+            .tool-card,
+            .app-header,
+            .btn-logout,
+            .logout-btn,
+            .dashboard-header,
+            .toolbar,
+            .trial-report-toolbar,
+            header.app-header {
+                display: none !important;
+            }
+            body * {
+                visibility: hidden;
+            }
+            .trial-print-root,
+            .trial-print-root *,
+            .comprehensive-report,
+            .comprehensive-report * {
+                visibility: visible !important;
+            }
+            .trial-print-root,
+            .comprehensive-report {
+                position: static !important;
+                left: auto !important;
+                top: auto !important;
+                width: 100% !important;
+                max-width: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: #fff !important;
+                overflow: visible !important;
+            }
+            .report-page-break {
+                page-break-before: always;
+                page-break-after: always;
+                page-break-inside: avoid;
+                border-top: none;
+                margin-top: 0;
+                padding-top: 16px;
+            }
+            .report-page-break.report-page-break--first,
+            .report-page-break:first-of-type {
+                page-break-before: avoid;
+            }
         }
     </style>
 </head>
@@ -901,6 +966,7 @@
                 'ul.trial-list li{margin-bottom:6px;}ul.trial-list li strong{color:#0c1c34;}' +
                 '.trial-note{margin:0;font-size:13px;color:#5a6a7a;font-style:italic;}' +
                 '.trial-tool-block h3{font-size:15px;color:#0c1c34;margin:0 0 14px;padding-bottom:10px;border-bottom:1px solid #d6d0c4;font-weight:600;}' +
+                '.trial-snapshot-embed>*{position:static!important;left:auto!important;top:auto!important;width:100%!important;max-width:100%!important;overflow:visible!important;pointer-events:auto!important;height:auto!important;}' +
                 'img,svg{max-width:100%!important;height:auto!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}' +
                 '@media print{*{ -webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}body{margin:0.5in;} }' +
                 (toolPrintCss || '');
@@ -949,6 +1015,7 @@
                 '.report-page-break{page-break-after:always;page-break-inside:avoid;border:none;margin:0;padding:0;}' +
                 '.report-page-break:last-of-type{page-break-after:auto;}' +
                 '.report-page-break--first{page-break-before:avoid;}' +
+                '.trial-snapshot-embed>*{position:static!important;left:auto!important;top:auto!important;width:100%!important;max-width:100%!important;overflow:visible!important;pointer-events:auto!important;height:auto!important;}' +
                 'img,svg{max-width:100%!important;height:auto!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}' +
                 '@media print{*{ -webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}body{margin:0;} }' +
                 (toolPrintCss || '');
@@ -1143,20 +1210,32 @@
             return '<p class="trial-note">This instrument does not have a configured narrative summary.</p>';
         }
 
+        var MIN_SAVED_REPORT_HTML_LEN = 48;
+
         function getStoredToolReportSectionHtml(toolIndex, toolName, reportData) {
             var storageKeys = ['tool1', 'tool2', 'tool3', 'tool4', 'tool5', 'tool6'];
             var sk = storageKeys[toolIndex - 1];
-            var reportHTML = localStorage.getItem('tool' + toolIndex + '_report_html');
-            var content = reportHTML;
-            if (!content) {
-                var inner = unwrapStoredTool(sk, reportData[sk]);
-                if (inner) {
-                    var bodyClass = 'trial-instrument-body';
-                    if (toolName === 'FCI') bodyClass += ' fci-report';
-                    content = '<div class="' + bodyClass + '">' + formatInstrumentHumanHtml(toolName, inner) + '</div>';
-                }
+            var htmlKey = 'tool' + toolIndex + '_report_html';
+            var dataKey = 'tool' + toolIndex + '_data';
+            var reportHTML = localStorage.getItem(htmlKey);
+            if (reportHTML && reportHTML.trim().length >= MIN_SAVED_REPORT_HTML_LEN) {
+                return (
+                    '<div class="trial-instrument-body trial-snapshot-embed">' +
+                    reportHTML.trim() +
+                    '</div>'
+                );
             }
-            return content || '';
+            var raw = reportData[sk];
+            if (!raw) {
+                raw = safeParseLocalStorage(dataKey);
+            }
+            var inner = unwrapStoredTool(sk, raw);
+            if (inner) {
+                var bodyClass = 'trial-instrument-body';
+                if (toolName === 'FCI') bodyClass += ' fci-report';
+                return '<div class="' + bodyClass + '">' + formatInstrumentHumanHtml(toolName, inner) + '</div>';
+            }
+            return '';
         }
 
         function buildComprehensiveReportHTML() {
@@ -1178,7 +1257,17 @@
                 var breakClass = 'report-page-break' + (i === 1 ? ' report-page-break--first' : '');
                 var content = getStoredToolReportSectionHtml(i, toolName, reportData);
                 if (!content) {
-                    html += '<div class="' + breakClass + '"><h2 style="font-family:Georgia, serif; color:#1a2e3f;">' + toolName + ' Assessment</h2><div style="background:#fff3cd; padding:20px;">This report will appear after you complete the ' + toolName + ' tool. Please return to the dashboard and complete this assessment.</div></div>';
+                    var markedDone = !!localStorage.getItem('tool' + i + '_complete');
+                    var hasRaw = !!localStorage.getItem('tool' + i + '_data');
+                    var hint = '';
+                    if (markedDone && !hasRaw) {
+                        hint = ' This browser shows the instrument as complete, but no saved responses were found (storage may have been cleared or you may be on a different browser/device). Complete the instrument again from this dashboard in this same browser.';
+                    } else if (markedDone && hasRaw) {
+                        hint = ' Data was found but could not be rendered. Open the developer console (F12) for errors, or complete the instrument once more from this dashboard to refresh the report capture.';
+                    } else {
+                        hint = ' Complete the ' + toolName + ' instrument from this dashboard in this browser, then generate the report again.';
+                    }
+                    html += '<div class="' + breakClass + '"><h2 style="font-family:Georgia, serif; color:#1a2e3f;">' + toolName + ' Assessment</h2><div style="background:#fff3cd; padding:20px;"><strong>No report section available.</strong>' + escBodyHtml(hint) + '</div></div>';
                     globalPageNumber += 1;
                     continue;
                 }
