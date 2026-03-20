@@ -1681,6 +1681,14 @@ function hsiScorePill(v) {
   const st = hsiValStyle(v);
   return '<span style="display:inline-block;font-size:11px;font-weight:800;padding:5px 11px;border-radius:6px;background:' + st.bg + ';color:' + st.fg + '">' + v + ' — ' + escHsi(SCORE_LABELS[v]) + '</span>';
 }
+function generateSlabBars(data) {
+  const intrinsic = data.intrinsic || 1;
+  const extrinsic = data.extrinsic || 1;
+  const total = intrinsic + extrinsic;
+  const intrinsicPercent = (intrinsic / total) * 100;
+  const extrinsicPercent = (extrinsic / total) * 100;
+  return '<div style="flex: ' + intrinsicPercent + '; background: #1a2e3f; height: 30px;"></div><div style="flex: ' + extrinsicPercent + '; background: #b09837; height: 30px;"></div>';
+}
 function buildHsiReportSnapshotHtml(toolData) {
   const scored = {
     ds: toolData.ds,
@@ -1705,20 +1713,7 @@ function buildHsiReportSnapshotHtml(toolData) {
     const v = scored.destab[i];
     return '<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-bottom:1px solid #eee"><span style="font-size:12px;color:#333">' + escHsi(name) + '</span>' + hsiScorePill(v) + '</div>';
   }).join('');
-  const liftFrac = (x) => Math.pow((x - 1) / 4, 0.68);
-  const maxBar = 100;
-  const ih = Math.max(8, Math.round(liftFrac(scored.intrinsic) * maxBar));
-  const eh = Math.max(8, Math.round(liftFrac(scored.extrinsic) * maxBar));
-  const slab = '<div style="display:flex;align-items:flex-end;justify-content:center;gap:40px;padding:24px 20px;background:linear-gradient(180deg,#f4f3f0 0%,#e8e6e0 100%);border-radius:10px;border:1px solid #d6d0c4;margin:16px 22px 0">' +
-    '<div style="text-align:center;width:120px"><div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#666;margin-bottom:10px">Intrinsic stability</div>' +
-    '<div style="height:120px;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0.06);border-radius:6px;padding:6px">' +
-    '<div style="width:48px;height:' + ih + 'px;background:linear-gradient(180deg,#e8c547,#b8922a);border-radius:4px 4px 2px 2px;box-shadow:0 2px 8px rgba(0,0,0,0.12)"></div></div>' +
-    '<div style="margin-top:8px;font-size:18px;font-weight:900;color:#0e1c2e">' + scored.intrinsic + '</div></div>' +
-    '<div style="text-align:center;width:120px"><div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#666;margin-bottom:10px">Extrinsic pressures</div>' +
-    '<div style="height:120px;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0.06);border-radius:6px;padding:6px">' +
-    '<div style="width:48px;height:' + eh + 'px;background:linear-gradient(180deg,#7a8aaa,#4a5f7a);border-radius:4px 4px 2px 2px;box-shadow:0 2px 8px rgba(0,0,0,0.12)"></div></div>' +
-    '<div style="margin-top:8px;font-size:18px;font-weight:900;color:#0e1c2e">' + scored.extrinsic + '</div></div></div>' +
-    '<p style="margin:10px 22px 0;font-size:11px;color:#777;line-height:1.5;text-align:center">Illustrative foundation model — gold: intrinsic (lowest 4P domain); slate: averaged social drivers.</p>';
+  const slabHtml = '<div class="stability-slab" style="margin:20px 0; padding:15px; background:#f8f7f4; border-left:4px solid #b09837; border-radius:0 4px 4px 0;"><div style="font-weight:600; margin-bottom:10px; font-family:Georgia, serif;">Stability Profile</div><div style="display:flex; align-items:center; gap:15px;"><div style="flex:1;"><div style="display:flex; gap:2px; height:30px; border-radius:4px; overflow:hidden;">' + generateSlabBars(toolData) + '</div><div style="display:flex; margin-top:5px; font-size:12px;"><div style="flex:1;">Intrinsic: ' + (toolData.intrinsic != null ? toolData.intrinsic : 0) + '</div><div style="flex:1; text-align:right;">Extrinsic: ' + (toolData.extrinsic != null ? toolData.extrinsic : 0) + '</div></div></div></div></div>';
 
   return '<div style="font-family:system-ui,Segoe UI,sans-serif;max-width:880px;margin:0 auto;background:#fff;border:1px solid #d6d0c4;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(14,28,46,0.08)">' +
     '<div style="background:linear-gradient(135deg,#0e1c2e 0%,#1a3050 100%);padding:20px 24px;color:#fff">' +
@@ -1730,7 +1725,7 @@ function buildHsiReportSnapshotHtml(toolData) {
     '<div style="font-size:13px;color:#444"><strong style="color:#0e1c2e">Intrinsic (4Ps floor):</strong> ' + hsiScorePill(scored.intrinsic) + '</div>' +
     '<div style="font-size:13px;color:#444"><strong style="color:#0e1c2e">Determining domain:</strong> ' + escHsi(scored.pCode) + ' — ' + escHsi(DOMAIN_DESCS[scored.pCode] || '') + '</div></div>' +
     '<div style="margin-top:12px;font-size:13px;color:#444"><strong style="color:#0e1c2e">Extrinsic (social drivers avg):</strong> ' + hsiScorePill(scored.extrinsic) + '</div></div>' +
-    slab +
+    slabHtml +
     '<div style="padding:16px 22px 8px"><div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#b8922a;margin-bottom:8px">Domain scores (lowest per domain)</div>' + domRows + '</div>' +
     '<div style="padding:8px 22px 8px"><div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#6a7a8a;margin-bottom:8px">Social drivers (9)</div>' + sdRows + '</div>' +
     '<div style="padding:8px 22px 20px"><div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#8b1e1e;margin-bottom:8px">Clinical destabilizers</div>' + destRows + '</div>' +

@@ -567,9 +567,20 @@
             max-width: 900px;
             font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
         }
-        .comprehensive-report .report-page-break {
-            margin-top: 28px;
-            padding-top: 8px;
+        .report-page-break {
+            page-break-before: always;
+            page-break-after: always;
+            page-break-inside: avoid;
+            border-top: 3px double #ccc;
+            margin-top: 50px;
+            padding-top: 40px;
+            position: relative;
+        }
+        .report-page-break:first-of-type,
+        .report-page-break.report-page-break--first {
+            border-top: none;
+            margin-top: 0;
+            padding-top: 20px;
         }
         .comprehensive-report .comprehensive-tool-h2 {
             font-family: Georgia, 'Times New Roman', serif;
@@ -602,18 +613,40 @@
             }
             .app-header { display: none !important; }
             .trial-print-root .report-page-break,
-            .comprehensive-report .report-page-break {
+            .comprehensive-report .report-page-break,
+            .report-page-break {
                 page-break-before: always;
                 page-break-after: always;
                 page-break-inside: avoid;
             }
             .trial-print-root .report-page-break:first-of-type,
-            .comprehensive-report .report-page-break:first-of-type {
+            .comprehensive-report .report-page-break:first-of-type,
+            .report-page-break.report-page-break--first {
                 page-break-before: avoid;
+            }
+            .report-page-break {
+                border-top: none;
+                margin-top: 0;
+                padding-top: 20px;
             }
             .trial-print-root h2,
             .trial-print-root .comprehensive-report h2 {
                 page-break-after: avoid;
+            }
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            .comprehensive-report, .comprehensive-report * { visibility: visible; }
+            .comprehensive-report {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: white;
+            }
+            .no-print, button, .toolbar, header, footer, .dashboard-header, .tool-card {
+                display: none !important;
             }
         }
     </style>
@@ -1021,23 +1054,34 @@
             var toolNames = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
             var storageKeys = ['tool1', 'tool2', 'tool3', 'tool4', 'tool5', 'tool6'];
             var reportData = gatherTrialReportData();
+            var globalPageNumber = 1;
             for (var i = 1; i <= 6; i++) {
+                var toolName = toolNames[i - 1];
                 var reportHTML = localStorage.getItem('tool' + i + '_report_html');
-                if (!reportHTML) {
+                var content = reportHTML;
+                if (!content) {
                     var inner = unwrapStoredTool(storageKeys[i - 1], reportData[storageKeys[i - 1]]);
                     if (inner) {
                         var bodyClass = 'trial-instrument-body';
-                        if (toolNames[i - 1] === 'FCI') bodyClass += ' fci-report';
-                        reportHTML = '<div class="' + bodyClass + '">' + formatInstrumentHumanHtml(toolNames[i - 1], inner) + '</div>';
+                        if (toolName === 'FCI') bodyClass += ' fci-report';
+                        content = '<div class="' + bodyClass + '">' + formatInstrumentHumanHtml(toolName, inner) + '</div>';
                     }
                 }
-                if (reportHTML) {
-                    html += '<div class="report-page-break">';
-                    html += '<h2 class="comprehensive-tool-h2" style="page-break-after: avoid;">' + toolNames[i - 1] + ' Assessment</h2>';
-                    html += reportHTML;
-                    html += '</div>';
+                if (!content) continue;
+                var estimatedPages = Math.max(1, Math.ceil((content.length || 1000) / 2500));
+                var pageLabel = toolName + '-' + globalPageNumber;
+                if (estimatedPages > 1) {
+                    pageLabel += ' – ' + toolName + '-' + (globalPageNumber + estimatedPages - 1);
                 }
+                var breakClass = 'report-page-break' + (i === 1 ? ' report-page-break--first' : '');
+                html += '<div class="' + breakClass + '" data-tool="' + toolName + '" data-start="' + globalPageNumber + '">';
+                html += '<div style="text-align:right; font-size:10px; color:#666; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:5px;"><span style="font-family:monospace;">' + pageLabel + '</span></div>';
+                html += '<h2 style="page-break-after: avoid; font-family:Georgia, serif; color:#1a2e3f;">' + toolName + ' Assessment</h2>';
+                html += content;
+                html += '</div>';
+                globalPageNumber += estimatedPages;
             }
+            html += '<div style="text-align:center; font-size:10px; color:#999; margin-top:30px;">Page ' + (globalPageNumber - 1) + ' total</div>';
             html += '</div>';
             return html;
         }
