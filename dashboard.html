@@ -1179,6 +1179,19 @@
             return 7 - daysPassed;
         }
 
+        function updateCountdown() {
+            var trialStart = localStorage.getItem('trial_start_at');
+            if (!trialStart) return;
+            var startDate = new Date(trialStart);
+            var today = new Date();
+            var daysPassed = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+            var daysRemaining = Math.max(0, 7 - daysPassed);
+            var timerEl = document.getElementById('trial-countdown');
+            if (timerEl) {
+                timerEl.textContent = daysRemaining + (daysRemaining === 1 ? ' day' : ' days');
+            }
+        }
+
         document.getElementById('assessment-id-display').textContent = assessmentId;
 
         window.toggleSection = function (sectionId) {
@@ -1272,7 +1285,6 @@
 
             var timerLabel = trialExpired ? 'Trial access' : 'Trial time remaining';
             var timerClass = trialExpired ? 'timer-warning' : (trialDaysRemaining <= 2 && trialDaysRemaining >= 0 ? 'timer-warning' : '');
-            var timerValue = trialExpired ? 'Trial expired' : (trialDaysRemaining === 0 ? 'Final day' : (trialDaysRemaining + ' day' + (trialDaysRemaining === 1 ? '' : 's')));
             const locA = safeParseLocalStorage('dashboard_case_active') || {};
             const locR = safeParseLocalStorage('dashboard_case_retro') || {};
             const acName = escapeAttr(locA.nameCaseId || '');
@@ -1294,7 +1306,7 @@
                         <span class="timer-label">${timerLabel}</span>
                         <div style="font-size:12px;color:#6a7a8a;margin-top:8px;max-width:520px;line-height:1.5;">7-day trial from first login on this device. Portal session may differ; tools lock when the trial ends.</div>
                     </div>
-                    <span class="timer-value ${timerClass}">${timerValue}</span>
+                    <span class="timer-value ${timerClass}" id="trial-countdown"></span>
                 </div>
                 ${trialExpired ? '<div style="background:#fdf0f0;border:1px solid #e8b4b4;border-left:4px solid #c0392b;padding:16px 20px;margin-bottom:24px;font-size:14px;color:#5c2a2a;"><strong>Trial expired.</strong> Your 7-day instrument access from first login has ended. Launching assessments is disabled.</div>' : ''}
 
@@ -1492,6 +1504,12 @@
                 </div>`;
 
             container.innerHTML = html;
+
+            updateCountdown();
+            if (window._trialCountdownInterval) {
+                clearInterval(window._trialCountdownInterval);
+            }
+            window._trialCountdownInterval = setInterval(updateCountdown, 60 * 60 * 1000);
 
             document.getElementById('save-case-info').addEventListener('click', saveCaseInfo);
             wireDashboardCaseAutoSave();
