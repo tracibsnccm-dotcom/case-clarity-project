@@ -529,6 +529,67 @@ function buildInterp({fciScore,primaryDomains,fvi,painScore,psychScore}){
   return paras;
 }
 
+function vulnLabel(score) {
+  if (score == null) return '—';
+  const L = {5:'Minimal',4:'Mild',3:'Moderate',2:'Significant',1:'Severe'};
+  return score + ' — ' + (L[score] || '');
+}
+function buildFciDashboardSnapshot(minS, weak, fvi, toolData) {
+  const pain = toolData.vulnScores.pain;
+  const psych = toolData.vulnScores.psych;
+  const paras = buildInterp({
+    fciScore: minS,
+    primaryDomains: weak,
+    fvi: fvi,
+    painScore: pain,
+    psychScore: psych
+  });
+  const fviSt = FVI_COLOR[fvi] || FVI_COLOR.Low;
+  const incomeLbl = (INCOME_RANGES.find(o => o.value === toolData.fviFields.incomeRange) || {}).label || '—';
+  const depLbl = (YES_NO.find(o => o.value === toolData.fviFields.hasDependents) || {}).label || '—';
+  const soleLbl = (YES_NO.find(o => o.value === toolData.fviFields.isSoleEarner) || {}).label || '—';
+  const domainRows = DOMAINS.map(function (d) {
+    const s = toolData.scores[d.id];
+    if (s == null) return '';
+    const cl = FCI_CLASS[s];
+    const isW = weak.indexOf(d.label) >= 0;
+    const fillW = (s / 5) * 100;
+    const fillBg = isW ? '#7a2e10' : '#0c1c34';
+    return '<div style="margin-bottom:14px">' +
+      '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><span style="font-size:13px;font-weight:700;color:#0e1c2e">' + esc(d.label) + '</span>' +
+      '<span style="font-size:13px;font-weight:800;color:' + (isW ? '#7a2e10' : '#0c1c34') + '">' + s + '</span></div>' +
+      '<div style="height:10px;background:#e8e3d8;border-radius:5px;overflow:hidden">' +
+      '<div style="height:100%;width:' + fillW + '%;background:' + fillBg + ';border-radius:5px"></div></div>' +
+      '<div style="margin-top:6px"><span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:4px;color:' + cl.text + ';background:' + cl.bg + ';border:1px solid ' + cl.border + '">' + esc(cl.label) + '</span></div></div>';
+  }).join('');
+  const interpHtml = paras.map(function (p) {
+    return '<p style="margin:0 0 12px;font-size:13px;line-height:1.65;color:#333">' + esc(p) + '</p>';
+  }).join('');
+  return '<div style="font-family:Georgia,\'Times New Roman\',serif;max-width:820px;margin:0 auto;background:#fff;border:1px solid #d6d0c4;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(14,28,46,0.08);border-top:4px solid #0c1c34">' +
+    '<div style="background:linear-gradient(135deg,#0c1c34 0%,#1a3050 100%);padding:20px 24px;color:#e8e2d4;border-bottom:3px solid #b8922a">' +
+    '<div style="font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#b8922a;margin-bottom:6px">Functional Capacity Index™</div>' +
+    '<h2 style="margin:0;font-size:24px;font-weight:400;letter-spacing:0.02em">Functional capacity analysis</h2>' +
+    '<div style="font-size:12px;opacity:0.88;margin-top:8px">' + esc(new Date(toolData.timestamp).toLocaleString()) + '</div></div>' +
+    '<div style="padding:20px 24px;background:' + fviSt.bg + ';border-bottom:2px solid ' + fviSt.border + '">' +
+    '<div style="font-size:11px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:' + fviSt.text + '">Functional vulnerability indicator</div>' +
+    '<div style="font-size:26px;font-weight:800;color:' + fviSt.text + ';margin-top:6px">' + esc(fvi) + '</div>' +
+    '<div style="font-size:13px;color:#444;margin-top:8px"><strong>FCI minimum score:</strong> ' + minS + ' &nbsp;·&nbsp; <strong>Primary instability:</strong> ' + esc(weak.join(', ')) + '</div></div>' +
+    '<div style="padding:22px 26px">' +
+    '<div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#6a7a8a;margin-bottom:12px">Context indicators (FVI inputs)</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;font-size:13px;color:#333;margin-bottom:24px">' +
+    '<div><span style="color:#6a7a8a">Income range:</span> ' + esc(incomeLbl) + '</div>' +
+    '<div><span style="color:#6a7a8a">Dependents:</span> ' + esc(depLbl) + '</div>' +
+    '<div><span style="color:#6a7a8a">Sole earner:</span> ' + esc(soleLbl) + '</div>' +
+    '<div><span style="color:#6a7a8a">Pain / injury:</span> ' + esc(vulnLabel(pain)) + '</div>' +
+    '<div style="grid-column:1/-1"><span style="color:#6a7a8a">Psychological stress:</span> ' + esc(vulnLabel(psych)) + '</div></div>' +
+    '<div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#0c1c34;margin-bottom:14px">4Ps wellness scores</div>' +
+    domainRows +
+    '<div style="margin-top:28px;padding:20px 22px;background:#faf8f4;border:1px solid #e8e3d8;border-left:3px solid #b8922a;border-radius:8px">' +
+    '<div style="font-size:11px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#0c1c34;margin-bottom:12px">Professional interpretation</div>' +
+    interpHtml + '</div>' +
+    '<p style="margin:18px 0 0;font-size:11px;line-height:1.55;color:#888">Structured care management framework — not a diagnostic instrument. Interpret in clinical and legal context.</p></div></div>';
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // STATE
 // ─────────────────────────────────────────────────────────────────────────────
@@ -655,19 +716,7 @@ function saveTool5AndComplete(){
   };
   localStorage.setItem('tool5_data',JSON.stringify(toolData));
   localStorage.setItem('tool5_complete','true');
-  var fviDisp=fvi==='Moderate'?'Medium':fvi;
-  var rows=DOMAINS.map(function(d){
-    var s=S.scores[d.id];
-    var cl=FCI_CLASS[s];
-    return '<p style="margin:8px 0"><strong>'+d.label+':</strong> '+s+(cl?' — '+cl.label:'')+'</p>';
-  }).join('');
-  var snap='<div class="fci-report vulnerability-output results">'+
-    '<h2 style="margin:0 0 16px;font-size:22px;color:#0c1c34">Functional Capacity Index™</h2>'+
-    '<p style="margin:0 0 8px"><strong>FCI minimum score:</strong> '+minS+'</p>'+
-    '<p style="margin:0 0 8px"><strong>Functional Vulnerability Indicator:</strong> '+fviDisp+'</p>'+
-    '<p style="margin:0 0 16px"><strong>Primary instability domain(s):</strong> '+weak.join('; ')+'</p>'+
-    '<div style="font-size:14px;line-height:1.6">'+rows+'</div></div>';
-  localStorage.setItem('tool5_report_html',snap);
+  localStorage.setItem('tool5_report_html', buildFciDashboardSnapshot(minS, weak, fvi, toolData));
 }
 
 function screenComplete(){

@@ -1317,7 +1317,7 @@
   <!-- Checker -->
   <div id="checker-section" style="display:none;">
     <div id="cards-container"></div>
-    <div id="csa-report-for-storage" class="results-summary alignment-report report-content" style="display:none" aria-hidden="true"></div>
+    <div id="csa-report-for-storage" class="results-summary alignment-report report-content" aria-hidden="true" style="position:absolute;left:-9999px;top:0;width:960px;pointer-events:none;overflow:visible"></div>
     <div class="submit-wrap" id="submit-wrap">
       <div class="submit-title">Assessment Complete</div>
       <p class="submit-sub">All 7 Clinical Rights have been evaluated. Use the options below to return to the dashboard or continue to the next assessment in your sequence.</p>
@@ -1598,27 +1598,6 @@ function selectSub(ri, qi, value) {
   } else {
     submitWrap.style.display = 'none';
   }
-}
-
-// Payload for dashboard integration (postMessage + sessionStorage in markAssessmentComplete)
-function renderCsaResultsCapture() {
-  const r = computeResults();
-  const d = buildAssessmentData();
-  const el = document.getElementById('csa-report-for-storage');
-  if (!el) return;
-  const pct = d.alignmentPercent != null ? d.alignmentPercent + '%' : '—';
-  const rightsLine = (d.rightStatuses || []).map(function (s) {
-    if (s === 'aligned') return 'Aligned';
-    if (s === 'partial') return 'Partial';
-    if (s === 'misaligned') return 'Misaligned';
-    return s;
-  }).join(' · ');
-  el.innerHTML =
-    '<h2 style="font-size:1.35rem;color:var(--navy,#1a2744);margin:0 0 12px">Clinical Sequencing Auditor™ — Results</h2>' +
-    '<p style="font-size:1.05rem;margin:0 0 8px"><strong>Overall alignment:</strong> ' + (d.overallLabel || '—') + '</p>' +
-    '<p style="margin:0 0 8px"><strong>Alignment indicator:</strong> ' + pct + ' <span style="color:#666;font-size:0.9rem">(informational)</span></p>' +
-    '<p style="margin:0 0 16px"><strong>Rights summary (1–7):</strong> ' + rightsLine + '</p>' +
-    '<p style="margin:0;line-height:1.65;color:#333">' + (r.overall && r.overall.interpretation ? r.overall.interpretation : '') + '</p>';
 }
 
 function buildAssessmentData() {
@@ -1941,6 +1920,105 @@ function computeResults() {
   const right1Triggered = overallKey === 'misaligned-r1';
   const right1Advisory  = overallKey === 'partial-r1';
   return { rightStatuses, overallKey, overall, right1Triggered, right1Advisory };
+}
+
+function escCsaRep(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function buildCsaFullReportHtml() {
+  const r = computeResults();
+  const d = buildAssessmentData();
+  const overallKey = d.overallKey;
+  const borderColor = overallKey === 'aligned' ? '#2ecc71' : (overallKey === 'misaligned' || overallKey === 'misaligned-r1') ? '#c0392b' : '#f0a030';
+  const heroBg = overallKey === 'aligned' ? '#f2fbf6' : (overallKey === 'misaligned' || overallKey === 'misaligned-r1') ? '#fdf3f3' : '#fffbf0';
+  const badgeStyle = overallKey === 'aligned'
+    ? 'background:#edfaf4;color:#1a5c3a;border:2px solid #2ecc71'
+    : (overallKey === 'partial' || overallKey === 'partial-r1')
+    ? 'background:#fff8e6;color:#7a4a00;border:2px solid #f0a030'
+    : 'background:#fdf0f0;color:#7a1a1a;border:2px solid #c0392b';
+
+  let interp = r.overall && r.overall.interpretation ? r.overall.interpretation : '';
+  if (!interp && overallKey === 'misaligned-r1') {
+    interp = 'Right #1 (Provider Authority) is structurally misaligned. When the primary managing provider lacks scope consistent with injury complexity, downstream rights cannot compensate for that foundational gap. Corrective structural review of provider authority and care oversight is indicated.';
+  }
+  const pct = d.alignmentPercent != null ? d.alignmentPercent : 0;
+  const careWarn = pct <= 40 ? (
+    '<div style="margin-top:16px;padding:14px 18px;background:#fff5f5;border:2px solid #c0392b;border-left:5px solid #c0392b;border-radius:8px">' +
+    '<div style="font-size:11px;font-weight:800;color:#c0392b;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Indicator note</div>' +
+    '<div style="font-size:13px;font-style:italic;color:#7a1a1a;line-height:1.65">A lower alignment percentage does not override the structural determination shown above. Treat the overall status badge and each right status as primary.</div></div>'
+  ) : '';
+
+  let rightsHtml = '';
+  RIGHTS.forEach((right, ri) => {
+    const st = r.rightStatuses[ri];
+    const rowBorder = st === 'aligned' ? '#2ecc71' : st === 'partial' ? '#f0a030' : '#c0392b';
+    const stLabel = st === 'aligned' ? 'Aligned' : st === 'partial' ? 'Partial' : 'Misaligned';
+    const stBg = st === 'aligned' ? '#edfaf4' : st === 'partial' ? '#fff8e6' : '#fdf0f0';
+    const stFg = st === 'aligned' ? '#1a5c3a' : st === 'partial' ? '#7a4a00' : '#7a1a1a';
+    let qs = '';
+    right.questions.forEach((q, qi) => {
+      const ans = answers[ri] && answers[ri][qi] ? answers[ri][qi].value : '';
+      const ic = ans === 'yes'
+        ? { sym: '&#10003;', bg: '#edfaf4', bd: '#2ecc71', fg: '#1a5c3a', lab: 'Yes' }
+        : ans === 'not-sure'
+        ? { sym: '?', bg: '#f5f3ff', bd: '#7c3aed', fg: '#5b21b6', lab: 'Not Sure' }
+        : { sym: '&#10007;', bg: '#fdf0f0', bd: '#c0392b', fg: '#7a1a1a', lab: 'No' };
+      qs += '<div style="display:flex;gap:12px;padding:12px 16px;border-bottom:1px solid #f3f4f6;align-items:flex-start">' +
+        '<div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;background:' + ic.bg + ';color:' + ic.fg + ';border:1.5px solid ' + ic.bd + '">' + ic.sym + '</div>' +
+        '<div style="flex:1;font-size:13px;color:#3a3f4a;line-height:1.55"><span style="font-weight:700;color:#0d2240">' + (qi + 1) + '.</span> ' + escCsaRep(q.text) + '</div>' +
+        '<span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:' + ic.bg + ';color:' + ic.fg + ';border:1px solid ' + ic.bd + ';flex-shrink:0">' + ic.lab + '</span></div>';
+    });
+    rightsHtml += '<div style="margin-bottom:18px;border:1.5px solid #e5e7eb;border-radius:10px;overflow:hidden;box-shadow:0 1px 6px rgba(13,34,64,0.06)">' +
+      '<div style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:linear-gradient(135deg,#eef1f7 0%,#f8f9fb 100%);border-bottom:3px solid ' + rowBorder + '">' +
+      '<span style="font-size:22px;font-weight:900;color:#0d2240;font-family:Georgia,serif;min-width:32px">' + escCsaRep(right.number) + '</span>' +
+      '<div style="flex:1"><div style="font-size:9px;font-weight:700;color:#d4820a;text-transform:uppercase;letter-spacing:0.08em">' + escCsaRep(right.label) + '</div>' +
+      '<div style="font-size:15px;font-weight:700;color:#0d2240;line-height:1.25">' + escCsaRep(right.title) + '</div></div>' +
+      '<span style="font-size:11px;font-weight:700;padding:6px 12px;border-radius:20px;text-transform:uppercase;letter-spacing:0.04em;background:' + stBg + ';color:' + stFg + ';border:1px solid ' + rowBorder + '">' + stLabel + '</span></div>' +
+      '<div>' + qs + '</div></div>';
+  });
+
+  const ctaBlock = r.overall && (r.overall.ctaHeadline || r.overall.ctaBody) ? (
+    '<div style="background:linear-gradient(135deg,#0d2240 0%,#163566 100%);border-radius:12px;padding:24px 28px;margin-bottom:20px;color:#fff">' +
+    '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#f0a030;margin-bottom:8px">Strategic takeaway</div>' +
+    (r.overall.ctaHeadline ? '<h3 style="font-family:Georgia,serif;font-size:20px;font-weight:700;margin:0 0 10px;color:#fff;line-height:1.25">' + escCsaRep(r.overall.ctaHeadline) + '</h3>' : '') +
+    (r.overall.ctaBody ? '<p style="font-size:14px;line-height:1.75;color:rgba(255,255,255,0.82);margin:0">' + escCsaRep(r.overall.ctaBody) + '</p>' : '') +
+    '</div>'
+  ) : '';
+
+  return '<div class="results-summary alignment-report report-content" style="font-family:\'DM Sans\',system-ui,sans-serif;max-width:900px;margin:0;padding:0;color:#3a3f4a">' +
+    '<div style="background:#fff;border-radius:12px;padding:24px 28px;margin-bottom:20px;box-shadow:0 2px 10px rgba(13,34,64,0.1);border-top:4px solid #0d2240">' +
+    '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#d4820a;margin-bottom:6px">Clinical Sequencing Auditor™</div>' +
+    '<div style="font-family:Georgia,\'Playfair Display\',serif;font-size:26px;font-weight:900;color:#0d2240;margin-bottom:8px;line-height:1.15">Structural Alignment Report</div>' +
+    '<div style="font-size:12px;color:#6b7280">Full formatted output · ' + escCsaRep(new Date().toLocaleString()) + '</div></div>' +
+    '<div style="text-align:center;padding:28px 24px;border-radius:12px;border:2px solid ' + borderColor + ';background:' + heroBg + ';margin-bottom:20px">' +
+    '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#6b7280;margin-bottom:12px">Overall structural status</div>' +
+    '<div style="display:inline-block;font-family:Georgia,serif;font-size:26px;font-weight:900;padding:12px 28px;border-radius:50px;margin-bottom:12px;' + badgeStyle + '">' + escCsaRep(d.overallLabel) + '</div>' +
+    '<p style="font-size:12px;color:#6b7280;line-height:1.65;max-width:540px;margin:0 auto">Determined from all seven rights using the C.S.A. structural logic (not the percentage alone).</p></div>' +
+    '<div style="background:#fff;border:1.5px solid #1e4a8c;border-radius:12px;padding:22px 26px;margin-bottom:20px">' +
+    '<div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;color:#0d2240;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid #d4820a">C.A.R.E. alignment indicator</div>' +
+    '<div style="font-family:Georgia,serif;font-size:44px;font-weight:700;color:#0d2240;line-height:1">' + pct + '%</div>' +
+    '<div style="font-size:12px;font-weight:600;color:#d4820a;margin-bottom:8px">Weighted response distribution (informational)</div>' +
+    '<p style="font-size:13px;color:#6b7280;line-height:1.65;margin:0">Informational only — does not override structural status.</p>' + careWarn + '</div>' +
+    '<div style="background:#fff;border:1.5px solid #e5e7eb;border-radius:10px;padding:20px 24px;margin-bottom:20px">' +
+    '<div style="font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;color:#0d2240;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #d4820a">Clinical interpretation</div>' +
+    '<div style="font-size:14px;line-height:1.75;color:#3a3f4a;font-weight:500">' + escCsaRep(interp) + '</div></div>' +
+    ctaBlock +
+    '<div style="padding:16px 20px;background:#f4f5f7;border-radius:9px;margin-bottom:20px">' +
+    '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#6b7280;margin-bottom:10px">Color legend</div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:18px;font-size:12px;color:#3a3f4a">' +
+    '<span><strong style="color:#1a5c3a">●</strong> Aligned</span>' +
+    '<span><strong style="color:#7a4a00">●</strong> Partial</span>' +
+    '<span><strong style="color:#c0392b">●</strong> Misaligned</span></div></div>' +
+    '<div style="margin-bottom:12px;font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:#0d2240">Detailed findings — each right &amp; criterion</div>' +
+    rightsHtml +
+    '<div style="padding:14px 18px;background:#f4f5f7;border-radius:8px;font-size:12px;color:#6b7280;line-height:1.65;border-left:3px solid #94a3b8;font-style:italic">Reconcile C.A.R.E. · Trial capture for consolidated dashboard report.</div></div>';
+}
+
+function renderCsaResultsCapture() {
+  const el = document.getElementById('csa-report-for-storage');
+  if (!el) return;
+  el.innerHTML = buildCsaFullReportHtml();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

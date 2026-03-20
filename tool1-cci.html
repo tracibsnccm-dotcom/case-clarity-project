@@ -584,15 +584,16 @@ input[type=text]::placeholder{color:#bbb}
 </div>
 
 <div id="trial-complete" style="display:none">
-  <div class="complexity-report report-view results-display" style="max-width:720px;margin:0 auto;text-align:center;padding:2rem 0 3rem">
+  <div style="max-width:720px;margin:0 auto;text-align:center;padding:2rem 0 3rem">
     <h2 style="color:#1a1a1a;font-weight:600;margin:0 0 12px">Assessment complete</h2>
-    <p style="color:#555;line-height:1.65;margin:0;font-size:15px">Your Case Complexity Index™ responses have been saved. A full report will be available on your dashboard after you finish all six assessments.</p>
+    <p style="color:#555;line-height:1.65;margin:0;font-size:15px">Your responses have been saved. The full formatted report appears only in your dashboard after all six instruments are complete.</p>
     <div style="display:flex;gap:16px;justify-content:center;margin-top:40px;flex-wrap:wrap">
       <button type="button" onclick="returnToDashboard()" class="btn-ghost">← Return to Dashboard</button>
       <button type="button" onclick="goToNext()" class="btn-primary">Continue to Next Assessment →</button>
     </div>
   </div>
 </div>
+<div id="cci-report-snapshot" class="complexity-report report-view results-display" aria-hidden="true" style="position:absolute;left:-9999px;top:0;width:920px;overflow:visible;pointer-events:none"></div>
 
 <script>
 
@@ -643,6 +644,61 @@ document.addEventListener('change',e=>{
 });
 
 function checked(attr,val){return[...document.querySelectorAll(`input[type=checkbox][${attr}="${val}"]:checked`)];}
+
+function escSnap(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function buildCciReportSnapshotHtml(ad,toolData,level,cmg){
+  var d=ad.drivers||{};
+  function driversCol(title,arr){
+    var items=(arr||[]).map(function(x){
+      return '<div style="display:flex;gap:8px;margin-bottom:6px;font-size:13px;color:#1a1a1a;line-height:1.45"><span style="width:6px;height:6px;border-radius:50%;background:#b09837;margin-top:6px;flex-shrink:0"></span><span>'+escSnap(x)+'</span></div>';
+    }).join('');
+    if(!items) items='<div style="font-size:12px;color:#bbb;font-style:italic">None listed</div>';
+    return '<div style="background:#fafafa;border:1px solid #e0d090;border-radius:6px;padding:14px 16px"><div style="font-size:9px;font-weight:700;color:#7a6a22;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #ecdfa0">'+escSnap(title)+'</div>'+items+'</div>';
+  }
+  var meter='';
+  for(var i=1;i<=5;i++){
+    meter+='<div style="flex:1;height:8px;border-radius:3px;margin-right:4px;background:'+(i<=level?'#b09837':'#2a2a2a')+'"></div>';
+  }
+  var guid=(cmg.guidance||[]).map(function(g){
+    return '<li style="display:flex;gap:8px;font-size:13px;color:#1a1a1a;margin-bottom:5px;line-height:1.5;list-style:none"><span style="width:5px;height:5px;border-radius:50%;background:#b09837;margin-top:7px;flex-shrink:0"></span><span>'+escSnap(g)+'</span></li>';
+  }).join('');
+  var arColor=ad.coord&&ad.coord.authRisk==='HIGH'?'#c0392b':(ad.coord&&ad.coord.authRisk==='MODERATE'?'#b09837':'#2e7d32');
+  var comp=toolData.composite!=null?Math.round(toolData.composite):'—';
+  return '<div style="font-family:Segoe UI,Arial,sans-serif;max-width:900px;margin:0 auto;background:#fff;border-radius:8px;overflow:hidden;border:1px solid #ddd">'+
+    '<div style="background:#1a1a1a;padding:16px 20px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;align-items:flex-start">'+
+    '<div style="font-size:11px;font-weight:700;color:#b09837;letter-spacing:0.14em;text-transform:uppercase">Case Complexity Index™ — Full Report</div>'+
+    '<div style="font-size:11px;color:#888;text-align:right"><span>Snapshot</span><span style="display:block;color:#aaa">'+escSnap(new Date().toLocaleString())+'</span></div></div>'+
+    '<div style="background:#111;padding:14px 20px 12px;border-bottom:1px solid #2a2a2a">'+
+    '<div style="font-size:9px;font-weight:700;color:#555;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px">Complexity spectrum (Level 1 = highest complexity)</div>'+
+    '<div style="display:flex;gap:5px">'+meter+'</div>'+
+    '<div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font-size:9px;color:#444">L1</span><span style="font-size:9px;color:#444">L2</span><span style="font-size:9px;color:#444">L3</span><span style="font-size:9px;color:#444">L4</span><span style="font-size:9px;color:#444">L5</span></div></div>'+
+    '<div style="padding:20px 22px;background:#fff">'+
+    '<div style="font-size:26px;font-weight:700;color:#1a1a1a;margin-bottom:6px">Level '+level+' — '+escSnap(ad.levelName)+'</div>'+
+    '<div style="font-size:13px;color:#555;line-height:1.55;margin-bottom:16px">'+escSnap(ad.levelSub)+'</div>'+
+    '<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#1a1a1a;border-radius:6px;margin-bottom:20px;flex-wrap:wrap">'+
+    '<span style="font-size:10px;font-weight:700;color:#888;letter-spacing:0.1em;text-transform:uppercase">Recommended review interval</span>'+
+    '<span style="background:#b09837;color:#fff;font-size:13px;font-weight:700;padding:6px 14px;border-radius:4px">'+escSnap(ad.interval)+'</span></div>'+
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">'+driversCol('Injury drivers',d.injury)+driversCol('Functional drivers',d.functional)+driversCol('Coordination drivers',d.coordination)+'</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">'+
+    '<div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:5px;padding:10px 12px"><div style="font-size:9px;font-weight:700;color:#888;text-transform:uppercase;margin-bottom:4px">Referral pattern</div><div style="font-size:13px;font-weight:600;color:#1a1a1a">'+escSnap(ad.coord&&ad.coord.ref)+'</div></div>'+
+    '<div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:5px;padding:10px 12px"><div style="font-size:9px;font-weight:700;color:#888;text-transform:uppercase;margin-bottom:4px">Treatment course</div><div style="font-size:13px;font-weight:600;color:#1a1a1a">'+escSnap(ad.coord&&ad.coord.dur)+'</div></div>'+
+    '<div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:5px;padding:10px 12px"><div style="font-size:9px;font-weight:700;color:#888;text-transform:uppercase;margin-bottom:4px">Authorization risk</div><div style="font-size:13px;font-weight:600;color:'+arColor+'">'+escSnap(ad.coord&&ad.coord.authRisk)+'</div></div>'+
+    '<div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:5px;padding:10px 12px"><div style="font-size:9px;font-weight:700;color:#888;text-transform:uppercase;margin-bottom:4px">Specialty count factor</div><div style="font-size:13px;font-weight:600;color:#1a1a1a">'+escSnap(ad.coord&&ad.coord.specCount!=null?String(ad.coord.specCount):'—')+'</div></div></div>'+
+    '<div style="border-left:4px solid #b09837;background:#fdf8e8;padding:14px 16px;border-radius:0 6px 6px 0;margin-bottom:14px">'+
+    '<div style="font-size:9px;font-weight:700;color:#7a6a22;text-transform:uppercase;margin-bottom:6px">Priority action</div>'+
+    '<p style="font-size:13px;color:#333;line-height:1.6;margin:0">'+escSnap(ad.priorityAction)+'</p></div>'+
+    '<div style="border-left:4px solid #b09837;background:#fdf8e8;padding:14px 16px;border-radius:0 6px 6px 0;margin-bottom:18px">'+
+    '<div style="font-size:9px;font-weight:700;color:#7a6a22;text-transform:uppercase;margin-bottom:6px">Documentation focus</div>'+
+    '<p style="font-size:13px;color:#333;line-height:1.6;margin:0">'+escSnap(ad.docFocus)+'</p></div>'+
+    '<div style="font-size:10px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">Monitoring guidance</div>'+
+    '<ul style="list-style:none;padding:0;margin:0 0 16px">'+guid+'</ul>'+
+    '<div style="font-size:12px;color:#555;padding:12px;background:#f9f9f9;border-radius:6px;border:1px solid #eee"><strong>Weighted composite:</strong> '+escSnap(String(comp))+' &nbsp;|&nbsp; <strong>Domain tiers:</strong> D1='+escSnap(String(toolData.d1Tier))+' · D2='+escSnap(String(toolData.d2Tier))+' · D3='+escSnap(String(toolData.d3Tier))+'</div>'+
+    '</div>'+
+    '<div style="background:#f5f5f5;padding:14px 22px;border-top:1px solid #eee"><p style="font-size:12px;color:#777;line-height:1.65;margin:0">Case Clarity trial capture — for use in the consolidated dashboard report only.</p></div></div>';
+}
 
 // ── Calculate ─────────────────────────────────────────
 function calculate(){
@@ -809,10 +865,11 @@ function calculate(){
     window.markAssessmentComplete(assessmentData);
   }
 
-  setTimeout(function () {
-    var reportDiv = document.querySelector('.complexity-report, .report-view, .results-display');
-    if (reportDiv) localStorage.setItem('tool1_report_html', reportDiv.innerHTML);
-  }, 100);
+  var snapEl=document.getElementById('cci-report-snapshot');
+  if(snapEl){
+    snapEl.innerHTML=buildCciReportSnapshotHtml(assessmentData,toolData,level,cmg);
+    localStorage.setItem('tool1_report_html',snapEl.innerHTML);
+  }
 }
 
 // ── Reset ─────────────────────────────────────────────

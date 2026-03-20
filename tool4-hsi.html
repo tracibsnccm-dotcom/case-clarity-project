@@ -1031,6 +1031,7 @@ canvas{display:block}
     </div>
   </div>
 </div>
+<div id="hsi-report-snapshot" aria-hidden="true" style="position:absolute;left:-9999px;top:0;width:920px;pointer-events:none"></div>
 
 
 <!-- ══════════════════════════════════════════
@@ -1669,6 +1670,73 @@ function score() {
   return { ds, intrinsic:minD, pCode:`P${pIdx+1}`, extrinsic:extr, destab };
 }
 
+function escHsi(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function hsiValStyle(v) {
+  const map = { 5:{bg:'#1e5c3a',fg:'#fff'}, 4:{bg:'#4a6741',fg:'#fff'}, 3:{bg:'#a8852b',fg:'#fff'}, 2:{bg:'#c45c1a',fg:'#fff'}, 1:{bg:'#8b1e1e',fg:'#fff'} };
+  return map[v] || map[3];
+}
+function hsiScorePill(v) {
+  const st = hsiValStyle(v);
+  return '<span style="display:inline-block;font-size:11px;font-weight:800;padding:5px 11px;border-radius:6px;background:' + st.bg + ';color:' + st.fg + '">' + v + ' — ' + escHsi(SCORE_LABELS[v]) + '</span>';
+}
+function buildHsiReportSnapshotHtml(toolData) {
+  const scored = {
+    ds: toolData.ds,
+    intrinsic: toolData.intrinsic,
+    pCode: toolData.pCode,
+    extrinsic: toolData.extrinsic,
+    destab: toolData.destab
+  };
+  const Ans = toolData.answers || {};
+  const domRows = DOMAINS.map((d, i) => {
+    const v = scored.ds[i];
+    const isPri = scored.pCode === d.code;
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid #eef0f3;background:' + (isPri ? '#fff9e6' : '#fafbfc') + '">' +
+      '<div style="font-size:13px;font-weight:' + (isPri ? '800' : '600') + ';color:#0e1c2e">' + escHsi(d.title) + (isPri ? ' <span style="font-size:10px;color:#b8922a">(priority)</span>' : '') + '</div>' +
+      '<div>' + hsiScorePill(v) + '</div></div>';
+  }).join('');
+  const sdRows = SOCIAL_DRIVERS.map((name, i) => {
+    const v = Ans[4] && Ans[4][i];
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-bottom:1px solid #eee"><span style="font-size:12px;color:#333">' + escHsi(name) + '</span>' + hsiScorePill(v) + '</div>';
+  }).join('');
+  const destRows = DESTABILIZERS.map((name, i) => {
+    const v = scored.destab[i];
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-bottom:1px solid #eee"><span style="font-size:12px;color:#333">' + escHsi(name) + '</span>' + hsiScorePill(v) + '</div>';
+  }).join('');
+  const liftFrac = (x) => Math.pow((x - 1) / 4, 0.68);
+  const maxBar = 100;
+  const ih = Math.max(8, Math.round(liftFrac(scored.intrinsic) * maxBar));
+  const eh = Math.max(8, Math.round(liftFrac(scored.extrinsic) * maxBar));
+  const slab = '<div style="display:flex;align-items:flex-end;justify-content:center;gap:40px;padding:24px 20px;background:linear-gradient(180deg,#f4f3f0 0%,#e8e6e0 100%);border-radius:10px;border:1px solid #d6d0c4;margin:16px 22px 0">' +
+    '<div style="text-align:center;width:120px"><div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#666;margin-bottom:10px">Intrinsic stability</div>' +
+    '<div style="height:120px;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0.06);border-radius:6px;padding:6px">' +
+    '<div style="width:48px;height:' + ih + 'px;background:linear-gradient(180deg,#e8c547,#b8922a);border-radius:4px 4px 2px 2px;box-shadow:0 2px 8px rgba(0,0,0,0.12)"></div></div>' +
+    '<div style="margin-top:8px;font-size:18px;font-weight:900;color:#0e1c2e">' + scored.intrinsic + '</div></div>' +
+    '<div style="text-align:center;width:120px"><div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#666;margin-bottom:10px">Extrinsic pressures</div>' +
+    '<div style="height:120px;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0.06);border-radius:6px;padding:6px">' +
+    '<div style="width:48px;height:' + eh + 'px;background:linear-gradient(180deg,#7a8aaa,#4a5f7a);border-radius:4px 4px 2px 2px;box-shadow:0 2px 8px rgba(0,0,0,0.12)"></div></div>' +
+    '<div style="margin-top:8px;font-size:18px;font-weight:900;color:#0e1c2e">' + scored.extrinsic + '</div></div></div>' +
+    '<p style="margin:10px 22px 0;font-size:11px;color:#777;line-height:1.5;text-align:center">Illustrative foundation model — gold: intrinsic (lowest 4P domain); slate: averaged social drivers.</p>';
+
+  return '<div style="font-family:system-ui,Segoe UI,sans-serif;max-width:880px;margin:0 auto;background:#fff;border:1px solid #d6d0c4;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(14,28,46,0.08)">' +
+    '<div style="background:linear-gradient(135deg,#0e1c2e 0%,#1a3050 100%);padding:20px 24px;color:#fff">' +
+    '<div style="font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#e8c547;margin-bottom:6px">Holistic Stability Index™</div>' +
+    '<h2 style="margin:0;font-size:22px;font-weight:800;letter-spacing:-0.02em">Stability assessment report</h2>' +
+    '<div style="font-size:12px;opacity:0.85;margin-top:8px">' + escHsi(new Date(toolData.timestamp).toLocaleString()) + ' · Case: ' + escHsi(toolData.caseType || '') + '</div></div>' +
+    '<div style="padding:20px 24px;background:#f8f6f1;border-bottom:1px solid #e0dcd4">' +
+    '<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center">' +
+    '<div style="font-size:13px;color:#444"><strong style="color:#0e1c2e">Intrinsic (4Ps floor):</strong> ' + hsiScorePill(scored.intrinsic) + '</div>' +
+    '<div style="font-size:13px;color:#444"><strong style="color:#0e1c2e">Determining domain:</strong> ' + escHsi(scored.pCode) + ' — ' + escHsi(DOMAIN_DESCS[scored.pCode] || '') + '</div></div>' +
+    '<div style="margin-top:12px;font-size:13px;color:#444"><strong style="color:#0e1c2e">Extrinsic (social drivers avg):</strong> ' + hsiScorePill(scored.extrinsic) + '</div></div>' +
+    slab +
+    '<div style="padding:16px 22px 8px"><div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#b8922a;margin-bottom:8px">Domain scores (lowest per domain)</div>' + domRows + '</div>' +
+    '<div style="padding:8px 22px 8px"><div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#6a7a8a;margin-bottom:8px">Social drivers (9)</div>' + sdRows + '</div>' +
+    '<div style="padding:8px 22px 20px"><div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#8b1e1e;margin-bottom:8px">Clinical destabilizers</div>' + destRows + '</div>' +
+    '<div style="padding:12px 18px;background:#f4f2ec;font-size:11px;color:#666;line-height:1.55;border-top:1px solid #e0dcd4">Dashboard capture. Destabilizers are contextual and do not change intrinsic or extrinsic scores.</div></div>';
+}
+
 /* ─────────────────────────────────────────────────────────
    BUILD RESULTS
 ───────────────────────────────────────────────────────── */
@@ -1698,10 +1766,11 @@ function buildResults() {
     });
   }
 
-  setTimeout(function () {
-    var hsiResults = document.querySelector('.hsi-output, .stability-report, .report-container');
-    if (hsiResults) localStorage.setItem('tool4_report_html', hsiResults.innerHTML);
-  }, 100);
+  var snapEl = document.getElementById('hsi-report-snapshot');
+  if (snapEl) {
+    snapEl.innerHTML = buildHsiReportSnapshotHtml(toolData);
+    localStorage.setItem('tool4_report_html', snapEl.innerHTML);
+  }
 }
 
 /* ─────────────────────────────────────────────────────────
