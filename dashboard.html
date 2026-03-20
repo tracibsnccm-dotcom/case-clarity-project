@@ -636,6 +636,37 @@
         }
 
         @media print {
+            /* Ensure colors print */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+
+            /* Keep all colors and backgrounds */
+            .comprehensive-report,
+            .comprehensive-report *,
+            [class*="badge"],
+            [class*="warning"],
+            [class*="alert"],
+            [class*="status"],
+            .slab-visual,
+            .stability-slab,
+            .fci-report,
+            .rrf-report {
+                background-color: inherit !important;
+                color: inherit !important;
+                border-color: inherit !important;
+                opacity: 1 !important;
+            }
+
+            /* Preserve specific color classes */
+            .badge-high, .warning-critical { background-color: #d9534f !important; color: white !important; }
+            .badge-moderate, .warning-moderate { background-color: #f0ad4e !important; color: white !important; }
+            .badge-low { background-color: #5bc0de !important; color: white !important; }
+            .badge-stable { background-color: #5cb85c !important; color: white !important; }
+
+            /* Hide UI elements */
             body * { visibility: hidden; }
             .comprehensive-report, .comprehensive-report * { visibility: visible; }
             .comprehensive-report {
