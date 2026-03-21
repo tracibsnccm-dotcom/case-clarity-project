@@ -712,10 +712,11 @@
     <script>
         (function () {
         // Protect dashboard — redirect to login if not authenticated
-        const assessmentId = localStorage.getItem('assessment_id');
-        const sessionId = localStorage.getItem('session_id');
+        const ccp = localStorage.getItem('ccp');
+        const email = localStorage.getItem('email');
+        const userId = localStorage.getItem('user_id');
 
-        if (!assessmentId || !sessionId) {
+        if (!ccp || !email || !userId) {
             window.location.href = 'login.html';
             return;
         }
@@ -1285,7 +1286,85 @@
             }
             html += '<div style="text-align:center; font-size:10px; color:#999; margin-top:30px;">Page ' + Math.max(0, globalPageNumber - 1) + ' total</div>';
             html += '</div>';
+            
+            // Add post-report section
+            html += buildPostReportSection();
+            
             return html;
+        }
+
+        function buildPostReportSection() {
+            var html = '<div class="report-page-break" style="margin-top:60px;padding-top:40px;border-top:3px double #ccc;">';
+            html += '<h2 style="font-family:Georgia, serif; color:#1a2e3f; margin-bottom:24px; border-bottom:2px solid #b09837; padding-bottom:12px;">Next Steps: Maximizing Your Assessments</h2>';
+            html += '<p style="font-size:15px; line-height:1.8; margin-bottom:24px;">To get the most value from Case Clarity Project, we recommend following a structured assessment schedule. Each instrument provides critical insights at different stages of case development, and running them at the right frequency ensures you capture important trajectory changes when they matter most.</p>';
+            
+            html += '<h3 style="font-size:20px; color:#1a2e3f; margin:32px 0 16px;">Recommended Follow-Up Schedule</h3>';
+            html += '<table style="width:100%; border-collapse:collapse; margin:32px 0; font-size:14px; border:1px solid #d6d0c4;">';
+            html += '<thead><tr style="background:#1a2e3f; color:#e8e2d4;">';
+            html += '<th style="padding:14px 16px; text-align:left; font-weight:600; font-size:11px; letter-spacing:0.1em; text-transform:uppercase;">Tool</th>';
+            html += '<th style="padding:14px 16px; text-align:left; font-weight:600; font-size:11px; letter-spacing:0.1em; text-transform:uppercase;">Description</th>';
+            html += '<th style="padding:14px 16px; text-align:left; font-weight:600; font-size:11px; letter-spacing:0.1em; text-transform:uppercase;">Minimum Frequency</th>';
+            html += '<th style="padding:14px 16px; text-align:left; font-weight:600; font-size:11px; letter-spacing:0.1em; text-transform:uppercase;">Best Practice</th>';
+            html += '</tr></thead><tbody>';
+            
+            var schedule = [
+                { tool: 'CCI', desc: 'Assesses case complexity level and identifies key drivers', freq: 'Level 1–2: Minimum every 7 days<br>Level 3: Minimum every 30 days<br>Level 4: Minimum every 45 days<br>Level 5: Minimum every 60 days', practice: 'Higher complexity requires tighter monitoring. Catching complexity shifts early prevents case drift.' },
+                { tool: 'CSA', desc: 'Evaluates clinical sequencing and identifies gaps in care coordination', freq: 'Minimum every 30 days', practice: 'Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.' },
+                { tool: 'CAF', desc: 'Measures barriers to care and treatment access friction points', freq: 'Minimum every 30 days', practice: 'Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.' },
+                { tool: 'HSI', desc: 'Assesses overall case stability across intrinsic and extrinsic factors', freq: 'Minimum every 30 days', practice: 'Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.' },
+                { tool: 'FCI', desc: 'Evaluates functional capacity and vulnerability indicators', freq: 'Minimum every 30 days', practice: 'Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.' },
+                { tool: 'RRF', desc: 'Predicts recovery trajectory and identifies risk factors', freq: 'Minimum every 30 days', practice: 'Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.' }
+            ];
+            
+            schedule.forEach(function(item) {
+                html += '<tr style="border-bottom:1px solid #d6d0c4;">';
+                html += '<td style="padding:14px 16px; font-weight:600; color:#1a2e3f;">' + escBodyHtml(item.tool) + '</td>';
+                html += '<td style="padding:14px 16px;">' + escBodyHtml(item.desc) + '</td>';
+                html += '<td style="padding:14px 16px;">' + item.freq + '</td>';
+                html += '<td style="padding:14px 16px;">' + escBodyHtml(item.practice) + '</td>';
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            
+            html += '<div style="background:#fff3cd; border-left:4px solid #b09837; padding:20px; margin:24px 0;">';
+            html += '<p style="margin-bottom:12px;"><strong>Important Context:</strong></p>';
+            html += '<p style="margin-bottom:12px;">While the minimum is every 30 days, it should be expected that these reports would—and should—be run often during the early phases of injury, treatment, and care. Early and frequent assessments capture the trajectory of decline and recovery when it matters most.</p>';
+            html += '<p>You have to run them often enough when the client is at their most vulnerable so that you can catch declines in condition before they undermine the case and the evidence you need to prove how hindered the client was from returning to baseline physically and financially.</p>';
+            html += '</div>';
+            
+            html += '</div>';
+            return html;
+        }
+
+        // Sync tool completions to Supabase
+        async function syncToolCompletionsToSupabase() {
+            try {
+                const userId = localStorage.getItem('user_id');
+                if (!userId) return;
+
+                const completedTools = {};
+                for (var i = 1; i <= 6; i++) {
+                    if (localStorage.getItem('tool' + i + '_complete')) {
+                        const toolNames = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
+                        completedTools[toolNames[i - 1]] = {
+                            completed: true,
+                            completed_at: localStorage.getItem('tool' + i + '_completed_at') || new Date().toISOString()
+                        };
+                    }
+                }
+
+                const { error } = await supabaseClient
+                    .from('trial_users')
+                    .update({ completed_tools: completedTools })
+                    .eq('id', userId);
+
+                if (error) {
+                    console.error('Error syncing tool completions:', error);
+                }
+            } catch (err) {
+                console.error('Error syncing to Supabase:', err);
+            }
         }
 
         function updateTrialReportUI() {
@@ -1298,6 +1377,9 @@
             }
             prog.textContent = 'Instruments saved in this browser: ' + n + '/6';
             wrap.style.display = allToolsComplete() ? 'block' : 'none';
+            
+            // Sync to Supabase when UI updates
+            syncToolCompletionsToSupabase();
         }
 
         function bindTrialReportHandlers() {
@@ -1435,59 +1517,65 @@
         };
 
         // Load dashboard
-        loadDashboard();
-
-        async function loadDashboard() {
+        // Check trial expiration on load
+        async function checkTrialStatus() {
             try {
-                // Get session data
-                const { data: session, error } = await supabaseClient
-                    .from('assessment_sessions')
-                    .select('*')
-                    .eq('id', sessionId)
+                const userId = localStorage.getItem('user_id');
+                if (!userId) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const { data: user, error } = await supabaseClient
+                    .from('trial_users')
+                    .select('trial_start_at, status')
+                    .eq('id', userId)
                     .single();
 
-                if (error || !session) {
-                    handleLogout();
+                if (error || !user) {
+                    window.location.href = 'login.html';
                     return;
                 }
 
-                // Check expiration
-                if (new Date() > new Date(session.expires_at)) {
+                // Check if trial expired (7 days from trial_start_at)
+                const trialStart = new Date(user.trial_start_at);
+                const now = new Date();
+                const daysElapsed = Math.floor((now - trialStart) / (1000 * 60 * 60 * 24));
+
+                if (daysElapsed >= 7 && user.status === 'trial_active') {
                     await supabaseClient
-                        .from('assessment_sessions')
-                        .update({ status: 'expired' })
-                        .eq('id', sessionId);
+                        .from('trial_users')
+                        .update({ status: 'trial_expired' })
+                        .eq('id', userId);
                     
-                    showExpiredMessage();
+                    alert('Your 7-day trial has ended. Please purchase a subscription to continue.');
+                    window.location.href = 'pricing.html';
                     return;
                 }
 
-                // Calculate progress
-                const activeAssessments = session.active_case?.assessments || {};
-                const retroAssessments = session.retropective_case?.assessments || {};
-                
-                const activeComplete = Object.values(activeAssessments)
-                    .filter(a => a?.status === 'complete').length;
-                const retroComplete = Object.values(retroAssessments)
-                    .filter(a => a?.status === 'complete').length;
-                
-                const activeAllDone = activeComplete === 6;
-                const retroAllDone = retroComplete === 6;
+                if (user.status === 'trial_expired') {
+                    alert('Your trial has ended. Please purchase a subscription to continue.');
+                    window.location.href = 'pricing.html';
+                    return;
+                }
 
-                // Render dashboard (trial countdown uses localStorage trial_start_at)
-                renderDashboard(session, activeComplete, retroComplete, activeAllDone, retroAllDone);
+                // Update UI
+                updateTrialReportUI();
+                updateReportUI();
 
             } catch (err) {
-                console.error('Error loading dashboard:', err);
+                console.error('Error checking trial status:', err);
             }
         }
+
+        checkTrialStatus();
 
         function escapeAttr(s) {
             if (!s) return '';
             return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
         }
 
-        function renderDashboard(session, activeComplete, retroComplete, activeAllDone, retroAllDone) {
+        function renderDashboard() {
             const container = document.getElementById('dashboard-content');
 
             if (!localStorage.getItem('trial_start_at')) {
@@ -1795,43 +1883,8 @@
         }
 
         async function saveCaseInfo() {
+            // Case info is stored in localStorage only (no Supabase sync needed for case info)
             persistDashboardCaseToLocal();
-            const activeName = document.getElementById('active-name-case-id').value.trim();
-            const retroName = document.getElementById('retro-name-case-id').value.trim();
-
-            const { data: session, error } = await supabaseClient
-                .from('assessment_sessions')
-                .select('active_case, retrospective_case')
-                .eq('id', sessionId)
-                .single();
-
-            if (error || !session) {
-                alert('Could not save. Please try again.');
-                return;
-            }
-
-            const activeCase = session.active_case || { assessments: {} };
-            const retroCase = session.retrospective_case || { assessments: {} };
-            if (!activeCase.assessments) activeCase.assessments = {};
-            if (!retroCase.assessments) retroCase.assessments = {};
-
-            activeCase.name_case_id = activeName;
-            activeCase.reference = activeName;
-            activeCase.date_of_injury = document.getElementById('active-date-injury').value || '';
-            activeCase.mechanism = document.getElementById('active-mechanism').value.trim();
-            activeCase.case_type = document.getElementById('active-case-type').value || '';
-
-            retroCase.name_case_id = retroName;
-            retroCase.reference = retroName;
-            retroCase.date_of_injury = document.getElementById('retro-date-injury').value || '';
-            retroCase.mechanism = document.getElementById('retro-mechanism').value.trim();
-            retroCase.case_type = document.getElementById('retro-case-type').value || '';
-
-            await supabaseClient
-                .from('assessment_sessions')
-                .update({ active_case: activeCase, retrospective_case: retroCase })
-                .eq('id', sessionId);
-
             alert('Case information saved');
         }
 
@@ -1883,15 +1936,12 @@
         window.launchTool = function(toolKey, caseType) {
             if (localStorage.getItem('trial_start_at') && computeTrialDaysRemaining() <= 0) {
                 alert('Trial expired. Your 7-day access from first login on this device has ended.');
+                window.location.href = 'pricing.html';
                 return;
             }
-            const sessionId = localStorage.getItem('session_id');
-            const assessmentId = localStorage.getItem('assessment_id');
             const tool = TOOL_INFO[toolKey];
             const toolUrl = tool.url;
             const url = new URL(toolUrl, window.location.href);
-            url.searchParams.set('session', sessionId);
-            url.searchParams.set('assessmentId', assessmentId);
             url.searchParams.set('caseType', caseType);
             url.searchParams.set('tool', toolKey);
 
@@ -1902,8 +1952,8 @@
             document.getElementById('dashboard-content').innerHTML = `
                 <div class="expired-message">
                     <h2>Access Expired</h2>
-                    <p>Your 7-day assessment window has expired.</p>
-                    <p>Please contact support if you need assistance.</p>
+                    <p>Your 7-day trial has ended.</p>
+                    <p><a href="pricing.html" style="color:#1a2e3f;text-decoration:underline;font-weight:bold;">Purchase a subscription to continue</a></p>
                     <button onclick="handleLogout()" class="btn-primary" style="margin-top: 20px;">Return to Login</button>
                 </div>
             `;
@@ -1915,7 +1965,10 @@
         };
 
         // Refresh progress every 30 seconds
-        setInterval(loadDashboard, 30000);
+        setInterval(function() {
+            updateTrialReportUI();
+            updateReportUI();
+        }, 30000);
         })();
     </script>
 </body>

@@ -104,20 +104,21 @@
     <div class="login-card">
         <div class="brand">Reconcile Care Management Services</div>
         <h1>Assessment Portal</h1>
-        <p class="subtitle">Enter your Assessment ID and PIN to access the Case Clarity Project evaluation portal.</p>
+        <p class="subtitle">Enter your CCP# and PIN to access the Case Clarity Project evaluation portal.</p>
         
         <form id="login-form" onsubmit="event.preventDefault(); window.handleLogin && window.handleLogin()">
-            <div class="field-label">ASSESSMENT ID</div>
-            <input type="text" id="assessment-id" class="field-input" placeholder="CCP-0001" autocomplete="off">
+            <div class="field-label">CCP#</div>
+            <input type="text" id="ccp" class="field-input" placeholder="CCP-123456" autocomplete="off">
             
-            <div class="field-label">ACCESS PIN</div>
+            <div class="field-label">PIN</div>
             <input type="password" id="pin" class="field-input" placeholder="6-digit PIN" maxlength="6" autocomplete="off">
             
             <button type="submit" class="btn-primary">ACCESS ASSESSMENT PORTAL</button>
         </form>
         
         <div id="error-message" class="error-message"></div>
-        <p class="info">Credentials were provided in your assessment access email.</p>
+        <div id="expired-message" class="error-message" style="display:none;background:#fff3cd;border-color:#ffc107;color:#856404;"></div>
+        <p class="info">Credentials were provided in your trial access email. <a href="trial-signup.html" style="color:#b09837;text-decoration:underline;">New user? Sign up here.</a></p>
     </div>
 
     <script>
@@ -141,21 +142,23 @@
 
             // Define login handler
             window.handleLogin = async function() {
-                const assessmentId = document.getElementById('assessment-id').value.trim();
+                const ccp = document.getElementById('ccp').value.trim();
                 const pin = document.getElementById('pin').value.trim();
                 const errorEl = document.getElementById('error-message');
+                const expiredEl = document.getElementById('expired-message');
                 
                 // Clear previous errors
                 errorEl.style.display = 'none';
+                expiredEl.style.display = 'none';
                 
                 // Validate inputs
-                if (!assessmentId || !pin) {
-                    showError('Please enter both Assessment ID and PIN');
+                if (!ccp || !pin) {
+                    showError('Please enter both CCP# and PIN');
                     return;
                 }
                 
-                if (!assessmentId.startsWith('CCP-')) {
-                    showError('Assessment ID must start with CCP-');
+                if (!ccp.startsWith('CCP-')) {
+                    showError('CCP# must start with CCP-');
                     return;
                 }
                 
@@ -165,65 +168,44 @@
                 }
                 
                 try {
-                    // Query Supabase
-                    const { data: session, error } = await supabaseClient
-                        .from('assessment_sessions')
+                    // Query Supabase trial_users table
+                    const { data: user, error } = await supabaseClient
+                        .from('trial_users')
                         .select('*')
-                        .eq('assessment_id', assessmentId)
+                        .eq('ccp', ccp)
                         .eq('pin', pin)
                         .single();
                     
-                    if (error || !session) {
-                        showError('Invalid Assessment ID or PIN');
+                    if (error || !user) {
+                        showError('Invalid CCP# or PIN');
                         return;
                     }
                     
                     // Check status
-                    if (session.status === 'expired') {
-                        showError('This assessment has expired. Contact support.');
+                    if (user.status !== 'trial_active') {
+                        showError('Your trial account is not active. Contact support.');
                         return;
                     }
                     
-                    // Check if first login
-                    if (!session.first_login_at) {
-                        // Set first login and expiration (7 days from now)
-                        const now = new Date().toISOString();
-                        const expiresAt = new Date();
-                        expiresAt.setDate(expiresAt.getDate() + 7);
-                        
-                        const { error: updateError } = await supabaseClient
-                            .from('assessment_sessions')
-                            .update({
-                                first_login_at: now,
-                                expires_at: expiresAt.toISOString(),
-                                status: 'active'
-                            })
-                            .eq('id', session.id);
-                        
-                        if (updateError) {
-                            showError('Error starting session');
-                            return;
-                        }
-                    } else {
-                        // Check if expired
-                        if (new Date() > new Date(session.expires_at)) {
-                            await supabaseClient
-                                .from('assessment_sessions')
-                                .update({ status: 'expired' })
-                                .eq('id', session.id);
-                            
-                            showError('Your 7-day access window has expired');
-                            return;
-                        }
+                    // Check if trial expired (7 days from trial_start_at)
+                    const trialStart = new Date(user.trial_start_at);
+                    const now = new Date();
+                    const daysElapsed = Math.floor((now - trialStart) / (1000 * 60 * 60 * 24));
+                    
+                    if (daysElapsed >= 7) {
+                        // Trial expired
+                        expiredEl.innerHTML = 'Your trial has ended. <a href="pricing.html" style="color:#1a2e3f;font-weight:bold;text-decoration:underline;">Purchase to continue</a>.';
+                        expiredEl.style.display = 'block';
+                        return;
                     }
                     
-                    // Store session info
-                    localStorage.setItem('assessment_id', assessmentId);
-                    localStorage.setItem('session_id', session.id);
+                    // Store session info in localStorage
+                    localStorage.setItem('ccp', ccp);
+                    localStorage.setItem('email', user.email);
+                    localStorage.setItem('trial_start_at', user.trial_start_at);
+                    localStorage.setItem('status', user.status);
                     localStorage.setItem('user_logged_in', 'true');
-                    if (!localStorage.getItem('trial_start_at')) {
-                        localStorage.setItem('trial_start_at', new Date().toISOString());
-                    }
+                    localStorage.setItem('user_id', user.id);
 
                     // Redirect to dashboard
                     window.location.href = 'dashboard.html';
