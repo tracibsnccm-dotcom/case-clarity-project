@@ -127,7 +127,7 @@
         console.log('Supabase library loaded?', typeof supabase !== 'undefined');
         // Wait for DOM and Supabase to be ready
         (function() {
-            // Supabase credentials
+            /* CONFIG: Supabase URL + anon key — same project as trial-signup.html / dashboard.html */
             const SUPABASE_URL = 'https://zmjxyspizdqhrtdcgkwk.supabase.co';
             const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptanh5c3BpemRxaHJ0ZGNna3drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MjQ1NDcsImV4cCI6MjA4NTE4NDU0N30.szuVr87xdq1aqYpaM6p390f48ozj4CENU4ksg8vumhM';
             
@@ -193,8 +193,9 @@
                     const daysElapsed = Math.floor((now - trialStart) / (1000 * 60 * 60 * 24));
                     
                     if (daysElapsed >= 7) {
-                        // Trial expired
-                        expiredEl.innerHTML = 'Your trial has ended. <a href="pricing.html" style="color:#1a2e3f;font-weight:bold;text-decoration:underline;">Purchase to continue</a>.';
+                        expiredEl.innerHTML =
+                            'Your trial has ended. Purchase to continue. ' +
+                            '<a href="pricing.html" style="color:#1a2e3f;font-weight:bold;text-decoration:underline;">View plans</a>';
                         expiredEl.style.display = 'block';
                         return;
                     }

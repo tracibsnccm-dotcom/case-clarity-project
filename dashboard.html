@@ -721,7 +721,7 @@
             return;
         }
 
-        // Supabase setup
+        /* CONFIG: Supabase — same keys as trial-signup.html / login.html; table: trial_users */
         const SUPABASE_URL = 'https://zmjxyspizdqhrtdcgkwk.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptanh5c3BpemRxaHJ0ZGNna3drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MjQ1NDcsImV4cCI6MjA4NTE4NDU0N30.szuVr87xdq1aqYpaM6p390f48ozj4CENU4ksg8vumhM';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1308,12 +1308,12 @@
             html += '</tr></thead><tbody>';
             
             var schedule = [
-                { tool: 'CCI', desc: 'Assesses case complexity level and identifies key drivers', freq: 'Level 1–2: Minimum every 7 days<br>Level 3: Minimum every 30 days<br>Level 4: Minimum every 45 days<br>Level 5: Minimum every 60 days', practice: 'Higher complexity requires tighter monitoring. Catching complexity shifts early prevents case drift.' },
-                { tool: 'CSA', desc: 'Evaluates clinical sequencing and identifies gaps in care coordination', freq: 'Minimum every 30 days', practice: 'Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.' },
-                { tool: 'CAF', desc: 'Measures barriers to care and treatment access friction points', freq: 'Minimum every 30 days', practice: 'Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.' },
-                { tool: 'HSI', desc: 'Assesses overall case stability across intrinsic and extrinsic factors', freq: 'Minimum every 30 days', practice: 'Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.' },
-                { tool: 'FCI', desc: 'Evaluates functional capacity and vulnerability indicators', freq: 'Minimum every 30 days', practice: 'Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.' },
-                { tool: 'RRF', desc: 'Predicts recovery trajectory and identifies risk factors', freq: 'Minimum every 30 days', practice: 'Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.' }
+                { tool: 'CCI (Case Complexity Index)', desc: 'Assesses case complexity level and identifies key drivers', freq: 'Level 1–2: Minimum every 7 days<br>Level 3: Minimum every 30 days<br>Level 4: Minimum every 45 days<br>Level 5: Minimum every 60 days', practice: 'Higher complexity requires tighter monitoring. Catching complexity shifts early prevents case drift.' },
+                { tool: 'CSA (Clinical Sequencing Auditor)', desc: 'Evaluates clinical sequencing and identifies gaps in care coordination', freq: 'Minimum every 30 days', practice: 'Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.' },
+                { tool: 'CAF (C.A.R.E. Access Friction Score)', desc: 'Measures barriers to care and treatment access friction points', freq: 'Minimum every 30 days', practice: 'Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.' },
+                { tool: 'HSI (Holistic Stability Index)', desc: 'Assesses overall case stability across intrinsic and extrinsic factors', freq: 'Minimum every 30 days', practice: 'Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.' },
+                { tool: 'FCI (Functional Capacity Index)', desc: 'Evaluates functional capacity and vulnerability indicators', freq: 'Minimum every 30 days', practice: 'Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.' },
+                { tool: 'RRF (Recovery Risk Forecaster)', desc: 'Predicts recovery trajectory and identifies risk factors', freq: 'Minimum every 30 days', practice: 'Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.' }
             ];
             
             schedule.forEach(function(item) {

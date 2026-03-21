@@ -166,14 +166,21 @@
 
     <script>
         (function() {
-            // Supabase credentials
+            /* ═══════════════════════════════════════════════════════════════════
+             * CONFIGURATION — update after deploy (see also login.html, dashboard.html)
+             * • Supabase: Project Settings → API → URL + anon public key
+             * • GHL:      Workflows → Inbound Webhook → copy URL into GHL_WEBHOOK_URL below
+             *   Workflow should email CCP#/PIN and may mirror lead data; signup already
+             *   writes the row to Supabase — GHL is for CRM + email automation.
+             * ═══════════════════════════════════════════════════════════════════ */
             const SUPABASE_URL = 'https://zmjxyspizdqhrtdcgkwk.supabase.co';
             const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptanh5c3BpemRxaHJ0ZGNna3drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MjQ1NDcsImV4cCI6MjA4NTE4NDU0N30.szuVr87xdq1aqYpaM6p390f48ozj4CENU4ksg8vumhM';
-            
+
             const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            
-            // GHL Webhook URL - REPLACE WITH YOUR ACTUAL WEBHOOK URL
-            const GHL_WEBHOOK_URL = 'https://services.leadconnectorhq.com/hooks/YOUR_WEBHOOK_ID'; // TODO: Replace with actual GHL webhook
+
+            /** GoHighLevel inbound webhook URL — replace YOUR_WEBHOOK_ID (or full path) when ready */
+            const GHL_WEBHOOK_URL = 'https://services.leadconnectorhq.com/hooks/YOUR_WEBHOOK_ID';
+            const GHL_WEBHOOK_READY = GHL_WEBHOOK_URL && !/YOUR_WEBHOOK/i.test(GHL_WEBHOOK_URL);
             
             function generateCCP() {
                 const num = Math.floor(Math.random() * 900000) + 100000; // 100000-999999
@@ -214,80 +221,104 @@
                 submitBtn.textContent = 'PROCESSING...';
                 
                 try {
-                    // Generate credentials
-                    const ccp = generateCCP();
                     const pin = generatePIN().toString();
                     const trialStartAt = new Date().toISOString();
-                    
+
                     // Check if email already exists
                     const { data: existing } = await supabaseClient
                         .from('trial_users')
                         .select('id')
                         .eq('email', email)
                         .single();
-                    
+
                     if (existing) {
                         showError('An account with this email already exists. Please use the login page.');
                         submitBtn.disabled = false;
                         submitBtn.textContent = 'START FREE TRIAL';
                         return;
                     }
-                    
-                    // Insert into Supabase
-                    const { data: user, error: dbError } = await supabaseClient
-                        .from('trial_users')
-                        .insert({
-                            full_name: fullName,
-                            title: title,
-                            email: email,
-                            law_firm: lawFirm,
-                            phone: phone || null,
-                            ccp: ccp,
-                            pin: pin,
-                            trial_start_at: trialStartAt,
-                            status: 'trial_active',
-                            completed_tools: {}
-                        })
-                        .select()
-                        .single();
-                    
-                    if (dbError) {
-                        console.error('Supabase error:', dbError);
+
+                    var user = null;
+                    var ccp = null;
+                    for (var attempt = 0; attempt < 8; attempt++) {
+                        ccp = generateCCP();
+                        var ins = await supabaseClient
+                            .from('trial_users')
+                            .insert({
+                                full_name: fullName,
+                                title: title,
+                                email: email,
+                                law_firm: lawFirm,
+                                phone: phone || null,
+                                ccp: ccp,
+                                pin: pin,
+                                trial_start_at: trialStartAt,
+                                status: 'trial_active',
+                                completed_tools: {}
+                            })
+                            .select()
+                            .single();
+                        if (!ins.error) {
+                            user = ins.data;
+                            break;
+                        }
+                        var dupMsg = ((ins.error.message || '') + ' ' + (ins.error.details || '')).toLowerCase();
+                        if (ins.error.code === '23505' && (dupMsg.indexOf('ccp') !== -1 || dupMsg.indexOf('trial_users_ccp') !== -1)) {
+                            continue;
+                        }
+                        if (ins.error.code === '23505') {
+                            showError('An account with this email already exists. Please use the login page.');
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'START FREE TRIAL';
+                            return;
+                        }
+                        console.error('Supabase error:', ins.error);
                         showError('Registration failed. Please try again.');
                         submitBtn.disabled = false;
                         submitBtn.textContent = 'START FREE TRIAL';
                         return;
                     }
-                    
-                    // Send to GHL webhook
-                    try {
-                        await fetch(GHL_WEBHOOK_URL, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                full_name: fullName,
-                                title: title,
-                                email: email,
-                                law_firm: lawFirm,
-                                phone: phone,
-                                ccp: ccp,
-                                pin: pin,
-                                trial_start_at: trialStartAt
-                            })
-                        });
-                    } catch (ghlError) {
-                        console.warn('GHL webhook failed (non-critical):', ghlError);
-                        // Continue even if webhook fails
+                    if (!user) {
+                        showError('Registration failed (could not assign a unique CCP#). Please try again.');
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'START FREE TRIAL';
+                        return;
                     }
-                    
-                    // Trigger email via Supabase Edge Function or GHL workflow
-                    // For now, we'll rely on GHL workflow triggered by webhook
-                    // If using Supabase Edge Function, call it here:
-                    // await supabaseClient.functions.invoke('send-trial-email', { body: { email, ccp, pin } });
-                    
-                    // Show success
+
+                    /* GHL: optional POST after Supabase insert — configure GHL_WEBHOOK_URL above */
+                    if (GHL_WEBHOOK_READY) {
+                        try {
+                            await fetch(GHL_WEBHOOK_URL, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    full_name: fullName,
+                                    title: title,
+                                    email: email,
+                                    law_firm: lawFirm,
+                                    phone: phone,
+                                    ccp: ccp,
+                                    pin: pin,
+                                    trial_start_at: trialStartAt
+                                })
+                            });
+                        } catch (ghlError) {
+                            console.warn('GHL webhook failed (non-critical):', ghlError);
+                        }
+                    } else {
+                        console.info('GHL webhook skipped: set GHL_WEBHOOK_URL when your inbound webhook is ready.');
+                    }
+
+                    /* Optional: Supabase Edge Function for email — uncomment and deploy function
+                     * await supabaseClient.functions.invoke('send-trial-email', {
+                     *   body: { email: email, ccp: ccp, pin: pin }
+                     * });
+                     */
+
                     document.getElementById('signup-form').style.display = 'none';
-                    successEl.innerHTML = '<strong>Success!</strong><br><br>Check your email for your login credentials:<br><strong>CCP#:</strong> ' + ccp + '<br><strong>PIN:</strong> ' + pin + '<br><br><a href="login.html" style="color:#1a2e3f;text-decoration:underline;">Go to Login</a>';
+                    successEl.innerHTML =
+                        '<strong>Success!</strong><br><br>Check your email for login credentials.<br><br>' +
+                        '<a href="login.html" style="color:#1a2e3f;text-decoration:underline;">Go to Login</a>';
                     successEl.style.display = 'block';
                     
                 } catch (err) {

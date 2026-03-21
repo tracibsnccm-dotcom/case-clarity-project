@@ -58,6 +58,22 @@
             color: #3a4a5a;
             text-align: center;
             margin-bottom: 48px;
+            max-width: 720px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .bundle-pill {
+            text-align: center;
+            font-size: 10px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #1a2e3f;
+            background: rgba(176, 152, 55, 0.2);
+            border: 1px solid #b09837;
+            padding: 10px 20px;
+            border-radius: 999px;
+            max-width: 420px;
+            margin: 0 auto 20px;
         }
         .pricing-grid {
             display: grid;
@@ -201,27 +217,28 @@
     </header>
 
     <div class="container">
+        <p class="bundle-pill">Full platform bundle — all six instruments included</p>
         <h1>Subscription Plans</h1>
-        <p class="subtitle">Choose the plan that fits your practice</p>
+        <p class="subtitle">Bundle-only access: every plan includes the complete Case Clarity assessment suite (CCI, CSA, CAF, HSI, FCI, RRF). Choose by case volume.</p>
 
         <div class="pricing-grid">
             <div class="pricing-card">
                 <div class="plan-name">4 Cases</div>
                 <div class="plan-price">$6,495<span class="period">/month</span></div>
-                <div class="plan-cases">4 cases per month</div>
-                <button class="btn-purchase" onclick="alert('Payment integration coming soon. Contact sales.')">SELECT PLAN</button>
+                <div class="plan-cases">4 cases per month · full bundle</div>
+                <button type="button" class="btn-purchase" data-plan="cases_4" data-label="4 Cases" data-price="6495">SELECT PLAN</button>
             </div>
             <div class="pricing-card featured">
                 <div class="plan-name">12 Cases</div>
                 <div class="plan-price">$7,995<span class="period">/month</span></div>
-                <div class="plan-cases">12 cases per month</div>
-                <button class="btn-purchase" onclick="alert('Payment integration coming soon. Contact sales.')">SELECT PLAN</button>
+                <div class="plan-cases">12 cases per month · full bundle</div>
+                <button type="button" class="btn-purchase" data-plan="cases_12" data-label="12 Cases" data-price="7995">SELECT PLAN</button>
             </div>
             <div class="pricing-card">
                 <div class="plan-name">Unlimited</div>
                 <div class="plan-price">$12,995<span class="period">/month</span></div>
-                <div class="plan-cases">Unlimited cases</div>
-                <button class="btn-purchase" onclick="alert('Payment integration coming soon. Contact sales.')">SELECT PLAN</button>
+                <div class="plan-cases">Unlimited cases · full bundle</div>
+                <button type="button" class="btn-purchase" data-plan="cases_unlimited" data-label="Unlimited" data-price="12995">SELECT PLAN</button>
             </div>
         </div>
 
@@ -241,37 +258,37 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td class="tool-name">CCI</td>
+                        <td class="tool-name">CCI (Case Complexity Index)</td>
                         <td>Assesses case complexity level and identifies key drivers</td>
                         <td>Level 1–2: Minimum every 7 days<br>Level 3: Minimum every 30 days<br>Level 4: Minimum every 45 days<br>Level 5: Minimum every 60 days</td>
                         <td>Higher complexity requires tighter monitoring. Catching complexity shifts early prevents case drift.</td>
                     </tr>
                     <tr>
-                        <td class="tool-name">CSA</td>
+                        <td class="tool-name">CSA (Clinical Sequencing Auditor)</td>
                         <td>Evaluates clinical sequencing and identifies gaps in care coordination</td>
                         <td>Minimum every 30 days</td>
                         <td>Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.</td>
                     </tr>
                     <tr>
-                        <td class="tool-name">CAF</td>
+                        <td class="tool-name">CAF (C.A.R.E. Access Friction Score)</td>
                         <td>Measures barriers to care and treatment access friction points</td>
                         <td>Minimum every 30 days</td>
                         <td>Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.</td>
                     </tr>
                     <tr>
-                        <td class="tool-name">HSI</td>
+                        <td class="tool-name">HSI (Holistic Stability Index)</td>
                         <td>Assesses overall case stability across intrinsic and extrinsic factors</td>
                         <td>Minimum every 30 days</td>
                         <td>Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.</td>
                     </tr>
                     <tr>
-                        <td class="tool-name">FCI</td>
+                        <td class="tool-name">FCI (Functional Capacity Index)</td>
                         <td>Evaluates functional capacity and vulnerability indicators</td>
                         <td>Minimum every 30 days</td>
                         <td>Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.</td>
                     </tr>
                     <tr>
-                        <td class="tool-name">RRF</td>
+                        <td class="tool-name">RRF (Recovery Risk Forecaster)</td>
                         <td>Predicts recovery trajectory and identifies risk factors</td>
                         <td>Minimum every 30 days</td>
                         <td>Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.</td>
@@ -287,18 +304,61 @@
         </div>
 
         <div class="section">
-            <h2>ROI & Value Proposition</h2>
-            <p>The Case Clarity Project provides structured, defensible documentation of case complexity, treatment sequencing, access barriers, stability factors, functional capacity, and recovery risk. This systematic approach helps you:</p>
-            <ul style="margin-left: 24px; margin-top: 16px; line-height: 2;">
-                <li>Identify case complexity shifts before they impact outcomes</li>
-                <li>Document treatment sequencing alignment with evidence-based standards</li>
-                <li>Capture access friction points that delay appropriate care</li>
-                <li>Track stability factors that influence recovery trajectory</li>
-                <li>Assess functional capacity changes over time</li>
-                <li>Predict and mitigate recovery risk factors</li>
+            <h2>ROI &amp; Value Proposition</h2>
+            <p>One case protected from a bad outcome—missed complexity, weak sequencing documentation, or an undetected stability decline—can dwarf the cost of years of structured monitoring. The bundle is priced so that a single defensible decision or strengthened negotiation position can pay for the subscription many times over.</p>
+            <p style="margin-top: 20px;"><strong>Why the full bundle matters.</strong> Unbundling means you only get part of the picture, not the complete picture. That means you are not serving your client to their full potential. It reduces the effectiveness of what it is intended to do.</p>
+            <p style="margin-top: 20px;">The six instruments work together: complexity (CCI), sequencing (CSA), access friction (CAF), holistic stability (HSI), functional capacity (FCI), and recovery risk (RRF). Together they support a coherent narrative of how the case evolved medically, functionally, and strategically—something piecemeal tools cannot replicate.</p>
+            <ul style="margin-left: 24px; margin-top: 20px; line-height: 2;">
+                <li>Identify complexity shifts before they harden into case drift</li>
+                <li>Document sequencing and access barriers with repeatable structure</li>
+                <li>Track stability and functional trajectory for depositions and settlement</li>
+                <li>Surface recovery-risk factors while there is still time to respond</li>
             </ul>
-            <p style="margin-top: 24px;">By running assessments at the recommended frequencies, you build a comprehensive timeline of case progression that strengthens your position in settlement negotiations, depositions, and trial preparation.</p>
         </div>
     </div>
+
+    <script>
+    /**
+     * PAYMENT INTEGRATION (replace initiateCheckout body before launch)
+     * ------------------------------------------------------------------
+     * Stripe:  Use Checkout Sessions (server endpoint returns session.url) or Payment Links.
+     *          Pass data-plan / price as metadata for fulfillment webhooks.
+     * GHL:     Use native order forms, payment links, or API — redirect user to the URL
+     *          for the selected plan or POST lead + plan to a GHL workflow.
+     * ------------------------------------------------------------------
+     * CONFIG:  Set window.CCP_STRIPE_CHECKOUT_BASE or window.CCP_GHL_ORDER_URLS below,
+     *          or implement fetch('/api/create-checkout', { method:'POST', body: JSON.stringify({ planId }) }).
+     */
+    window.CCP_STRIPE_CHECKOUT_BASE = ''; // e.g. 'https://buy.stripe.com/...' per plan, or leave empty if using API
+    window.CCP_GHL_ORDER_URLS = {
+        cases_4: '',
+        cases_12: '',
+        cases_unlimited: ''
+    };
+
+    function initiateCheckout(planId, planLabel, priceCents) {
+        var ghl = window.CCP_GHL_ORDER_URLS && window.CCP_GHL_ORDER_URLS[planId];
+        if (ghl) {
+            window.location.href = ghl;
+            return;
+        }
+        if (window.CCP_STRIPE_CHECKOUT_BASE) {
+            window.location.href = window.CCP_STRIPE_CHECKOUT_BASE + '?client_reference_id=' + encodeURIComponent(planId);
+            return;
+        }
+        console.info('[CCP Checkout placeholder]', planId, planLabel, priceCents);
+        alert('Online checkout is being connected. Plan: ' + planLabel + ' ($' + priceCents + '/mo). Replace initiateCheckout in pricing.html with Stripe or GHL.');
+    }
+
+    document.querySelectorAll('.btn-purchase[data-plan]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            initiateCheckout(
+                btn.getAttribute('data-plan'),
+                btn.getAttribute('data-label'),
+                btn.getAttribute('data-price')
+            );
+        });
+    });
+    </script>
 </body>
 </html>
