@@ -575,18 +575,9 @@ function buildFciDashboardSnapshot(minS, weak, fvi, toolData) {
     '<div style="padding:20px 24px;background:' + fviSt.bg + ';border-bottom:2px solid ' + fviSt.border + '">' +
     '<div style="font-size:11px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:' + fviSt.text + '">Functional vulnerability indicator</div>' +
     '<div style="font-size:26px;font-weight:800;color:' + fviSt.text + ';margin-top:6px">' + esc(fvi) + '</div>' +
-    '<div style="font-size:13px;color:#444;margin-top:8px"><strong>FCI minimum score:</strong> ' + minS + ' &nbsp;·&nbsp; <strong>Primary instability:</strong> ' + esc(weak.join(', ')) + '</div></div>' +
+    '<div style="font-size:13px;color:#444;margin-top:8px"><strong>Primary instability domain(s):</strong> ' + esc(weak.join(', ')) + '</div></div>' +
     '<div style="padding:22px 26px">' +
-    '<div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#6a7a8a;margin-bottom:12px">Context indicators (FVI inputs)</div>' +
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;font-size:13px;color:#333;margin-bottom:24px">' +
-    '<div><span style="color:#6a7a8a">Income range:</span> ' + esc(incomeLbl) + '</div>' +
-    '<div><span style="color:#6a7a8a">Dependents:</span> ' + esc(depLbl) + '</div>' +
-    '<div><span style="color:#6a7a8a">Sole earner:</span> ' + esc(soleLbl) + '</div>' +
-    '<div><span style="color:#6a7a8a">Pain / injury:</span> ' + esc(vulnLabel(pain)) + '</div>' +
-    '<div style="grid-column:1/-1"><span style="color:#6a7a8a">Psychological stress:</span> ' + esc(vulnLabel(psych)) + '</div></div>' +
-    '<div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#0c1c34;margin-bottom:14px">4Ps wellness scores</div>' +
-    domainRows +
-    '<div style="margin-top:28px;padding:20px 22px;background:#faf8f4;border:1px solid #e8e3d8;border-left:3px solid #b8922a;border-radius:8px">' +
+    '<div style="margin-top:0;padding:20px 22px;background:#faf8f4;border:1px solid #e8e3d8;border-left:3px solid #b8922a;border-radius:8px">' +
     '<div style="font-size:11px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#0c1c34;margin-bottom:12px">Professional interpretation</div>' +
     interpHtml + '</div>' +
     '<p style="margin:18px 0 0;font-size:11px;line-height:1.55;color:#888">Structured care management framework — not a diagnostic instrument. Interpret in clinical and legal context.</p></div></div>';

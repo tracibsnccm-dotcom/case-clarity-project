@@ -456,9 +456,7 @@ function buildCafSnapshotHtml(toolData,minLvl,flags){
     var c=levelColor(lv);
     return '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #eee;background:#fafafa">'+
       '<div style="font-size:14px;font-weight:600;color:#0e1c2e">'+escCaf(s.title)+'</div>'+
-      '<div style="display:flex;align-items:center;gap:10px">'+
-      '<span style="font-size:12px;color:#666">Raw '+s.raw+'/25</span>'+
-      '<span style="font-size:13px;font-weight:800;padding:6px 14px;border-radius:6px;background:'+c+';color:#fff">Level '+lv+'</span></div></div>';
+      '<span style="font-size:13px;font-weight:800;padding:6px 14px;border-radius:6px;background:'+c+';color:#fff">Level '+lv+'</span></div>';
   }).join('');
   var flagBlock=flags.length?(
     '<div style="margin-top:18px;padding:16px 18px;background:#fff5f5;border:2px solid #e74c3c;border-radius:10px">'+

@@ -1727,16 +1727,8 @@ function buildHsiReportSnapshotHtml(toolData) {
     '<div style="font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#e8c547;margin-bottom:6px">Holistic Stability Index™</div>' +
     '<h2 style="margin:0;font-size:22px;font-weight:800;letter-spacing:-0.02em">Stability assessment report</h2>' +
     '<div style="font-size:12px;opacity:0.85;margin-top:8px">' + escHsi(new Date(toolData.timestamp).toLocaleString()) + ' · Case: ' + escHsi(toolData.caseType || '') + '</div></div>' +
-    '<div style="padding:20px 24px;background:#f8f6f1;border-bottom:1px solid #e0dcd4">' +
-    '<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center">' +
-    '<div style="font-size:13px;color:#444"><strong style="color:#0e1c2e">Intrinsic (4Ps floor):</strong> ' + hsiScorePill(scored.intrinsic) + '</div>' +
-    '<div style="font-size:13px;color:#444"><strong style="color:#0e1c2e">Determining domain:</strong> ' + escHsi(scored.pCode) + ' — ' + escHsi(DOMAIN_DESCS[scored.pCode] || '') + '</div></div>' +
-    '<div style="margin-top:12px;font-size:13px;color:#444"><strong style="color:#0e1c2e">Extrinsic (social drivers avg):</strong> ' + hsiScorePill(scored.extrinsic) + '</div></div>' +
     slabHtml +
-    '<div style="padding:16px 22px 8px"><div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#b8922a;margin-bottom:8px">Domain scores (lowest per domain)</div>' + domRows + '</div>' +
-    '<div style="padding:8px 22px 8px"><div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#6a7a8a;margin-bottom:8px">Social drivers (9)</div>' + sdRows + '</div>' +
-    '<div style="padding:8px 22px 20px"><div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#8b1e1e;margin-bottom:8px">Clinical destabilizers</div>' + destRows + '</div>' +
-    '<div style="padding:12px 18px;background:#f4f2ec;font-size:11px;color:#666;line-height:1.55;border-top:1px solid #e0dcd4">Dashboard capture. Destabilizers are contextual and do not change intrinsic or extrinsic scores.</div></div>';
+    '<div style="padding:12px 18px;background:#f4f2ec;font-size:11px;color:#666;line-height:1.55;border-top:1px solid #e0dcd4">Dashboard capture.</div></div>';
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -2049,8 +2041,11 @@ function buildHsiFoundationSlabSnapshotBlock(intrinsic, extrinsic) {
     return '<div class="hsi-foundation-slab-block" style="margin:16px 22px 0;padding:20px 22px 24px;background:linear-gradient(180deg,#f4f3f0 0%,#eceae5 100%);border:1px solid #d6d0c4;border-radius:10px;text-align:center">' +
       '<div style="font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#6a6560;margin-bottom:10px">Foundation Stability Model™</div>' +
       '<img src="' + url + '" alt="Foundation Stability Model" width="700" height="380" style="max-width:100%;height:auto;display:block;margin:0 auto;border-radius:8px;box-shadow:0 4px 18px rgba(14,28,46,0.12)" />' +
-      '<p style="margin:16px 0 0;font-size:12px;color:#555;line-height:1.65;max-width:640px;margin-left:auto;margin-right:auto;text-align:left">The model visualizes how intrinsic stability and external pressures interact to influence recovery outcomes. The left pillar reflects <strong>intrinsic</strong> stability (lowest score across the four 4Ps wellness domains). The right pillar reflects <strong>extrinsic</strong> pressures (average rating across nine social drivers of health). The gold leading edge marks the stress line between them—where internal functional limits meet environmental load. Higher pillars indicate stronger stability on that dimension.</p>' +
-      '<p style="margin:10px 0 0;font-size:11px;color:#777;line-height:1.5;text-align:center;font-style:italic">Same Foundation Stability Model™ rendering as the in-tool preview (full canvas engine).</p></div>';
+      '<ul style="margin:16px 0 0;font-size:12px;color:#555;line-height:1.65;max-width:640px;margin-left:auto;margin-right:auto;text-align:left;list-style:disc;padding-left:1.25em">' +
+      '<li>The model visualizes how intrinsic stability and external pressures interact to influence recovery outcomes.</li>' +
+      '<li>The left pillar reflects intrinsic stability (lowest score across the four 4Ps wellness domains). The right pillar reflects extrinsic pressures (average rating across nine social drivers of health). The gold leading edge marks the stress line between them—where internal functional limits meet environmental load.</li>' +
+      '<li>Higher pillars indicate stronger stability on that dimension. A level slab does not mean the client is stable—it reflects the balance between internal resilience and external demands.</li>' +
+      '</ul></div>';
   } catch (e) {
     return '';
   }

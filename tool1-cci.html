@@ -667,7 +667,6 @@ function buildCciReportSnapshotHtml(ad,toolData,level,cmg){
     return '<li style="display:flex;gap:8px;font-size:13px;color:#1a1a1a;margin-bottom:5px;line-height:1.5;list-style:none"><span style="width:5px;height:5px;border-radius:50%;background:#b09837;margin-top:7px;flex-shrink:0"></span><span>'+escSnap(g)+'</span></li>';
   }).join('');
   var arColor=ad.coord&&ad.coord.authRisk==='HIGH'?'#c0392b':(ad.coord&&ad.coord.authRisk==='MODERATE'?'#b09837':'#2e7d32');
-  var comp=toolData.composite!=null?Math.round(toolData.composite):'—';
   return '<div style="font-family:Segoe UI,Arial,sans-serif;max-width:900px;margin:0 auto;background:#fff;border-radius:8px;overflow:hidden;border:1px solid #ddd">'+
     '<div style="background:#1a1a1a;padding:16px 20px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;align-items:flex-start">'+
     '<div style="font-size:11px;font-weight:700;color:#b09837;letter-spacing:0.14em;text-transform:uppercase">Case Complexity Index™ — Full Report</div>'+
@@ -687,7 +686,7 @@ function buildCciReportSnapshotHtml(ad,toolData,level,cmg){
     '<div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:5px;padding:10px 12px"><div style="font-size:9px;font-weight:700;color:#888;text-transform:uppercase;margin-bottom:4px">Referral pattern</div><div style="font-size:13px;font-weight:600;color:#1a1a1a">'+escSnap(ad.coord&&ad.coord.ref)+'</div></div>'+
     '<div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:5px;padding:10px 12px"><div style="font-size:9px;font-weight:700;color:#888;text-transform:uppercase;margin-bottom:4px">Treatment course</div><div style="font-size:13px;font-weight:600;color:#1a1a1a">'+escSnap(ad.coord&&ad.coord.dur)+'</div></div>'+
     '<div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:5px;padding:10px 12px"><div style="font-size:9px;font-weight:700;color:#888;text-transform:uppercase;margin-bottom:4px">Authorization risk</div><div style="font-size:13px;font-weight:600;color:'+arColor+'">'+escSnap(ad.coord&&ad.coord.authRisk)+'</div></div>'+
-    '<div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:5px;padding:10px 12px"><div style="font-size:9px;font-weight:700;color:#888;text-transform:uppercase;margin-bottom:4px">Specialty count factor</div><div style="font-size:13px;font-weight:600;color:#1a1a1a">'+escSnap(ad.coord&&ad.coord.specCount!=null?String(ad.coord.specCount):'—')+'</div></div></div>'+
+    '<div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:5px;padding:10px 12px"><div style="font-size:9px;font-weight:700;color:#888;text-transform:uppercase;margin-bottom:4px">Specialty count factor</div><div style="font-size:13px;font-weight:600;color:#1a1a1a">—</div></div></div>'+
     '<div style="border-left:4px solid #b09837;background:#fdf8e8;padding:14px 16px;border-radius:0 6px 6px 0;margin-bottom:14px">'+
     '<div style="font-size:9px;font-weight:700;color:#7a6a22;text-transform:uppercase;margin-bottom:6px">Priority action</div>'+
     '<p style="font-size:13px;color:#333;line-height:1.6;margin:0">'+escSnap(ad.priorityAction)+'</p></div>'+
@@ -696,7 +695,6 @@ function buildCciReportSnapshotHtml(ad,toolData,level,cmg){
     '<p style="font-size:13px;color:#333;line-height:1.6;margin:0">'+escSnap(ad.docFocus)+'</p></div>'+
     '<div style="font-size:10px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">Monitoring guidance</div>'+
     '<ul style="list-style:none;padding:0;margin:0 0 16px">'+guid+'</ul>'+
-    '<div style="font-size:12px;color:#555;padding:12px;background:#f9f9f9;border-radius:6px;border:1px solid #eee"><strong>Weighted composite:</strong> '+escSnap(String(comp))+' &nbsp;|&nbsp; <strong>Domain tiers:</strong> D1='+escSnap(String(toolData.d1Tier))+' · D2='+escSnap(String(toolData.d2Tier))+' · D3='+escSnap(String(toolData.d3Tier))+'</div>'+
     '</div>'+
     '<div style="background:#f5f5f5;padding:14px 22px;border-top:1px solid #eee"><p style="font-size:12px;color:#777;line-height:1.65;margin:0">Case Clarity trial capture — for use in the consolidated dashboard report only.</p></div></div>';
 }

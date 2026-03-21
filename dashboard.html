@@ -1115,18 +1115,10 @@
                 if (levelName) lead += ' — ' + escBodyHtml(levelName);
                 parts.push('<p class="trial-lead">' + lead + '</p>');
                 if (ad.levelSub) parts.push('<p class="trial-para">' + escBodyHtml(ad.levelSub) + '</p>');
-                var t1 = inner.d1Tier != null ? String(inner.d1Tier) : '—';
-                var t2 = inner.d2Tier != null ? String(inner.d2Tier) : '—';
-                var t3 = inner.d3Tier != null ? String(inner.d3Tier) : '—';
-                parts.push('<p class="trial-para"><strong>Domain tiers:</strong> D1 (injury) tier ' + escTrialHtml(t1) + '; D2 (functional) tier ' + escTrialHtml(t2) + '; D3 (coordination) tier ' + escTrialHtml(t3) + '</p>');
-                if (inner.composite != null) {
-                    parts.push('<p class="trial-para"><strong>Weighted composite:</strong> ' + escTrialHtml(String(Math.round(inner.composite))) + '</p>');
-                }
                 if (ad.interval) parts.push('<p class="trial-para"><strong>Recommended review interval:</strong> ' + escBodyHtml(ad.interval) + '</p>');
                 var c = ad.coord;
                 if (c && typeof c === 'object') {
                     var snap = 'Referral pattern: ' + (c.ref || '—') + '; Treatment course: ' + (c.dur || '—') + '; Authorization risk: ' + (c.authRisk || '—');
-                    if (c.specCount != null) snap += '; Specialty count factor: ' + c.specCount;
                     parts.push('<p class="trial-para"><strong>Coordination snapshot:</strong> ' + escBodyHtml(snap) + '</p>');
                 }
                 parts.push('<div class="trial-subhd">Recommendations</div>');
@@ -1146,9 +1138,7 @@
             }
             if (abbrev === 'CSA') {
                 var label = inner.overallLabel || '—';
-                var pct = inner.alignmentPercent != null ? String(inner.alignmentPercent) + '%' : '—';
                 parts.push('<p class="trial-lead"><strong>Overall Alignment:</strong> ' + escBodyHtml(label) + '</p>');
-                parts.push('<p class="trial-para"><strong>Alignment indicator:</strong> ' + escTrialHtml(pct) + ' <span style="color:#6a7a8a;font-size:12px;">(informational; does not override structural determination)</span></p>');
                 parts.push('<p class="trial-para"><strong>Structural status:</strong> ' + escBodyHtml(csaStructuralStatusLine(inner.overallKey)) + '</p>');
                 if (inner.rightStatuses && inner.rightStatuses.length) {
                     var rs = inner.rightStatuses.map(function (s) {
@@ -1166,11 +1156,10 @@
                 parts.push('<p class="trial-lead"><strong>Access Friction Level:</strong> ' + escTrialHtml(fl) + '</p>');
                 parts.push('<p class="trial-para"><strong>Determining domain:</strong> ' + escBodyHtml(inner.determiningDomainTitle || '—') + '</p>');
                 if (inner.domainScores && inner.domainScores.length) {
-                    parts.push('<div class="trial-subhd">Domain scores</div><ul class="trial-list">' + inner.domainScores.map(function (ds) {
+                    parts.push('<div class="trial-subhd">Domain levels</div><ul class="trial-list">' + inner.domainScores.map(function (ds) {
                         var title = ds.title || ds.domain || 'Domain';
                         var lv = ds.level != null ? String(ds.level) : '—';
-                        var raw = ds.raw != null ? ' (raw total ' + ds.raw + '/25)' : '';
-                        return '<li><strong>' + escBodyHtml(title) + ':</strong> Level ' + escTrialHtml(lv) + escBodyHtml(raw) + '</li>';
+                        return '<li><strong>' + escBodyHtml(title) + ':</strong> Level ' + escTrialHtml(lv) + '</li>';
                     }).join('') + '</ul>');
                 }
                 if (inner.flags && inner.flags.length) {
@@ -1179,33 +1168,28 @@
                 return parts.join('');
             }
             if (abbrev === 'HSI') {
-                var intr = inner.intrinsic != null ? String(inner.intrinsic) : '—';
-                var extr = inner.extrinsic != null ? String(inner.extrinsic) : '—';
-                var pc = inner.pCode ? ' <span style="color:#5a6a7a;font-size:13px;">(' + escBodyHtml(inner.pCode) + ' lowest domain)</span>' : '';
-                parts.push('<p class="trial-lead"><strong>Intrinsic score:</strong> ' + escTrialHtml(intr) + pc + ' &nbsp;&nbsp;<strong>Extrinsic score:</strong> ' + escTrialHtml(extr) + '</p>');
-                var dest = Array.isArray(inner.destab) ? inner.destab : [];
-                parts.push('<p class="trial-para"><strong>Clinical destabilizer factors rated:</strong> ' + escTrialHtml(String(dest.length)) + '</p>');
-                if (dest.length) {
-                    parts.push('<p class="trial-para">Ratings on a 1–5 scale (one per factor): ' + escTrialHtml(dest.join(', ')) + '</p>');
-                }
+                parts.push('<ul class="trial-list" style="list-style:disc;margin:0 0 16px 1.25em;padding:0">');
+                parts.push('<li>The model visualizes how intrinsic stability and external pressures interact to influence recovery outcomes.</li>');
+                parts.push('<li>The left pillar reflects intrinsic stability (lowest score across the four 4Ps wellness domains). The right pillar reflects extrinsic pressures (average rating across nine social drivers of health). The gold leading edge marks the stress line between them—where internal functional limits meet environmental load.</li>');
+                parts.push('<li>Higher pillars indicate stronger stability on that dimension. A level slab does not mean the client is stable—it reflects the balance between internal resilience and external demands.</li>');
+                parts.push('</ul>');
                 return parts.join('');
             }
             if (abbrev === 'FCI') {
                 var fvi = inner.functionalVulnerabilityIndicator || '—';
                 if (fvi === 'Moderate') fvi = 'Medium';
-                parts.push('<p class="trial-lead"><strong>FCI minimum score:</strong> ' + escTrialHtml(inner.fciMinScore != null ? String(inner.fciMinScore) : '—') + ' <span style="color:#5a6a7a;font-size:13px;">(lowest of four domain scores)</span></p>');
-                parts.push('<p class="trial-para"><strong>Functional Vulnerability Indicator (FVI):</strong> ' + escTrialHtml(fvi) + '</p>');
+                parts.push('<p class="trial-lead"><strong>Functional Vulnerability Indicator (FVI):</strong> ' + escTrialHtml(fvi) + '</p>');
                 if (inner.primaryInstabilityDomains && inner.primaryInstabilityDomains.length) {
                     parts.push('<p class="trial-para"><strong>Primary instability domain(s):</strong> ' + escBodyHtml(inner.primaryInstabilityDomains.join('; ')) + '</p>');
                 }
                 return parts.join('');
             }
             if (abbrev === 'RRF') {
-                parts.push('<p class="trial-lead"><strong>Recovery Risk Level:</strong> ' + escTrialHtml(inner.level || '—') + '</p>');
-                parts.push('<p class="trial-para"><strong>Composite score:</strong> ' + escTrialHtml(inner.total != null ? String(inner.total) + ' out of 100' : '—') + '</p>');
-                parts.push('<p class="trial-para"><strong>Predicted duration (illustrative):</strong> ' + escTrialHtml(inner.predictedDays != null ? String(inner.predictedDays) + ' days' : '—') + '</p>');
+                parts.push('<p class="trial-lead"><strong>Risk Level:</strong> ' + escTrialHtml(inner.level || '—') + '</p>');
+                parts.push('<p class="trial-para"><strong>Predicted recovery (illustrative):</strong> ' + escTrialHtml(inner.predictedDays != null ? String(inner.predictedDays) + ' days' : '—') + '</p>');
                 var br = inner.branch === 'WC' ? "Workers' Compensation" : (inner.branch === 'PI' ? 'Personal Injury' : (inner.branch || ''));
-                if (br) parts.push('<p class="trial-para"><strong>Matter branch:</strong> ' + escBodyHtml(br) + '</p>');
+                if (br) parts.push('<p class="trial-para"><strong>Branch:</strong> ' + escBodyHtml(br) + '</p>');
+                if (inner.narrative) parts.push('<p class="trial-para"><strong>Clinical narrative:</strong> ' + escBodyHtml(inner.narrative) + '</p>');
                 return parts.join('');
             }
             return '<p class="trial-note">This instrument does not have a configured narrative summary.</p>';
