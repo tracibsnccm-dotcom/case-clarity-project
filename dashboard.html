@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Case Clarity Project - Dashboard</title>
+    <title>C.A.S.E. Clarity Assessments — Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
@@ -691,7 +691,7 @@
         <div class="app-header-left">
             <span class="app-header-brand">Reconcile Care Management Services</span>
             <span class="app-header-div">|</span>
-            <span class="app-header-title">Case Clarity Project</span>
+            <span class="app-header-title">C.A.S.E. Clarity Assessments — Forensic Intelligence System</span>
             <div class="trial-timer" style="background:#f8f7f4; padding:8px 15px; border-radius:20px; border:1px solid #b09837; display:inline-block; margin-left:15px;">
                 <span style="font-weight:600;">Trial: </span>
                 <span id="trial-countdown" class="trial-countdown-clock" aria-live="polite">7d 00h 00m 00s</span> remaining
@@ -711,16 +711,13 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         (function () {
-        // Protect dashboard — redirect to login if not authenticated
-        const assessmentId = localStorage.getItem('assessment_id');
-        const sessionId = localStorage.getItem('session_id');
-
-        if (!assessmentId || !sessionId) {
+        /* Main bundle: must match early <body> script — user_logged_in set by login.html */
+        if (!localStorage.getItem('user_logged_in')) {
             window.location.href = 'login.html';
             return;
         }
 
-        // Supabase setup
+        /* CONFIG: Supabase — trial_users (optional sync); same project as login / trial-signup */
         const SUPABASE_URL = 'https://zmjxyspizdqhrtdcgkwk.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptanh5c3BpemRxaHJ0ZGNna3drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MjQ1NDcsImV4cCI6MjA4NTE4NDU0N30.szuVr87xdq1aqYpaM6p390f48ozj4CENU4ksg8vumhM';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1005,7 +1002,7 @@
                 return;
             }
 
-            var titleLabel = 'Case Clarity — Complete Assessment Report';
+            var titleLabel = 'C.A.S.E. Clarity Assessments — Complete Assessment Report';
             var toolPrintCss = await loadToolPrintStyles();
 
             var printCss =
@@ -1114,18 +1111,10 @@
                 if (levelName) lead += ' — ' + escBodyHtml(levelName);
                 parts.push('<p class="trial-lead">' + lead + '</p>');
                 if (ad.levelSub) parts.push('<p class="trial-para">' + escBodyHtml(ad.levelSub) + '</p>');
-                var t1 = inner.d1Tier != null ? String(inner.d1Tier) : '—';
-                var t2 = inner.d2Tier != null ? String(inner.d2Tier) : '—';
-                var t3 = inner.d3Tier != null ? String(inner.d3Tier) : '—';
-                parts.push('<p class="trial-para"><strong>Domain tiers:</strong> D1 (injury) tier ' + escTrialHtml(t1) + '; D2 (functional) tier ' + escTrialHtml(t2) + '; D3 (coordination) tier ' + escTrialHtml(t3) + '</p>');
-                if (inner.composite != null) {
-                    parts.push('<p class="trial-para"><strong>Weighted composite:</strong> ' + escTrialHtml(String(Math.round(inner.composite))) + '</p>');
-                }
                 if (ad.interval) parts.push('<p class="trial-para"><strong>Recommended review interval:</strong> ' + escBodyHtml(ad.interval) + '</p>');
                 var c = ad.coord;
                 if (c && typeof c === 'object') {
                     var snap = 'Referral pattern: ' + (c.ref || '—') + '; Treatment course: ' + (c.dur || '—') + '; Authorization risk: ' + (c.authRisk || '—');
-                    if (c.specCount != null) snap += '; Specialty count factor: ' + c.specCount;
                     parts.push('<p class="trial-para"><strong>Coordination snapshot:</strong> ' + escBodyHtml(snap) + '</p>');
                 }
                 parts.push('<div class="trial-subhd">Recommendations</div>');
@@ -1145,9 +1134,7 @@
             }
             if (abbrev === 'CSA') {
                 var label = inner.overallLabel || '—';
-                var pct = inner.alignmentPercent != null ? String(inner.alignmentPercent) + '%' : '—';
                 parts.push('<p class="trial-lead"><strong>Overall Alignment:</strong> ' + escBodyHtml(label) + '</p>');
-                parts.push('<p class="trial-para"><strong>Alignment indicator:</strong> ' + escTrialHtml(pct) + ' <span style="color:#6a7a8a;font-size:12px;">(informational; does not override structural determination)</span></p>');
                 parts.push('<p class="trial-para"><strong>Structural status:</strong> ' + escBodyHtml(csaStructuralStatusLine(inner.overallKey)) + '</p>');
                 if (inner.rightStatuses && inner.rightStatuses.length) {
                     var rs = inner.rightStatuses.map(function (s) {
@@ -1165,11 +1152,10 @@
                 parts.push('<p class="trial-lead"><strong>Access Friction Level:</strong> ' + escTrialHtml(fl) + '</p>');
                 parts.push('<p class="trial-para"><strong>Determining domain:</strong> ' + escBodyHtml(inner.determiningDomainTitle || '—') + '</p>');
                 if (inner.domainScores && inner.domainScores.length) {
-                    parts.push('<div class="trial-subhd">Domain scores</div><ul class="trial-list">' + inner.domainScores.map(function (ds) {
+                    parts.push('<div class="trial-subhd">Domain levels</div><ul class="trial-list">' + inner.domainScores.map(function (ds) {
                         var title = ds.title || ds.domain || 'Domain';
                         var lv = ds.level != null ? String(ds.level) : '—';
-                        var raw = ds.raw != null ? ' (raw total ' + ds.raw + '/25)' : '';
-                        return '<li><strong>' + escBodyHtml(title) + ':</strong> Level ' + escTrialHtml(lv) + escBodyHtml(raw) + '</li>';
+                        return '<li><strong>' + escBodyHtml(title) + ':</strong> Level ' + escTrialHtml(lv) + '</li>';
                     }).join('') + '</ul>');
                 }
                 if (inner.flags && inner.flags.length) {
@@ -1178,33 +1164,28 @@
                 return parts.join('');
             }
             if (abbrev === 'HSI') {
-                var intr = inner.intrinsic != null ? String(inner.intrinsic) : '—';
-                var extr = inner.extrinsic != null ? String(inner.extrinsic) : '—';
-                var pc = inner.pCode ? ' <span style="color:#5a6a7a;font-size:13px;">(' + escBodyHtml(inner.pCode) + ' lowest domain)</span>' : '';
-                parts.push('<p class="trial-lead"><strong>Intrinsic score:</strong> ' + escTrialHtml(intr) + pc + ' &nbsp;&nbsp;<strong>Extrinsic score:</strong> ' + escTrialHtml(extr) + '</p>');
-                var dest = Array.isArray(inner.destab) ? inner.destab : [];
-                parts.push('<p class="trial-para"><strong>Clinical destabilizer factors rated:</strong> ' + escTrialHtml(String(dest.length)) + '</p>');
-                if (dest.length) {
-                    parts.push('<p class="trial-para">Ratings on a 1–5 scale (one per factor): ' + escTrialHtml(dest.join(', ')) + '</p>');
-                }
+                parts.push('<ul class="trial-list" style="list-style:disc;margin:0 0 16px 1.25em;padding:0">');
+                parts.push('<li>The model visualizes how intrinsic stability and external pressures interact to influence recovery outcomes.</li>');
+                parts.push('<li>The left pillar reflects intrinsic stability (lowest score across the four 4Ps wellness domains). The right pillar reflects extrinsic pressures (average rating across nine social drivers of health). The gold leading edge marks the stress line between them—where internal functional limits meet environmental load.</li>');
+                parts.push('<li>Higher pillars indicate stronger stability on that dimension. A level slab does not mean the client is stable—it reflects the balance between internal resilience and external demands.</li>');
+                parts.push('</ul>');
                 return parts.join('');
             }
             if (abbrev === 'FCI') {
                 var fvi = inner.functionalVulnerabilityIndicator || '—';
                 if (fvi === 'Moderate') fvi = 'Medium';
-                parts.push('<p class="trial-lead"><strong>FCI minimum score:</strong> ' + escTrialHtml(inner.fciMinScore != null ? String(inner.fciMinScore) : '—') + ' <span style="color:#5a6a7a;font-size:13px;">(lowest of four domain scores)</span></p>');
-                parts.push('<p class="trial-para"><strong>Functional Vulnerability Indicator (FVI):</strong> ' + escTrialHtml(fvi) + '</p>');
+                parts.push('<p class="trial-lead"><strong>Functional Vulnerability Indicator (FVI):</strong> ' + escTrialHtml(fvi) + '</p>');
                 if (inner.primaryInstabilityDomains && inner.primaryInstabilityDomains.length) {
                     parts.push('<p class="trial-para"><strong>Primary instability domain(s):</strong> ' + escBodyHtml(inner.primaryInstabilityDomains.join('; ')) + '</p>');
                 }
                 return parts.join('');
             }
             if (abbrev === 'RRF') {
-                parts.push('<p class="trial-lead"><strong>Recovery Risk Level:</strong> ' + escTrialHtml(inner.level || '—') + '</p>');
-                parts.push('<p class="trial-para"><strong>Composite score:</strong> ' + escTrialHtml(inner.total != null ? String(inner.total) + ' out of 100' : '—') + '</p>');
-                parts.push('<p class="trial-para"><strong>Predicted duration (illustrative):</strong> ' + escTrialHtml(inner.predictedDays != null ? String(inner.predictedDays) + ' days' : '—') + '</p>');
+                parts.push('<p class="trial-lead"><strong>Risk Level:</strong> ' + escTrialHtml(inner.level || '—') + '</p>');
+                parts.push('<p class="trial-para"><strong>Predicted recovery (illustrative):</strong> ' + escTrialHtml(inner.predictedDays != null ? String(inner.predictedDays) + ' days' : '—') + '</p>');
                 var br = inner.branch === 'WC' ? "Workers' Compensation" : (inner.branch === 'PI' ? 'Personal Injury' : (inner.branch || ''));
-                if (br) parts.push('<p class="trial-para"><strong>Matter branch:</strong> ' + escBodyHtml(br) + '</p>');
+                if (br) parts.push('<p class="trial-para"><strong>Branch:</strong> ' + escBodyHtml(br) + '</p>');
+                if (inner.narrative) parts.push('<p class="trial-para"><strong>Clinical narrative:</strong> ' + escBodyHtml(inner.narrative) + '</p>');
                 return parts.join('');
             }
             return '<p class="trial-note">This instrument does not have a configured narrative summary.</p>';
@@ -1246,7 +1227,7 @@
             console.log('Tool5 exists:', !!localStorage.getItem('tool5_report_html'));
             console.log('Tool6 exists:', !!localStorage.getItem('tool6_report_html'));
             var html = '<div class="comprehensive-report">';
-            html += '<h2 style="font-size:22px;color:#0c1c34;margin:0 0 8px;padding:0;border:none;font-weight:600;">Case Clarity — Complete Assessment Report</h2>';
+            html += '<h2 style="font-size:22px;color:#0c1c34;margin:0 0 8px;padding:0;border:none;font-weight:600;">C.A.S.E. Clarity Assessments — Complete Assessment Report</h2>';
             html += '<p style="font-size:13px;color:#6a7a8a;margin:0 0 24px;line-height:1.6;">Formatted output from each instrument (saved in this browser when you completed the tool). If a section is missing, re-open that tool once to refresh the capture.</p>';
             html += buildDashboardCasePrintHtml('active') + buildDashboardCasePrintHtml('retro');
             var toolNames = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
@@ -1285,6 +1266,44 @@
             }
             html += '<div style="text-align:center; font-size:10px; color:#999; margin-top:30px;">Page ' + Math.max(0, globalPageNumber - 1) + ' total</div>';
             html += '</div>';
+            html += buildPostReportSection();
+            return html;
+        }
+
+        function buildPostReportSection() {
+            var html = '<div class="report-page-break" style="margin-top:60px;padding-top:40px;border-top:3px double #ccc;">';
+            html += '<h2 style="font-family:Georgia, serif; color:#1a2e3f; margin-bottom:24px; border-bottom:2px solid #b09837; padding-bottom:12px;">Next Steps: Maximizing Your Assessments</h2>';
+            html += '<p style="font-size:15px; line-height:1.8; margin-bottom:24px;">To get the most value from C.A.S.E. Clarity Assessments, we recommend following a structured assessment schedule. Each instrument provides critical insights at different stages of case development, and running them at the right frequency ensures you capture important trajectory changes when they matter most.</p>';
+            html += '<h3 style="font-size:20px; color:#1a2e3f; margin:32px 0 16px;">Recommended Follow-Up Schedule</h3>';
+            html += '<table style="width:100%; border-collapse:collapse; margin:32px 0; font-size:14px; border:1px solid #d6d0c4;">';
+            html += '<thead><tr style="background:#1a2e3f; color:#e8e2d4;">';
+            html += '<th style="padding:14px 16px; text-align:left; font-weight:600; font-size:11px; letter-spacing:0.1em; text-transform:uppercase;">Tool</th>';
+            html += '<th style="padding:14px 16px; text-align:left; font-weight:600; font-size:11px; letter-spacing:0.1em; text-transform:uppercase;">Description</th>';
+            html += '<th style="padding:14px 16px; text-align:left; font-weight:600; font-size:11px; letter-spacing:0.1em; text-transform:uppercase;">Minimum Frequency</th>';
+            html += '<th style="padding:14px 16px; text-align:left; font-weight:600; font-size:11px; letter-spacing:0.1em; text-transform:uppercase;">Best Practice</th>';
+            html += '</tr></thead><tbody>';
+            var schedule = [
+                { tool: 'CCI (Case Complexity Index)', desc: 'Assesses case complexity level and identifies key drivers', freq: 'Level 1–2: Minimum every 7 days<br>Level 3: Minimum every 30 days<br>Level 4: Minimum every 45 days<br>Level 5: Minimum every 60 days', practice: 'Higher complexity requires tighter monitoring. Catching complexity shifts early prevents case drift.' },
+                { tool: 'CSA (Clinical Sequencing Auditor)', desc: 'Evaluates clinical sequencing and identifies gaps in care coordination', freq: 'Minimum every 30 days', practice: 'Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.' },
+                { tool: 'CAF (C.A.R.E. Access Friction Score)', desc: 'Measures barriers to care and treatment access friction points', freq: 'Minimum every 30 days', practice: 'Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.' },
+                { tool: 'HSI (Holistic Stability Index)', desc: 'Assesses overall case stability across intrinsic and extrinsic factors', freq: 'Minimum every 30 days', practice: 'Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.' },
+                { tool: 'FCI (Functional Capacity Index)', desc: 'Evaluates functional capacity and vulnerability indicators', freq: 'Minimum every 30 days', practice: 'Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.' },
+                { tool: 'RRF (Recovery Risk Forecaster)', desc: 'Predicts recovery trajectory and identifies risk factors', freq: 'Minimum every 30 days', practice: 'Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.' }
+            ];
+            schedule.forEach(function (item) {
+                html += '<tr style="border-bottom:1px solid #d6d0c4;">';
+                html += '<td style="padding:14px 16px; font-weight:600; color:#1a2e3f;">' + escBodyHtml(item.tool) + '</td>';
+                html += '<td style="padding:14px 16px;">' + escBodyHtml(item.desc) + '</td>';
+                html += '<td style="padding:14px 16px;">' + item.freq + '</td>';
+                html += '<td style="padding:14px 16px;">' + escBodyHtml(item.practice) + '</td>';
+                html += '</tr>';
+            });
+            html += '</tbody></table>';
+            html += '<div style="background:#fff3cd; border-left:4px solid #b09837; padding:20px; margin:24px 0;">';
+            html += '<p style="margin-bottom:12px;"><strong>Important Context:</strong></p>';
+            html += '<p style="margin-bottom:12px;">While the minimum is every 30 days, it should be expected that these reports would—and should—be run often during the early phases of injury, treatment, and care. Early and frequent assessments capture the trajectory of decline and recovery when it matters most.</p>';
+            html += '<p>You have to run them often enough when the client is at their most vulnerable so that you can catch declines in condition before they undermine the case and the evidence you need to prove how hindered the client was from returning to baseline physically and financially.</p>';
+            html += '</div></div>';
             return html;
         }
 
@@ -1298,6 +1317,27 @@
             }
             prog.textContent = 'Instruments saved in this browser: ' + n + '/6';
             wrap.style.display = allToolsComplete() ? 'block' : 'none';
+            syncToolCompletionsToSupabase();
+        }
+
+        async function syncToolCompletionsToSupabase() {
+            try {
+                var userId = localStorage.getItem('user_id');
+                if (!userId) return;
+                var completedTools = {};
+                var names = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
+                for (var i = 1; i <= 6; i++) {
+                    if (localStorage.getItem('tool' + i + '_complete')) {
+                        completedTools[names[i - 1]] = {
+                            completed: true,
+                            completed_at: localStorage.getItem('tool' + i + '_completed_at') || new Date().toISOString()
+                        };
+                    }
+                }
+                await supabaseClient.from('trial_users').update({ completed_tools: completedTools }).eq('id', userId);
+            } catch (e) {
+                console.warn('Supabase tool sync skipped:', e);
+            }
         }
 
         function bindTrialReportHandlers() {
@@ -1406,7 +1446,13 @@
             window._beforeYouBeginCountdownInterval = setInterval(updateRealCountdown, 3600000);
         }
 
-        document.getElementById('assessment-id-display').textContent = assessmentId;
+        (function updateHeaderAccountDisplay() {
+            var el = document.getElementById('assessment-id-display');
+            if (!el) return;
+            var ccp = localStorage.getItem('ccp');
+            var aid = localStorage.getItem('assessment_id');
+            el.textContent = ccp ? ('CCP# ' + ccp) : (aid || '');
+        })();
 
         window.toggleSection = function (sectionId) {
             var content = document.getElementById(sectionId);
@@ -1434,51 +1480,44 @@
             if (rp != null && retroComplete != null) rp.textContent = retroComplete + '/6';
         };
 
-        // Load dashboard
+        var EMPTY_SESSION = {
+            active_case: { assessments: {} },
+            retrospective_case: { assessments: {} }
+        };
+
         loadDashboard();
 
         async function loadDashboard() {
             try {
-                // Get session data
-                const { data: session, error } = await supabaseClient
-                    .from('assessment_sessions')
-                    .select('*')
-                    .eq('id', sessionId)
-                    .single();
-
-                if (error || !session) {
-                    handleLogout();
-                    return;
+                var userId = localStorage.getItem('user_id');
+                if (userId) {
+                    var res = await supabaseClient
+                        .from('trial_users')
+                        .select('trial_start_at, status')
+                        .eq('id', userId)
+                        .single();
+                    var user = res.data;
+                    var err = res.error;
+                    if (!err && user) {
+                        if (user.status === 'trial_expired') {
+                            alert('Your trial has ended. Please purchase a subscription to continue.');
+                            window.location.href = 'pricing.html';
+                            return;
+                        }
+                        var trialStart = new Date(user.trial_start_at);
+                        var daysElapsed = Math.floor((Date.now() - trialStart.getTime()) / (1000 * 60 * 60 * 24));
+                        if (daysElapsed >= 7 && user.status === 'trial_active') {
+                            await supabaseClient.from('trial_users').update({ status: 'trial_expired' }).eq('id', userId);
+                            alert('Your 7-day trial has ended. Please purchase a subscription to continue.');
+                            window.location.href = 'pricing.html';
+                            return;
+                        }
+                    }
                 }
-
-                // Check expiration
-                if (new Date() > new Date(session.expires_at)) {
-                    await supabaseClient
-                        .from('assessment_sessions')
-                        .update({ status: 'expired' })
-                        .eq('id', sessionId);
-                    
-                    showExpiredMessage();
-                    return;
-                }
-
-                // Calculate progress
-                const activeAssessments = session.active_case?.assessments || {};
-                const retroAssessments = session.retropective_case?.assessments || {};
-                
-                const activeComplete = Object.values(activeAssessments)
-                    .filter(a => a?.status === 'complete').length;
-                const retroComplete = Object.values(retroAssessments)
-                    .filter(a => a?.status === 'complete').length;
-                
-                const activeAllDone = activeComplete === 6;
-                const retroAllDone = retroComplete === 6;
-
-                // Render dashboard (trial countdown uses localStorage trial_start_at)
-                renderDashboard(session, activeComplete, retroComplete, activeAllDone, retroAllDone);
-
+                renderDashboard(EMPTY_SESSION, 0, 0, false, false);
             } catch (err) {
                 console.error('Error loading dashboard:', err);
+                renderDashboard(EMPTY_SESSION, 0, 0, false, false);
             }
         }
 
@@ -1551,7 +1590,7 @@
                   <p>The instruments do not function as simple calculators. Each tool evaluates structural elements of case progression, treatment sequencing, and recovery dynamics.</p>
                 </div>
 
-                <h1 class="dashboard-heading">Assessment Dashboard</h1>
+                <h1 class="dashboard-heading">C.A.S.E. Clarity Assessments — Forensic Intelligence System</h1>
 
                 <div id="trial-complete-report-panel" class="trial-report-panel">
                     <h2>Complete trial report</h2>
@@ -1796,42 +1835,6 @@
 
         async function saveCaseInfo() {
             persistDashboardCaseToLocal();
-            const activeName = document.getElementById('active-name-case-id').value.trim();
-            const retroName = document.getElementById('retro-name-case-id').value.trim();
-
-            const { data: session, error } = await supabaseClient
-                .from('assessment_sessions')
-                .select('active_case, retrospective_case')
-                .eq('id', sessionId)
-                .single();
-
-            if (error || !session) {
-                alert('Could not save. Please try again.');
-                return;
-            }
-
-            const activeCase = session.active_case || { assessments: {} };
-            const retroCase = session.retrospective_case || { assessments: {} };
-            if (!activeCase.assessments) activeCase.assessments = {};
-            if (!retroCase.assessments) retroCase.assessments = {};
-
-            activeCase.name_case_id = activeName;
-            activeCase.reference = activeName;
-            activeCase.date_of_injury = document.getElementById('active-date-injury').value || '';
-            activeCase.mechanism = document.getElementById('active-mechanism').value.trim();
-            activeCase.case_type = document.getElementById('active-case-type').value || '';
-
-            retroCase.name_case_id = retroName;
-            retroCase.reference = retroName;
-            retroCase.date_of_injury = document.getElementById('retro-date-injury').value || '';
-            retroCase.mechanism = document.getElementById('retro-mechanism').value.trim();
-            retroCase.case_type = document.getElementById('retro-case-type').value || '';
-
-            await supabaseClient
-                .from('assessment_sessions')
-                .update({ active_case: activeCase, retrospective_case: retroCase })
-                .eq('id', sessionId);
-
             alert('Case information saved');
         }
 
@@ -1883,18 +1886,13 @@
         window.launchTool = function(toolKey, caseType) {
             if (localStorage.getItem('trial_start_at') && computeTrialDaysRemaining() <= 0) {
                 alert('Trial expired. Your 7-day access from first login on this device has ended.');
+                window.location.href = 'pricing.html';
                 return;
             }
-            const sessionId = localStorage.getItem('session_id');
-            const assessmentId = localStorage.getItem('assessment_id');
             const tool = TOOL_INFO[toolKey];
-            const toolUrl = tool.url;
-            const url = new URL(toolUrl, window.location.href);
-            url.searchParams.set('session', sessionId);
-            url.searchParams.set('assessmentId', assessmentId);
+            const url = new URL(tool.url, window.location.href);
             url.searchParams.set('caseType', caseType);
             url.searchParams.set('tool', toolKey);
-
             window.open(url.toString(), '_blank');
         };
 
@@ -1902,8 +1900,8 @@
             document.getElementById('dashboard-content').innerHTML = `
                 <div class="expired-message">
                     <h2>Access Expired</h2>
-                    <p>Your 7-day assessment window has expired.</p>
-                    <p>Please contact support if you need assistance.</p>
+                    <p>Your 7-day trial has ended.</p>
+                    <p><a href="pricing.html" style="color:#1a2e3f;font-weight:bold;text-decoration:underline;">Purchase to continue</a></p>
                     <button onclick="handleLogout()" class="btn-primary" style="margin-top: 20px;">Return to Login</button>
                 </div>
             `;
