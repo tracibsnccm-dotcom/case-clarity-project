@@ -682,10 +682,16 @@
 </head>
 <body>
     <script>
-    // Protect dashboard - redirect to login if not logged in
-    if (!localStorage.getItem('user_logged_in')) {
-        window.location.href = 'login.html';
-    }
+    /* Early gate — must match login.html (trial_users session). Full dashboard logic loads in the bundle below. */
+    (function () {
+        var ok = localStorage.getItem('user_logged_in') &&
+            localStorage.getItem('ccp') &&
+            localStorage.getItem('email') &&
+            localStorage.getItem('user_id');
+        if (!ok) {
+            window.location.href = 'login.html';
+        }
+    })();
     </script>
     <header class="app-header">
         <div class="app-header-left">
@@ -1557,6 +1563,8 @@
             }
         }
 
+        /* Initial paint: build tool grid, case forms, report panel (was never invoked after loadDashboard removal) */
+        renderDashboard();
         checkTrialStatus();
 
         function escapeAttr(s) {
