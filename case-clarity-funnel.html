@@ -117,11 +117,6 @@
     border-color: var(--gold);
   }
 
-  a.header-nav {
-    text-decoration: none;
-    color: inherit;
-  }
-
   /* ── TYPOGRAPHY SYSTEM ───────────────────────────────── */
   .section-label {
     font-family: var(--font-ui);
@@ -1207,7 +1202,7 @@
       <em>Forensic Care Management</em>
     </div>
   </div>
-  <a class="header-nav" href="https://case-clarity-project-9fu6-cqlue6i2y-tracis-projects-26fd65a2.vercel.app/login.html">Sign in to begin</a>
+  <div class="header-nav" onclick="goToPage('form')">Request assessment</div>
 </header>
 
 
@@ -1232,7 +1227,7 @@
         Developed by clinical case management professionals to provide objective insight into the factors that drive case outcomes.
       </p>
       <div class="gold-rule"></div>
-      <a class="btn-primary" href="https://case-clarity-project-9fu6-cqlue6i2y-tracis-projects-26fd65a2.vercel.app/login.html">Request Complimentary Assessment</a>
+      <button class="btn-primary" onclick="goToPage('form')">Request Complimentary Assessment</button>
       <div class="btn-caption">No obligation &nbsp;·&nbsp; 48-hour turnaround &nbsp;·&nbsp; Keep all reports</div>
       <p style="font-family:var(--font-body); font-size:16px; font-style:italic; color:var(--gray-mid); margin-top:16px; max-width:500px;">Most attorneys complete the full assessment in approximately 90–180 minutes total, typically across multiple sessions.</p>
     </div>
@@ -1366,7 +1361,7 @@
       </p>
 
       <div class="mt-40" style="margin-top:40px;">
-        <a class="btn-primary" href="https://case-clarity-project-9fu6-cqlue6i2y-tracis-projects-26fd65a2.vercel.app/login.html">Request Complimentary Assessment</a>
+        <button class="btn-primary" onclick="goToPage('form')">Request Complimentary Assessment</button>
       </div>
     </div>
   </div>
@@ -1492,7 +1487,7 @@
         <p class="tools-footnote">Each tool may be used independently. Together, they provide a comprehensive view of the factors influencing case outcomes.</p>
 
         <div style="margin-top:36px;">
-          <a class="btn-primary" href="https://case-clarity-project-9fu6-cqlue6i2y-tracis-projects-26fd65a2.vercel.app/login.html">Request Complimentary Assessment</a>
+          <button class="btn-primary" onclick="goToPage('form')">Request Complimentary Assessment</button>
         </div>
       </div>
     </div>
@@ -1704,7 +1699,7 @@
     <div class="section-label">Request Your Assessment</div>
     <h2>Request Your Complimentary Assessment</h2>
     <p>Twelve reports. Two cases. No obligation.</p>
-    <a class="btn-primary" href="https://case-clarity-project-9fu6-cqlue6i2y-tracis-projects-26fd65a2.vercel.app/login.html">Request Assessment</a>
+    <button class="btn-primary" onclick="goToPage('form')">Request Assessment</button>
     <p style="font-family:var(--font-body); font-size:16px; font-style:italic; color:rgba(255,255,255,0.5); margin-top:20px; max-width:480px; margin-left:auto; margin-right:auto; line-height:1.7;">Most assessment requests are reviewed and approved within one business day. If the submitted case meets assessment criteria, access credentials will be issued automatically.</p>
   </div>
 
