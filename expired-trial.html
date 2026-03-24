@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Trial Has Ended — C.A.S.E. Clarity System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold:        #9a7e1e;
+    --gold-light:  #b09837;
+    --gold-dim:    rgba(154,126,30,0.10);
+    --gold-border: rgba(154,126,30,0.28);
+    --navy:        #1e2a4a;
+    --navy-mid:    #263257;
+    --page-bg:     #f8f9fb;
+    --panel-bg:    #ffffff;
+    --panel-alt:   #f2f4f8;
+    --text:        #1a1a1a;
+    --text-muted:  #4a5568;
+    --text-dim:    #8a95a8;
+    --green:       #1a7a4a;
+    --green-dim:   rgba(26,122,74,0.09);
+    --red-dim:     rgba(180,40,40,0.07);
+    --tier1:       #2e5f8a;
+    --tier2:       #9a7e1e;
+    --tier3:       #5a3e8a;
+    --divider:     rgba(30,42,74,0.10);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--page-bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    background: var(--navy);
+    border-bottom: 1px solid rgba(154,126,30,0.3);
+    padding: 12px 48px;
+  }
+  .topbar-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  }
+  .topbar-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px; font-weight: 600;
+    color: var(--gold-light); letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;
+  }
+  .topbar-brand span { color: rgba(255,255,255,0.4); font-weight: 300; font-size: 13px; margin-left: 8px; letter-spacing: 0.03em; text-transform: none; }
+  .topbar-status {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 3px;
+    padding: 4px 12px;
+  }
+
+  /* ── EXPIRATION NOTICE ── */
+  .expiry-banner {
+    background: linear-gradient(155deg, #2b3760 0%, #394878 100%);
+    padding: 64px 48px 56px;
+    text-align: center;
+  }
+  .expiry-banner-inner { max-width: 680px; margin: 0 auto; }
+
+  .expiry-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .expiry-eyebrow::before, .expiry-eyebrow::after {
+    content: ''; width: 28px; height: 1px; background: rgba(255,255,255,0.15);
+  }
+
+  .expiry-icon {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px;
+  }
+
+  .expiry-banner h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 300;
+    color: #ffffff;
+    line-height: 1.15;
+    margin-bottom: 16px;
+  }
+
+  .expiry-sub {
+    font-size: 15px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.7;
+    margin-bottom: 28px;
+  }
+
+  .expiry-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(180,40,40,0.18);
+    border: 1px solid rgba(220,80,80,0.3);
+    border-radius: 4px;
+    padding: 8px 18px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #e07070;
+  }
+  .expiry-status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #e07070;
+  }
+
+  /* ── EXPIRY BODY ── */
+  .expiry-body {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 52px 48px 0;
+  }
+
+  .expiry-notice-block {
+    background: var(--panel-bg);
+    border: 1px solid var(--divider);
+    border-left: 3px solid var(--gold);
+    border-radius: 8px;
+    padding: 28px 32px;
+    margin-bottom: 0;
+  }
+  .expiry-notice-block p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.75;
+    max-width: 700px;
+  }
+  .expiry-notice-block p + p { margin-top: 12px; }
+  .expiry-notice-block strong { color: var(--navy); font-weight: 600; }
+
+  /* ── VALUE REMINDER ── */
+  .value-reminder {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 52px 48px 0;
+  }
+  .value-reminder-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .value-reminder-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(22px, 2.8vw, 32px);
+    font-weight: 400;
+    color: var(--navy);
+    margin-bottom: 24px;
+    line-height: 1.2;
+  }
+  .value-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .value-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--divider);
+    border-radius: 8px;
+    padding: 22px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .value-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--gold), transparent);
+  }
+  .value-card-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
+    font-style: italic;
+  }
+  .value-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+  .value-card-body {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* ── TRANSITION BAND ── */
+  .transition-band {
+    margin-top: 52px;
+    background: linear-gradient(135deg, #2b3760 0%, #1e2a4a 100%);
+    padding: 48px 48px;
+    text-align: center;
+  }
+  .transition-band-inner { max-width: 700px; margin: 0 auto; }
+  .transition-band-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(201,168,76,0.7);
+    margin-bottom: 12px;
+  }
+  .transition-band h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(26px, 3.5vw, 40px);
+    font-weight: 300;
+    color: #ffffff;
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+  .transition-band h2 em { font-style: italic; color: var(--gold-light); }
+  .transition-band p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.7;
+    max-width: 540px;
+    margin: 0 auto 24px;
+  }
+  .transition-arrow {
+    color: rgba(154,126,30,0.5);
+    font-size: 22px;
+    margin-top: 4px;
+  }
+
+  /* ══════════════════════════════
+     PRICING / PAYMENT SECTION
+     (embedded from purchase page)
+  ══════════════════════════════ */
+
+  /* ── JUMP BAR ── */
+  .jump-bar { background: var(--panel-alt); border-bottom: 1px solid var(--divider); padding: 12px 48px; }
+  .jump-bar-inner { max-width: 1200px; margin: 0 auto; display: flex; gap: 7px; flex-wrap: wrap; justify-content: center; }
+  .jump-link {
+    font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-muted); text-decoration: none; padding: 6px 13px;
+    border: 1px solid var(--divider); border-radius: 3px; background: var(--panel-bg); transition: all 0.16s;
+  }
+  .jump-link:hover { color: var(--gold); border-color: var(--gold-border); background: var(--gold-dim); }
+
+  /* ── SECTION ── */
+  .section { padding: 60px 48px; max-width: 1200px; margin: 0 auto; }
+  .section-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+  .section-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(24px, 3vw, 36px); font-weight: 400; color: var(--navy); margin-bottom: 8px; line-height: 1.2; }
+  .section-desc { font-size: 14px; color: var(--text-muted); max-width: 640px; margin-bottom: 32px; line-height: 1.7; }
+  .section-divider { border: none; border-top: 1px solid var(--divider); }
+
+  /* ── TIER CTA BUTTONS ── */
+  .tier-cta {
+    display: block; width: 100%; padding: 13px 20px; text-align: center;
+    border-radius: 5px; font-size: 12px; font-weight: 600; letter-spacing: 0.07em;
+    text-transform: uppercase; text-decoration: none; transition: all 0.18s; cursor: pointer; border: none;
+  }
+  .tier-cta.primary   { background: var(--gold); color: #fff; }
+  .tier-cta.primary:hover { background: var(--gold-light); }
+  .tier-cta.secondary { background: transparent; color: var(--gold); border: 1px solid var(--gold-border); }
+  .tier-cta.secondary:hover { background: var(--gold-dim); }
+  .tier-cta.tertiary  { background: transparent; color: var(--navy); border: 1px solid var(--divider); }
+  .tier-cta.tertiary:hover { border-color: var(--gold-border); color: var(--gold); }
+
+  /* ── TOOL TABLE ── */
+  .tool-table-wrap {
+    overflow-x: auto; border-radius: 8px; border: 1px solid var(--divider); background: var(--panel-bg);
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead tr { background: var(--panel-alt); border-bottom: 2px solid var(--gold-border); }
+  thead th {
+    padding: 13px 18px; text-align: left;
+    font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--gold); font-weight: 500; white-space: nowrap;
+  }
+  thead th.center { text-align: center; }
+  tbody tr { border-bottom: 1px solid var(--divider); transition: background 0.12s; }
+  tbody tr:hover { background: rgba(154,126,30,0.04); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody td { padding: 13px 18px; color: var(--text); vertical-align: middle; }
+  tbody td.center { text-align: center; }
+  .tool-table-wrap thead th:nth-child(1) { width: 180px; }
+  .tool-table-wrap thead th:nth-child(2) { width: 22%; }
+  .tool-table-wrap thead th:nth-child(3) { min-width: 300px; }
+  .tool-table-wrap thead th:nth-child(4) { width: 150px; }
+  .tool-table-wrap thead th:nth-child(5) { width: 100px; }
+  .tool-name { font-weight: 600; color: var(--navy); font-size: 13px; display: block; margin-bottom: 2px; }
+  .tool-tag  { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 0.06em; }
+  .check { color: var(--green); font-size: 16px; font-weight: 600; }
+  .incl-badge { display: inline-flex; align-items: center; gap: 4px; background: var(--green-dim); color: var(--green); border-radius: 3px; padding: 2px 8px; font-size: 11px; font-family: 'DM Mono', monospace; letter-spacing: 0.04em; white-space: nowrap; }
+  .row-csa { background: rgba(154,126,30,0.05) !important; border-top: 2px solid var(--gold-border) !important; }
+  .row-csa td:first-child::before { content: 'FOUNDATIONAL LAYER'; display: block; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 4px; }
+
+  /* ── TAGS ── */
+  .tag-unlimited { display: inline-block; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.04em; background: var(--green-dim); color: var(--green); border-radius: 3px; padding: 2px 8px; }
+  .tag-add       { display: inline-block; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.04em; background: var(--gold-dim); color: var(--gold); border-radius: 3px; padding: 2px 8px; }
+
+  /* ── CASE DEFS ── */
+  .case-defs { display: grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap: 16px; }
+  .case-def { border-radius: 8px; border: 1px solid var(--divider); padding: 24px 20px; }
+  .case-def.active  { background: linear-gradient(135deg,rgba(154,126,30,0.06),var(--panel-bg)); border-color: var(--gold-border); }
+  .case-def.closed  { background: var(--panel-bg); }
+  .case-def.dormant { background: var(--panel-alt); }
+  .case-def-badge { display: inline-block; padding: 3px 10px; border-radius: 3px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 12px; }
+  .case-def.active  .case-def-badge { background: var(--gold-dim); color: var(--gold); border: 1px solid var(--gold-border); }
+  .case-def.closed  .case-def-badge { background: var(--green-dim); color: var(--green); border: 1px solid rgba(26,122,74,0.2); }
+  .case-def.dormant .case-def-badge { background: var(--panel-alt); color: var(--text-muted); border: 1px solid var(--divider); }
+  .case-def h3 { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 400; color: var(--navy); margin-bottom: 10px; }
+  .case-def p  { font-size: 13px; color: var(--text-muted); line-height: 1.7; margin-bottom: 10px; }
+  .case-def ul { padding-left: 16px; }
+  .case-def li { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; line-height: 1.55; }
+  .case-pricing-note { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--divider); font-size: 12px; color: var(--gold); font-family: 'DM Mono', monospace; }
+
+  /* ── ONBOARDING ── */
+  .onboarding-card { border: 1px solid var(--gold-border); border-radius: 10px; overflow: hidden; max-width: 860px; background: var(--panel-bg); }
+  .onboarding-head { background: linear-gradient(135deg,rgba(154,126,30,0.07),var(--panel-bg)); padding: 24px 28px; display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; border-bottom: 1px solid var(--gold-border); }
+  .onboarding-badge { display: inline-block; background: var(--gold-dim); color: var(--gold); border: 1px solid var(--gold-border); border-radius: 3px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; padding: 3px 10px; margin-bottom: 8px; }
+  .onboarding-head h3 { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 400; color: var(--navy); }
+  .onboarding-price-block { text-align: right; flex-shrink: 0; }
+  .ob-price { font-family: 'Cormorant Garamond', serif; font-size: 38px; font-weight: 300; color: var(--gold); line-height: 1; }
+  .ob-price-note { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+  .onboarding-body { padding: 24px 28px; }
+  .ob-included-title { font-size: 11px; font-weight: 600; color: var(--text); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .ob-item { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--divider); font-size: 13px; color: var(--text-muted); }
+  .ob-item:last-child { border-bottom: none; }
+  .ob-item-icon { color: var(--gold); flex-shrink: 0; margin-top: 2px; }
+  .without-box { background: var(--red-dim); border: 1px solid rgba(180,40,40,0.18); border-radius: 6px; padding: 14px 18px; font-size: 13px; color: #9a2020; margin-top: 18px; }
+  .without-box strong { display: block; margin-bottom: 4px; color: #7a1818; }
+
+  /* ── PURCHASE BLOCKS ── */
+  .purchase-block {
+    background: var(--panel-bg); border: 1px solid var(--divider); border-radius: 10px;
+    padding: 26px 30px; margin-bottom: 16px;
+    display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center;
+  }
+  .purchase-block.featured { border-color: var(--gold-border); background: linear-gradient(135deg,rgba(154,126,30,0.05),var(--panel-bg)); position: relative; overflow: hidden; }
+  .purchase-block.featured::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg,var(--gold),transparent); }
+  .pb-eyebrow { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 6px; }
+  .pb-title   { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 400; color: var(--navy); margin-bottom: 6px; }
+  .pb-desc    { font-size: 13px; color: var(--text-muted); max-width: 500px; }
+  .pb-price   { font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 300; color: var(--navy); margin-bottom: 4px; text-align: right; white-space: nowrap; }
+  .pb-price.gold { color: var(--gold); }
+  .pb-price-sub { font-size: 11px; color: var(--text-dim); margin-bottom: 12px; text-align: right; }
+  .pb-buttons { display: flex; flex-direction: column; gap: 8px; }
+
+  /* ── SYSTEM VALUE BAR ── */
+  .system-value-bar { margin-top: 14px; background: var(--gold-dim); border: 1px solid var(--gold-border); border-radius: 6px; padding: 13px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+  .system-value-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); }
+  .system-value-num   { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 400; color: var(--navy); }
+  .system-value-num span { font-size: 14px; color: var(--gold); }
+
+  /* ── UNIFIED PRICING TABLE ── */
+  .ptable {
+    display: grid;
+    grid-template-columns: 160px 1fr 1fr 1fr;
+    border: 1px solid var(--divider);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--panel-bg);
+  }
+  .pt-label-cell,
+  .pt-tier-cell {
+    border-bottom: 1px solid var(--divider);
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+  }
+  .pt-cta-cell,
+  .ptable > .pt-label-cell:last-of-type { border-bottom: none; }
+  .pt-label-cell {
+    background: var(--panel-alt);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-right: 1px solid var(--divider);
+  }
+  .pt-header-blank { background: var(--panel-alt); }
+  .pt-tier-cell { border-right: 1px solid var(--divider); }
+  .pt-tier-cell:last-child { border-right: none; }
+  .pt-head {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 22px 18px 18px;
+    background: var(--panel-alt);
+    border-bottom: 2px solid var(--gold-border) !important;
+    position: relative;
+  }
+  .pt-head-1 { background: linear-gradient(135deg, rgba(46,95,138,0.06), var(--panel-alt)); }
+  .pt-head-2 { background: linear-gradient(135deg, rgba(154,126,30,0.08), var(--panel-alt)); }
+  .pt-head-3 { background: linear-gradient(135deg, rgba(90,62,138,0.06), var(--panel-alt)); }
+  .pt-desc {
+    font-size: 13px; color: var(--text-muted); line-height: 1.55;
+    align-items: flex-start; padding-top: 16px; padding-bottom: 16px;
+  }
+  .pt-price-cell {
+    flex-direction: column; align-items: flex-start; padding: 18px 18px;
+    background: var(--panel-bg); border-bottom: 1px solid var(--divider) !important;
+  }
+  .pt-price {
+    font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 300;
+    color: var(--navy); line-height: 1; margin-bottom: 4px;
+  }
+  .pt-per { font-size: 16px; color: var(--text-muted); }
+  .pt-price-sub { font-size: 11px; color: var(--text-dim); }
+  .pt-val { font-size: 13.5px; font-weight: 600; color: var(--navy); justify-content: flex-start; }
+  .pt-gold { color: var(--gold); }
+  .pt-dim  { color: var(--text-dim); font-weight: 400; font-style: italic; }
+  .pt-featured-col { background: rgba(154,126,30,0.04); }
+  .pt-head-2.pt-featured-col { background: linear-gradient(135deg, rgba(154,126,30,0.10), rgba(154,126,30,0.04)); }
+  .pt-cta-cell { padding: 18px 18px; align-items: stretch; border-bottom: none !important; }
+  .pt-cta-cell .tier-cta { width: 100%; }
+
+  /* ── FINAL CTA ── */
+  .final-cta { background: linear-gradient(155deg,var(--navy) 0%,var(--navy-mid) 100%); padding: 64px 48px; text-align: center; }
+  .final-cta h2 { font-family: 'Cormorant Garamond', serif; font-size: clamp(26px,3.5vw,42px); font-weight: 300; color: #fff; margin-bottom: 12px; }
+  .final-cta p  { color: rgba(255,255,255,0.55); font-size: 15px; max-width: 520px; margin: 0 auto 30px; line-height: 1.7; }
+  .cta-buttons  { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .cta-btn { display: inline-flex; align-items: center; gap: 8px; padding: 13px 26px; border-radius: 5px; font-size: 12px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; text-decoration: none; transition: all 0.18s; }
+  .cta-btn.gold    { background: var(--gold); color: #fff; }
+  .cta-btn.gold:hover { background: var(--gold-light); }
+  .cta-btn.outline { color: rgba(255,255,255,0.8); border: 1px solid rgba(255,255,255,0.25); }
+  .cta-btn.outline:hover { background: rgba(255,255,255,0.08); }
+
+  /* ── FOOTER ── */
+  .footer { background: var(--panel-alt); border-top: 1px solid var(--divider); padding: 20px 48px; display: flex; justify-content: space-between; align-items: center; gap: 20px; font-size: 12px; color: var(--text-dim); flex-wrap: wrap; }
+  .footer a { color: var(--text-dim); text-decoration: none; }
+  .footer a:hover { color: var(--gold); }
+
+  /* ── REVEAL ── */
+  .reveal { opacity: 1; transform: none; transition: opacity 0.5s ease, transform 0.5s ease; }
+  .js-animate .reveal { opacity: 0; transform: translateY(16px); }
+  .js-animate .reveal.visible { opacity: 1; transform: none; }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-brand">C.A.S.E. Clarity™ <span>by Reconcile Care Management Services</span></div>
+    <div class="topbar-status">Trial Expired</div>
+  </div>
+</div>
+
+<!-- ══ EXPIRATION NOTICE ══ -->
+<div class="expiry-banner reveal">
+  <div class="expiry-banner-inner">
+    <div class="expiry-eyebrow">C.A.S.E. Clarity System</div>
+    <div class="expiry-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+    </div>
+    <h1>Your 7-Day Trial Has Ended</h1>
+    <p class="expiry-sub">Your trial access to the C.A.S.E. Clarity System has expired. Access is currently paused.</p>
+    <div class="expiry-status-pill">
+      <span class="expiry-status-dot"></span>
+      Access Paused — Trial Period Ended
+    </div>
+  </div>
+</div>
+
+<!-- ══ EXPIRY BODY ══ -->
+<div class="expiry-body reveal">
+  <div class="expiry-notice-block">
+    <p>Your 7-day trial provided full access to the C.A.S.E. Clarity System and its complete suite of clinical assessment tools. That access period has now concluded.</p>
+    <p>You can <strong>restore full access immediately</strong> by selecting a plan below. No data is lost. Cases you worked on during the trial remain available upon activation. There is no gap in case continuity when you select a plan today.</p>
+    <p>If you have questions before selecting a plan, contact RCMS directly at <a href="mailto:traci.johnson@rcmspllc.com" style="color:var(--gold);text-decoration:none">traci.johnson@rcmspllc.com</a>.</p>
+  </div>
+</div>
+
+<!-- ══ VALUE REMINDER ══ -->
+<div class="value-reminder reveal">
+  <div class="value-reminder-label">During Your Trial</div>
+  <h2 class="value-reminder-title">What the System Made Possible</h2>
+  <div class="value-cards">
+    <div class="value-card">
+      <div class="value-card-num">Case Structure</div>
+      <div class="value-card-title">Evaluate Case Complexity</div>
+      <div class="value-card-body">You were able to assess the structural complexity of active cases — identifying where coordination demands and risk exposure were concentrated.</div>
+    </div>
+    <div class="value-card">
+      <div class="value-card-num">Stability & Risk</div>
+      <div class="value-card-title">Identify Instability Patterns</div>
+      <div class="value-card-body">The system surfaced stability gaps, access barriers, and recovery risk patterns that standard clinical records may not capture on their own.</div>
+    </div>
+    <div class="value-card">
+      <div class="value-card-num">Clinical Sequencing</div>
+      <div class="value-card-title">Audit Treatment Progression</div>
+      <div class="value-card-body">You were able to evaluate whether care pathways followed a coherent and defensible sequence — documentation that supports case positioning.</div>
+    </div>
+    <div class="value-card">
+      <div class="value-card-num">Case Oversight</div>
+      <div class="value-card-title">Support Case Strategy</div>
+      <div class="value-card-body">Across six integrated tools, the system provided a structured clinical record tied to a proprietary methodology — built for the legal-medical environment.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TRANSITION BAND ══ -->
+<div class="transition-band reveal">
+  <div class="transition-band-inner">
+    <div class="transition-band-label">Continue Your Access</div>
+    <h2>Select Your Access Plan</h2>
+    <p>All six tools are included at every tier. Pricing is based on concurrent active cases — not on reports generated. Select the plan that fits your caseload and restore access immediately.</p>
+    <div class="transition-arrow">↓</div>
+  </div>
+</div>
+
+<!-- ══ JUMP BAR ══ -->
+<div class="jump-bar">
+  <div class="jump-bar-inner">
+    <a class="jump-link" href="#tiers">Tier Pricing</a>
+    <a class="jump-link" href="#onboarding">Onboarding</a>
+    <a class="jump-link" href="#tools">Tool Suite</a>
+    <a class="jump-link" href="#cases">Case Definitions</a>
+    <a class="jump-link" href="#purchase">Select &amp; Purchase</a>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PRICING / PAYMENT SECTION — EMBEDDED
+══════════════════════════════════════════════ -->
+
+<!-- 1 — PRICING -->
+<section class="section reveal" id="tiers">
+  <div class="section-label">Select Your Tier</div>
+  <h2 class="section-title">Tier Pricing</h2>
+  <p class="section-desc">All six tools are included at every tier. Select based on your concurrent active caseload — not on features, because every tier gets everything.</p>
+
+  <div class="ptable">
+    <div class="pt-label-cell pt-header-blank"></div>
+    <div class="pt-tier-cell pt-head pt-head-1">
+      <div class="tier-badge" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--tier1);margin-bottom:6px;">Tier 1 — Foundation</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;color:var(--navy);">Foundation</div>
+    </div>
+    <div class="pt-tier-cell pt-head pt-head-2">
+      <div class="tier-badge" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--tier2);margin-bottom:6px;">Tier 2 — Professional</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;color:var(--navy);">Professional</div>
+    </div>
+    <div class="pt-tier-cell pt-head pt-head-3">
+      <div class="tier-badge" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--tier3);margin-bottom:6px;">Tier 3 — Enterprise</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;color:var(--navy);">Enterprise</div>
+    </div>
+
+    <div class="pt-label-cell pt-row-label">Best For</div>
+    <div class="pt-tier-cell pt-desc">Focused evaluation and structured oversight of a single active case. Ideal for complex or high-value matters requiring deeper clinical-legal visibility.</div>
+    <div class="pt-tier-cell pt-desc pt-featured-col">Consistent oversight across multiple active cases. Routine monitoring of case structure, stability, sequencing, and functional progression.</div>
+    <div class="pt-tier-cell pt-desc">Organizations managing large inventories of active cases requiring coordinated, portfolio-level visibility across high-volume litigation workflows.</div>
+
+    <div class="pt-label-cell pt-row-label">Price</div>
+    <div class="pt-tier-cell pt-price-cell">
+      <div class="pt-price">$6,995 <span class="pt-per" style="font-size:13px;color:var(--green);font-family:'DM Sans',sans-serif;font-weight:600">one-time</span></div>
+      <div class="pt-price-sub">One-time purchase</div>
+    </div>
+    <div class="pt-tier-cell pt-price-cell pt-featured-col">
+      <div class="pt-price">$9,995<span class="pt-per">/mo</span></div>
+      <div class="pt-price-sub">Monthly subscription</div>
+    </div>
+    <div class="pt-tier-cell pt-price-cell">
+      <div class="pt-price">$11,995<span class="pt-per">/mo</span></div>
+      <div class="pt-price-sub">Monthly subscription</div>
+    </div>
+
+    <div class="pt-label-cell pt-row-label">Active Cases</div>
+    <div class="pt-tier-cell pt-val">1</div>
+    <div class="pt-tier-cell pt-val pt-featured-col">20</div>
+    <div class="pt-tier-cell pt-val">250</div>
+
+    <div class="pt-label-cell pt-row-label">Users Included</div>
+    <div class="pt-tier-cell pt-val">1 user</div>
+    <div class="pt-tier-cell pt-val pt-featured-col">1 user</div>
+    <div class="pt-tier-cell pt-val">Up to 3 users</div>
+
+    <div class="pt-label-cell pt-row-label">Additional Users</div>
+    <div class="pt-tier-cell pt-val pt-dim">Not Available</div>
+    <div class="pt-tier-cell pt-val pt-featured-col"><span class="tag-add">$1,250/user/mo</span></div>
+    <div class="pt-tier-cell pt-val"><span class="tag-add">$1,250/user/mo</span></div>
+
+    <div class="pt-label-cell pt-row-label">Reports per Active Case</div>
+    <div class="pt-tier-cell pt-val"><span class="tag-unlimited">Unlimited</span></div>
+    <div class="pt-tier-cell pt-val pt-featured-col"><span class="tag-unlimited">Unlimited</span></div>
+    <div class="pt-tier-cell pt-val"><span class="tag-unlimited">Unlimited</span></div>
+
+    <div class="pt-label-cell pt-row-label">Tools Included</div>
+    <div class="pt-tier-cell pt-val pt-gold">All 6</div>
+    <div class="pt-tier-cell pt-val pt-gold pt-featured-col">All 6</div>
+    <div class="pt-tier-cell pt-val pt-gold">All 6</div>
+
+    <div class="pt-label-cell pt-row-label">Billing Model</div>
+    <div class="pt-tier-cell pt-val">One-Time Purchase</div>
+    <div class="pt-tier-cell pt-val pt-featured-col">Monthly Subscription</div>
+    <div class="pt-tier-cell pt-val">Monthly Subscription</div>
+
+    <div class="pt-label-cell pt-row-label">Support Rate</div>
+    <div class="pt-tier-cell pt-val">$1,595/hr*</div>
+    <div class="pt-tier-cell pt-val pt-featured-col">$1,595/hr*</div>
+    <div class="pt-tier-cell pt-val">$1,595/hr*</div>
+
+    <div class="pt-label-cell"></div>
+    <div class="pt-tier-cell pt-cta-cell">
+      <a href="#purchase-t1" class="tier-cta tertiary">Select Foundation →</a>
+    </div>
+    <div class="pt-tier-cell pt-cta-cell pt-featured-col">
+      <a href="#purchase-t2" class="tier-cta primary">Select Professional →</a>
+    </div>
+    <div class="pt-tier-cell pt-cta-cell">
+      <a href="#purchase-t3" class="tier-cta secondary">Select Enterprise →</a>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- 2 — ONBOARDING -->
+<section class="section reveal" id="onboarding">
+  <div class="section-label">Optional Add-On</div>
+  <h2 class="section-title">Onboarding &amp; Implementation Support</h2>
+  <p class="section-desc">Optional but recommended for practices new to structured clinical assessment workflows. Without it, support is available at the standard hourly rate.</p>
+  <div class="onboarding-card">
+    <div class="onboarding-head">
+      <div>
+        <span class="onboarding-badge">Optional Add-On · Any Tier</span>
+        <h3>C.A.S.E. Clarity Onboarding Package</h3>
+      </div>
+      <div class="onboarding-price-block">
+        <div class="ob-price">$4,800</div>
+        <div class="ob-price-note">One-time · Add to any tier</div>
+      </div>
+    </div>
+    <div class="onboarding-body">
+      <div class="ob-included-title">What's Included</div>
+      <div class="ob-item"><span class="ob-item-icon">◆</span><div><strong style="color:var(--navy);display:block;margin-bottom:2px">Practice Assessment &amp; Case Classification Review</strong>Structured intake session to map your caseload against C.A.S.E. Clarity's active/closed/dormant model and confirm the right tier.</div></div>
+      <div class="ob-item"><span class="ob-item-icon">◆</span><div><strong style="color:var(--navy);display:block;margin-bottom:2px">Tool-by-Tool Methodology Training</strong>Guided walkthrough of all six tools — output interpretation and clinical documentation best practices for PI and WC environments.</div></div>
+      <div class="ob-item"><span class="ob-item-icon">◆</span><div><strong style="color:var(--navy);display:block;margin-bottom:2px">C.A.R.E. Framework Integration</strong>Orientation to the clinical methodology as it applies to each tool's output structure and documentation standards.</div></div>
+      <div class="ob-item"><span class="ob-item-icon">◆</span><div><strong style="color:var(--navy);display:block;margin-bottom:2px">Live Case Walkthrough Session</strong>Apply the full tool suite to a real or de-identified case to anchor learning in your actual practice context.</div></div>
+      <div class="ob-item"><span class="ob-item-icon">◆</span><div><strong style="color:var(--navy);display:block;margin-bottom:2px">Implementation Q&amp;A + Documentation Standards Review</strong>Dedicated session to address workflow-specific questions and review standards for legal-facing clinical output.</div></div>
+      <div class="ob-item"><span class="ob-item-icon">◆</span><div><strong style="color:var(--navy);display:block;margin-bottom:2px">30-Day Post-Onboarding Email Access</strong>Direct access to RCMS clinical staff for implementation questions during your first 30 days.</div></div>
+      <div class="without-box"><strong>Without the Onboarding Package:</strong> Ad hoc support, training sessions, and implementation consultations are available at $1,595 per hour. There is no bundled support included with tool access alone.</div>
+    </div>
+  </div>
+</section>
+<hr class="section-divider">
+
+<!-- 3 — TOOL SUITE -->
+<section class="section reveal" id="tools">
+  <div class="section-label">Included in Every Tier</div>
+  <h2 class="section-title">The Complete C.A.S.E. Clarity Tool Suite</h2>
+  <p class="section-desc">All six clinical assessment tools are available under every pricing tier. No partial access, no tool-level upgrades.</p>
+  <div class="tool-table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Tool</th>
+          <th>What It Helps Identify</th>
+          <th>Why It Matters</th>
+          <th>Typical ROI Impact</th>
+          <th class="center">Included</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="tool-name">Case Complexity Index</span><span class="tool-tag">CCI</span></td>
+          <td>Identifies the structural complexity of a case so attorneys can recognize where coordination demands and risk exposure may increase.</td>
+          <td>Earlier complexity recognition reduces unexpected escalation and supports proactive case positioning.</td>
+          <td><strong style="color:var(--gold)">$20,000–$80,000</strong></td>
+          <td class="center"><span class="incl-badge">✓ All Tiers</span></td>
+        </tr>
+        <tr>
+          <td><span class="tool-name">C.A.R.E. Access Friction Score</span><span class="tool-tag">CAF</span></td>
+          <td>Identifies barriers that interfere with treatment access and continuity.</td>
+          <td>Unresolved access friction stalls recovery timelines and weakens case documentation — detecting it early protects both the client and the file.</td>
+          <td><strong style="color:var(--gold)">$15,000–$60,000</strong></td>
+          <td class="center"><span class="incl-badge">✓ All Tiers</span></td>
+        </tr>
+        <tr>
+          <td><span class="tool-name">Holistic Stability Index</span><span class="tool-tag">HSI</span></td>
+          <td>Evaluates overall case stability across major life and recovery domains.</td>
+          <td>Stability gaps outside the clinical record are a leading source of case disruption — this tool surfaces what standard assessments miss.</td>
+          <td><strong style="color:var(--gold)">$25,000–$100,000</strong></td>
+          <td class="center"><span class="incl-badge">✓ All Tiers</span></td>
+        </tr>
+        <tr>
+          <td><span class="tool-name">Functional Capacity Index</span><span class="tool-tag">FCI</span></td>
+          <td>Evaluates functional trajectory and sustainable capacity progression.</td>
+          <td>Documenting functional capacity at key milestones creates a defensible longitudinal record that supports case value at resolution.</td>
+          <td><strong style="color:var(--gold)">$20,000–$80,000</strong></td>
+          <td class="center"><span class="incl-badge">✓ All Tiers</span></td>
+        </tr>
+        <tr>
+          <td><span class="tool-name">Recovery Risk Forecaster</span><span class="tool-tag">RRF</span></td>
+          <td>Identifies patterns that may signal elevated recovery disruption or instability.</td>
+          <td>Early risk identification allows care management to intervene before disruption affects the clinical record or case trajectory.</td>
+          <td><strong style="color:var(--gold)">$40,000–$150,000</strong></td>
+          <td class="center"><span class="incl-badge">✓ All Tiers</span></td>
+        </tr>
+        <tr class="row-csa">
+          <td><span class="tool-name">Clinical Sequencing Auditor</span><span class="tool-tag">CSA</span></td>
+          <td>Evaluates whether treatment progression follows a coherent and defensible sequence.</td>
+          <td>Sequencing gaps are among the most commonly challenged elements in injury litigation. The CSA audits the integrity of the care pathway across the entire case.</td>
+          <td><strong style="color:var(--gold)">$50,000–$150,000</strong></td>
+          <td class="center"><span class="incl-badge">✓ All Tiers</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="system-value-bar">
+    <div class="system-value-label">System-Level Integrated Value</div>
+    <div class="system-value-num">$200,000–$780,000 <span>+ Potential Case Impact</span></div>
+  </div>
+</section>
+<hr class="section-divider">
+
+<!-- CASE DEFINITIONS -->
+<section class="section reveal" id="cases">
+  <div class="section-label">How Cases Are Counted</div>
+  <h2 class="section-title">Active, Closed &amp; Dormant — Defined</h2>
+  <p class="section-desc">Your tier's case capacity refers specifically to <strong>active cases</strong>. Understanding the distinction between case states is essential for selecting the right tier.</p>
+  <div class="case-defs">
+    <div class="case-def active">
+      <span class="case-def-badge">Active</span>
+      <h3>Active Case</h3>
+      <p>An active case occupies one slot in your tier's concurrent capacity. All six tools are available and unlimited reports can be generated at any point.</p>
+      <ul><li>Counts toward your tier's capacity limit</li><li>All tools accessible with no report limits</li><li>Can be reassessed at any treatment milestone</li><li>Moves to Closed or Dormant when appropriate</li></ul>
+      <div class="case-pricing-note">Pricing is based on active case slots — not on report volume.</div>
+    </div>
+    <div class="case-def closed">
+      <span class="case-def-badge">Closed</span>
+      <h3>Closed Case</h3>
+      <p>A closed case has reached its end state — settlement, resolution, or formal discharge. Closed cases release their slot back to your active capacity.</p>
+      <ul><li>No longer occupies a capacity slot</li><li>Prior assessments and reports remain accessible</li><li>Cannot receive new assessments once closed</li><li>Can be reopened if case status changes</li></ul>
+      <div class="case-pricing-note" style="color:var(--green)">Closing a case frees your slot for a new active case.</div>
+    </div>
+    <div class="case-def dormant">
+      <span class="case-def-badge">Dormant</span>
+      <h3>Dormant Case</h3>
+      <p>A dormant case is temporarily paused — treatment on hold, client non-responsive, or file pending an external event.</p>
+      <ul><li>Still occupies a capacity slot while dormant</li><li>Can be reactivated without data loss</li><li>No new assessments during dormancy</li><li>Intended for temporary holds, not closure</li></ul>
+      <div class="case-pricing-note" style="color:var(--text-dim)">Dormant cases count against your active limit until formally closed.</div>
+    </div>
+  </div>
+</section>
+<hr class="section-divider">
+
+<!-- 4 — PURCHASE CTAs -->
+<section class="section reveal" id="purchase">
+  <div class="section-label">Complete Your Purchase</div>
+  <h2 class="section-title">Ready to Proceed</h2>
+  <p class="section-desc">Select your tier below. Pricing is as shown — no hidden fees, no per-report charges, no feature upgrades required.</p>
+
+  <div id="purchase-t1" class="purchase-block">
+    <div>
+      <div class="pb-eyebrow" style="color:var(--tier1)">Tier 1 — Foundation</div>
+      <div class="pb-title">Foundation · 1 Active Case · 1 User</div>
+      <div class="pb-desc">One-time purchase. All six tools included. Unlimited reports per active case. Close and open new cases freely. No recurring fees.</div>
+    </div>
+    <div>
+      <div class="pb-price">$6,995</div>
+      <div class="pb-price-sub">One-time purchase</div>
+      <div class="pb-buttons">
+        <a href="#" class="tier-cta tertiary" style="min-width:210px">Select Foundation</a>
+        <a href="#" class="tier-cta secondary" style="min-width:210px">+ Add Onboarding ($4,800)</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="purchase-t2" class="purchase-block featured">
+    <div>
+      <div class="pb-eyebrow" style="color:var(--gold)">Tier 2 — Professional · Most Selected</div>
+      <div class="pb-title">Professional · 20 Active Cases · 1 User</div>
+      <div class="pb-desc">Monthly subscription. All six tools. Unlimited reports across all 20 active cases simultaneously. Designed for consistent oversight across an active caseload.</div>
+    </div>
+    <div>
+      <div class="pb-price gold">$9,995<span style="font-size:15px;color:var(--text-muted)">/mo</span></div>
+      <div class="pb-price-sub">Monthly subscription</div>
+      <div class="pb-buttons">
+        <a href="#" class="tier-cta primary" style="min-width:210px">Select Professional</a>
+        <a href="#" class="tier-cta secondary" style="min-width:210px">+ Add Onboarding ($4,800)</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="purchase-t3" class="purchase-block">
+    <div>
+      <div class="pb-eyebrow" style="color:var(--tier3)">Tier 3 — Enterprise</div>
+      <div class="pb-title">Enterprise · 250 Active Cases · Up to 3 Users</div>
+      <div class="pb-desc">Monthly subscription. All six tools. 250 concurrent active cases. Up to 3 named users; additional users at $1,250/user/month.</div>
+    </div>
+    <div>
+      <div class="pb-price">$11,995<span style="font-size:15px;color:var(--text-muted)">/mo</span></div>
+      <div class="pb-price-sub">+ $1,250/additional user/month</div>
+      <div class="pb-buttons">
+        <a href="#" class="tier-cta tertiary" style="min-width:210px">Select Enterprise</a>
+        <a href="#" class="tier-cta secondary" style="min-width:210px">+ Add Onboarding ($4,800)</a>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:var(--panel-alt);border:1px solid var(--divider);border-radius:8px;padding:18px 22px;font-size:13px;color:var(--text-muted);line-height:1.7;margin-top:4px;">
+    <strong style="color:var(--navy);display:block;margin-bottom:5px;">Questions Before Purchasing?</strong>
+    Contact RCMS at <a href="mailto:traci.johnson@rcmspllc.com" style="color:var(--gold);text-decoration:none">traci.johnson@rcmspllc.com</a> to discuss which tier fits your caseload, confirm case counting rules, or explore multi-seat Enterprise pricing. All purchases are governed by the RCMS Master Services Agreement.
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<div class="final-cta reveal">
+  <h2>Your trial is over.<br><em style="font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--gold-light)">Continued access starts now.</em></h2>
+  <p>Select a plan above to restore full access to the C.A.S.E. Clarity System. No setup required. Access is immediate upon purchase.</p>
+  <div class="cta-buttons">
+    <a href="#tiers" class="cta-btn gold">View Tier Pricing</a>
+    <a href="#purchase" class="cta-btn outline">Go to Purchase</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div>© 2025 Reconcile Care Management Services · RCMS · All Rights Reserved</div>
+  <div style="display:flex;gap:20px"><a href="#">Master Services Agreement</a><a href="#">Privacy Policy</a><a href="#">Contact RCMS</a></div>
+  <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.06em">C.A.S.E. Clarity™ · C.A.R.E. Methodology™</div>
+</div>
+
+<script>
+  document.body.classList.add('js-animate');
+  const reveals = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.07 });
+  reveals.forEach(r => obs.observe(r));
+
+  const SUPABASE_URL = 'https://zmjxyspizdqhrtdcgkwk.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptanh5c3BpemRxaHJ0ZGNna3drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MjQ1NDcsImV4cCI6MjA4NTE4NDU0N30.szuVr87xdq1aqYpaM6p390f48ozj4CENU4ksg8vumhM';
+
+  async function startCheckout(tier, addOnboarding) {
+    const params = new URLSearchParams(window.location.search);
+    const userId = params.get('uid') || localStorage.getItem('user_id');
+    if (!userId) {
+      alert('Unable to identify your account. Please contact RCMS at traci.johnson@rcmspllc.com to complete your purchase.');
+      return;
+    }
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/functions/v1/create-case-clarity-checkout-session`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: 'Bearer ' + SUPABASE_ANON_KEY,
+          },
+          body: JSON.stringify({
+            tier,
+            addOnboarding,
+            user_id: userId,
+          }),
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Checkout failed');
+      }
+      window.location.href = data.url;
+    } catch (err) {
+      console.error(err);
+      alert('Unable to start checkout. Please try again.');
+    }
+  }
+
+  function wirePurchaseLink(anchor, tier, addOnboarding) {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      startCheckout(tier, addOnboarding);
+    });
+  }
+
+  wirePurchaseLink(document.querySelector('#purchase-t1 a.tier-cta.tertiary'), 'foundation', false);
+  wirePurchaseLink(document.querySelector('#purchase-t1 a.tier-cta.secondary'), 'foundation', true);
+  wirePurchaseLink(document.querySelector('#purchase-t2 a.tier-cta.primary'), 'professional', false);
+  wirePurchaseLink(document.querySelector('#purchase-t2 a.tier-cta.secondary'), 'professional', true);
+  wirePurchaseLink(document.querySelector('#purchase-t3 a.tier-cta.tertiary'), 'enterprise', false);
+  wirePurchaseLink(document.querySelector('#purchase-t3 a.tier-cta.secondary'), 'enterprise', true);
+</script>
+</body>
+</html>
