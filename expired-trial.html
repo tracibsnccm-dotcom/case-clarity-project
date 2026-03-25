@@ -872,10 +872,12 @@
   async function startCheckout(tier, addOnboarding) {
     const params = new URLSearchParams(window.location.search);
     const userId = params.get('uid') || localStorage.getItem('user_id');
+
     if (!userId) {
       alert('Unable to identify your account. Please contact RCMS at traci.johnson@rcmspllc.com to complete your purchase.');
       return;
     }
+
     try {
       const res = await fetch(
         `${SUPABASE_URL}/functions/v1/create-case-clarity-checkout-session`,
@@ -893,10 +895,13 @@
           }),
         }
       );
+
       const data = await res.json();
+
       if (!res.ok) {
         throw new Error(data.error || 'Checkout failed');
       }
+
       window.location.href = data.url;
     } catch (err) {
       console.error(err);
@@ -905,6 +910,7 @@
   }
 
   function wirePurchaseLink(anchor, tier, addOnboarding) {
+    if (!anchor) return;
     anchor.addEventListener('click', function (e) {
       e.preventDefault();
       startCheckout(tier, addOnboarding);
