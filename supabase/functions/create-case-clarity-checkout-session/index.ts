@@ -4,7 +4,7 @@
  * Secrets (Supabase Dashboard → Edge Functions → Secrets, or `supabase secrets set`):
  *   STRIPE_SECRET_KEY       — Stripe secret key (test/live matching your Price IDs)
  *   CASE_CLARITY_SITE_URL   — Origin only, no trailing slash: the live site that hosts
- *                             pricing.html, expired-trial.html, and case-clarity-portal.html
+ *                             pricing.html, clarity-post-trial-pricing.html, and case-clarity-portal.html
  *                             (e.g. your Vercel deployment URL). Used for Stripe success/cancel redirects.
  */
 import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
