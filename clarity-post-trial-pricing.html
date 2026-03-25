@@ -62,76 +62,206 @@
     font-size: 10px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: #ffffff;
-    background: rgba(180,40,40,0.5);
-    border: 1px solid rgba(220,80,80,0.6);
+    color: rgba(255,255,255,0.35);
+    border: 1px solid rgba(255,255,255,0.12);
     border-radius: 3px;
     padding: 4px 12px;
   }
 
-  /* ── STATUS HEADER ── */
-  .status-header {
-    background: var(--panel-bg);
-    border-bottom: 1px solid var(--divider);
-    padding: 0 0 28px 0;
+  /* ── EXPIRATION NOTICE ── */
+  .expiry-banner {
+    background: linear-gradient(155deg, #2b3760 0%, #394878 100%);
+    padding: 64px 48px 56px;
+    text-align: center;
   }
-  .status-header-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  .status-header-bar {
-    background: var(--navy);
-    border-bottom: 3px solid var(--gold);
-    padding: 24px 48px 20px;
-    margin-bottom: 24px;
-  }
-  .status-system-line {
+  .expiry-banner-inner { max-width: 680px; margin: 0 auto; }
+
+  .expiry-eyebrow {
     font-family: 'DM Mono', monospace;
     font-size: 10px;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: var(--gold-light);
-    margin-bottom: 8px;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
   }
-  .status-header h1 {
+  .expiry-eyebrow::before, .expiry-eyebrow::after {
+    content: ''; width: 28px; height: 1px; background: rgba(255,255,255,0.15);
+  }
+
+  .expiry-icon {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px;
+  }
+
+  .expiry-banner h1 {
     font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(24px, 3vw, 34px);
-    font-weight: 400;
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 300;
     color: #ffffff;
-    line-height: 1.2;
-    margin-bottom: 0;
+    line-height: 1.15;
+    margin-bottom: 16px;
   }
-  .status-row {
-    display: none;
+
+  .expiry-sub {
+    font-size: 15px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.7;
+    margin-bottom: 28px;
   }
-  .status-message {
-    font-size: 14px;
-    color: var(--text-muted);
-    line-height: 1.65;
-    max-width: 720px;
-    margin: 0 48px 16px;
+
+  .expiry-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(180,40,40,0.18);
+    border: 1px solid rgba(220,80,80,0.3);
+    border-radius: 4px;
+    padding: 8px 18px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #e07070;
   }
-  .status-notice-block {
-    background: var(--panel-alt);
+  .expiry-status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #e07070;
+  }
+
+  /* ── EXPIRY BODY ── */
+  .expiry-body {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 52px 48px 0;
+  }
+
+  .expiry-notice-block {
+    background: var(--panel-bg);
     border: 1px solid var(--divider);
     border-left: 3px solid var(--gold);
-    border-radius: 6px;
-    padding: 14px 20px;
-    margin: 0 48px;
-    max-width: 720px;
+    border-radius: 8px;
+    padding: 28px 32px;
+    margin-bottom: 0;
   }
-  .status-notice-block p {
+  .expiry-notice-block p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.75;
+    max-width: 700px;
+  }
+  .expiry-notice-block p + p { margin-top: 12px; }
+  .expiry-notice-block strong { color: var(--navy); font-weight: 600; }
+
+  /* ── VALUE REMINDER ── */
+  .value-reminder {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 52px 48px 0;
+  }
+  .value-reminder-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .value-reminder-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(22px, 2.8vw, 32px);
+    font-weight: 400;
+    color: var(--navy);
+    margin-bottom: 24px;
+    line-height: 1.2;
+  }
+  .value-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .value-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--divider);
+    border-radius: 8px;
+    padding: 22px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .value-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--gold), transparent);
+  }
+  .value-card-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
+    font-style: italic;
+  }
+  .value-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+  .value-card-body {
     font-size: 13px;
     color: var(--text-muted);
     line-height: 1.6;
   }
-  .status-notice-block p + p { margin-top: 6px; }
-  .status-notice-block strong { color: var(--navy); font-weight: 600; }
 
-  /* ── EXPIRY BODY (legacy — hidden) ── */
-  .expiry-body { display: none; }
-  .expiry-banner { display: none; }
-  .expiry-notice-block { display: none; }
+  /* ── TRANSITION BAND ── */
+  .transition-band {
+    margin-top: 52px;
+    background: linear-gradient(135deg, #2b3760 0%, #1e2a4a 100%);
+    padding: 48px 48px;
+    text-align: center;
+  }
+  .transition-band-inner { max-width: 700px; margin: 0 auto; }
+  .transition-band-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(201,168,76,0.7);
+    margin-bottom: 12px;
+  }
+  .transition-band h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(26px, 3.5vw, 40px);
+    font-weight: 300;
+    color: #ffffff;
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+  .transition-band h2 em { font-style: italic; color: var(--gold-light); }
+  .transition-band p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.7;
+    max-width: 540px;
+    margin: 0 auto 24px;
+  }
+  .transition-arrow {
+    color: rgba(154,126,30,0.5);
+    font-size: 22px;
+    margin-top: 4px;
+  }
 
   /* ══════════════════════════════
      PRICING / PAYMENT SECTION
@@ -293,9 +423,9 @@
     border-bottom: 2px solid var(--gold-border) !important;
     position: relative;
   }
-  .pt-head-1 { background: var(--panel-alt); }
+  .pt-head-1 { background: linear-gradient(135deg, rgba(46,95,138,0.06), var(--panel-alt)); }
   .pt-head-2 { background: linear-gradient(135deg, rgba(154,126,30,0.08), var(--panel-alt)); }
-  .pt-head-3 { background: var(--panel-alt); }
+  .pt-head-3 { background: linear-gradient(135deg, rgba(90,62,138,0.06), var(--panel-alt)); }
   .pt-desc {
     font-size: 13px; color: var(--text-muted); line-height: 1.55;
     align-items: flex-start; padding-top: 16px; padding-bottom: 16px;
@@ -317,12 +447,6 @@
   .pt-head-2.pt-featured-col { background: linear-gradient(135deg, rgba(154,126,30,0.10), rgba(154,126,30,0.04)); }
   .pt-cta-cell { padding: 18px 18px; align-items: stretch; border-bottom: none !important; }
   .pt-cta-cell .tier-cta { width: 100%; }
-  .tag-unlimited { display: inline-block; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.04em; background: var(--green-dim); color: var(--green); border-radius: 3px; padding: 2px 8px; }
-  .tag-add { display: inline-block; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.04em; background: var(--gold-dim); color: var(--gold); border-radius: 3px; padding: 2px 8px; }
-  .tier-cta.tertiary  { background: transparent; color: var(--navy); border: 1px solid var(--divider); }
-  .tier-cta.tertiary:hover { border-color: var(--gold-border); color: var(--gold); }
-  .tier-cta.secondary { background: transparent; color: var(--gold); border: 1px solid var(--gold-border); }
-  .tier-cta.secondary:hover { background: var(--gold-dim); }
 
   /* ── FINAL CTA ── */
   .final-cta { background: linear-gradient(155deg,var(--navy) 0%,var(--navy-mid) 100%); padding: 64px 48px; text-align: center; }
@@ -356,18 +480,80 @@
   </div>
 </div>
 
-<!-- ══ STATUS HEADER ══ -->
-<div class="status-header reveal">
-  <div class="status-header-inner">
-    <div class="status-header-bar">
-      <div class="status-system-line">Reconcile Care Management Services</div>
-      <h1>Your 7-Day Trial Has Ended</h1>
+<!-- ══ EXPIRATION NOTICE ══ -->
+<div class="expiry-banner reveal">
+  <div class="expiry-banner-inner">
+    <div class="expiry-eyebrow">C.A.S.E. Clarity System</div>
+    <div class="expiry-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
     </div>
-    <p class="status-message">Your <strong>C.A.S.E. Clarity System</strong> trial access has expired. Access is currently paused.</p>
-    <div class="status-notice-block">
-      <p>Your trial provided full access to the C.A.S.E. Clarity System. That period has now concluded. <strong>No data is lost</strong> — cases you worked on remain available upon activation.</p>
-      <p>Questions? Contact RCMS at <a href="/cdn-cgi/l/email-protection#c7b3b5a6a4aee9ada8afa9b4a8a987b5a4aab4b7ababa4e9a4a8aa" style="color:var(--gold);text-decoration:none"><span class="__cf_email__" data-cfemail="b4c0c6d5d7dd9adedbdcdac7dbdaf4c6d7d9c7c4d8d8d79ad7dbd9">[email&#160;protected]</span></a>.</p>
+    <h1>Your 7-Day Trial Has Ended</h1>
+    <p class="expiry-sub">Your trial access to the C.A.S.E. Clarity System has expired. Access is currently paused.</p>
+    <div class="expiry-status-pill">
+      <span class="expiry-status-dot"></span>
+      Access Paused — Trial Period Ended
     </div>
+  </div>
+</div>
+
+<!-- ══ EXPIRY BODY ══ -->
+<div class="expiry-body reveal">
+  <div class="expiry-notice-block">
+    <p>Your 7-day trial provided full access to the C.A.S.E. Clarity System and its complete suite of clinical assessment tools. That access period has now concluded.</p>
+    <p>You can <strong>restore full access immediately</strong> by selecting a plan below. No data is lost. Cases you worked on during the trial remain available upon activation. There is no gap in case continuity when you select a plan today.</p>
+    <p>If you have questions before selecting a plan, contact RCMS directly at <a href="mailto:traci.johnson@rcmspllc.com" style="color:var(--gold);text-decoration:none">traci.johnson@rcmspllc.com</a>.</p>
+  </div>
+</div>
+
+<!-- ══ VALUE REMINDER ══ -->
+<div class="value-reminder reveal">
+  <div class="value-reminder-label">During Your Trial</div>
+  <h2 class="value-reminder-title">What the System Made Possible</h2>
+  <div class="value-cards">
+    <div class="value-card">
+      <div class="value-card-num">Case Structure</div>
+      <div class="value-card-title">Evaluate Case Complexity</div>
+      <div class="value-card-body">You were able to assess the structural complexity of active cases — identifying where coordination demands and risk exposure were concentrated.</div>
+    </div>
+    <div class="value-card">
+      <div class="value-card-num">Stability & Risk</div>
+      <div class="value-card-title">Identify Instability Patterns</div>
+      <div class="value-card-body">The system surfaced stability gaps, access barriers, and recovery risk patterns that standard clinical records may not capture on their own.</div>
+    </div>
+    <div class="value-card">
+      <div class="value-card-num">Clinical Sequencing</div>
+      <div class="value-card-title">Audit Treatment Progression</div>
+      <div class="value-card-body">You were able to evaluate whether care pathways followed a coherent and defensible sequence — documentation that supports case positioning.</div>
+    </div>
+    <div class="value-card">
+      <div class="value-card-num">Case Oversight</div>
+      <div class="value-card-title">Support Case Strategy</div>
+      <div class="value-card-body">Across six integrated tools, the system provided a structured clinical record tied to a proprietary methodology — built for the legal-medical environment.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TRANSITION BAND ══ -->
+<div class="transition-band reveal">
+  <div class="transition-band-inner">
+    <div class="transition-band-label">Continue Your Access</div>
+    <h2>Select Your Access Plan</h2>
+    <p>All six tools are included at every tier. Pricing is based on concurrent active cases — not on reports generated. Select the plan that fits your caseload and restore access immediately.</p>
+    <div class="transition-arrow">↓</div>
+  </div>
+</div>
+
+<!-- ══ JUMP BAR ══ -->
+<div class="jump-bar">
+  <div class="jump-bar-inner">
+    <a class="jump-link" href="#tiers">Tier Pricing</a>
+    <a class="jump-link" href="#onboarding">Onboarding</a>
+    <a class="jump-link" href="#tools">Tool Suite</a>
+    <a class="jump-link" href="#cases">Case Definitions</a>
+    <a class="jump-link" href="#purchase">Select &amp; Purchase</a>
   </div>
 </div>
 
@@ -651,7 +837,7 @@
 
   <div style="background:var(--panel-alt);border:1px solid var(--divider);border-radius:8px;padding:18px 22px;font-size:13px;color:var(--text-muted);line-height:1.7;margin-top:4px;">
     <strong style="color:var(--navy);display:block;margin-bottom:5px;">Questions Before Purchasing?</strong>
-    Contact RCMS at <a href="/cdn-cgi/l/email-protection#cdb9bfacaea4e3a7a2a5a3bea2a38dbfaea0bebda1a1aee3aea2a0" style="color:var(--gold);text-decoration:none"><span class="__cf_email__" data-cfemail="f5818794969cdb9f9a9d9b869a9bb58796988685999996db969a98">[email&#160;protected]</span></a> to discuss which tier fits your caseload, confirm case counting rules, or explore multi-seat Enterprise pricing. All purchases are governed by the RCMS Master Services Agreement.
+    Contact RCMS at <a href="mailto:traci.johnson@rcmspllc.com" style="color:var(--gold);text-decoration:none">traci.johnson@rcmspllc.com</a> to discuss which tier fits your caseload, confirm case counting rules, or explore multi-seat Enterprise pricing. All purchases are governed by the RCMS Master Services Agreement.
   </div>
 </section>
 
@@ -672,7 +858,7 @@
   <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.06em">C.A.S.E. Clarity™ · C.A.R.E. Methodology™</div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
   document.body.classList.add('js-animate');
   const reveals = document.querySelectorAll('.reveal');
   const obs = new IntersectionObserver((entries) => {
