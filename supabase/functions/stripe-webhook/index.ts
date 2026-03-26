@@ -9,7 +9,7 @@
  * Secrets: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET (or your project’s webhook secret name),
  *         SUPABASE_SERVICE_ROLE_KEY (service role for trial_users updates)
  */
-import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
+import Stripe from "https://esm.sh/stripe@14.25.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.8";
 
 const CASE_TIERS = new Set(["foundation", "professional", "enterprise"]);
