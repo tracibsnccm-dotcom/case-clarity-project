@@ -107,7 +107,7 @@ Deno.serve(async (req) => {
 
   const successUrl =
     tier === "foundation"
-      ? `https://clarity-post-trial-pricing.vercel.app/thank-you-report.html?uid=${encodeURIComponent(userId)}`
+      ? `https://clarity-post-trial-pricing.vercel.app/thank-you-single-report.html?uid=${encodeURIComponent(userId)}`
       : `https://clarity-post-trial-pricing.vercel.app/thank-you-subscription.html?uid=${encodeURIComponent(userId)}`;
   const cancelUrl = `${siteBase}/pricing.html?purchase=cancelled`;
 
