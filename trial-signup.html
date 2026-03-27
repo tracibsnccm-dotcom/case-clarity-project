@@ -215,6 +215,40 @@
                     showError('Please enter a valid email address');
                     return;
                 }
+
+                const BLOCKED = [
+                    "gmail.com",
+                    "yahoo.com",
+                    "hotmail.com",
+                    "outlook.com",
+                    "icloud.com",
+                    "aol.com",
+                    "proton.me",
+                    "protonmail.com",
+                    "mail.com",
+                    "gmx.com",
+                    "msn.com",
+                    "live.com",
+                    "me.com",
+                    "att.net",
+                    "comcast.net",
+                    "verizon.net",
+                    "sbcglobal.net",
+                    "ymail.com"
+                ];
+
+                function isPersonalEmail(e) {
+                    return BLOCKED.includes(
+                        (e.trim().toLowerCase().split("@")[1] || "")
+                    );
+                }
+
+                if (isPersonalEmail(email)) {
+                    showError(
+                        "Access is available only to verified professional or firm email addresses. Please enter your law firm or company email to continue."
+                    );
+                    return;
+                }
                 
                 // Disable button
                 submitBtn.disabled = true;
