@@ -1,15 +1,7 @@
-/**
- * create-case-clarity-checkout-session
- *
- * Secrets (Supabase Dashboard → Edge Functions → Secrets, or `supabase secrets set`):
- *   STRIPE_SECRET_KEY       — Stripe secret key (test/live matching your Price IDs)
- *   CASE_CLARITY_SITE_URL   — Origin only, no trailing slash: the live site that hosts
- *                             pricing.html, clarity-post-trial-pricing.html, and case-clarity-portal.html
- *                             (e.g. your Vercel deployment URL). Used for Stripe success/cancel redirects.
- */
+import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
 
-// Stripe Price IDs (C.A.S.E. Clarity). SUPPORT is not used in this flow.
+// Stripe Price IDs
 const FOUNDATION_PRICE_ID = "price_1TEYqhGINAhAkAYrDyydtLe0";
 const PROFESSIONAL_PRICE_ID = "price_1TEYs0GINAhAkAYrX7yHGeXI";
 const ENTERPRISE_PRICE_ID = "price_1TEYt8GINAhAkAYr2TvFElmU";
@@ -37,7 +29,7 @@ function jsonResponse(body: unknown, status = 200): Response {
   });
 }
 
-Deno.serve(async (req) => {
+serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -46,16 +38,11 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: "Method not allowed" }, 405);
   }
 
-  const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY");
+  const stripeSecretKey = "sk_test_51RESxrGINAhAkAYrp6eMxwZb3NBkQuq2JURDYlfEnU0pZVcQF5hyBpPW3URFaEy1U2w79haV1UTBLfxG0Zg0fLO100X4PWs8F5";
   const siteUrlRaw = Deno.env.get("CASE_CLARITY_SITE_URL");
 
-  if (!stripeSecretKey) {
-    console.error("create-case-clarity-checkout-session: STRIPE_SECRET_KEY is not set");
-    return jsonResponse({ error: "Server configuration error" }, 500);
-  }
-
   if (!siteUrlRaw?.trim()) {
-    console.error("create-case-clarity-checkout-session: CASE_CLARITY_SITE_URL is not set");
+    console.error("CASE_CLARITY_SITE_URL is not set");
     return jsonResponse({ error: "Server configuration error" }, 500);
   }
 
@@ -102,7 +89,6 @@ Deno.serve(async (req) => {
 
   const stripe = new Stripe(stripeSecretKey, {
     apiVersion: "2023-10-16",
-    httpClient: Stripe.createFetchHttpClient(),
   });
 
   const successUrl =
@@ -112,11 +98,28 @@ Deno.serve(async (req) => {
   const cancelUrl = `${siteBase}/pricing.html?purchase=cancelled`;
 
   try {
+    // First, check if customer exists, if not create one
+    let customerId = userId;
+
+    try {
+      // Try to retrieve the customer
+      await stripe.customers.retrieve(customerId);
+      console.log(`Customer ${customerId} exists`);
+    } catch (err) {
+      // Customer doesn't exist, create it
+      console.log(`Creating customer ${customerId}`);
+      await stripe.customers.create({
+        id: customerId,
+        metadata: { user_id: userId },
+      });
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode,
       line_items: lineItems,
       success_url: successUrl,
       cancel_url: cancelUrl,
+      customer: customerId, // Use the user's UUID as Stripe customer ID
       metadata: {
         product_family: "case_clarity",
         tier,
