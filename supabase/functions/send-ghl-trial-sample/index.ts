@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 
 const GHL_WEBHOOK_URL =
-  "https://services.leadconnectorhq.com/hooks/ITbDyXjk2WeWIs8L8mmP/webhook-trigger/5fedcd2f-2256-4bd0-848c-0176ce6946dc";
+  "https://services.leadconnectorhq.com/hooks/ITbDyXjk2WeWIs8L8mmP/webhook-trigger/1dc872ce-450c-40a2-890e-f18e3f743e42";
 
 const corsHeaders: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
