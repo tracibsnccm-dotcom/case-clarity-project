@@ -82,6 +82,25 @@
             border-color: #b8922a;
             color: #fff;
         }
+        .btn-purchase {
+            background: rgba(184, 146, 42, 0.14);
+            color: #e8e2d4;
+            border: 1px solid #b8922a;
+            padding: 8px 14px;
+            font-size: 10px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-purchase:hover {
+            background: rgba(184, 146, 42, 0.24);
+            color: #fff;
+            border-color: #d5b15b;
+        }
         
         .container {
             max-width: 1200px;
@@ -696,6 +715,7 @@
         </div>
         <div class="app-header-actions">
             <span class="app-header-right" id="assessment-id-display"></span>
+            <a href="clarity-post-trial-pricing.html" class="btn-purchase">Purchase Access</a>
             <button type="button" class="btn-logout">Logout</button>
         </div>
     </header>
