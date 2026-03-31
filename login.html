@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>C.A.S.E. Clarity — Attorney sign in</title>
+    <title>C.A.S.E. Clarity Assessments Login</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-client.js"></script>
     <script src="js/auth-guard.js"></script>
@@ -67,9 +67,6 @@
         .field-input:focus {
             border-color: #b8922a;
         }
-        .field-group {
-            margin-bottom: 18px;
-        }
         .btn-primary {
             width: 100%;
             background: #0c1c34;
@@ -81,7 +78,7 @@
             text-transform: uppercase;
             cursor: pointer;
             font-family: 'Georgia', 'Times New Roman', serif;
-            margin-top: 8px;
+            margin-top: 20px;
         }
         .btn-primary:hover {
             background: #1a2c44;
@@ -92,104 +89,134 @@
         }
         .error-message {
             color: #c0392b;
-            font-size: 13px;
-            margin-top: 16px;
-            padding: 10px 12px;
+            font-size: 12px;
+            margin-top: 10px;
+            padding: 10px;
             background: #fdf1f0;
             border: 1px solid #f5c6cb;
             display: none;
-            line-height: 1.5;
         }
-        .error-message.visible {
-            display: block;
+        .info {
+            font-size: 11px;
+            color: #9aabb8;
+            margin-top: 20px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
     <div class="login-card">
         <div class="brand">Reconcile Care Management Services</div>
-        <h1>Attorney sign in</h1>
-        <p class="subtitle">Sign in with the email and password for your paid portal account.</p>
+        <h1>C.A.S.E. Clarity Assessments Login</h1>
+        <p class="subtitle">Enter your CCP# and PIN to access the Forensic Intelligence System.</p>
 
         <form id="login-form" novalidate>
-            <div class="field-group">
-                <label class="field-label" for="email">Email</label>
-                <input type="email" id="email" class="field-input" name="email" autocomplete="email" required>
-            </div>
-            <div class="field-group">
-                <label class="field-label" for="password">Password</label>
-                <input type="password" id="password" class="field-input" name="password" autocomplete="current-password" required>
-            </div>
-            <button type="submit" class="btn-primary" id="btn-submit">Sign in</button>
+            <div class="field-label">CCP#</div>
+            <input type="text" id="ccp" class="field-input" placeholder="CCP-123456" autocomplete="off">
+
+            <div class="field-label" style="margin-top: 16px;">PIN</div>
+            <input type="password" id="pin" class="field-input" placeholder="6-digit PIN" maxlength="6" autocomplete="off">
+
+            <button type="submit" class="btn-primary" id="btn-submit">ACCESS ASSESSMENT PORTAL</button>
         </form>
 
         <div id="error-message" class="error-message" role="alert"></div>
+        <div id="expired-message" class="error-message" style="display:none;background:#fff3cd;border-color:#ffc107;color:#856404;"></div>
+        <p class="info">Credentials were provided in your trial access email. <a href="trial-signup.html" style="color:#b09837;text-decoration:underline;">New user? Sign up here.</a></p>
     </div>
 
     <script>
         (function () {
-            function showError(msg) {
-                var el = document.getElementById('error-message');
-                if (!el) return;
-                el.textContent = msg || 'Sign in failed. Please try again.';
-                el.classList.add('visible');
+            function showError(message) {
+                var errorEl = document.getElementById('error-message');
+                errorEl.textContent = message;
+                errorEl.style.display = 'block';
+                document.getElementById('expired-message').style.display = 'none';
             }
 
-            function hideError() {
-                var el = document.getElementById('error-message');
-                if (!el) return;
-                el.textContent = '';
-                el.classList.remove('visible');
-            }
-
-            function friendlyAuthMessage(err) {
-                if (!err) return 'Sign in failed. Please try again.';
-                var m = String(err.message || err).toLowerCase();
-                if (m.indexOf('invalid login') !== -1 || m.indexOf('invalid credentials') !== -1) {
-                    return 'Invalid email or password.';
-                }
-                if (m.indexOf('email not confirmed') !== -1) {
-                    return 'Please confirm your email address before signing in.';
-                }
-                return err.message || 'Sign in failed. Please try again.';
+            function hideErrors() {
+                document.getElementById('error-message').style.display = 'none';
+                document.getElementById('expired-message').style.display = 'none';
             }
 
             document.addEventListener('DOMContentLoaded', async function () {
-                await redirectIfLoggedIn();
-                var sess = window.supabaseClient
-                    ? await window.supabaseClient.auth.getSession()
-                    : { data: { session: null } };
-                if (sess && sess.data && sess.data.session) return;
-
-                var form = document.getElementById('login-form');
-                var btn = document.getElementById('btn-submit');
-                if (!form || !window.supabaseClient) {
-                    if (!window.supabaseClient) showError('Application configuration error. Check Supabase settings in js/supabase-client.js.');
+                if (typeof redirectIfLoggedIn === 'function') {
+                    await redirectIfLoggedIn();
+                }
+                var client = window.supabaseClient;
+                if (!client) {
+                    showError('Application configuration error. Check js/supabase-client.js.');
                     return;
                 }
 
+                var form = document.getElementById('login-form');
+                var btn = document.getElementById('btn-submit');
                 form.addEventListener('submit', async function (e) {
                     e.preventDefault();
-                    hideError();
+                    hideErrors();
 
-                    var email = (document.getElementById('email') && document.getElementById('email').value || '').trim();
-                    var password = (document.getElementById('password') && document.getElementById('password').value) || '';
+                    var ccp = (document.getElementById('ccp').value || '').trim();
+                    var pin = (document.getElementById('pin').value || '').trim();
+                    var errorEl = document.getElementById('error-message');
+                    var expiredEl = document.getElementById('expired-message');
 
-                    if (!email || !password) {
-                        showError('Please enter your email and password.');
+                    if (!ccp || !pin) {
+                        showError('Please enter both CCP# and PIN');
+                        return;
+                    }
+                    if (!ccp.startsWith('CCP-')) {
+                        showError('CCP# must start with CCP-');
+                        return;
+                    }
+                    if (pin.length !== 6 || !/^\d+$/.test(pin)) {
+                        showError('PIN must be a 6-digit number');
                         return;
                     }
 
                     btn.disabled = true;
                     try {
-                        var res = await window.supabaseClient.auth.signInWithPassword({ email: email, password: password });
-                        if (res.error) {
-                            showError(friendlyAuthMessage(res.error));
+                        var res = await client
+                            .from('trial_users')
+                            .select('*')
+                            .eq('ccp', ccp)
+                            .eq('pin', pin)
+                            .single();
+
+                        if (res.error || !res.data) {
+                            showError('Invalid CCP# or PIN');
                             return;
                         }
-                        window.location.href = '/dashboard.html';
+
+                        var user = res.data;
+                        if (user.status !== 'trial_active') {
+                            showError('Your trial account is not active. Contact support.');
+                            return;
+                        }
+
+                        var trialStart = new Date(user.trial_start_at);
+                        var now = new Date();
+                        var daysElapsed = Math.floor((now - trialStart) / (1000 * 60 * 60 * 24));
+
+                        if (daysElapsed >= 7) {
+                            expiredEl.innerHTML =
+                                'Your trial has ended. Purchase to continue. ' +
+                                '<a href="pricing.html" style="color:#1a2e3f;font-weight:bold;text-decoration:underline;">View plans</a>';
+                            expiredEl.style.display = 'block';
+                            errorEl.style.display = 'none';
+                            return;
+                        }
+
+                        localStorage.setItem('ccp', ccp);
+                        localStorage.setItem('email', user.email || '');
+                        localStorage.setItem('trial_start_at', user.trial_start_at);
+                        localStorage.setItem('status', user.status);
+                        localStorage.setItem('user_logged_in', 'true');
+                        localStorage.setItem('user_id', user.id);
+
+                        window.location.href = 'dashboard.html';
                     } catch (err) {
-                        showError(friendlyAuthMessage(err));
+                        showError('Login failed. Please try again.');
+                        console.error(err);
                     } finally {
                         btn.disabled = false;
                     }

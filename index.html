@@ -18,7 +18,8 @@
       }
       var res = await window.supabaseClient.auth.getSession();
       var session = res.data && res.data.session;
-      if (session) {
+      var trialOk = localStorage.getItem('user_logged_in') === 'true' && localStorage.getItem('user_id');
+      if (session || trialOk) {
         window.location.replace('/dashboard.html');
       } else {
         window.location.replace('/login.html');

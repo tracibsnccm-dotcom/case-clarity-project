@@ -1,9 +1,13 @@
 /**
- * Minimal auth helpers for static HTML pages. Depends on window.supabaseClient.
+ * Auth helpers. Paid portal: Supabase Auth session. Trial: CCP#/PIN sets localStorage (see login.html).
  */
 (function () {
   function getClient() {
     return window.supabaseClient;
+  }
+
+  function hasTrialLocalSession() {
+    return localStorage.getItem('user_logged_in') === 'true' && !!localStorage.getItem('user_id');
   }
 
   async function requireAuth() {
@@ -14,11 +18,14 @@
     }
     var result = await client.auth.getSession();
     var session = result.data && result.data.session;
-    if (result.error || !session) {
-      window.location.href = '/login.html';
-      return null;
+    if (session) {
+      return session;
     }
-    return session;
+    if (hasTrialLocalSession()) {
+      return { trialLocalSession: true };
+    }
+    window.location.href = '/login.html';
+    return null;
   }
 
   async function redirectIfLoggedIn() {
@@ -26,7 +33,7 @@
     if (!client) return;
     var result = await client.auth.getSession();
     var session = result.data && result.data.session;
-    if (session) {
+    if (session || hasTrialLocalSession()) {
       window.location.href = '/dashboard.html';
     }
   }
@@ -40,6 +47,9 @@
         /* ignore */
       }
     }
+    try {
+      localStorage.clear();
+    } catch (e) { /* ignore */ }
     window.location.href = '/login.html';
   }
 
