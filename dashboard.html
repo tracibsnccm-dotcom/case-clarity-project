@@ -715,13 +715,13 @@
         </div>
         <div class="app-header-actions">
             <span class="app-header-right" id="assessment-id-display"></span>
-            <a href="https://case-clarity-trial-active-purchase-jczm1l6aw.vercel.app" class="btn-purchase">Purchase Access</a>
+            <a href="https://case-clarity-trial-active-purchase-jczm1l6aw.vercel.app" class="btn-purchase" id="purchase-access-link">Purchase Access</a>
             <button type="button" class="btn-logout">Logout</button>
         </div>
     </header>
 
     <div class="container" style="padding-top: 20px; padding-bottom: 0;">
-        <p style="font-size: 13px; color: #6a7a8a; margin: 0 0 8px;">You are signed in to the paid portal.</p>
+        <p style="font-size: 13px; color: #6a7a8a; margin: 0 0 8px;">You are signed in to the trial portal.</p>
     </div>
 
     <div class="container" id="dashboard-content">
@@ -742,6 +742,17 @@
         }
 
         attachLogoutHandler('.btn-logout');
+        (function wirePurchaseAccessLink() {
+            var link = document.getElementById('purchase-access-link');
+            if (!link) return;
+            var userId = localStorage.getItem('user_id');
+            if (!userId) return;
+            try {
+                var url = new URL(link.href, window.location.href);
+                url.searchParams.set('uid', userId);
+                link.href = url.toString();
+            } catch (e) { /* ignore */ }
+        })();
 
         // ===== REPORT STORAGE (No Database Required) =====
         try {
