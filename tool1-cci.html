@@ -596,10 +596,14 @@ input[type=text]::placeholder{color:#bbb}
 </div>
 <div id="cci-report-snapshot" class="complexity-report report-view results-display" aria-hidden="true" style="position:absolute;left:-9999px;top:0;width:920px;overflow:visible;pointer-events:none"></div>
 
+<script src="js/trial-tool-storage.js"></script>
 <script>
 
-// Read case type from portal launch URL (?caseType=active|closed)
-const caseType = new URLSearchParams(window.location.search).get('caseType') || 'active';
+// Read case type from portal launch URL (?caseType=active|retrospective|closed)
+const caseType = new URLSearchParams(window.location.search).get('caseType') || sessionStorage.getItem('tool_caseType') || 'active';
+if (new URLSearchParams(window.location.search).get('caseType')) {
+  try { sessionStorage.setItem('tool_caseType', String(new URLSearchParams(window.location.search).get('caseType'))); } catch (e) {}
+}
 
 // ── Accordion ─────────────────────────────────────────
 function toggleStep(id){
@@ -850,8 +854,9 @@ function calculate(){
     psAffected,
     assessmentData
   };
-  localStorage.setItem('tool1_data',JSON.stringify(toolData));
-  localStorage.setItem('tool1_complete','true');
+  const _ts = window.CaseClarityTrialStorage;
+  localStorage.setItem(_ts.key(1, caseType, 'data'), JSON.stringify(toolData));
+  localStorage.setItem(_ts.key(1, caseType, 'complete'), 'true');
 
   document.getElementById('assessment').style.display='none';
   document.getElementById('trial-complete').style.display='block';
@@ -868,8 +873,8 @@ function calculate(){
   if(snapEl){
     snapEl.innerHTML=buildCciReportSnapshotHtml(assessmentData,toolData,level,cmg);
     snapEl.className='complexity-report report-view results-display';
-    localStorage.setItem('tool1_report_html',snapEl.outerHTML);
-    console.log('CCI report HTML saved, length:', localStorage.getItem('tool1_report_html')?localStorage.getItem('tool1_report_html').length:0);
+    localStorage.setItem(_ts.key(1, caseType, 'report_html'), snapEl.outerHTML);
+    console.log('CCI report HTML saved, length:', localStorage.getItem(_ts.key(1, caseType, 'report_html')) ? localStorage.getItem(_ts.key(1, caseType, 'report_html')).length : 0);
   } else {
     console.warn('CCI: cci-report-snapshot host missing; report HTML not saved.');
   }

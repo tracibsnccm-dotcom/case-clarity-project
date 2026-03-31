@@ -372,7 +372,13 @@
 <div id="app"></div>
 <div id="fci-report-snapshot-host" style="position:absolute;left:-9999px;top:0;width:1px;height:1px;overflow:hidden" aria-hidden="true"></div>
 
+<script src="js/trial-tool-storage.js"></script>
 <script>
+// Trial dashboard passes ?caseType=active|retrospective
+const caseType = new URLSearchParams(window.location.search).get('caseType') || sessionStorage.getItem('tool_caseType') || 'active';
+if (new URLSearchParams(window.location.search).get('caseType')) {
+  try { sessionStorage.setItem('tool_caseType', String(new URLSearchParams(window.location.search).get('caseType'))); } catch (e) {}
+}
 // ─────────────────────────────────────────────────────────────────────────────
 // DATA
 // ─────────────────────────────────────────────────────────────────────────────
@@ -700,6 +706,7 @@ function saveTool5AndComplete(){
   const toolData={
     completed:true,
     timestamp:new Date().toISOString(),
+    caseType,
     scores:{...S.scores},
     vulnScores:{...S.vulnScores},
     fviFields:{...S.fviFields},
@@ -707,16 +714,17 @@ function saveTool5AndComplete(){
     primaryInstabilityDomains:weak,
     functionalVulnerabilityIndicator:fvi
   };
-  localStorage.setItem('tool5_data',JSON.stringify(toolData));
-  localStorage.setItem('tool5_complete','true');
+  const _ts = window.CaseClarityTrialStorage;
+  localStorage.setItem(_ts.key(5, caseType, 'data'), JSON.stringify(toolData));
+  localStorage.setItem(_ts.key(5, caseType, 'complete'), 'true');
   var snapshotHtml = buildFciDashboardSnapshot(minS, weak, fvi, toolData);
   var fciHost = document.getElementById('fci-report-snapshot-host');
   if (fciHost) {
     fciHost.innerHTML = snapshotHtml;
     fciHost.innerHTML = '';
   }
-  localStorage.setItem('tool5_report_html', snapshotHtml);
-  console.log('FCI report HTML saved, length:', localStorage.getItem('tool5_report_html') ? localStorage.getItem('tool5_report_html').length : 0);
+  localStorage.setItem(_ts.key(5, caseType, 'report_html'), snapshotHtml);
+  console.log('FCI report HTML saved, length:', localStorage.getItem(_ts.key(5, caseType, 'report_html')) ? localStorage.getItem(_ts.key(5, caseType, 'report_html')).length : 0);
 }
 
 function screenComplete(){

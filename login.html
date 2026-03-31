@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>C.A.S.E. Clarity Assessments Login</title>
-    <!-- Load Supabase first -->
+    <title>C.A.S.E. Clarity — Attorney sign in</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/auth-guard.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -66,6 +67,9 @@
         .field-input:focus {
             border-color: #b8922a;
         }
+        .field-group {
+            margin-bottom: 18px;
+        }
         .btn-primary {
             width: 100%;
             background: #0c1c34;
@@ -77,151 +81,120 @@
             text-transform: uppercase;
             cursor: pointer;
             font-family: 'Georgia', 'Times New Roman', serif;
-            margin-top: 20px;
+            margin-top: 8px;
         }
         .btn-primary:hover {
             background: #1a2c44;
         }
+        .btn-primary:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
         .error-message {
             color: #c0392b;
-            font-size: 12px;
-            margin-top: 10px;
-            padding: 10px;
+            font-size: 13px;
+            margin-top: 16px;
+            padding: 10px 12px;
             background: #fdf1f0;
             border: 1px solid #f5c6cb;
             display: none;
+            line-height: 1.5;
         }
-        .info {
-            font-size: 11px;
-            color: #9aabb8;
-            margin-top: 20px;
-            text-align: center;
+        .error-message.visible {
+            display: block;
         }
     </style>
 </head>
 <body>
-    <!-- DEPLOYMENT VERSION: 2.0 - FIXED SUPABASE SCRIPT -->
     <div class="login-card">
         <div class="brand">Reconcile Care Management Services</div>
-        <h1>C.A.S.E. Clarity Assessments Login</h1>
-        <p class="subtitle">Enter your CCP# and PIN to access the Forensic Intelligence System.</p>
-        
-        <form id="login-form" onsubmit="event.preventDefault(); window.handleLogin && window.handleLogin()">
-            <div class="field-label">CCP#</div>
-            <input type="text" id="ccp" class="field-input" placeholder="CCP-123456" autocomplete="off">
-            
-            <div class="field-label">PIN</div>
-            <input type="password" id="pin" class="field-input" placeholder="6-digit PIN" maxlength="6" autocomplete="off">
-            
-            <button type="submit" class="btn-primary">ACCESS ASSESSMENT PORTAL</button>
+        <h1>Attorney sign in</h1>
+        <p class="subtitle">Sign in with the email and password for your paid portal account.</p>
+
+        <form id="login-form" novalidate>
+            <div class="field-group">
+                <label class="field-label" for="email">Email</label>
+                <input type="email" id="email" class="field-input" name="email" autocomplete="email" required>
+            </div>
+            <div class="field-group">
+                <label class="field-label" for="password">Password</label>
+                <input type="password" id="password" class="field-input" name="password" autocomplete="current-password" required>
+            </div>
+            <button type="submit" class="btn-primary" id="btn-submit">Sign in</button>
         </form>
-        
-        <div id="error-message" class="error-message"></div>
-        <div id="expired-message" class="error-message" style="display:none;background:#fff3cd;border-color:#ffc107;color:#856404;"></div>
-        <p class="info">Credentials were provided in your trial access email. <a href="trial-signup.html" style="color:#b09837;text-decoration:underline;">New user? Sign up here.</a></p>
+
+        <div id="error-message" class="error-message" role="alert"></div>
     </div>
 
     <script>
-        console.log('🔍 Login page v2.0 loaded');
-        console.log('Supabase script found?', !!document.querySelector('script[src*="supabase"]'));
-        console.log('Supabase library loaded?', typeof supabase !== 'undefined');
-        // Wait for DOM and Supabase to be ready
-        (function() {
-            /* CONFIG: Supabase URL + anon key — same project as trial-signup.html / dashboard.html */
-            const SUPABASE_URL = 'https://zmjxyspizdqhrtdcgkwk.supabase.co';
-            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptanh5c3BpemRxaHJ0ZGNna3drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MjQ1NDcsImV4cCI6MjA4NTE4NDU0N30.szuVr87xdq1aqYpaM6p390f48ozj4CENU4ksg8vumhM';
-            
-            // Create client immediately
-            const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            
-            // Make globally available
-            window.supabaseClient = supabaseClient;
-            window.supabase = supabaseClient;
-            
-            console.log('✅ Supabase client ready');
-
-            // Define login handler
-            window.handleLogin = async function() {
-                const ccp = document.getElementById('ccp').value.trim();
-                const pin = document.getElementById('pin').value.trim();
-                const errorEl = document.getElementById('error-message');
-                const expiredEl = document.getElementById('expired-message');
-                
-                // Clear previous errors
-                errorEl.style.display = 'none';
-                expiredEl.style.display = 'none';
-                
-                // Validate inputs
-                if (!ccp || !pin) {
-                    showError('Please enter both CCP# and PIN');
-                    return;
-                }
-                
-                if (!ccp.startsWith('CCP-')) {
-                    showError('CCP# must start with CCP-');
-                    return;
-                }
-                
-                if (pin.length !== 6 || !/^\d+$/.test(pin)) {
-                    showError('PIN must be a 6-digit number');
-                    return;
-                }
-                
-                try {
-                    // Query Supabase trial_users table
-                    const { data: user, error } = await supabaseClient
-                        .from('trial_users')
-                        .select('*')
-                        .eq('ccp', ccp)
-                        .eq('pin', pin)
-                        .single();
-                    
-                    if (error || !user) {
-                        showError('Invalid CCP# or PIN');
-                        return;
-                    }
-                    
-                    // Check status
-                    if (user.status !== 'trial_active') {
-                        showError('Your trial account is not active. Contact support.');
-                        return;
-                    }
-                    
-                    // Check if trial expired (7 days from trial_start_at)
-                    const trialStart = new Date(user.trial_start_at);
-                    const now = new Date();
-                    const daysElapsed = Math.floor((now - trialStart) / (1000 * 60 * 60 * 24));
-                    
-                    if (daysElapsed >= 7) {
-                        expiredEl.innerHTML =
-                            'Your trial has ended. Purchase to continue. ' +
-                            '<a href="pricing.html" style="color:#1a2e3f;font-weight:bold;text-decoration:underline;">View plans</a>';
-                        expiredEl.style.display = 'block';
-                        return;
-                    }
-                    
-                    // Store session info in localStorage
-                    localStorage.setItem('ccp', ccp);
-                    localStorage.setItem('email', user.email);
-                    localStorage.setItem('trial_start_at', user.trial_start_at);
-                    localStorage.setItem('status', user.status);
-                    localStorage.setItem('user_logged_in', 'true');
-                    localStorage.setItem('user_id', user.id);
-
-                    // Redirect to dashboard
-                    window.location.href = 'dashboard.html';
-                    
-                } catch (err) {
-                    showError('Login failed. Please try again.');
-                    console.error(err);
-                }
-            };
-
-            function showError(message) {
-                const errorEl = document.getElementById('error-message');
-                errorEl.textContent = message;
-                errorEl.style.display = 'block';
+        (function () {
+            function showError(msg) {
+                var el = document.getElementById('error-message');
+                if (!el) return;
+                el.textContent = msg || 'Sign in failed. Please try again.';
+                el.classList.add('visible');
             }
+
+            function hideError() {
+                var el = document.getElementById('error-message');
+                if (!el) return;
+                el.textContent = '';
+                el.classList.remove('visible');
+            }
+
+            function friendlyAuthMessage(err) {
+                if (!err) return 'Sign in failed. Please try again.';
+                var m = String(err.message || err).toLowerCase();
+                if (m.indexOf('invalid login') !== -1 || m.indexOf('invalid credentials') !== -1) {
+                    return 'Invalid email or password.';
+                }
+                if (m.indexOf('email not confirmed') !== -1) {
+                    return 'Please confirm your email address before signing in.';
+                }
+                return err.message || 'Sign in failed. Please try again.';
+            }
+
+            document.addEventListener('DOMContentLoaded', async function () {
+                await redirectIfLoggedIn();
+                var sess = window.supabaseClient
+                    ? await window.supabaseClient.auth.getSession()
+                    : { data: { session: null } };
+                if (sess && sess.data && sess.data.session) return;
+
+                var form = document.getElementById('login-form');
+                var btn = document.getElementById('btn-submit');
+                if (!form || !window.supabaseClient) {
+                    if (!window.supabaseClient) showError('Application configuration error. Check Supabase settings in js/supabase-client.js.');
+                    return;
+                }
+
+                form.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+                    hideError();
+
+                    var email = (document.getElementById('email') && document.getElementById('email').value || '').trim();
+                    var password = (document.getElementById('password') && document.getElementById('password').value) || '';
+
+                    if (!email || !password) {
+                        showError('Please enter your email and password.');
+                        return;
+                    }
+
+                    btn.disabled = true;
+                    try {
+                        var res = await window.supabaseClient.auth.signInWithPassword({ email: email, password: password });
+                        if (res.error) {
+                            showError(friendlyAuthMessage(res.error));
+                            return;
+                        }
+                        window.location.href = '/dashboard.html';
+                    } catch (err) {
+                        showError(friendlyAuthMessage(err));
+                    } finally {
+                        btn.disabled = false;
+                    }
+                });
+            });
         })();
     </script>
 </body>

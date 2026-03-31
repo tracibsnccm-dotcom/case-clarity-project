@@ -681,12 +681,9 @@
     </style>
 </head>
 <body>
-    <script>
-    // Protect dashboard - redirect to login if not logged in
-    if (!localStorage.getItem('user_logged_in')) {
-        window.location.href = 'login.html';
-    }
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/auth-guard.js"></script>
     <header class="app-header">
         <div class="app-header-left">
             <span class="app-header-brand">Reconcile Care Management Services</span>
@@ -699,28 +696,32 @@
         </div>
         <div class="app-header-actions">
             <span class="app-header-right" id="assessment-id-display"></span>
-            <button type="button" class="btn-logout" onclick="localStorage.removeItem('user_logged_in'); window.location.href='login.html';">Logout</button>
+            <button type="button" class="btn-logout">Logout</button>
         </div>
     </header>
+
+    <div class="container" style="padding-top: 20px; padding-bottom: 0;">
+        <p style="font-size: 13px; color: #6a7a8a; margin: 0 0 8px;">You are signed in to the paid portal.</p>
+    </div>
 
     <div class="container" id="dashboard-content">
         <!-- Content loaded dynamically -->
     </div>
 
     <script src="trial-pinned-banner.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/trial-tool-storage.js"></script>
     <script>
-        (function () {
-        /* Main bundle: must match early <body> script — user_logged_in set by login.html */
-        if (!localStorage.getItem('user_logged_in')) {
-            window.location.href = 'login.html';
+        (async function () {
+        var authSession = await requireAuth();
+        if (!authSession) return;
+
+        var supabaseClient = window.supabaseClient;
+        if (!supabaseClient) {
+            window.location.href = '/login.html';
             return;
         }
 
-        /* CONFIG: Supabase — trial_users (optional sync); same project as login / trial-signup */
-        const SUPABASE_URL = 'https://zmjxyspizdqhrtdcgkwk.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptanh5c3BpemRxaHJ0ZGNna3drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MjQ1NDcsImV4cCI6MjA4NTE4NDU0N30.szuVr87xdq1aqYpaM6p390f48ozj4CENU4ksg8vumhM';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        attachLogoutHandler('.btn-logout');
 
         // ===== REPORT STORAGE (No Database Required) =====
         try {
@@ -731,20 +732,29 @@
         if (!window.reportData.active) window.reportData.active = {};
         if (!window.reportData.retro) window.reportData.retro = {};
 
+        function trialCaseTypeParamFromScope(scope) {
+            return scope === 'retro' ? 'retrospective' : 'active';
+        }
+
+        function isToolCompleteForScope(toolIndex, scope) {
+            var ct = trialCaseTypeParamFromScope(scope);
+            if (localStorage.getItem(window.CaseClarityTrialStorage.key(toolIndex, ct, 'complete'))) return true;
+            if (scope === 'active' && localStorage.getItem('tool' + toolIndex + '_complete')) return true;
+            return false;
+        }
+
         function allToolsComplete() {
             for (var i = 1; i <= 6; i++) {
-                if (!localStorage.getItem('tool' + i + '_complete')) {
-                    return false;
-                }
+                if (!isToolCompleteForScope(i, 'active')) return false;
             }
             return true;
         }
         window.allToolsComplete = allToolsComplete;
 
-        function countLocalToolsComplete() {
+        function countLocalToolsComplete(scope) {
             var n = 0;
             for (var i = 1; i <= 6; i++) {
-                if (localStorage.getItem('tool' + i + '_complete')) n++;
+                if (isToolCompleteForScope(i, scope)) n++;
             }
             return n;
         }
@@ -759,18 +769,26 @@
             }
         }
 
-        function buildTrialPrintPayloadFromLocal() {
+        function buildTrialPrintPayloadFromLocal(scope) {
+            var ct = trialCaseTypeParamFromScope(scope);
             var keys = [
-                ['CCI', 'tool1_data'],
-                ['CSA', 'tool2_data'],
-                ['CAF', 'tool3_data'],
-                ['HSI', 'tool4_data'],
-                ['FCI', 'tool5_data'],
-                ['RRF', 'tool6_data']
+                ['CCI', 1],
+                ['CSA', 2],
+                ['CAF', 3],
+                ['HSI', 4],
+                ['FCI', 5],
+                ['RRF', 6]
             ];
             var obj = {};
             keys.forEach(function (row) {
-                var p = safeParseLocalStorage(row[1]);
+                var raw = window.CaseClarityTrialStorage.readRaw(row[1], ct, 'data');
+                if (raw == null) return;
+                var p;
+                try {
+                    p = JSON.parse(raw);
+                } catch (e) {
+                    return;
+                }
                 if (!p) return;
                 var inner = p.data !== undefined ? p.data : p;
                 obj[row[0]] = {
@@ -891,23 +909,24 @@
         });
 
         function updateReportUI() {
-            var localN = countLocalToolsComplete();
+            var localActive = countLocalToolsComplete('active');
+            var localRetro = countLocalToolsComplete('retro');
             var capA = document.getElementById('report-active-capture');
             var capR = document.getElementById('report-retro-capture');
             if (capA) {
-                capA.textContent = localN === 6 ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localN + '/6. Complete all six to unlock downloads.');
+                capA.textContent = localActive === 6 ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localActive + '/6. Complete all six to unlock downloads.');
             }
             if (capR) {
-                capR.textContent = localN === 6 ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localN + '/6. Complete all six to unlock downloads.');
+                capR.textContent = localRetro === 6 ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localRetro + '/6. Complete all six to unlock downloads.');
             }
         }
 
         window.printActiveReports = async function() {
-            if (countLocalToolsComplete() < 6) {
-                alert('Download requires all 6 instruments to be completed in this browser. Saved: ' + countLocalToolsComplete() + '/6.');
+            if (countLocalToolsComplete('active') < 6) {
+                alert('Download requires all 6 Active-case instruments to be completed in this browser. Saved: ' + countLocalToolsComplete('active') + '/6.');
                 return;
             }
-            var data = buildTrialPrintPayloadFromLocal();
+            var data = buildTrialPrintPayloadFromLocal('active');
             var tools = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
             var missing = tools.filter(function (t) { return !data[t]; });
             if (missing.length) {
@@ -918,11 +937,11 @@
         };
 
         window.printRetroReports = async function() {
-            if (countLocalToolsComplete() < 6) {
-                alert('Download requires all 6 instruments to be completed in this browser. Saved: ' + countLocalToolsComplete() + '/6.');
+            if (countLocalToolsComplete('retro') < 6) {
+                alert('Download requires all 6 Retrospective-case instruments to be completed in this browser. Saved: ' + countLocalToolsComplete('retro') + '/6.');
                 return;
             }
-            var data = buildTrialPrintPayloadFromLocal();
+            var data = buildTrialPrintPayloadFromLocal('retro');
             var tools = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
             var missing = tools.filter(function (t) { return !data[t]; });
             if (missing.length) {
@@ -939,7 +958,7 @@
                 return;
             }
             var titleLabel = caseType === 'active' ? 'Active' : 'Retrospective';
-            var reportData = gatherTrialReportData();
+            var reportData = gatherTrialReportData(caseType === 'retro' ? 'retro' : 'active');
             var toolPrintCss = await loadToolPrintStyles();
             var printCss =
                 '*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}' +
@@ -978,7 +997,7 @@
             var toolList = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
             toolList.forEach(function (tool, idx) {
                 if (data[tool]) {
-                    var sectionBody = getStoredToolReportSectionHtml(idx + 1, tool, reportData);
+                    var sectionBody = getStoredToolReportSectionHtml(idx + 1, tool, reportData, caseType === 'retro' ? 'retro' : 'active');
                     if (!sectionBody) {
                         sectionBody = '<div class="trial-instrument-body">' + formatInstrumentHumanHtml(tool, data[tool].data) + '</div>';
                     }
@@ -1051,14 +1070,22 @@
         }
 
         // ===== TRIAL: all 6 tools → localStorage → consolidated report =====
-        function gatherTrialReportData() {
+        function safeParseScopedToolJson(toolIndex, scope) {
+            var ct = trialCaseTypeParamFromScope(scope);
+            var k = window.CaseClarityTrialStorage.key(toolIndex, ct, 'data');
+            var p = safeParseLocalStorage(k);
+            if (p || scope !== 'active') return p;
+            return safeParseLocalStorage('tool' + toolIndex + '_data');
+        }
+
+        function gatherTrialReportData(scope) {
             return {
-                tool1: safeParseLocalStorage('tool1_data'),
-                tool2: safeParseLocalStorage('tool2_data'),
-                tool3: safeParseLocalStorage('tool3_data'),
-                tool4: safeParseLocalStorage('tool4_data'),
-                tool5: safeParseLocalStorage('tool5_data'),
-                tool6: safeParseLocalStorage('tool6_data'),
+                tool1: safeParseScopedToolJson(1, scope),
+                tool2: safeParseScopedToolJson(2, scope),
+                tool3: safeParseScopedToolJson(3, scope),
+                tool4: safeParseScopedToolJson(4, scope),
+                tool5: safeParseScopedToolJson(5, scope),
+                tool6: safeParseScopedToolJson(6, scope),
                 caseActive: safeParseLocalStorage('dashboard_case_active'),
                 caseRetro: safeParseLocalStorage('dashboard_case_retro'),
                 generatedAt: new Date().toISOString()
@@ -1193,12 +1220,15 @@
 
         var MIN_SAVED_REPORT_HTML_LEN = 48;
 
-        function getStoredToolReportSectionHtml(toolIndex, toolName, reportData) {
+        function getStoredToolReportSectionHtml(toolIndex, toolName, reportData, scope) {
             var storageKeys = ['tool1', 'tool2', 'tool3', 'tool4', 'tool5', 'tool6'];
             var sk = storageKeys[toolIndex - 1];
-            var htmlKey = 'tool' + toolIndex + '_report_html';
-            var dataKey = 'tool' + toolIndex + '_data';
+            var ct = trialCaseTypeParamFromScope(scope);
+            var htmlKey = window.CaseClarityTrialStorage.key(toolIndex, ct, 'report_html');
             var reportHTML = localStorage.getItem(htmlKey);
+            if ((!reportHTML || reportHTML.trim().length < MIN_SAVED_REPORT_HTML_LEN) && scope === 'active') {
+                reportHTML = localStorage.getItem('tool' + toolIndex + '_report_html');
+            }
             if (reportHTML && reportHTML.trim().length >= MIN_SAVED_REPORT_HTML_LEN) {
                 return (
                     '<div class="trial-instrument-body trial-snapshot-embed">' +
@@ -1208,7 +1238,7 @@
             }
             var raw = reportData[sk];
             if (!raw) {
-                raw = safeParseLocalStorage(dataKey);
+                raw = safeParseScopedToolJson(toolIndex, scope);
             }
             var inner = unwrapStoredTool(sk, raw);
             if (inner) {
@@ -1220,26 +1250,28 @@
         }
 
         function buildComprehensiveReportHTML() {
-            console.log('Tool1 exists:', !!localStorage.getItem('tool1_report_html'));
-            console.log('Tool2 exists:', !!localStorage.getItem('tool2_report_html'));
-            console.log('Tool3 exists:', !!localStorage.getItem('tool3_report_html'));
-            console.log('Tool4 exists:', !!localStorage.getItem('tool4_report_html'));
-            console.log('Tool5 exists:', !!localStorage.getItem('tool5_report_html'));
-            console.log('Tool6 exists:', !!localStorage.getItem('tool6_report_html'));
+            var comprehensiveScope = 'active';
+            var ct = trialCaseTypeParamFromScope(comprehensiveScope);
+            console.log('Tool1 exists:', !!localStorage.getItem(window.CaseClarityTrialStorage.key(1, ct, 'report_html')) || !!localStorage.getItem('tool1_report_html'));
+            console.log('Tool2 exists:', !!localStorage.getItem(window.CaseClarityTrialStorage.key(2, ct, 'report_html')) || !!localStorage.getItem('tool2_report_html'));
+            console.log('Tool3 exists:', !!localStorage.getItem(window.CaseClarityTrialStorage.key(3, ct, 'report_html')) || !!localStorage.getItem('tool3_report_html'));
+            console.log('Tool4 exists:', !!localStorage.getItem(window.CaseClarityTrialStorage.key(4, ct, 'report_html')) || !!localStorage.getItem('tool4_report_html'));
+            console.log('Tool5 exists:', !!localStorage.getItem(window.CaseClarityTrialStorage.key(5, ct, 'report_html')) || !!localStorage.getItem('tool5_report_html'));
+            console.log('Tool6 exists:', !!localStorage.getItem(window.CaseClarityTrialStorage.key(6, ct, 'report_html')) || !!localStorage.getItem('tool6_report_html'));
             var html = '<div class="comprehensive-report">';
             html += '<h2 style="font-size:22px;color:#0c1c34;margin:0 0 8px;padding:0;border:none;font-weight:600;">C.A.S.E. Clarity Assessments — Complete Assessment Report</h2>';
             html += '<p style="font-size:13px;color:#6a7a8a;margin:0 0 24px;line-height:1.6;">Formatted output from each instrument (saved in this browser when you completed the tool). If a section is missing, re-open that tool once to refresh the capture.</p>';
             html += buildDashboardCasePrintHtml('active') + buildDashboardCasePrintHtml('retro');
             var toolNames = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
-            var reportData = gatherTrialReportData();
+            var reportData = gatherTrialReportData(comprehensiveScope);
             var globalPageNumber = 1;
             for (var i = 1; i <= 6; i++) {
                 var toolName = toolNames[i - 1];
                 var breakClass = 'report-page-break' + (i === 1 ? ' report-page-break--first' : '');
-                var content = getStoredToolReportSectionHtml(i, toolName, reportData);
+                var content = getStoredToolReportSectionHtml(i, toolName, reportData, comprehensiveScope);
                 if (!content) {
-                    var markedDone = !!localStorage.getItem('tool' + i + '_complete');
-                    var hasRaw = !!localStorage.getItem('tool' + i + '_data');
+                    var markedDone = isToolCompleteForScope(i, comprehensiveScope);
+                    var hasRaw = !!safeParseScopedToolJson(i, comprehensiveScope);
                     var hint = '';
                     if (markedDone && !hasRaw) {
                         hint = ' This browser shows the instrument as complete, but no saved responses were found (storage may have been cleared or you may be on a different browser/device). Complete the instrument again from this dashboard in this same browser.';
@@ -1311,11 +1343,9 @@
             var prog = document.getElementById('trial-local-progress');
             var wrap = document.getElementById('trial-generate-wrap');
             if (!prog || !wrap) return;
-            var n = 0;
-            for (var i = 1; i <= 6; i++) {
-                if (localStorage.getItem('tool' + i + '_complete')) n++;
-            }
-            prog.textContent = 'Instruments saved in this browser: ' + n + '/6';
+            var na = countLocalToolsComplete('active');
+            var nr = countLocalToolsComplete('retro');
+            prog.textContent = 'Instruments saved in this browser — Active: ' + na + '/6 · Retrospective: ' + nr + '/6';
             wrap.style.display = allToolsComplete() ? 'block' : 'none';
             syncToolCompletionsToSupabase();
         }
@@ -1326,14 +1356,19 @@
                 if (!userId) return;
                 var completedTools = {};
                 var names = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
-                for (var i = 1; i <= 6; i++) {
-                    if (localStorage.getItem('tool' + i + '_complete')) {
-                        completedTools[names[i - 1]] = {
+                ['active', 'retro'].forEach(function (scope) {
+                    var ct = trialCaseTypeParamFromScope(scope);
+                    for (var i = 1; i <= 6; i++) {
+                        if (!isToolCompleteForScope(i, scope)) continue;
+                        var suffix = scope === 'retro' ? '_retro' : '_active';
+                        completedTools[names[i - 1] + suffix] = {
                             completed: true,
-                            completed_at: localStorage.getItem('tool' + i + '_completed_at') || new Date().toISOString()
+                            completed_at: localStorage.getItem(window.CaseClarityTrialStorage.key(i, ct, 'completed_at'))
+                                || (scope === 'active' ? localStorage.getItem('tool' + i + '_completed_at') : null)
+                                || new Date().toISOString()
                         };
                     }
-                }
+                });
                 await supabaseClient.from('trial_users').update({ completed_tools: completedTools }).eq('id', userId);
             } catch (e) {
                 console.warn('Supabase tool sync skipped:', e);
@@ -1405,10 +1440,11 @@
         };
 
         const TOOL_LOCAL_INDEX = { CCI: 1, CSA: 2, CAF: 3, HSI: 4, FCI: 5, RRF: 6 };
-        function isLocalToolComplete(toolKey) {
+        function isLocalToolComplete(toolKey, caseType) {
             var idx = TOOL_LOCAL_INDEX[toolKey];
             if (!idx) return false;
-            return !!localStorage.getItem('tool' + idx + '_complete');
+            var scope = window.CaseClarityTrialStorage.normalizeScope(caseType);
+            return isToolCompleteForScope(idx, scope);
         }
         function computeTrialDaysRemaining() {
             var raw = localStorage.getItem('trial_start_at');
@@ -1534,7 +1570,8 @@
             }
             var trialDaysRemaining = computeTrialDaysRemaining();
             var trialExpired = !!localStorage.getItem('trial_start_at') && trialDaysRemaining <= 0;
-            var localN = countLocalToolsComplete();
+            var localActive = countLocalToolsComplete('active');
+            var localRetro = countLocalToolsComplete('retro');
 
             var timerLabel = trialExpired ? 'Trial access' : 'Trial time remaining';
             var timerClass = trialExpired ? 'timer-warning' : (trialDaysRemaining <= 2 && trialDaysRemaining >= 0 ? 'timer-warning' : '');
@@ -1549,9 +1586,9 @@
             const rcMech = escapeAttr(locR.mechanism || '');
             const rcType = locR.caseType === 'PI' || locR.caseType === 'WC' || locR.caseType === 'Disability' ? locR.caseType : '';
             const sel = function (cur, val) { return cur === val ? ' selected' : ''; };
-            const activePrintReady = localN === 6;
-            const retroPrintReady = localN === 6;
-            var trialRetroLocked = !trialExpired && localN < 6;
+            const activePrintReady = localActive === 6;
+            const retroPrintReady = localRetro === 6;
+            var trialRetroLocked = !trialExpired && localActive < 6;
 
             let html = `
                 <div class="timer-card">
@@ -1686,7 +1723,7 @@
                       <div class="collapsible-header" onclick="toggleSection('active-tools')">
                         <span style="display: flex; align-items: center; gap: 12px;">
                           <span class="arrow expanded" id="arrow-active">▶</span>
-                          <span>Active Case Tools (<span id="active-progress">${localN}/6</span> completed)</span>
+                          <span>Active Case Tools (<span id="active-progress">${localActive}/6</span> completed)</span>
                         </span>
                       </div>
                       <div class="collapsible-content expanded" id="active-tools">
@@ -1709,9 +1746,9 @@
                     <div class="inline-reports-card">
                       <h4 style="font-size: 15px; color: #0c1c34; margin-bottom: 12px;">Active Case Reports</h4>
                       <p style="font-size: 14px; color: #4a5568; margin-bottom: 10px; line-height: 1.5;">Reports available when all 6 Active assessments are complete.</p>
-                      <p style="font-size: 14px; color: #b8922a; margin-bottom: 8px;">Progress: <span id="active-assessment-report-progress">${localN}</span>/6</p>
-                      <p id="report-active-capture" style="font-size: 12px; color: #6a7a8a; margin-bottom: 14px; line-height: 1.4;">${activePrintReady ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localN + '/6. Complete all six to unlock downloads.')}</p>
-                      <button type="button" class="btn-report" data-report-btn="active" id="btn-download-active-all" ${(localN === 6 && !trialExpired) ? '' : 'disabled'} onclick="printActiveReports()">Download All Active Reports</button>
+                      <p style="font-size: 14px; color: #b8922a; margin-bottom: 8px;">Progress: <span id="active-assessment-report-progress">${localActive}</span>/6</p>
+                      <p id="report-active-capture" style="font-size: 12px; color: #6a7a8a; margin-bottom: 14px; line-height: 1.4;">${activePrintReady ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localActive + '/6. Complete all six to unlock downloads.')}</p>
+                      <button type="button" class="btn-report" data-report-btn="active" id="btn-download-active-all" ${(localActive === 6 && !trialExpired) ? '' : 'disabled'} onclick="printActiveReports()">Download All Active Reports</button>
                     </div>
                       </div>
                     </div>
@@ -1726,7 +1763,7 @@
                       <div class="collapsible-header" onclick="toggleSection('retro-tools')">
                         <span style="display: flex; align-items: center; gap: 12px;">
                           <span class="arrow" id="arrow-retro">▶</span>
-                          <span>Retrospective Case Tools (<span id="retro-progress">${localN}/6</span> completed)</span>
+                          <span>Retrospective Case Tools (<span id="retro-progress">${localRetro}/6</span> completed)</span>
                         </span>
                       </div>
                       <div id="retro-preview" class="tool-preview" style="margin: 4px 0 8px 24px; font-size: 13px; color: #8a9aa8;">
@@ -1753,9 +1790,9 @@
                     <div class="inline-reports-card">
                       <h4 style="font-size: 15px; color: #0c1c34; margin-bottom: 12px;">Retrospective Case Reports</h4>
                       <p style="font-size: 14px; color: #4a5568; margin-bottom: 10px; line-height: 1.5;">Reports available when all 6 Retrospective assessments are complete.</p>
-                      <p style="font-size: 14px; color: #b8922a; margin-bottom: 8px;">Progress: <span id="retro-assessment-report-progress">${localN}</span>/6</p>
-                      <p id="report-retro-capture" style="font-size: 12px; color: #6a7a8a; margin-bottom: 14px; line-height: 1.4;">${retroPrintReady ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localN + '/6. Complete all six to unlock downloads.')}</p>
-                      <button type="button" class="btn-report" data-report-btn="retro" id="btn-download-retro-all" ${(localN === 6 && !trialExpired) ? '' : 'disabled'} onclick="printRetroReports()">Download All Retro Reports</button>
+                      <p style="font-size: 14px; color: #b8922a; margin-bottom: 8px;">Progress: <span id="retro-assessment-report-progress">${localRetro}</span>/6</p>
+                      <p id="report-retro-capture" style="font-size: 12px; color: #6a7a8a; margin-bottom: 14px; line-height: 1.4;">${retroPrintReady ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localRetro + '/6. Complete all six to unlock downloads.')}</p>
+                      <button type="button" class="btn-report" data-report-btn="retro" id="btn-download-retro-all" ${(localRetro === 6 && !trialExpired) ? '' : 'disabled'} onclick="printRetroReports()">Download All Retro Reports</button>
                     </div>
                       </div>
                     </div>
@@ -1771,7 +1808,7 @@
             document.getElementById('save-case-info').addEventListener('click', saveCaseInfo);
             wireDashboardCaseAutoSave();
             updateReportUI();
-            updateCollapsibleProgress(localN, localN);
+            updateCollapsibleProgress(localActive, localRetro);
             syncCollapsiblePreview('retro-tools');
             syncCollapsiblePreview('active-tools');
 
@@ -1844,7 +1881,7 @@
             const cardExtra = opts.cardClass ? ' ' + opts.cardClass : '';
             const trialExpired = !!opts.trialExpired;
             const lockedClass = opts.lockedBySequence ? ' tool-card-locked' : '';
-            const localDone = isLocalToolComplete(toolKey);
+            const localDone = isLocalToolComplete(toolKey, caseType);
             const sessionDone = status === 'complete';
             const effectiveDone = localDone || sessionDone;
 
@@ -1907,9 +1944,12 @@
             `;
         }
 
-        window.handleLogout = function() {
+        window.handleLogout = async function() {
             localStorage.clear();
-            window.location.href = 'login.html';
+            try {
+                if (window.supabaseClient) await window.supabaseClient.auth.signOut();
+            } catch (e) { /* ignore */ }
+            window.location.href = '/login.html';
         };
 
         // Refresh progress every 30 seconds

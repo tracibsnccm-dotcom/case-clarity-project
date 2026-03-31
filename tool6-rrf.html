@@ -1275,10 +1275,14 @@
   For clinical and legal professional use only. Not a substitute for clinical judgment.
 </footer>
 
+<script src="js/trial-tool-storage.js"></script>
 <script>
 
-  // Read case type from portal launch URL (?caseType=active|closed) or session after auth
+  // Read case type from portal launch URL (?caseType=active|retrospective|closed) or session after auth
   const caseType = new URLSearchParams(window.location.search).get('caseType') || sessionStorage.getItem('tool_caseType') || 'active';
+  if (new URLSearchParams(window.location.search).get('caseType')) {
+    try { sessionStorage.setItem('tool_caseType', String(new URLSearchParams(window.location.search).get('caseType'))); } catch (e) {}
+  }
 
   /* ── Explainer → Forecaster flow ── */
   function startForecaster() {
@@ -1681,8 +1685,8 @@
       rrfHost.innerHTML = html;
       rrfHost.innerHTML = '';
     }
-    localStorage.setItem('tool6_report_html', html);
-    console.log('RRF report HTML saved, length:', localStorage.getItem('tool6_report_html') ? localStorage.getItem('tool6_report_html').length : 0);
+    localStorage.setItem(window.CaseClarityTrialStorage.key(6, caseType, 'report_html'), html);
+    console.log('RRF report HTML saved, length:', localStorage.getItem(window.CaseClarityTrialStorage.key(6, caseType, 'report_html')) ? localStorage.getItem(window.CaseClarityTrialStorage.key(6, caseType, 'report_html')).length : 0);
   }
 
   /* ── PI Calculation ── */
@@ -1764,8 +1768,9 @@
       intrinsicScore,
       behavioralScore
     };
-    localStorage.setItem('tool6_data', JSON.stringify(toolData));
-    localStorage.setItem('tool6_complete', 'true');
+    const _ts = window.CaseClarityTrialStorage;
+    localStorage.setItem(_ts.key(6, caseType, 'data'), JSON.stringify(toolData));
+    localStorage.setItem(_ts.key(6, caseType, 'complete'), 'true');
     persistRrfReportHtml(toolData);
 
     if (window.opener && !window.opener.closed) {
@@ -1854,8 +1859,9 @@
       intrinsicScore,
       behavioralScore
     };
-    localStorage.setItem('tool6_data', JSON.stringify(toolData));
-    localStorage.setItem('tool6_complete', 'true');
+    const _tsWc = window.CaseClarityTrialStorage;
+    localStorage.setItem(_tsWc.key(6, caseType, 'data'), JSON.stringify(toolData));
+    localStorage.setItem(_tsWc.key(6, caseType, 'complete'), 'true');
     persistRrfReportHtml(toolData);
 
     if (window.opener && !window.opener.closed) {

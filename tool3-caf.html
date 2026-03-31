@@ -327,9 +327,13 @@ body{background:transparent;font-family:Georgia,'Times New Roman',serif;color:va
 </div>
 <div id="caf-report-snapshot" class="caf-report findings results-display" aria-hidden="true" style="position:absolute;left:-9999px;top:0;width:880px;pointer-events:none"></div>
 
+<script src="js/trial-tool-storage.js"></script>
 <script>
-// Read case type from portal launch URL or session (?caseType=active|closed)
+// Read case type from portal launch URL or session (?caseType=active|retrospective|closed)
 const caseType = new URLSearchParams(window.location.search).get('caseType') || sessionStorage.getItem('tool_caseType') || 'active';
+if (new URLSearchParams(window.location.search).get('caseType')) {
+  try { sessionStorage.setItem('tool_caseType', String(new URLSearchParams(window.location.search).get('caseType'))); } catch (e) {}
+}
 
 function showAssessment(){
   document.getElementById('explainer').classList.add('hidden');
@@ -495,14 +499,15 @@ function saveCafComplete(){
     domainScores:scores.map((s,i)=>({domain:DOMS[i].id,title:DOMS[i].title,raw:s.raw,level:s.lvl})),
     flags
   };
-  localStorage.setItem('tool3_data',JSON.stringify(toolData));
-  localStorage.setItem('tool3_complete','true');
+  const _ts = window.CaseClarityTrialStorage;
+  localStorage.setItem(_ts.key(3, caseType, 'data'), JSON.stringify(toolData));
+  localStorage.setItem(_ts.key(3, caseType, 'complete'), 'true');
   var snap=document.getElementById('caf-report-snapshot');
   if(snap){
     snap.innerHTML=buildCafSnapshotHtml(toolData,minLvl,flags);
     snap.className='caf-report findings results-display';
-    localStorage.setItem('tool3_report_html',snap.outerHTML);
-    console.log('CAF report HTML saved, length:', localStorage.getItem('tool3_report_html')?localStorage.getItem('tool3_report_html').length:0);
+    localStorage.setItem(_ts.key(3, caseType, 'report_html'), snap.outerHTML);
+    console.log('CAF report HTML saved, length:', localStorage.getItem(_ts.key(3, caseType, 'report_html')) ? localStorage.getItem(_ts.key(3, caseType, 'report_html')).length : 0);
   } else {
     console.warn('CAF: caf-report-snapshot host missing; report HTML not saved.');
   }

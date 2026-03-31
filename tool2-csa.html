@@ -1338,7 +1338,13 @@
   Unauthorized reproduction or redistribution of this tool or its output is prohibited.
 </footer>
 
+<script src="js/trial-tool-storage.js"></script>
 <script>
+// Trial dashboard passes ?caseType=active|retrospective
+const caseType = new URLSearchParams(window.location.search).get('caseType') || sessionStorage.getItem('tool_caseType') || 'active';
+if (new URLSearchParams(window.location.search).get('caseType')) {
+  try { sessionStorage.setItem('tool_caseType', String(new URLSearchParams(window.location.search).get('caseType'))); } catch (e) {}
+}
 // ─────────────────────────────────────────────────────────────────────────────
 // STATE
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1585,18 +1591,20 @@ function selectSub(ri, qi, value) {
     const toolData = {
       completed: true,
       timestamp: new Date().toISOString(),
+      caseType,
       data: assessmentData
     };
-    localStorage.setItem('tool2_data', JSON.stringify(toolData));
-    localStorage.setItem('tool2_complete', 'true');
+    const _ts = window.CaseClarityTrialStorage;
+    localStorage.setItem(_ts.key(2, caseType, 'data'), JSON.stringify(toolData));
+    localStorage.setItem(_ts.key(2, caseType, 'complete'), 'true');
     if (typeof window.markAssessmentComplete === 'function') {
       window.markAssessmentComplete(assessmentData);
     }
     renderCsaResultsCapture();
     const csaHost = document.getElementById('csa-report-for-storage');
     if (csaHost) {
-      localStorage.setItem('tool2_report_html', csaHost.outerHTML);
-      console.log('CSA report HTML saved, length:', localStorage.getItem('tool2_report_html') ? localStorage.getItem('tool2_report_html').length : 0);
+      localStorage.setItem(_ts.key(2, caseType, 'report_html'), csaHost.outerHTML);
+      console.log('CSA report HTML saved, length:', localStorage.getItem(_ts.key(2, caseType, 'report_html')) ? localStorage.getItem(_ts.key(2, caseType, 'report_html')).length : 0);
     } else {
       console.warn('CSA: csa-report-for-storage host missing; report HTML not saved.');
     }

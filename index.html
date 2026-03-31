@@ -1,10 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta http-equiv="refresh" content="0; url=/login.html">
-  <title>Redirecting to Login</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Case Clarity — Redirecting</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth-guard.js"></script>
 </head>
 <body>
-  <p>Redirecting to login page...</p>
+  <p style="font-family: Georgia, serif; padding: 24px; color: #3a4a5a;">Redirecting…</p>
+  <script>
+    (async function () {
+      if (!window.supabaseClient) {
+        window.location.replace('/login.html');
+        return;
+      }
+      var res = await window.supabaseClient.auth.getSession();
+      var session = res.data && res.data.session;
+      if (session) {
+        window.location.replace('/dashboard.html');
+      } else {
+        window.location.replace('/login.html');
+      }
+    })();
+  </script>
 </body>
 </html>
