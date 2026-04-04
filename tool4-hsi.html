@@ -231,15 +231,10 @@ canvas{display:block}
   font-style:italic;
 }
 #hsi-identity-slot-intro .hsi-tool-page-overview,
-#hsi-identity-slot-assess .hsi-tool-page-overview,
 #hsi-identity-slot-global .hsi-tool-page-overview{
   max-width:920px;margin:0 auto;padding:0.45rem 0 0.65rem;
   background:transparent;
   border-bottom:none;
-}
-.hsi-identity-slot-assess{
-  max-width:920px;margin:0 auto;
-  padding:0 1.5rem;
 }
 .hsi-identity-slot-global{
   max-width:920px;margin:0 auto;
@@ -463,24 +458,37 @@ canvas{display:block}
 .slab-preview--in-acc:hover{transform:none;filter:none}
 
 /* ═══════════════════════════════════════════════════
-   ── ASSESSMENT SCREEN ──
+   ── ASSESSMENT SCREEN (CAF-style centered working column) ──
 ═══════════════════════════════════════════════════ */
 #sc-assess{background:transparent}
+.hsi-assess-work{
+  flex:1;
+  width:100%;
+  max-width:1320px;
+  margin:0 auto;
+  padding:0 20px 40px;
+  box-sizing:border-box;
+  min-height:0;
+}
 .assess-layout{
   display:grid;
-  grid-template-columns:264px 1fr;
+  grid-template-columns:232px minmax(0,1fr);
+  gap:0 32px;
+  align-items:start;
   flex:1;
 }
 
 /* Sidebar */
 .sidebar{
   background:var(--surface);
-  border-right:1px solid var(--border);
-  padding:44px 28px;
-  position:sticky;top:60px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:36px 22px;
+  position:sticky;top:72px;
   align-self:start;
-  max-height:calc(100vh - 60px);
+  max-height:calc(100vh - 72px);
   overflow-y:auto;
+  box-shadow:0 1px 0 rgba(255,255,255,0.85) inset;
 }
 .sb-heading{
   font-size:9px;font-weight:700;
@@ -504,13 +512,32 @@ canvas{display:block}
 .sb-step.active .sb-pip{background:var(--gold)}
 .sb-step.done .sb-pip{background:#ccc}
 
-/* Main */
+/* Main: fluid cell; inner column matches CAF .page width (~860px) */
 .assess-main{
-  padding:56px 68px 80px;max-width:740px;
-  background:rgba(255,255,255,0.45);
-  border-radius:var(--r);
-  border:1px solid rgba(10,22,40,0.06);
-  box-shadow:0 1px 0 rgba(255,255,255,0.85) inset;
+  padding:32px 0 48px;
+  min-width:0;
+  width:100%;
+  background:transparent;
+  border:none;
+  box-shadow:none;
+}
+.hsi-assess-main-inner{
+  max-width:860px;
+  width:100%;
+  margin:0;
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  min-height:0;
+}
+#hsi-identity-slot-assess{
+  width:100%;
+  margin:0 0 1.25rem;
+}
+#hsi-identity-slot-assess .hsi-tool-page-overview{
+  max-width:none;
+  margin:0;
+  padding:0 0 0.5rem;
 }
 
 /* Domain header */
@@ -569,7 +596,7 @@ canvas{display:block}
 .q-text{
   font-family:var(--fd);font-size:20px;font-weight:500;
   color:var(--ink);line-height:1.45;
-  margin-bottom:30px;max-width:580px;
+  margin-bottom:30px;max-width:100%;
 }
 
 /* Stage options */
@@ -696,19 +723,27 @@ canvas{display:block}
   content:'•';color:var(--gold);flex-shrink:0;font-weight:700;
 }
 
-/* Nav */
+/* Nav — anchored to main column width */
 .assess-nav{
   display:flex;justify-content:space-between;align-items:center;
-  padding-top:28px;border-top:1px solid var(--border);
-  margin-top:8px;
+  gap:16px;
+  flex-wrap:wrap;
+  padding-top:24px;
+  margin-top:12px;
+  border-top:1px solid rgba(10,22,40,0.1);
+  width:100%;
+  max-width:100%;
 }
 
 /* ═══════════════════════════════════════════════════
    SOCIAL DRIVERS (reuses assess layout)
 ═══════════════════════════════════════════════════ */
 .drivers-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:14px;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:16px;
   margin-bottom:36px;
+  width:100%;
 }
 .driver-card{
   background:var(--white);border:1.5px solid var(--border);
@@ -1079,9 +1114,14 @@ canvas{display:block}
 @media(max-width:1080px){
   .intro-hero-navy{padding:28px 22px 20px}
   .intro-hero-navy .hero-h{font-size:clamp(2rem,4.5vw,2.65rem)}
-  .assess-layout{grid-template-columns:1fr}
-  .sidebar{display:none}
-  .assess-main{padding:40px 36px 64px;max-width:100%}
+  .hsi-assess-work{padding:0 16px 32px}
+  .assess-layout{grid-template-columns:1fr;gap:0}
+  .sidebar{
+    position:relative;top:auto;max-height:none;
+    margin-bottom:20px;
+  }
+  .assess-main{padding:24px 0 40px}
+  .hsi-assess-main-inner{max-width:100%}
   .plans-grid{grid-template-columns:1fr 1fr}
 }
 @media(max-width:660px){
@@ -1459,19 +1499,23 @@ canvas{display:block}
     <div class="nav-brand">Holistic Stability Index<span class="g">™</span></div>
     <div class="nav-pill" id="assessPill">P1 of 4</div>
   </nav>
-  <div id="hsi-identity-slot-assess" class="hsi-identity-slot-assess"></div>
-  <div class="assess-layout">
-    <aside class="sidebar">
-      <div class="sb-heading">Assessment Progress</div>
-      <div id="sbSteps"></div>
-    </aside>
-    <main class="assess-main">
-      <div id="assessContent"></div>
-      <div class="assess-nav">
-        <button class="btn btn-outline" onclick="navBack()">← Back</button>
-        <button class="btn btn-dark" id="btnNext" onclick="navNext()">Continue →</button>
-      </div>
-    </main>
+  <div class="hsi-assess-work">
+    <div class="assess-layout">
+      <aside class="sidebar">
+        <div class="sb-heading">Assessment Progress</div>
+        <div id="sbSteps"></div>
+      </aside>
+      <main class="assess-main">
+        <div class="hsi-assess-main-inner">
+          <div id="hsi-identity-slot-assess" class="hsi-identity-slot-assess"></div>
+          <div id="assessContent"></div>
+          <div class="assess-nav">
+            <button class="btn btn-outline" onclick="navBack()">← Back</button>
+            <button class="btn btn-dark" id="btnNext" onclick="navNext()">Continue →</button>
+          </div>
+        </div>
+      </main>
+    </div>
   </div>
 </div>
 
