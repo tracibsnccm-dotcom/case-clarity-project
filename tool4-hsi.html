@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Jost:wght@300;400;500;600;700&family=Source+Code+Pro:wght@600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="trial-pinned-banner.css">
 <link rel="stylesheet" href="css/case-identity.css">
+<link rel="stylesheet" href="css/theme.css">
 <style>
 /* ═══════════════════════════════════════════════════
    TOKENS
@@ -19,11 +20,15 @@
   --gold-pale:  #faf7ee;
   --gold-dim:   rgba(176,152,55,0.10);
   --gold-ring:  rgba(176,152,55,0.30);
+  --hsi-navy:   #0e1c2e;
+  --hsi-navy-mid: #152238;
+  --hsi-navy-deep: #0a1628;
   --ink:        #111111;
   --ink-mid:    #3a3a3a;
   --ink-soft:   #666666;
   --white:      #ffffff;
   --surface:    #f8f8f6;
+  --page-tint:  #f3f1ec;
   --border:     #e4e4e2;
   --border-md:  #d0d0ce;
   --shadow-xs:  0 1px 3px rgba(0,0,0,0.05);
@@ -41,12 +46,13 @@
 html{scroll-behavior:smooth}
 body{
   font-family:var(--fb);
-  background:var(--white);
+  background:var(--page-tint);
   color:var(--ink);
   min-height:100vh;
   -webkit-font-smoothing:antialiased;
   line-height:1.6;
 }
+body.tool-hsi{background:linear-gradient(180deg,#ebe8e1 0%,var(--page-tint) 28%,#f7f6f3 100%)}
 button{cursor:pointer;font-family:var(--fb)}
 canvas{display:block}
 
@@ -147,60 +153,145 @@ canvas{display:block}
 /* ═══════════════════════════════════════════════════
    ── INTRO SCREEN ──
 ═══════════════════════════════════════════════════ */
-#sc-intro{background:var(--white)}
+#sc-intro{background:transparent}
 .intro-flow{
   display:flex;flex-direction:column;flex:1;
+  padding:0 12px;
+  box-sizing:border-box;
 }
 .intro-hero{
-  padding:72px 24px 40px;
-  max-width:720px;margin:0 auto;
+  padding:0;
+  max-width:100%;margin:0;
   width:100%;
 }
-.tool-hsi-hide-identity-shell{display:none!important}
+/* Navy title band: title, subtitle, intro copy + gold accent under block (compact) */
+.intro-hero-navy{
+  background:linear-gradient(165deg,var(--hsi-navy-deep) 0%,var(--hsi-navy) 42%,var(--hsi-navy-mid) 100%);
+  padding:32px 24px 22px;
+  border-bottom:3px solid var(--gold);
+  box-shadow:0 8px 28px rgba(10,22,40,0.1);
+}
+.intro-hero-navy .eyebrow{color:#e8c97a;margin-bottom:8px}
+.intro-hero-navy .hero-h{
+  font-weight:700;color:#fff;
+  font-size:clamp(2.35rem,5.2vw,2.95rem);
+  line-height:0.92;
+  letter-spacing:-0.02em;
+  text-shadow:0 1px 2px rgba(0,0,0,0.2);
+}
+.intro-hero-navy .hero-sub{color:rgba(255,255,255,0.92);font-weight:500;margin-bottom:14px}
+.intro-hero-navy .rule{background:linear-gradient(90deg,var(--gold),var(--gold-lt));height:3px;margin:12px 0 14px}
+.intro-hero-navy .hero-body{
+  max-width:none;
+  margin-bottom:0;
+}
+.intro-hero-navy .hero-body p{
+  color:rgba(255,255,255,0.9);
+  font-weight:400;
+  line-height:1.65;
+}
+.intro-hero-navy .hero-body p + p{margin-top:0.65rem}
+.intro-hero-navy .hero-body p{font-size:14px;line-height:1.6}
+.intro-hero-navy-inner{
+  max-width:720px;margin:0 auto;
+}
+/* Start Assessment — footer inside .intro-acc-wrap (below accordions) */
+.hsi-intro-cta{
+  margin-top:0;
+  padding:1.35rem 1.25rem 1.45rem;
+  border-top:1px solid rgba(176,152,55,0.2);
+  background:linear-gradient(180deg,#f4f1ea 0%,#ebe6dc 100%);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  gap:0.5rem;
+}
+.hsi-intro-cta-btn{
+  width:100%;
+  max-width:300px;
+  height:44px;
+  font-size:11px;
+  letter-spacing:0.12em;
+  padding:0 24px;
+}
+.hsi-intro-cta .hsi-intro-cta-meta{
+  margin:0.15rem 0 0;
+  font-size:10px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+}
+.hsi-intro-cta .hsi-intro-cta-note{
+  margin:0;
+  max-width:440px;
+  font-size:12px;
+  line-height:1.6;
+  color:#777;
+  font-style:italic;
+}
+#hsi-identity-slot-intro .hsi-tool-page-overview,
+#hsi-identity-slot-assess .hsi-tool-page-overview,
+#hsi-identity-slot-global .hsi-tool-page-overview{
+  max-width:920px;margin:0 auto;padding:0.45rem 0 0.65rem;
+  background:transparent;
+  border-bottom:none;
+}
+.hsi-identity-slot-assess{
+  max-width:920px;margin:0 auto;
+  padding:0 1.5rem;
+}
+.hsi-identity-slot-global{
+  max-width:920px;margin:0 auto;
+  padding:0 1.5rem;
+}
+/* Anchor card to shared case-identity look (navy head + gold already in case-identity.css) */
+.hsi-tool-page-overview .case-clarity-identity-card{
+  box-shadow:0 4px 24px rgba(10,22,40,0.08),0 1px 0 rgba(255,255,255,0.85) inset;
+}
 .fsm-section-heading{
   font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);
   font-family:var(--fb);font-weight:700;margin-bottom:10px;
 }
+/* Accordion + Start CTA — align with .case-clarity-identity-card (12px radius, gold edge, warm gradient) */
 .intro-acc-wrap{
-  max-width:920px;margin:0 auto;padding:8px 24px 24px;
+  max-width:920px;margin:0.35rem auto 2.5rem;padding:0;
   width:100%;
-  border:1px solid var(--border);border-radius:var(--r);
-  overflow:hidden;background:var(--white);
+  border:1px solid rgba(176,152,55,0.34);
+  border-radius:12px;
+  overflow:hidden;
+  background:linear-gradient(165deg,#fdfcfa 0%,#f7f4ed 42%,#f0ebe3 100%);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 10px 36px rgba(10,22,40,0.07),
+    0 2px 10px rgba(10,22,40,0.04);
 }
 .intro-acc-wrap .byb-acc{border-bottom:1px solid var(--border)}
-.intro-acc-wrap .byb-acc:last-child{border-bottom:none}
+.intro-acc-wrap .byb-acc:nth-last-child(2){border-bottom:none}
 .intro-acc-wrap .byb-acc-hd{
-  width:100%;text-align:left;padding:1.05rem 1.5rem;cursor:pointer;
+  width:100%;text-align:left;padding:1.05rem 1.35rem 1.05rem 1.25rem;cursor:pointer;
   display:flex;align-items:center;justify-content:space-between;gap:12px;
-  background:var(--white);border:none;font:inherit;transition:background .15s;
+  background:linear-gradient(100deg,var(--hsi-navy-deep) 0%,var(--hsi-navy) 55%,var(--hsi-navy-mid) 100%);
+  border:none;border-left:4px solid var(--gold);
+  font:inherit;transition:background .18s ease,filter .18s ease;
 }
-.intro-acc-wrap .byb-acc-hd:hover{background:var(--gold-pale)}
-.intro-acc-wrap .byb-acc:nth-child(even) .byb-acc-hd:not(.open){background:var(--surface)}
-.intro-acc-wrap .byb-acc:nth-child(even) .byb-acc-hd:not(.open):hover{background:#f0efe9}
-.intro-acc-wrap .byb-acc-hd.open{background:var(--ink)}
+.intro-acc-wrap .byb-acc-hd:hover{filter:brightness(1.08)}
+.intro-acc-wrap .byb-acc-hd.open{
+  background:linear-gradient(100deg,#0a1422 0%,var(--hsi-navy-deep) 100%);
+  border-left-color:var(--gold-lt);
+}
 .intro-acc-wrap .byb-acc-title{
-  font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);
-  font-family:var(--fb);
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#fff;
+  font-family:var(--fb);font-weight:600;
 }
-.intro-acc-wrap .byb-acc-hd.open .byb-acc-title{color:var(--gold-lt)}
+.intro-acc-wrap .byb-acc-hd.open .byb-acc-title{color:#fff}
 .intro-acc-wrap .byb-acc-cv{
-  width:14px;height:14px;color:var(--ink-mid);transition:transform .25s,color .15s;flex-shrink:0;
+  width:14px;height:14px;color:var(--gold-lt);transition:transform .25s,color .15s;flex-shrink:0;
 }
 .intro-acc-wrap .byb-acc-hd.open .byb-acc-cv{transform:rotate(180deg);color:var(--gold)}
-.intro-acc-wrap .byb-acc-body{display:none;padding:1.1rem 1.5rem 1.25rem;background:var(--white)}
-.intro-acc-wrap .byb-acc:nth-child(even) .byb-acc-body{background:var(--surface)}
+.intro-acc-wrap .byb-acc-body{display:none;padding:1.1rem 1.5rem 1.25rem;background:#fafaf8}
+.intro-acc-wrap .byb-acc:nth-child(even) .byb-acc-body{background:#f5f4f0}
 .intro-acc-wrap .byb-acc-body.open{display:block}
-.intro-fsm-wrap{
-  max-width:920px;margin:0 auto;padding:0 24px 72px;
-  width:100%;
-}
-.fsm-explain-list{
-  margin:14px 0 0;padding-left:1.25rem;
-  font-size:13px;color:var(--ink-soft);line-height:1.65;
-  text-align:left;font-family:var(--fb);
-}
-.fsm-explain-list li{margin:0 0 .55rem}
-.fsm-explain-list li:last-child{margin-bottom:0}
 .hsi-fourps-summary{
   margin:0 0 20px;padding:16px 18px;
   background:linear-gradient(180deg,#f8f7f4 0%,#f2f0eb 100%);
@@ -227,7 +318,6 @@ canvas{display:block}
   color:var(--ink-soft);max-width:420px;margin-bottom:44px;
 }
 .hero-body p+p{margin-top:14px}
-.hero-cta{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
 .hero-time{
   font-size:11px;font-weight:500;
   letter-spacing:0.12em;text-transform:uppercase;
@@ -283,7 +373,7 @@ canvas{display:block}
   letter-spacing:0.2em;text-transform:uppercase;
   color:var(--gold);margin-bottom:12px;
 }
-#cvMini{display:block;width:100%;min-height:140px;height:140px;max-width:100%}
+#cvMini,#cvAssessFsm{display:block;width:100%;min-height:140px;height:140px;max-width:100%}
 .slab-preview-caption{
   font-size:12px;line-height:1.65;
   color:#999;text-align:center;
@@ -291,10 +381,91 @@ canvas{display:block}
   max-width:320px;margin-left:auto;margin-right:auto;
 }
 
+/* Foundation Stability Model — intro/assess use collapsible .byb-acc */
+.fsm-intro-wrap,.intro-acc-wrap .slab-preview{margin-top:0}
+.fsm-section-heading{
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);
+  font-family:var(--fb);font-weight:700;margin-bottom:10px;
+}
+.hsi-fsm-assess-acc canvas#cvAssessFsm{display:block;width:100%;min-height:140px;height:140px;max-width:100%}
+.fsm-explain-list{
+  margin:12px 0 0;padding-left:1.25rem;
+  font-size:13px;color:var(--ink-soft);line-height:1.65;
+  text-align:left;font-style:normal;font-family:var(--fb);
+}
+.fsm-explain-list li{margin:0 0 .55rem}
+.fsm-explain-list li:last-child{margin-bottom:0}
+
+/* ── CAF-aligned accordions (same structure & behavior as tool3-caf .byb-acc) ── */
+.byb-acc{border-bottom:1px solid var(--border)}
+.byb-acc:last-child{border-bottom:none}
+.byb-acc-hd{
+  width:100%;text-align:left;padding:1.05rem 1.5rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:var(--white);border:none;font:inherit;transition:background .15s;
+}
+.byb-acc-hd:hover{background:var(--gold-pale)}
+.byb-acc:nth-child(even) .byb-acc-hd:not(.open){background:var(--surface)}
+.byb-acc:nth-child(even) .byb-acc-hd:not(.open):hover{background:#f0efe9}
+.byb-acc-hd.open{background:var(--ink)}
+.byb-acc-title{
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);
+  font-family:var(--fb);
+}
+.byb-acc-hd.open .byb-acc-title{color:var(--gold-lt)}
+.byb-acc-cv{
+  width:14px;height:14px;color:var(--ink-mid);transition:transform .25s,color .15s;flex-shrink:0;
+}
+.byb-acc-hd.open .byb-acc-cv{transform:rotate(180deg);color:var(--gold)}
+.byb-acc-body{display:none;padding:1.35rem 1.5rem;background:var(--white)}
+.byb-acc:nth-child(even) .byb-acc-body{background:var(--surface)}
+.byb-acc-body.open{display:block}
+.byb-acc-body>p{
+  font-size:14px;color:var(--ink-soft);font-family:var(--fb);
+  line-height:1.75;margin-bottom:.875rem;
+}
+.byb-acc-body>p:last-child{margin-bottom:0}
+.intro-r .byb-acc{
+  border:1px solid var(--border);border-radius:var(--r);
+  margin-top:8px;overflow:hidden;
+}
+.intro-r .byb-acc .byb-acc-body{background:var(--white)}
+.hsi-assess-acc-wrap .byb-acc{
+  border:1px solid rgba(10,22,40,0.1);border-radius:var(--r);
+  margin-bottom:12px;overflow:hidden;
+  box-shadow:0 2px 12px rgba(10,22,40,0.04);
+}
+.hsi-assess-acc-wrap .byb-acc:last-child{margin-bottom:0}
+/* Assess accordions (FSM, Social Drivers, Destabilizers): navy headers, light bodies */
+.hsi-assess-acc-wrap .byb-acc .byb-acc-hd{
+  background:linear-gradient(100deg,var(--hsi-navy-deep) 0%,var(--hsi-navy) 55%,var(--hsi-navy-mid) 100%);
+  border-left:4px solid var(--gold);
+}
+.hsi-assess-acc-wrap .byb-acc .byb-acc-hd:hover{filter:brightness(1.08)}
+.hsi-assess-acc-wrap .byb-acc:nth-child(even) .byb-acc-hd:not(.open),
+.hsi-assess-acc-wrap .byb-acc:nth-child(even) .byb-acc-hd:not(.open):hover{
+  background:linear-gradient(100deg,var(--hsi-navy-deep) 0%,var(--hsi-navy) 55%,var(--hsi-navy-mid) 100%);
+}
+.hsi-assess-acc-wrap .byb-acc:nth-child(even) .byb-acc-hd:not(.open):hover{filter:brightness(1.08)}
+.hsi-assess-acc-wrap .byb-acc .byb-acc-hd.open{
+  background:linear-gradient(100deg,#0a1422 0%,var(--hsi-navy-deep) 100%);
+  border-left-color:var(--gold-lt);
+}
+.hsi-assess-acc-wrap .byb-acc .byb-acc-title{color:#fff;font-weight:600}
+.hsi-assess-acc-wrap .byb-acc .byb-acc-hd.open .byb-acc-title{color:#fff}
+.hsi-assess-acc-wrap .byb-acc .byb-acc-cv{color:var(--gold-lt)}
+.hsi-assess-acc-wrap .byb-acc .byb-acc-body{background:#fafaf8}
+.hsi-assess-acc-wrap .byb-acc:nth-child(even) .byb-acc-body{background:#f5f4f0}
+.slab-preview--in-acc{
+  background:transparent;border:none;box-shadow:none;
+  padding:0;margin:0;
+}
+.slab-preview--in-acc:hover{transform:none;filter:none}
+
 /* ═══════════════════════════════════════════════════
    ── ASSESSMENT SCREEN ──
 ═══════════════════════════════════════════════════ */
-#sc-assess{background:var(--white)}
+#sc-assess{background:transparent}
 .assess-layout{
   display:grid;
   grid-template-columns:264px 1fr;
@@ -334,7 +505,13 @@ canvas{display:block}
 .sb-step.done .sb-pip{background:#ccc}
 
 /* Main */
-.assess-main{padding:56px 68px 80px;max-width:740px}
+.assess-main{
+  padding:56px 68px 80px;max-width:740px;
+  background:rgba(255,255,255,0.45);
+  border-radius:var(--r);
+  border:1px solid rgba(10,22,40,0.06);
+  box-shadow:0 1px 0 rgba(255,255,255,0.85) inset;
+}
 
 /* Domain header */
 .d-header{margin-bottom:40px}
@@ -900,8 +1077,8 @@ canvas{display:block}
    RESPONSIVE
 ═══════════════════════════════════════════════════ */
 @media(max-width:1080px){
-  .intro-hero{padding:56px 24px 32px}
-  .hero-h{font-size:48px}
+  .intro-hero-navy{padding:28px 22px 20px}
+  .intro-hero-navy .hero-h{font-size:clamp(2rem,4.5vw,2.65rem)}
   .assess-layout{grid-template-columns:1fr}
   .sidebar{display:none}
   .assess-main{padding:40px 36px 64px;max-width:100%}
@@ -909,8 +1086,10 @@ canvas{display:block}
 }
 @media(max-width:660px){
   .nav{padding:0 20px}
-  .intro-hero,.intro-acc-wrap,.intro-fsm-wrap{padding-left:20px;padding-right:20px}
-  .hero-h{font-size:38px}
+  .intro-flow{padding:0 10px}
+  .intro-hero-navy{padding:24px 18px 18px}
+  .hsi-intro-cta{padding-left:1rem;padding-right:1rem}
+  .intro-hero-navy .hero-h{font-size:clamp(1.75rem,7vw,2.35rem)}
   .assess-main{padding:28px 18px 56px}
   .results-wrap,.upgrade-wrap{padding:36px 18px 56px}
   .score-row{grid-template-columns:1fr}
@@ -920,39 +1099,121 @@ canvas{display:block}
   .slab-card{padding:24px 16px}
   .destab-card-r,.interp-card{padding:24px 18px}
 }
-  /* ── Collapsible domain sections ── */
+  /* ── Collapsible domain sections (4P) — navy headers, gold accent ── */
   .domain-section {
-    border: 1.5px solid var(--border);
+    border: 1px solid rgba(10, 22, 40, 0.12);
     border-radius: var(--r);
     margin-bottom: 16px;
     overflow: hidden;
+    box-shadow: 0 2px 12px rgba(10, 22, 40, 0.05);
   }
   .domain-section-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 20px;
+    padding: 16px 18px 16px 16px;
     cursor: pointer;
-    background: var(--white);
+    background: linear-gradient(100deg, var(--hsi-navy-deep) 0%, var(--hsi-navy) 55%, var(--hsi-navy-mid) 100%);
+    border-left: 4px solid var(--gold);
     user-select: none;
+    transition: filter 0.18s ease;
   }
-  .domain-section-header:hover { background: var(--gold-pale); }
-  .domain-section-header.open { border-bottom: 1.5px solid var(--border); }
+  .domain-section-header:hover { filter: brightness(1.06); }
+  .domain-section-header.open { border-bottom: 1px solid rgba(255, 255, 255, 0.12); }
   .domain-section-title {
-    font-family: var(--font-display);
+    font-family: var(--fd);
     font-size: 17px;
     font-weight: 600;
-    color: var(--black);
+    color: #fff;
   }
   .domain-section-badge {
-    font-family: var(--font-ui);
+    font-family: var(--fb);
     font-size: 10px;
     font-weight: 600;
     letter-spacing: 0.15em;
     text-transform: uppercase;
-    color: var(--gray-mid);
+    color: #e8c97a;
   }
   .domain-section-status {
+    font-family: var(--fb);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .domain-section-status.complete {
+    background: rgba(46, 125, 50, 0.35);
+    color: #c8f0c9;
+  }
+  .domain-section-arrow {
+    font-size: 12px;
+    color: var(--gold-lt);
+    transition: transform 0.2s;
+  }
+  .domain-section-arrow.open { transform: rotate(180deg); }
+  .domain-section-body {
+    display: none;
+    padding: 20px;
+    background: #f7f6f3;
+  }
+  .domain-section-body.open { display: block; }
+
+  /* Level 2: one collapsible block per question inside each 4P domain */
+  .hsi-q-acc {
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    margin-bottom: 12px;
+    overflow: hidden;
+    background: var(--white);
+  }
+  .hsi-q-acc:last-child { margin-bottom: 0; }
+  .hsi-q-acc-hd {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px 12px 12px;
+    cursor: pointer;
+    border: none;
+    border-left: 3px solid rgba(176, 152, 55, 0.55);
+    background: #fdfcfa;
+    text-align: left;
+    font: inherit;
+    box-sizing: border-box;
+  }
+  .hsi-q-acc-hd:hover { background: var(--gold-pale); }
+  .hsi-q-acc-hd.open {
+    border-bottom: 1px solid var(--border);
+    border-left-color: var(--gold);
+    background: #faf8f3;
+  }
+  .hsi-q-acc-hd-text { min-width: 0; flex: 1; }
+  .hsi-q-acc-hd-num {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gray-mid);
+    margin-bottom: 4px;
+  }
+  .hsi-q-acc-hd-title {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--black);
+    line-height: 1.35;
+  }
+  .hsi-q-acc-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .hsi-q-acc-status {
     font-family: var(--font-ui);
     font-size: 11px;
     font-weight: 600;
@@ -961,30 +1222,152 @@ canvas{display:block}
     background: var(--surf-line);
     color: var(--gray-mid);
   }
-  .domain-section-status.complete {
+  .hsi-q-acc-status.answered {
     background: #e6f4ea;
     color: #1a6e2e;
   }
-  .domain-section-arrow {
+  .hsi-q-acc-arrow {
     font-size: 12px;
     color: var(--gray-mid);
     transition: transform 0.2s;
   }
-  .domain-section-arrow.open { transform: rotate(180deg); }
-  .domain-section-body {
+  .hsi-q-acc-body {
     display: none;
-    padding: 20px;
+    padding: 0 16px 16px;
     background: var(--surface);
   }
-  .domain-section-body.open { display: block; }
+  .hsi-q-acc-body.open { display: block; }
+  .hsi-q-acc-body .q-text {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    margin-top: 4px;
+    margin-bottom: 14px;
+  }
+
+  @media print {
+    .no-print { display: none !important; }
+    #sc-assess, #sc-intro { display: none !important; }
+    #sc-results { display: block !important; }
+    #sc-results .screen { display: block !important; }
+    #case-header-fields,
+    #case-header-fields *,
+    #hsi-paid-report-visible,
+    #hsi-paid-report-visible * {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+  }
 
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/auth-guard.js"></script>
+<script src="js/portal-header-nav.js"></script>
+<script>
+(function (w) {
+  w.paidPortalRecordCaseToolRunAsync = async function (opts) {
+    var toolKey = opts.toolKey;
+    var scoreSummary = opts.scoreSummary;
+    var resultJson = opts.resultJson;
+    try {
+      var params = new URLSearchParams(window.location.search);
+      var caseRef = params.get('case_ref');
+      if (!caseRef || !w.supabaseClient) return;
+      var client = w.supabaseClient;
+      var sessRes = await client.auth.getSession();
+      var session = sessRes.data.session;
+      if (!session) return;
+      var cq = await client
+        .from('case_cases')
+        .select('id, attorney_user_id')
+        .eq('case_ref', caseRef)
+        .eq('attorney_user_id', session.user.id)
+        .maybeSingle();
+      if (cq.error || !cq.data) {
+        if (cq.error) console.error('[paid-portal] case lookup', cq.error);
+        return;
+      }
+      var caseId = cq.data.id;
+      var attorneyUserId = cq.data.attorney_user_id;
+      var runNumber = 1;
+      var rpc = await client.rpc('get_next_tool_run_number', {
+        case_id: caseId,
+        tool_key: toolKey
+      });
+      if (rpc.error) {
+        console.warn('[paid-portal] get_next_tool_run_number RPC, using fallback', rpc.error);
+        var mx = await client
+          .from('case_tool_runs')
+          .select('run_number')
+          .eq('case_id', caseId)
+          .eq('tool_key', toolKey)
+          .order('run_number', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (mx.error) {
+          console.error('[paid-portal] run_number fallback failed', mx.error);
+          return;
+        }
+        runNumber = (mx.data && mx.data.run_number != null ? Number(mx.data.run_number) : 0) + 1;
+      } else {
+        var d = rpc.data;
+        runNumber = typeof d === 'number' ? d : (d != null ? parseInt(String(d), 10) : NaN);
+        if (!Number.isFinite(runNumber) || runNumber < 1) runNumber = 1;
+      }
+      var upd = await client
+        .from('case_tool_runs')
+        .update({ is_latest: false })
+        .eq('case_id', caseId)
+        .eq('tool_key', toolKey)
+        .eq('is_latest', true);
+      if (upd.error) console.warn('[paid-portal] is_latest update', upd.error);
+      var ins = await client.from('case_tool_runs').insert({
+        case_id: caseId,
+        attorney_user_id: attorneyUserId,
+        tool_key: toolKey,
+        run_number: runNumber,
+        is_latest: true,
+        completion_status: 'completed',
+        score_summary: scoreSummary,
+        result_json: resultJson
+      });
+      if (ins.error) console.error('[paid-portal] case_tool_runs insert', ins.error);
+    } catch (err) {
+      console.error('[paid-portal] recordCaseToolRun', err);
+    }
+  };
+})(window);
+</script>
+<script src="js/case-identity.js"></script>
 </head>
-<body class="tool-hsi">
-<!-- Identifier is embedded in the generated report header only (not a separate floating card). -->
-<div class="trial-case-identity-shell tool-hsi-hide-identity-shell">
-  <div id="case-header-fields"></div>
-</div>
+<body class="with-portal-tool-header tool-hsi">
+
+<header class="portal-header no-print">
+  <a href="/index.html" class="portal-logo">
+    <div class="portal-logo-box"><span>C</span></div>
+    <div class="portal-logo-text">
+      <strong>C.A.S.E. Clarity</strong>
+      Reconcile Care Management Services
+    </div>
+  </a>
+  <div class="portal-header-right">
+    <a href="/case-detail.html" class="portal-nav-link" id="portal-nav-back-case">Back to Case</a>
+    <a href="/dashboard.html" class="portal-nav-link" id="portal-nav-back-dashboard">Back to Dashboard</a>
+    <span class="portal-user" id="user-email">Loading…</span>
+    <button type="button" class="btn-secondary" id="portal-nav-logout" disabled>Logout</button>
+  </div>
+</header>
+<script>
+(function () {
+  function boot() {
+    if (typeof initPortalHeaderNav === 'function') initPortalHeaderNav();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
+<div id="hsi-identity-slot-global" class="hsi-identity-slot-global" style="display:none" aria-hidden="true"></div>
 
 <!-- ══════════════════════════════════════════
      INTRO
@@ -996,27 +1379,31 @@ canvas{display:block}
   </nav>
   <div class="intro-flow">
     <div class="intro-hero">
-      <div class="eyebrow">Personal Injury &amp; Workers' Compensation</div>
-      <h1 class="hero-h">Holistic<br>Stability<br>Index<sup>™</sup></h1>
-      <p class="hero-sub">Powered by the 4Ps of Wellness</p>
-      <div class="rule"></div>
-      <div class="hero-body">
-        <p>Recovery outcomes are influenced by more than medical treatment alone. Internal stability and environmental pressures interact to either support or destabilize recovery.</p>
-        <p>The Holistic Stability Index™ evaluates these structural forces to help identify hidden pressures affecting recovery progress and case outcomes.</p>
+      <div class="intro-hero-navy">
+        <div class="intro-hero-navy-inner">
+          <div class="eyebrow">Personal Injury &amp; Workers' Compensation</div>
+          <h1 class="hero-h">Holistic<br>Stability<br>Index<sup>™</sup></h1>
+          <p class="hero-sub">Powered by the 4Ps of Wellness</p>
+          <div class="rule"></div>
+          <div class="hero-body">
+            <p>Recovery outcomes are influenced by more than medical treatment alone. Internal stability and environmental pressures interact to either support or destabilize recovery.</p>
+            <p>The Holistic Stability Index™ evaluates these structural forces to help identify hidden pressures affecting recovery progress and case outcomes.</p>
+          </div>
+        </div>
       </div>
-      <div class="hero-cta">
-        <button type="button" class="btn btn-dark" onclick="window.startAssessment()">Start Assessment →</button>
-        <p class="hero-time">⏱ Estimated time: 3–5 minutes</p>
-        <p class="hero-note">Medical records are not required. Please answer based on the most accurate and current information available.</p>
+      <div id="hsi-identity-slot-intro">
+        <div id="hsi-identity-mount" class="hsi-tool-page-overview">
+          <div id="case-header-fields"></div>
+        </div>
       </div>
     </div>
     <div class="intro-acc-wrap">
       <div class="byb-acc">
-        <button type="button" class="byb-acc-hd open" id="hsi-intro-acc-hd-0" aria-expanded="true" onclick="hsiToggleIntroAcc(0)">
+        <button type="button" class="byb-acc-hd" id="hsi-intro-acc-hd-0" aria-expanded="false" onclick="hsiToggleIntroAcc(0)">
           <span class="byb-acc-title">What This Evaluates</span>
           <svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
-        <div class="byb-acc-body open" id="hsi-intro-acc-bd-0">
+        <div class="byb-acc-body" id="hsi-intro-acc-bd-0">
           <ul class="r-list">
             <li><span class="dot"></span>Physical wellness and injury-related functional capacity</li>
             <li><span class="dot"></span>Psychological stability and behavioral health impact</li>
@@ -1041,14 +1428,24 @@ canvas{display:block}
           </ul>
         </div>
       </div>
-    </div>
-    <div class="intro-fsm-wrap">
-      <div class="fsm-section-heading">Foundation Stability Model™</div>
-      <div class="slab-preview">
-        <div class="slab-preview-divider"></div>
-        <div class="slab-preview-lbl">Foundation Stability Model™ Preview</div>
-        <canvas id="cvMini"></canvas>
-        <div id="fsm-intro-explain"></div>
+      <div class="byb-acc">
+        <button type="button" class="byb-acc-hd" id="hsi-fsm-intro-hd" aria-expanded="false" onclick="hsiToggleFsmIntro()">
+          <span class="byb-acc-title">Foundation Stability Model™</span>
+          <svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="byb-acc-body" id="hsi-fsm-intro-bd">
+          <div class="slab-preview slab-preview--in-acc">
+            <div class="slab-preview-divider"></div>
+            <div class="slab-preview-lbl">Foundation Stability Model™ Preview</div>
+            <canvas id="cvMini"></canvas>
+            <div id="fsm-intro-explain"></div>
+          </div>
+        </div>
+      </div>
+      <div class="hsi-intro-cta">
+        <button type="button" class="btn btn-dark hsi-intro-cta-btn" onclick="window.startAssessment()">Start Assessment →</button>
+        <p class="hero-time hsi-intro-cta-meta">⏱ Estimated time: 3–5 minutes</p>
+        <p class="hero-note hsi-intro-cta-note">Medical records are not required. Please answer based on the most accurate and current information available.</p>
       </div>
     </div>
   </div>
@@ -1062,6 +1459,7 @@ canvas{display:block}
     <div class="nav-brand">Holistic Stability Index<span class="g">™</span></div>
     <div class="nav-pill" id="assessPill">P1 of 4</div>
   </nav>
+  <div id="hsi-identity-slot-assess" class="hsi-identity-slot-assess"></div>
   <div class="assess-layout">
     <aside class="sidebar">
       <div class="sb-heading">Assessment Progress</div>
@@ -1085,13 +1483,28 @@ canvas{display:block}
     <div class="nav-brand">Holistic Stability Index<span class="g">™</span></div>
     <div class="nav-pill">Complete</div>
   </nav>
-  <div class="results-wrap" style="max-width:640px;margin:0 auto;padding:48px 24px 80px;text-align:center">
+  <div id="hsi-results-trial" class="results-wrap" style="max-width:640px;margin:0 auto;padding:48px 24px 80px;text-align:center">
     <div class="eyebrow">Assessment complete</div>
     <h1 class="results-title" style="margin:12px 0 16px">Holistic Stability Index™</h1>
-    <p class="results-sub" style="margin:0 auto;max-width:520px;line-height:1.65;color:var(--muted,#555)">Your responses have been saved. A detailed stability report will be available on the dashboard after all six assessments are finished.</p>
+    <p class="results-sub" style="margin:0 auto;max-width:520px;line-height:1.65;color:var(--muted,#555)">Your responses have been recorded. Review the stability summary below.</p>
     <div class="no-print" style="display:flex;gap:16px;justify-content:center;margin-top:40px;flex-wrap:wrap">
       <button type="button" onclick="returnToDashboard()" class="btn-ghost">← Return to Dashboard</button>
       <button type="button" onclick="goToNext()" class="btn-primary">Continue to Next Assessment →</button>
+    </div>
+  </div>
+  <div id="hsi-results-paid" class="results-wrap" style="display:none;max-width:920px;margin:0 auto;padding:48px 24px 80px;text-align:center">
+    <div class="eyebrow">Assessment complete</div>
+    <h1 class="results-title" style="margin:12px 0 16px">Holistic Stability Index™</h1>
+    <p class="results-sub no-print" style="margin:0 auto;max-width:560px;line-height:1.65;color:var(--muted,#555)">Your stability report is ready below. You may print or save a PDF, then return to this case or the dashboard.</p>
+    <div class="no-print" style="display:flex;gap:12px;justify-content:center;margin-top:32px;flex-wrap:wrap;align-items:center">
+      <button type="button" class="btn-primary" onclick="hsiScrollToPaidReport()">View Report</button>
+      <button type="button" class="btn-primary" onclick="hsiPrintPaidReport()">Print / Save PDF</button>
+      <a id="hsi-paid-return-case" class="btn-ghost" href="/case-detail.html" style="display:inline-block;text-decoration:none;padding:10px 20px;border-radius:4px;font-weight:600">Return to Case</a>
+      <button type="button" onclick="returnToDashboard()" class="btn-ghost">Dashboard</button>
+    </div>
+    <div id="hsi-paid-report-anchor"></div>
+    <div id="hsi-paid-report-block" style="max-width:920px;margin:0 auto;text-align:left">
+    <div id="hsi-paid-report-visible" style="margin-top:0;text-align:left"></div>
     </div>
   </div>
 </div>
@@ -1101,15 +1514,11 @@ canvas{display:block}
 <!-- ══════════════════════════════════════════
      JAVASCRIPT
 ══════════════════════════════════════════ -->
-<script src="js/trial-tool-storage.js"></script>
 <script>
 'use strict';
 
-// Read case type from portal launch URL (?caseType=active|retrospective|closed)
-const caseType = new URLSearchParams(window.location.search).get('caseType') || sessionStorage.getItem('tool_caseType') || 'active';
-if (new URLSearchParams(window.location.search).get('caseType')) {
-  try { sessionStorage.setItem('tool_caseType', String(new URLSearchParams(window.location.search).get('caseType'))); } catch (e) {}
-}
+// Read case type from portal launch URL (?caseType=active|closed)
+const caseType = new URLSearchParams(window.location.search).get('caseType') || 'active';
 
 function getFsmExplainBulletsHtml() {
   return '<ul class="fsm-explain-list">' +
@@ -1120,16 +1529,6 @@ function getFsmExplainBulletsHtml() {
     '<li>Higher pillars indicate stronger stability on that dimension.</li>' +
     '<li>Level foundations are not necessarily an indication of health and progress, especially if the leveling occurs at lower levels of the slab.</li>' +
     '</ul>';
-}
-
-function hsiToggleIntroAcc(idx) {
-  var hd = document.getElementById('hsi-intro-acc-hd-' + idx);
-  var bd = document.getElementById('hsi-intro-acc-bd-' + idx);
-  if (!hd || !bd) return;
-  var willOpen = !bd.classList.contains('open');
-  bd.classList.toggle('open', willOpen);
-  hd.classList.toggle('open', willOpen);
-  hd.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -1408,8 +1807,11 @@ const DOMAIN_DESCS  = {P1:'physical wellness',P2:'psychological wellness',P3:'ps
 ───────────────────────────────────────────────────────── */
 let step = 0;   // 0–5
 let currentQuestionIndex = 0;   // 0–4 within a P domain (resets when advancing to a new domain section)
-/** Which 4P domain accordion is expanded (0–3), or -1 for all collapsed */
 let hsiOpenDomain = 0;
+/** Per 4P domain: index of the one open question accordion, or -1 if none */
+let hsiOpenQiPerDomain = [-1, -1, -1, -1];
+/** Assess screen: Foundation Stability Model accordion */
+let hsiFsmAssessOpen = false;
 
 // answers[stepIdx][qi] = value
 const A = {0:{},1:{},2:{},3:{},4:{},5:{}};
@@ -1417,9 +1819,34 @@ const A = {0:{},1:{},2:{},3:{},4:{},5:{}};
 /* ─────────────────────────────────────────────────────────
    SCREEN MANAGEMENT
 ───────────────────────────────────────────────────────── */
+/** Single #hsi-identity-mount (contains #case-header-fields) moves between intro / assess / results. */
+function hsiPlaceIdentityMount() {
+  var mount = document.getElementById('hsi-identity-mount');
+  if (!mount) return;
+  var intro = document.getElementById('hsi-identity-slot-intro');
+  var assess = document.getElementById('hsi-identity-slot-assess');
+  var global = document.getElementById('hsi-identity-slot-global');
+  var active = document.querySelector('.screen.active');
+  var sid = active ? active.id : '';
+  if (sid === 'sc-intro' && intro) {
+    intro.appendChild(mount);
+  } else if (sid === 'sc-assess' && assess) {
+    assess.appendChild(mount);
+  } else if (sid === 'sc-results' && global) {
+    global.appendChild(mount);
+  }
+}
+
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  hsiPlaceIdentityMount();
+  var g = document.getElementById('hsi-identity-slot-global');
+  if (g) {
+    var showGlobal = id === 'sc-results';
+    g.style.display = showGlobal ? '' : 'none';
+    g.setAttribute('aria-hidden', showGlobal ? 'false' : 'true');
+  }
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -1428,6 +1855,8 @@ function showScreen(id) {
 ───────────────────────────────────────────────────────── */
 function startAssessment() {
   step=0; currentQuestionIndex=0; hsiOpenDomain=0;
+  hsiOpenQiPerDomain = [-1, -1, -1, -1];
+  hsiFsmAssessOpen = false;
   showScreen('sc-assess');
   render();
   requestAnimationFrame(function(){
@@ -1447,12 +1876,8 @@ function navNext() {
       if (unanswered !== -1) {
         toast(`Please answer all questions for ${DOMAINS[di].title} before continuing.`);
         hsiOpenDomain = di;
-        DOMAINS.forEach((_, j) => {
-          const b = document.getElementById(`dom-body-${j}`);
-          const a = document.getElementById(`dom-arrow-${j}`);
-          if (b) b.classList.toggle('open', j === di);
-          if (a) a.style.transform = j === di ? 'rotate(180deg)' : '';
-        });
+        hsiOpenQiPerDomain[di] = unanswered;
+        renderAllDomains();
         return;
       }
     }
@@ -1460,12 +1885,20 @@ function navNext() {
     currentQuestionIndex = 0;
   } else if (step===4) {
     for (let i=0;i<SOCIAL_DRIVERS.length;i++) {
-      if (A[4][i]===undefined) { toast('Please rate all Social Drivers before continuing.'); return; }
+      if (A[4][i]===undefined) {
+        toast('Please rate all Social Drivers before continuing.');
+        hsiEnsureBybAccOpen('sd');
+        return;
+      }
     }
     step++;
   } else if (step===5) {
     for (let i=0;i<DESTABILIZERS.length;i++) {
-      if (A[5][i]===undefined) { toast('Please rate all Clinical Destabilizers before continuing.'); return; }
+      if (A[5][i]===undefined) {
+        toast('Please rate all Clinical Destabilizers before continuing.');
+        hsiEnsureBybAccOpen('cd');
+        return;
+      }
     }
     buildResults(); return;
   }
@@ -1491,6 +1924,27 @@ function toast(msg) {
   el.textContent=msg;
   document.body.appendChild(el);
   setTimeout(()=>el.remove(),2800);
+}
+
+/** Same toggle logic as CAF cafToggleBybAcc (independent panels). */
+function hsiToggleBybAcc(key) {
+  const hd = document.getElementById('byb-acc-hd-' + key);
+  const bd = document.getElementById('byb-acc-bd-' + key);
+  if (!hd || !bd) return;
+  const willOpen = !bd.classList.contains('open');
+  hd.classList.toggle('open', willOpen);
+  bd.classList.toggle('open', willOpen);
+  hd.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+}
+
+function hsiEnsureBybAccOpen(key) {
+  const pbd = document.getElementById('byb-acc-bd-' + key);
+  const phd = document.getElementById('byb-acc-hd-' + key);
+  if (pbd && phd && !pbd.classList.contains('open')) {
+    pbd.classList.add('open');
+    phd.classList.add('open');
+    phd.setAttribute('aria-expanded', 'true');
+  }
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -1534,9 +1988,7 @@ function advanceToNextDomain(nextDi) {
   requestAnimationFrame(function () {
     const sec = document.getElementById('dom-section-' + nextDi);
     if (!sec) return;
-    const firstQ = sec.querySelector('.q-view');
-    const el = firstQ || sec;
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 }
 
@@ -1559,8 +2011,10 @@ function renderAllDomains() {
     const anyAnswered = dom.questions.some((_, qi) => A[di][qi] !== undefined);
     const isOpen = di === hsiOpenDomain;
 
+    const openQi = hsiOpenQiPerDomain[di];
     const questionsHtml = dom.questions.map((q, qi) => {
       const saved = A[di][qi];
+      const isQOpen = openQi === qi;
       const optsHtml = stg.map(s => {
         const buls = s.bullets.map(b => `<li>${b}</li>`).join('');
         return `
@@ -1577,24 +2031,34 @@ function renderAllDomains() {
       }).join('');
 
       return `
-      <div class="q-view" style="margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid var(--surf-line);">
-        <div class="q-num">Question ${qi + 1} of ${dom.questions.length}</div>
-        <div class="q-title">${q.title}</div>
-        <div class="q-text">${q.text}</div>
-        <div class="stage-opts" id="domOpts-${di}-${qi}">${optsHtml}</div>
+      <div class="hsi-q-acc" id="hsi-q-wrap-${di}-${qi}">
+        <button type="button" class="hsi-q-acc-hd${isQOpen ? ' open' : ''}" id="hsi-q-hd-${di}-${qi}" aria-expanded="${isQOpen ? 'true' : 'false'}" onclick="toggleHsiQuestion(${di},${qi})">
+          <div class="hsi-q-acc-hd-text">
+            <div class="hsi-q-acc-hd-num">Question ${qi + 1} of ${dom.questions.length}</div>
+            <div class="hsi-q-acc-hd-title">${q.title}</div>
+          </div>
+          <div class="hsi-q-acc-meta">
+            <span class="hsi-q-acc-status${saved !== undefined ? ' answered' : ''}">${saved !== undefined ? 'Answered' : 'Not answered'}</span>
+            <span class="hsi-q-acc-arrow" id="hsi-q-arrow-${di}-${qi}" style="${isQOpen ? 'transform:rotate(180deg)' : ''}">▾</span>
+          </div>
+        </button>
+        <div class="hsi-q-acc-body${isQOpen ? ' open' : ''}" id="hsi-q-body-${di}-${qi}">
+          <div class="q-text">${q.text}</div>
+          <div class="stage-opts" id="domOpts-${di}-${qi}">${optsHtml}</div>
+        </div>
       </div>`;
     }).join('');
 
     return `
     <div class="domain-section" id="dom-section-${di}">
-      <div class="domain-section-header${isOpen ? '' : '' }" onclick="toggleDomainSection(${di})">
+      <div class="domain-section-header${isOpen ? ' open' : ''}" onclick="toggleDomainSection(${di})">
         <div>
           <div class="domain-section-badge">${dom.badge}</div>
           <div class="domain-section-title">${dom.title}</div>
         </div>
         <div style="display:flex;align-items:center;gap:12px;">
           <div class="domain-section-status${allAnswered ? ' complete' : ''}">${allAnswered ? 'Complete' : anyAnswered ? 'In Progress' : 'Not Started'}</div>
-          <span class="domain-section-arrow${isOpen ? '' : ''}" id="dom-arrow-${di}">▾</span>
+          <span class="domain-section-arrow${isOpen ? ' open' : ''}" id="dom-arrow-${di}" style="${isOpen ? 'transform:rotate(180deg)' : ''}">▾</span>
         </div>
       </div>
       <div class="domain-section-body${isOpen ? ' open' : ''}" id="dom-body-${di}">
@@ -1612,38 +2076,96 @@ function renderAllDomains() {
       '</div>'
     : '';
 
+  const fsmAssessHdOpen = hsiFsmAssessOpen ? ' open' : '';
+  const fsmAssessBdOpen = hsiFsmAssessOpen ? ' open' : '';
+  const fsmAssessAria = hsiFsmAssessOpen ? 'true' : 'false';
+  const fsmAssessBlock =
+    '<div class="byb-acc hsi-fsm-assess-acc">' +
+    '<button type="button" class="byb-acc-hd' + fsmAssessHdOpen + '" id="hsi-fsm-assess-hd" aria-expanded="' + fsmAssessAria + '" onclick="toggleHsiFsmAssess()">' +
+    '<span class="byb-acc-title">Foundation Stability Model™</span>' +
+    '<svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+    '</button>' +
+    '<div class="byb-acc-body' + fsmAssessBdOpen + '" id="hsi-fsm-assess-bd">' +
+    '<canvas id="cvAssessFsm"></canvas>' +
+    getFsmExplainBulletsHtml() +
+    '</div></div>';
+
   document.getElementById('assessContent').innerHTML = `
     <div class="d-header" style="margin-bottom:24px;">
       <div class="d-badge">4Ps of Wellness Assessment</div>
       <div class="d-title">Rate each domain below</div>
-      <div style="font-size:13px;color:var(--gray-mid);margin-top:4px;">Expand one section at a time, answer all questions in that domain, then continue to the next.</div>
+      <div style="font-size:13px;color:var(--gray-mid);margin-top:4px;">Open one 4P domain at a time. Inside each domain, expand one question at a time; after you select a score, that question collapses automatically.</div>
     </div>
     ${snapHtml}
-    ${sectionsHtml}`;
+    <div class="hsi-assess-acc-wrap">
+      ${fsmAssessBlock}
+      ${sectionsHtml}
+    </div>`;
+  requestAnimationFrame(function () {
+    requestAnimationFrame(drawMiniSlab);
+  });
 }
 
 function toggleDomainSection(di) {
   const body = document.getElementById(`dom-body-${di}`);
   const arrow = document.getElementById(`dom-arrow-${di}`);
+  const hdr = document.querySelector('#dom-section-' + di + ' .domain-section-header');
   if (!body) return;
   if (body.classList.contains('open')) {
     body.classList.remove('open');
-    if (arrow) arrow.style.transform = '';
+    if (arrow) {
+      arrow.style.transform = '';
+      arrow.classList.remove('open');
+    }
+    if (hdr) hdr.classList.remove('open');
+    hsiOpenQiPerDomain[di] = -1;
     hsiOpenDomain = -1;
     return;
   }
   DOMAINS.forEach((_, j) => {
     const b = document.getElementById(`dom-body-${j}`);
     const a = document.getElementById(`dom-arrow-${j}`);
+    const h = document.querySelector('#dom-section-' + j + ' .domain-section-header');
     if (b) b.classList.toggle('open', j === di);
-    if (a) a.style.transform = j === di ? 'rotate(180deg)' : '';
+    if (a) {
+      a.style.transform = j === di ? 'rotate(180deg)' : '';
+      a.classList.toggle('open', j === di);
+    }
+    if (h) h.classList.toggle('open', j === di);
+    if (j !== di) hsiOpenQiPerDomain[j] = -1;
   });
   hsiOpenDomain = di;
+}
+
+/**
+ * Level 2: only one question open at a time within a domain (reduces scroll wall).
+ */
+function toggleHsiQuestion(di, qi) {
+  const dom = DOMAINS[di];
+  if (!dom) return;
+  const body = document.getElementById('hsi-q-body-' + di + '-' + qi);
+  if (!body) return;
+  const isCurrentlyOpen = body.classList.contains('open');
+  const willOpen = !isCurrentlyOpen;
+  dom.questions.forEach(function (_, j) {
+    const b = document.getElementById('hsi-q-body-' + di + '-' + j);
+    const h = document.getElementById('hsi-q-hd-' + di + '-' + j);
+    const ar = document.getElementById('hsi-q-arrow-' + di + '-' + j);
+    const open = willOpen && j === qi;
+    if (b) b.classList.toggle('open', open);
+    if (h) {
+      h.classList.toggle('open', open);
+      h.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    if (ar) ar.style.transform = open ? 'rotate(180deg)' : '';
+  });
+  hsiOpenQiPerDomain[di] = willOpen ? qi : -1;
 }
 
 function pickDomainStage(val, el, di, qi) {
   currentQuestionIndex = qi;
   A[di][qi] = val;
+  hsiOpenQiPerDomain[di] = -1;
   const opts = document.getElementById(`domOpts-${di}-${qi}`);
   if (opts) opts.querySelectorAll('.stage-opt').forEach(o => o.classList.remove('sel'));
   const opt = el.closest('.stage-opt') || el;
@@ -1708,18 +2230,29 @@ function renderDrivers() {
     </div>`;
   }).join('');
 
+  const accChevron = '<svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   document.getElementById('assessContent').innerHTML = `
-    <div class="d-header">
-      <div class="d-badge">Social Drivers of Health</div>
-      <div class="d-title">Social Drivers</div>
-      <div class="d-progress">
-        <span>Rate all 9 factors</span>
-        <div class="d-pbar"><div class="d-pfill" style="width:${getDriverPct()}%"></div></div>
-        <span>Final Step</span>
+    <div class="hsi-assess-acc-wrap">
+      <div class="byb-acc">
+        <button type="button" class="byb-acc-hd" id="byb-acc-hd-sd" aria-expanded="false" onclick="hsiToggleBybAcc('sd')">
+          <span class="byb-acc-title">Social Drivers of Health</span>
+          ${accChevron}
+        </button>
+        <div class="byb-acc-body" id="byb-acc-bd-sd">
+          <div class="d-header">
+            <div class="d-badge">Social Drivers of Health</div>
+            <div class="d-title">Social Drivers</div>
+            <div class="d-progress">
+              <span>Rate all 9 factors</span>
+              <div class="d-pbar"><div class="d-pfill" style="width:${getDriverPct()}%"></div></div>
+              <span>Final Step</span>
+            </div>
+          </div>
+          <div class="safeguard">Rate each Social Driver on the same 1–5 scale. Select the lower rating if uncertain.</div>
+          <div class="drivers-grid">${cards}</div>
+        </div>
       </div>
-    </div>
-    <div class="safeguard">Rate each Social Driver on the same 1–5 scale. Select the lower rating if uncertain.</div>
-    <div class="drivers-grid">${cards}</div>`;
+    </div>`;
 }
 
 function getDriverPct() {
@@ -1752,18 +2285,29 @@ function renderDestab() {
     </div>`;
   }).join('');
 
+  const accChevron = '<svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   document.getElementById('assessContent').innerHTML = `
-    <div class="d-header">
-      <div class="d-badge">Clinical Destabilizers</div>
-      <div class="d-title">Clinical Destabilizers</div>
-      <div class="d-progress">
-        <span>Rate all 3 factors</span>
-        <div class="d-pbar"><div class="d-pfill" style="width:100%"></div></div>
-        <span>Step 6 of 6</span>
+    <div class="hsi-assess-acc-wrap">
+      <div class="byb-acc">
+        <button type="button" class="byb-acc-hd" id="byb-acc-hd-cd" aria-expanded="false" onclick="hsiToggleBybAcc('cd')">
+          <span class="byb-acc-title">Clinical Destabilizers</span>
+          ${accChevron}
+        </button>
+        <div class="byb-acc-body" id="byb-acc-bd-cd">
+          <div class="d-header">
+            <div class="d-badge">Clinical Destabilizers</div>
+            <div class="d-title">Clinical Destabilizers</div>
+            <div class="d-progress">
+              <span>Rate all 3 factors</span>
+              <div class="d-pbar"><div class="d-pfill" style="width:100%"></div></div>
+              <span>Step 6 of 6</span>
+            </div>
+          </div>
+          <div class="safeguard">These ratings are stand-alone contextual factors and do not affect the Intrinsic or Extrinsic scores. They are included in the final report to identify additional pressures on recovery.</div>
+          <div class="destab-cards">${cards}</div>
+        </div>
       </div>
-    </div>
-    <div class="safeguard">These ratings are stand-alone contextual factors and do not affect the Intrinsic or Extrinsic scores. They are included in the final report to identify additional pressures on recovery.</div>
-    <div class="destab-cards">${cards}</div>`;
+    </div>`;
 }
 
 function pickDestab(idx, val, btn) {
@@ -1801,77 +2345,113 @@ function escHsi(s) {
   return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+function hsiToggleIntroAcc(idx) {
+  var hd = document.getElementById('hsi-intro-acc-hd-' + idx);
+  var bd = document.getElementById('hsi-intro-acc-bd-' + idx);
+  if (!hd || !bd) return;
+  var willOpen = !bd.classList.contains('open');
+  hd.classList.toggle('open', willOpen);
+  bd.classList.toggle('open', willOpen);
+  hd.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+}
+
+function hsiToggleFsmIntro() {
+  var hd = document.getElementById('hsi-fsm-intro-hd');
+  var bd = document.getElementById('hsi-fsm-intro-bd');
+  if (!hd || !bd) return;
+  var willOpen = !bd.classList.contains('open');
+  hd.classList.toggle('open', willOpen);
+  bd.classList.toggle('open', willOpen);
+  hd.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+  if (willOpen) {
+    requestAnimationFrame(function () {
+      requestAnimationFrame(drawMiniSlab);
+    });
+  }
+}
+
+function toggleHsiFsmAssess() {
+  hsiFsmAssessOpen = !hsiFsmAssessOpen;
+  var hd = document.getElementById('hsi-fsm-assess-hd');
+  var bd = document.getElementById('hsi-fsm-assess-bd');
+  if (hd && bd) {
+    hd.classList.toggle('open', hsiFsmAssessOpen);
+    bd.classList.toggle('open', hsiFsmAssessOpen);
+    hd.setAttribute('aria-expanded', hsiFsmAssessOpen ? 'true' : 'false');
+  }
+  if (hsiFsmAssessOpen) {
+    requestAnimationFrame(function () {
+      requestAnimationFrame(drawMiniSlab);
+    });
+  }
+}
+
+/** Report snapshot: locale string for generated-at line */
+function hsiFormatDateReport(ts) {
+  var d = ts ? new Date(ts) : new Date();
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+}
+
+/**
+ * Prefer live Case overview in #case-header-fields (data-case-identity), same labels as case-identity.js.
+ */
 function hsiReadCasePayloadForReport() {
-  var params = new URLSearchParams(window.location.search);
-  var ct =
-    params.get('caseType') ||
-    (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('tool_caseType') : null) ||
-    'active';
-  var v = String(ct == null ? '' : ct).toLowerCase();
-  var scope = v === 'retrospective' || v === 'retro' || v === 'closed' ? 'retro' : 'active';
-  var key = scope === 'retro' ? 'dashboard_case_retro' : 'dashboard_case_active';
-  var raw = null;
-  try {
-    raw = localStorage.getItem(key);
-  } catch (e) {}
-  var data = {};
-  if (raw) {
-    try {
-      data = JSON.parse(raw) || {};
-    } catch (e) {}
+  var out = {
+    case_title: '',
+    client_name: '',
+    case_type: '',
+    case_ref: '',
+    date_of_injury: '',
+    client_identifier: '',
+    case_status: '',
+    created_at: ''
+  };
+  var root = document.getElementById('case-header-fields');
+  if (root) {
+    root.querySelectorAll('[data-case-identity]').forEach(function (span) {
+      var key = span.getAttribute('data-case-identity');
+      if (!key || !Object.prototype.hasOwnProperty.call(out, key)) return;
+      var t = (span.textContent || '').trim();
+      if (t && t !== '—') out[key] = t;
+    });
   }
-  var statusLabel = scope === 'retro' ? 'Retrospective (closed)' : 'Active';
-  return { scope: scope, data: data, statusLabel: statusLabel };
+  return out;
 }
 
-function hsiFormatDateReport(iso) {
-  if (!iso) return '';
-  var d = String(iso).trim();
-  if (!d) return '';
-  var m = d.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (m) {
-    try {
-      var dt = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
-      if (!isNaN(dt.getTime())) {
-        return dt.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-      }
-    } catch (e) {}
+function hsiBuildReportHeaderIdentifierHtml(payload) {
+  var rows = [];
+  function push(label, key) {
+    var v = payload[key];
+    if (v == null) return;
+    var s = String(v).trim();
+    if (s === '' || s === '—') return;
+    rows.push({ label: label, val: escHsi(s) });
   }
-  return escHsi(d);
-}
-
-function hsiBuildReportHeaderIdentifierHtml() {
-  var info = hsiReadCasePayloadForReport();
-  var d = info.data || {};
-  var dash = '\u2014';
-  var caseTitle = d.caseTitle ? escHsi(d.caseTitle) : dash;
-  var clientName = d.clientName ? escHsi(d.clientName) : dash;
-  var caseType = d.caseType ? escHsi(d.caseType) : dash;
-  var sysId = d.systemIdentifier ? escHsi(d.systemIdentifier) : d.nameCaseId ? escHsi(d.nameCaseId) : dash;
-  var doiRaw = d.dateOfInjury;
-  var doi = doiRaw ? hsiFormatDateReport(doiRaw) || escHsi(String(doiRaw)) : dash;
-  var status = escHsi(info.statusLabel);
-  var created = d.creationDate ? hsiFormatDateReport(d.creationDate) || escHsi(String(d.creationDate)) : dash;
-  function row(label, valHtml) {
+  push('Case title', 'case_title');
+  push('Client name', 'client_name');
+  push('Case type', 'case_type');
+  push('System identifier', 'case_ref');
+  push('Date of injury / loss', 'date_of_injury');
+  push('Client identifier', 'client_identifier');
+  push('Status', 'case_status');
+  push('Creation date', 'created_at');
+  if (!rows.length) return '';
+  var cells = rows.map(function (r) {
     return (
-      '<div style="opacity:0.78">' +
-      escHsi(label) +
-      '</div><div style="font-weight:600">' +
-      valHtml +
-      '</div>'
+      '<div style="min-width:0">' +
+      '<div style="font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;opacity:0.75;margin-bottom:3px">' +
+      r.label +
+      '</div>' +
+      '<div style="font-size:13px;font-weight:600;line-height:1.35;word-break:break-word">' +
+      r.val +
+      '</div></div>'
     );
-  }
+  }).join('');
   return (
-    '<div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.28)">' +
-    '<div style="display:grid;grid-template-columns:minmax(118px,160px) 1fr;gap:6px 14px;font-size:11px;line-height:1.45;align-items:baseline">' +
-    row('Case Title', caseTitle) +
-    row('Client Name', clientName) +
-    row('Case Type', caseType) +
-    row('System Identifier', sysId) +
-    row('Date of Injury / Loss', doi) +
-    row('Status', status) +
-    row('Creation Date', created) +
-    '</div></div>'
+    '<div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.2);display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px 20px">' +
+    cells +
+    '</div>'
   );
 }
 function hsiValStyle(v) {
@@ -1918,17 +2498,23 @@ function buildHsiReportSnapshotHtml(toolData) {
     }).join('') +
     '</div>';
 
+  var casePayload = hsiReadCasePayloadForReport();
+  var idHtml = hsiBuildReportHeaderIdentifierHtml(casePayload);
+  var tsLine = hsiFormatDateReport(toolData.timestamp);
+
   return '<div style="font-family:system-ui,Segoe UI,sans-serif;max-width:880px;margin:0 auto;background:#fff;border:1px solid #d6d0c4;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(14,28,46,0.08)">' +
-    '<div style="background:linear-gradient(135deg,#0e1c2e 0%,#1a3050 100%);padding:20px 24px 22px;color:#fff">' +
+    '<div style="background:linear-gradient(135deg,#0e1c2e 0%,#1a3050 100%);padding:20px 24px;color:#fff">' +
     '<div style="font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#e8c547;margin-bottom:6px">Holistic Stability Index™</div>' +
     '<h2 style="margin:0;font-size:22px;font-weight:800;letter-spacing:-0.02em">Stability assessment report</h2>' +
-    '<div style="font-size:12px;opacity:0.88;margin-top:8px">' + escHsi(new Date(toolData.timestamp).toLocaleString()) + '</div>' +
-    hsiBuildReportHeaderIdentifierHtml() +
+    (tsLine
+      ? '<div style="font-size:12px;opacity:0.9;margin-top:10px;line-height:1.45">' + escHsi(tsLine) + '</div>'
+      : '') +
+    idHtml +
     '</div>' +
     topSummary +
     slabHtml +
     bottomFourPs +
-    '<div style="padding:12px 18px;background:#f4f2ec;font-size:11px;color:#666;line-height:1.55;border-top:1px solid #e0dcd4">Dashboard capture.</div></div>';
+    '<div style="padding:12px 18px;background:#f4f2ec;font-size:11px;color:#666;line-height:1.55;border-top:1px solid #e0dcd4">Destabilizers are contextual and do not change intrinsic or extrinsic scores.</div></div>';
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -1943,12 +2529,24 @@ function buildResults() {
     ...scored,
     answers: JSON.parse(JSON.stringify(A))
   };
-  const _ts = window.CaseClarityTrialStorage;
-  localStorage.setItem(_ts.key(4, caseType, 'data'), JSON.stringify(toolData));
-  localStorage.setItem(_ts.key(4, caseType, 'complete'), 'true');
+  localStorage.setItem('tool4_data', JSON.stringify(toolData));
+  localStorage.setItem('tool4_complete', 'true');
 
   showScreen('sc-results');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  var paidHsiRef = new URLSearchParams(window.location.search).get('case_ref');
+  var hsiTrial = document.getElementById('hsi-results-trial');
+  var hsiPaid = document.getElementById('hsi-results-paid');
+  var hsiRet = document.getElementById('hsi-paid-return-case');
+  if (paidHsiRef) {
+    if (hsiTrial) hsiTrial.style.display = 'none';
+    if (hsiPaid) hsiPaid.style.display = 'block';
+    if (hsiRet) hsiRet.setAttribute('href', '/case-detail.html?case_ref=' + encodeURIComponent(paidHsiRef));
+  } else {
+    if (hsiTrial) hsiTrial.style.display = 'block';
+    if (hsiPaid) hsiPaid.style.display = 'none';
+  }
 
   if (typeof window.markAssessmentComplete === 'function') {
     window.markAssessmentComplete({
@@ -1965,11 +2563,26 @@ function buildResults() {
   if (snapEl) {
     snapEl.innerHTML = buildHsiReportSnapshotHtml(toolData);
     snapEl.className = 'hsi-output stability-report report-container';
-    localStorage.setItem(_ts.key(4, caseType, 'report_html'), snapEl.outerHTML);
-    console.log('HSI report HTML saved, length:', localStorage.getItem(_ts.key(4, caseType, 'report_html')) ? localStorage.getItem(_ts.key(4, caseType, 'report_html')).length : 0);
+    localStorage.setItem('tool4_report_html', snapEl.outerHTML);
+    console.log('HSI report HTML saved, length:', localStorage.getItem('tool4_report_html') ? localStorage.getItem('tool4_report_html').length : 0);
+    if (paidHsiRef) {
+      var hsiPaidVis = document.getElementById('hsi-paid-report-visible');
+      if (hsiPaidVis) hsiPaidVis.innerHTML = snapEl.innerHTML;
+    }
   } else {
     console.warn('HSI: hsi-report-snapshot host missing; report HTML not saved.');
   }
+
+  void paidPortalRecordCaseToolRunAsync({
+    toolKey: 'HSI',
+    scoreSummary: {
+      tool: 'HSI',
+      intrinsic: scored.intrinsic,
+      extrinsic: scored.extrinsic,
+      pCode: scored.pCode
+    },
+    resultJson: toolData
+  });
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -1991,6 +2604,7 @@ function drawSlab(canvasEl, intrinsic, extrinsic, opts={}) {
   ctx.clearRect(0,0,W,H);
 
   const GOLD = '#b09837';
+  /* Wide side margin so left scale labels (e.g. “Struggling”) stay on-canvas and clear of the numeric ticks */
   const sW   = mini ? 0 : 100;
   const padT = mini ? 10 : 36;
   const padB = mini ? 22 : 54;
@@ -2241,14 +2855,10 @@ function renderFoundationSlabToDataUrl(intrinsic, extrinsic) {
 function buildHsiFoundationSlabSnapshotBlock(intrinsic, extrinsic) {
   try {
     const url = renderFoundationSlabToDataUrl(intrinsic, extrinsic);
-    const explain = getFsmExplainBulletsHtml().replace(
-      /class="fsm-explain-list"/,
-      'class="fsm-explain-list" style="margin:16px auto 0;max-width:640px;padding-left:1.25em;font-size:12px;color:#555;line-height:1.65;text-align:left;list-style:disc"'
-    );
     return '<div class="hsi-foundation-slab-block" style="margin:16px 22px 0;padding:20px 22px 24px;background:linear-gradient(180deg,#f4f3f0 0%,#eceae5 100%);border:1px solid #d6d0c4;border-radius:10px;text-align:center">' +
       '<div style="font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#6a6560;margin-bottom:10px">Foundation Stability Model™</div>' +
       '<img src="' + url + '" alt="Foundation Stability Model" width="720" height="380" style="max-width:100%;height:auto;display:block;margin:0 auto;border-radius:8px;box-shadow:0 4px 18px rgba(14,28,46,0.12)" />' +
-      explain +
+      getFsmExplainBulletsHtml().replace(/class="fsm-explain-list"/g, 'class="fsm-explain-list" style="margin:16px auto 0;max-width:640px;padding-left:1.25rem;font-size:12px;color:#555;line-height:1.65;text-align:left"') +
       '</div>';
   } catch (e) {
     return '';
@@ -2256,9 +2866,9 @@ function buildHsiFoundationSlabSnapshotBlock(intrinsic, extrinsic) {
 }
 
 function drawMiniSlab(){
-  const cv=document.getElementById('cvMini');
-  if(!cv) return;
-  drawSlab(cv,3,5,{mini:true});
+  document.querySelectorAll('#cvMini, #cvAssessFsm').forEach(function(cv){
+    drawSlab(cv,3,5,{mini:true});
+  });
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -2275,7 +2885,7 @@ window.addEventListener('resize',()=>{
    INIT
 ───────────────────────────────────────────────────────── */
 window.addEventListener('load',()=>{
-  var introExplain = document.getElementById('fsm-intro-explain');
+  const introExplain = document.getElementById('fsm-intro-explain');
   if (introExplain) introExplain.innerHTML = getFsmExplainBulletsHtml();
   function kick(){
     drawMiniSlab();
@@ -2284,6 +2894,14 @@ window.addEventListener('load',()=>{
   setTimeout(kick, 80);
   setTimeout(kick, 400);
 });
+
+function hsiScrollToPaidReport(){
+  var el=document.getElementById('hsi-paid-report-block')||document.getElementById('hsi-paid-report-anchor');
+  if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function hsiPrintPaidReport(){
+  window.print();
+}
 
 </script>
 <script>
@@ -2329,7 +2947,13 @@ function returnToDashboard() {
     window.location.href = 'dashboard.html';
 }
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  if (window.caseClarityIdentity && window.supabaseClient) {
+    void window.caseClarityIdentity.mountToolPage(window.supabaseClient);
+  }
+});
+</script>
 <script src="trial-pinned-banner.js"></script>
-<script src="js/case-identity.js"></script>
 </body>
 </html>
