@@ -742,7 +742,6 @@
         }
 
         attachLogoutHandler('.btn-logout');
-        var trialStillActiveEmailSent = false;
         (function wirePurchaseAccessLink() {
             var link = document.getElementById('purchase-access-link');
             if (!link) return;
@@ -1402,22 +1401,6 @@
                     }
                 });
                 await supabaseClient.from('trial_users').update({ completed_tools: completedTools }).eq('id', userId);
-                if (allToolsComplete() && !trialStillActiveEmailSent) {
-                    try {
-                        var inv = await supabaseClient.functions.invoke('send-ghl-trial-still-active', {
-                            body: { id: userId }
-                        });
-                        var payload = inv.data;
-                        if (!inv.error && payload && typeof payload === 'object') {
-                            if (payload.sent === true ||
-                                (payload.skipped === true && payload.reason === 'already_sent')) {
-                                trialStillActiveEmailSent = true;
-                            }
-                        }
-                    } catch (ghlErr) {
-                        console.warn('send-ghl-trial-still-active:', ghlErr);
-                    }
-                }
             } catch (e) {
                 console.warn('Supabase tool sync skipped:', e);
             }
@@ -1577,13 +1560,12 @@
                 if (userId) {
                     var res = await supabaseClient
                         .from('trial_users')
-                        .select('trial_start_at, status, trial_still_active_email_sent')
+                        .select('trial_start_at, status')
                         .eq('id', userId)
                         .single();
                     var user = res.data;
                     var err = res.error;
                     if (!err && user) {
-                        trialStillActiveEmailSent = !!user.trial_still_active_email_sent;
                         if (user.status === 'trial_expired') {
                             alert('Your trial has ended. Please purchase a subscription to continue.');
                             window.location.href = 'pricing.html';
