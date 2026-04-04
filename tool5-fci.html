@@ -6,6 +6,7 @@
   <title>Functional Capacity Index | Reconcile Care Management Services</title>
   <link rel="stylesheet" href="trial-pinned-banner.css">
   <link rel="stylesheet" href="css/case-identity.css">
+  <link rel="stylesheet" href="css/theme.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
@@ -33,6 +34,11 @@
       .print-summary-tile { background: #fff !important; border: 1px solid #aaa !important; border-top: 3px solid #333 !important; }
       .print-bullet { color: #333 !important; }
       .print-footer { display: block !important; }
+      #case-header-fields,
+      #case-header-fields * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
       @page { margin: 0.75in 0.75in 0.85in 0.75in; size: letter portrait; }
     }
 
@@ -54,6 +60,28 @@
     .app-header-div { color: #3a5070; }
 
     .container { max-width: 860px; margin: 0 auto; padding: 48px 32px 80px; }
+
+    /* FCI intro: main explainer card + action row only (no case overview on this page) */
+    .fci-intro-page {
+      display: block;
+    }
+    .fci-intro-case-overview {
+      margin-bottom: 24px;
+    }
+    .fci-action-row.nav-row {
+      margin-top: 16px;
+      padding-top: 18px;
+      border-top: 1px solid #e8e3d8;
+    }
+
+    /* FCI completion (paid + non-paid report view): report first, compact actions below */
+    .fci-paid-complete-container {
+      padding-top: 12px;
+      padding-bottom: 48px;
+    }
+    .fci-paid-complete-container .progress-bar.no-print {
+      margin-bottom: 20px;
+    }
 
     .card {
       background: #fff;
@@ -368,21 +396,118 @@
       .final-nav-bar { padding: 12px 20px; flex-direction: column; gap: 10px; align-items: flex-start; }
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth-guard.js"></script>
+  <script src="js/portal-header-nav.js"></script>
+  <script>
+  (function (w) {
+    w.paidPortalRecordCaseToolRunAsync = async function (opts) {
+      var toolKey = opts.toolKey;
+      var scoreSummary = opts.scoreSummary;
+      var resultJson = opts.resultJson;
+      try {
+        var params = new URLSearchParams(window.location.search);
+        var caseRef = params.get('case_ref');
+        if (!caseRef || !w.supabaseClient) return;
+        var client = w.supabaseClient;
+        var sessRes = await client.auth.getSession();
+        var session = sessRes.data.session;
+        if (!session) return;
+        var cq = await client
+          .from('case_cases')
+          .select('id, attorney_user_id')
+          .eq('case_ref', caseRef)
+          .eq('attorney_user_id', session.user.id)
+          .maybeSingle();
+        if (cq.error || !cq.data) {
+          if (cq.error) console.error('[paid-portal] case lookup', cq.error);
+          return;
+        }
+        var caseId = cq.data.id;
+        var attorneyUserId = cq.data.attorney_user_id;
+        var runNumber = 1;
+        var rpc = await client.rpc('get_next_tool_run_number', {
+          case_id: caseId,
+          tool_key: toolKey
+        });
+        if (rpc.error) {
+          console.warn('[paid-portal] get_next_tool_run_number RPC, using fallback', rpc.error);
+          var mx = await client
+            .from('case_tool_runs')
+            .select('run_number')
+            .eq('case_id', caseId)
+            .eq('tool_key', toolKey)
+            .order('run_number', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          if (mx.error) {
+            console.error('[paid-portal] run_number fallback failed', mx.error);
+            return;
+          }
+          runNumber = (mx.data && mx.data.run_number != null ? Number(mx.data.run_number) : 0) + 1;
+        } else {
+          var d = rpc.data;
+          runNumber = typeof d === 'number' ? d : (d != null ? parseInt(String(d), 10) : NaN);
+          if (!Number.isFinite(runNumber) || runNumber < 1) runNumber = 1;
+        }
+        var upd = await client
+          .from('case_tool_runs')
+          .update({ is_latest: false })
+          .eq('case_id', caseId)
+          .eq('tool_key', toolKey)
+          .eq('is_latest', true);
+        if (upd.error) console.warn('[paid-portal] is_latest update', upd.error);
+        var ins = await client.from('case_tool_runs').insert({
+          case_id: caseId,
+          attorney_user_id: attorneyUserId,
+          tool_key: toolKey,
+          run_number: runNumber,
+          is_latest: true,
+          completion_status: 'completed',
+          score_summary: scoreSummary,
+          result_json: resultJson
+        });
+        if (ins.error) console.error('[paid-portal] case_tool_runs insert', ins.error);
+      } catch (err) {
+        console.error('[paid-portal] recordCaseToolRun', err);
+      }
+    };
+  })(window);
+  </script>
+  <script src="js/case-identity.js"></script>
 </head>
-<body>
-<div class="trial-case-identity-shell">
-  <div id="case-header-fields"></div>
-</div>
+<body class="with-portal-tool-header">
+
+<header class="portal-header no-print">
+  <a href="/index.html" class="portal-logo">
+    <div class="portal-logo-box"><span>C</span></div>
+    <div class="portal-logo-text">
+      <strong>C.A.S.E. Clarity</strong>
+      Reconcile Care Management Services
+    </div>
+  </a>
+  <div class="portal-header-right">
+    <a href="/case-detail.html" class="portal-nav-link" id="portal-nav-back-case">Back to Case</a>
+    <a href="/dashboard.html" class="portal-nav-link" id="portal-nav-back-dashboard">Back to Dashboard</a>
+    <span class="portal-user" id="user-email">Loading…</span>
+    <button type="button" class="btn-secondary" id="portal-nav-logout" disabled>Logout</button>
+  </div>
+</header>
+<script>
+(function () {
+  function boot() {
+    if (typeof initPortalHeaderNav === 'function') initPortalHeaderNav();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
+
 <div id="app"></div>
 <div id="fci-report-snapshot-host" style="position:absolute;left:-9999px;top:0;width:1px;height:1px;overflow:hidden" aria-hidden="true"></div>
 
-<script src="js/trial-tool-storage.js"></script>
 <script>
-// Trial dashboard passes ?caseType=active|retrospective
-const caseType = new URLSearchParams(window.location.search).get('caseType') || sessionStorage.getItem('tool_caseType') || 'active';
-if (new URLSearchParams(window.location.search).get('caseType')) {
-  try { sessionStorage.setItem('tool_caseType', String(new URLSearchParams(window.location.search).get('caseType'))); } catch (e) {}
-}
 // ─────────────────────────────────────────────────────────────────────────────
 // DATA
 // ─────────────────────────────────────────────────────────────────────────────
@@ -581,13 +706,28 @@ function buildFciDashboardSnapshot(minS, weak, fvi, toolData) {
     '<div style="background:linear-gradient(135deg,#0c1c34 0%,#1a3050 100%);padding:20px 24px;color:#e8e2d4;border-bottom:3px solid #b8922a">' +
     '<div style="font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#b8922a;margin-bottom:6px">Functional Capacity Index™</div>' +
     '<h2 style="margin:0;font-size:24px;font-weight:400;letter-spacing:0.02em">Functional capacity analysis</h2>' +
-    '<div style="font-size:12px;opacity:0.88;margin-top:8px">' + esc(new Date(toolData.timestamp).toLocaleString()) + '</div></div>' +
+    '<div class="fci-report-header-identifier" style="font-size:11px;line-height:1.4;margin-top:8px;opacity:0.92;display:grid;grid-template-columns:1fr 1fr;gap:2px 18px">' +
+    '<div><strong>Case:</strong> <span id="fci-report-id-case">—</span></div>' +
+    '<div><strong>Client:</strong> <span id="fci-report-id-client">—</span></div>' +
+    '<div><strong>Date of Injury:</strong> <span id="fci-report-id-doi">—</span></div>' +
+    '<div><strong>Status:</strong> <span id="fci-report-id-status">—</span></div>' +
+    '</div>' +
+    '<div style="font-size:12px;opacity:0.88;margin-top:6px">' + esc(new Date(toolData.timestamp).toLocaleString()) + '</div></div>' +
     '<div style="padding:20px 24px;background:' + fviSt.bg + ';border-bottom:2px solid ' + fviSt.border + '">' +
     '<div style="font-size:11px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:' + fviSt.text + '">Functional vulnerability indicator</div>' +
     '<div style="font-size:26px;font-weight:800;color:' + fviSt.text + ';margin-top:6px">' + esc(fvi) + '</div>' +
-    '<div style="font-size:13px;color:#444;margin-top:8px"><strong>Primary instability domain(s):</strong> ' + esc(weak.join(', ')) + '</div></div>' +
+    '<div style="font-size:13px;color:#444;margin-top:8px"><strong>FCI minimum score:</strong> ' + minS + ' &nbsp;·&nbsp; <strong>Primary instability:</strong> ' + esc(weak.join(', ')) + '</div></div>' +
     '<div style="padding:22px 26px">' +
-    '<div style="margin-top:0;padding:20px 22px;background:#faf8f4;border:1px solid #e8e3d8;border-left:3px solid #b8922a;border-radius:8px">' +
+    '<div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#6a7a8a;margin-bottom:12px">Context indicators (FVI inputs)</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;font-size:13px;color:#333;margin-bottom:24px">' +
+    '<div><span style="color:#6a7a8a">Income range:</span> ' + esc(incomeLbl) + '</div>' +
+    '<div><span style="color:#6a7a8a">Dependents:</span> ' + esc(depLbl) + '</div>' +
+    '<div><span style="color:#6a7a8a">Sole earner:</span> ' + esc(soleLbl) + '</div>' +
+    '<div><span style="color:#6a7a8a">Pain / injury:</span> ' + esc(vulnLabel(pain)) + '</div>' +
+    '<div style="grid-column:1/-1"><span style="color:#6a7a8a">Psychological stress:</span> ' + esc(vulnLabel(psych)) + '</div></div>' +
+    '<div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#0c1c34;margin-bottom:14px">4Ps wellness scores</div>' +
+    domainRows +
+    '<div style="margin-top:28px;padding:20px 22px;background:#faf8f4;border:1px solid #e8e3d8;border-left:3px solid #b8922a;border-radius:8px">' +
     '<div style="font-size:11px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#0c1c34;margin-bottom:12px">Professional interpretation</div>' +
     interpHtml + '</div>' +
     '<p style="margin:18px 0 0;font-size:11px;line-height:1.55;color:#888">Structured care management framework — not a diagnostic instrument. Interpret in clinical and legal context.</p></div></div>';
@@ -651,14 +791,14 @@ function scoreBarRow(d,s,isWeakest){
 // SCREEN RENDERERS
 // ─────────────────────────────────────────────────────────────────────────────
 function screenIntro(){
-  return appHeader()+`<div class="container">`+progressBar("intro")+`<div class="card"><span class="eyebrow">Care Management Assessment Tool</span><h1 style="font-size:34px;font-weight:normal;color:#0c1c34;margin:0 0 6px;letter-spacing:0.01em">Functional Capacity Index</h1><p style="font-size:17px;color:#3a4a5a;margin:0 0 32px;line-height:1.6">A structured evaluation of holistic wellness across the 4Ps of Wellness</p><hr class="light" style="margin:0 0 32px"><p style="font-size:15px;line-height:1.85;color:#0e1c2e;margin:0 0 18px">The <strong>Functional Capacity Index (FCI)</strong> is a structured care management assessment tool developed by Reconcile Care Management Services. This analysis evaluates how a client's current condition across the 4Ps of Wellness may affect their ability to sustain work or continue in a professional or occupational role.</p><p style="font-size:15px;line-height:1.85;color:#0e1c2e;margin:0 0 32px">This assessment is designed to be completed thoughtfully. The value of this analysis depends on responses that reflect what is actually being experienced — not what is desired or hoped for. Estimated completion time: approximately 8–10 minutes.</p><div class="grid-4p">`+
+  return appHeader()+`<div class="container fci-intro-page">`+progressBar("intro")+`<div id="case-header-fields" class="no-print fci-intro-case-overview"></div><div class="card fci-intro-card"><span class="eyebrow">Care Management Assessment Tool</span><h1 style="font-size:34px;font-weight:normal;color:#0c1c34;margin:0 0 6px;letter-spacing:0.01em">Functional Capacity Index</h1><p style="font-size:17px;color:#3a4a5a;margin:0 0 32px;line-height:1.6">A structured evaluation of holistic wellness across the 4Ps of Wellness</p><hr class="light" style="margin:0 0 32px"><p style="font-size:15px;line-height:1.85;color:#0e1c2e;margin:0 0 18px">The <strong>Functional Capacity Index (FCI)</strong> is a structured care management assessment tool developed by Reconcile Care Management Services. This analysis evaluates how a client's current condition across the 4Ps of Wellness may affect their ability to sustain work or continue in a professional or occupational role.</p><p style="font-size:15px;line-height:1.85;color:#0e1c2e;margin:0 0 32px">This assessment is designed to be completed thoughtfully. The value of this analysis depends on responses that reflect what is actually being experienced — not what is desired or hoped for. Estimated completion time: approximately 8–10 minutes.</p><div class="grid-4p">`+
     [{p:"Physical",d:"Functional mobility, pain, and medical stability"},{p:"Psychological",d:"Emotional regulation, mental health, and cognitive functioning"},{p:"Psychosocial",d:"Support systems, relationships, and environmental stability"},{p:"Professional",d:"Occupational functioning, work capacity, and financial stability"}].map(x=>`<div class="fourp-card"><span class="fourp-label">${x.p} Wellness</span><span class="fourp-desc">${x.d}</span></div>`).join("")+
-    `</div><div class="callout" style="margin-bottom:32px"><span class="callout-label">Framework Notice</span><p style="font-size:13px;color:#3a4a5a;line-height:1.8;margin:0">The Functional Capacity Index is a structured care management assessment framework. It is not a scientific, diagnostic, or clinical instrument and does not replace medical evaluation, clinical judgment, or legal analysis. Results support care management documentation and case support purposes only.</p></div>
-    <div class="nav-row no-print"><button type="button" class="btn-ghost" id="intro-back">&larr; Back</button><button type="button" class="btn-primary" id="intro-next">Begin Analysis &rarr;</button></div></div></div>`;
+    `</div><div class="callout" style="margin-bottom:0"><span class="callout-label">Framework Notice</span><p style="font-size:13px;color:#3a4a5a;line-height:1.8;margin:0">The Functional Capacity Index is a structured care management assessment framework. It is not a scientific, diagnostic, or clinical instrument and does not replace medical evaluation, clinical judgment, or legal analysis. Results support care management documentation and case support purposes only.</p></div></div>
+    <div class="nav-row no-print fci-action-row"><button type="button" class="btn-ghost" id="intro-back">&larr; Back</button><button type="button" class="btn-primary" id="intro-next">Begin Analysis &rarr;</button></div></div>`;
 }
 
 function screenVulnIntro(){
-  return appHeader()+`<div class="container">`+progressBar("vuln-intro")+`<span class="eyebrow">Step 1 of 7 — Vulnerability Overview</span><h2 class="section-title">Functional Vulnerability Indicator</h2><div class="card"><p style="font-size:15px;color:#3a4a5a;line-height:1.85;margin:0 0 20px">The Functional Vulnerability Indicator identifies contextual factors that may increase pressure on a client's recovery trajectory or increase the likelihood of premature return to work before full recovery or medical clearance.</p><p style="font-size:15px;color:#3a4a5a;line-height:1.85;margin:0 0 20px">This portion of the analysis considers factors such as income level, dependent responsibilities, sole income earner status, pain related to injury, and psychological stress. These factors may increase vulnerability during recovery and may affect the client's ability to maintain stability over the life of a case.</p><p style="font-size:15px;color:#3a4a5a;line-height:1.85;margin:0 0 32px">These indicators help inform the Functional Vulnerability Indicator but <strong>do not</strong> change the Functional Capacity Index score.</p><div class="callout" style="margin-bottom:32px"><span class="callout-label">Indicators Covered</span><ul style="margin:0;padding:0;list-style:none">`+
+  return appHeader()+`<div class="container">`+progressBar("vuln-intro")+`<div id="case-header-fields" class="no-print" style="margin-bottom:24px"></div><span class="eyebrow">Step 1 of 7 — Vulnerability Overview</span><h2 class="section-title">Functional Vulnerability Indicator</h2><div class="card"><p style="font-size:15px;color:#3a4a5a;line-height:1.85;margin:0 0 20px">The Functional Vulnerability Indicator identifies contextual factors that may increase pressure on a client's recovery trajectory or increase the likelihood of premature return to work before full recovery or medical clearance.</p><p style="font-size:15px;color:#3a4a5a;line-height:1.85;margin:0 0 20px">This portion of the analysis considers factors such as income level, dependent responsibilities, sole income earner status, pain related to injury, and psychological stress. These factors may increase vulnerability during recovery and may affect the client's ability to maintain stability over the life of a case.</p><p style="font-size:15px;color:#3a4a5a;line-height:1.85;margin:0 0 32px">These indicators help inform the Functional Vulnerability Indicator but <strong>do not</strong> change the Functional Capacity Index score.</p><div class="callout" style="margin-bottom:32px"><span class="callout-label">Indicators Covered</span><ul style="margin:0;padding:0;list-style:none">`+
     ["Pre-Injury Annual Income Range","Dependent Responsibilities","Sole Income Earner Status","Pain Related to Injury","Psychological Stress (Depression / Anxiety)"].map(i=>`<li style="display:flex;align-items:baseline;gap:10px;font-size:13px;color:#3a4a5a;padding:7px 0;border-bottom:1px solid #e8e3d8"><span style="color:#b8922a;font-size:10px;flex-shrink:0">&#9670;</span>${esc(i)}</li>`).join("")+
     `</ul></div><div class="nav-row no-print"><button type="button" class="btn-ghost" id="vi-back">&larr; Back</button><button type="button" class="btn-primary" id="vi-next">Continue to Vulnerability Indicators &rarr;</button></div></div></div>`;
 }
@@ -666,7 +806,7 @@ function screenVulnIntro(){
 function screenVuln(){
   const can=S.fviFields.incomeRange!==""&&S.fviFields.hasDependents!==""&&S.fviFields.isSoleEarner!==""&&S.vulnScores.pain!==null&&S.vulnScores.psych!==null;
   const shortL={5:"Minimal",4:"Mild",3:"Moderate",2:"Significant",1:"Severe"};
-  let html=appHeader()+`<div class="container">`+progressBar("vuln")+`<span class="eyebrow">Step 2 of 7 — Vulnerability Indicators</span><h2 class="section-title">Functional Vulnerability Indicators</h2><p class="subtitle">These indicators help identify factors that may increase vulnerability during recovery. They may influence the Functional Vulnerability Indicator but <span style="font-style:normal">do not</span> change the Functional Capacity Index score.</p><div class="card"><div style="margin-bottom:28px;padding-bottom:28px;border-bottom:1px solid #e8e3d8"><span class="vuln-section-label">Financial &amp; Household Context</span><div class="grid-3">`+
+  let html=appHeader()+`<div class="container">`+progressBar("vuln")+`<div id="case-header-fields" class="no-print" style="margin-bottom:24px"></div><span class="eyebrow">Step 2 of 7 — Vulnerability Indicators</span><h2 class="section-title">Functional Vulnerability Indicators</h2><p class="subtitle">These indicators help identify factors that may increase vulnerability during recovery. They may influence the Functional Vulnerability Indicator but <span style="font-style:normal">do not</span> change the Functional Capacity Index score.</p><div class="card"><div style="margin-bottom:28px;padding-bottom:28px;border-bottom:1px solid #e8e3d8"><span class="vuln-section-label">Financial &amp; Household Context</span><div class="grid-3">`+
     fieldWrap("Pre-Injury Annual Income Range",true,selectInput("fvi-income",S.fviFields.incomeRange,INCOME_RANGES),"Used to calculate the Functional Vulnerability Indicator.")+
     fieldWrap("Dependents",true,selectInput("fvi-dep",S.fviFields.hasDependents,YES_NO),"Does the client have financial dependents?")+
     fieldWrap("Sole Income Earner",true,selectInput("fvi-sole",S.fviFields.isSoleEarner,YES_NO),"Is the client the primary or sole household income earner?")+
@@ -691,7 +831,7 @@ function screenDomain(idx){
   const cur=S.scores[dom.id];
   const stepNum=idx+3;
   const shortL={5:"Minimal",4:"Mild",3:"Moderate",2:"Significant",1:"Severe"};
-  let html=appHeader()+`<div class="container">`+progressBar("domain-"+idx)+`<span class="eyebrow">Step ${stepNum} of 7 — Domain Assessment</span><h2 class="section-title">${esc(dom.label)}</h2><p class="subtitle">${esc(dom.subtitle)}</p><div style="font-size:14px;color:#0e1c2e;margin-bottom:22px;padding:14px 20px;background:#faf8f4;border:1px solid #e8e3d8;border-left:3px solid #b8922a;line-height:1.7">Select the level that most accurately reflects the client's current situation in this domain. Choose the <strong>lowest level</strong> that accurately applies.</div>`;
+  let html=appHeader()+`<div class="container">`+progressBar("domain-"+idx)+`<div id="case-header-fields" class="no-print" style="margin-bottom:24px"></div><span class="eyebrow">Step ${stepNum} of 7 — Domain Assessment</span><h2 class="section-title">${esc(dom.label)}</h2><p class="subtitle">${esc(dom.subtitle)}</p><div style="font-size:14px;color:#0e1c2e;margin-bottom:22px;padding:14px 20px;background:#faf8f4;border:1px solid #e8e3d8;border-left:3px solid #b8922a;line-height:1.7">Select the level that most accurately reflects the client's current situation in this domain. Choose the <strong>lowest level</strong> that accurately applies.</div>`;
   dom.levels.slice().sort((a,b)=>b.score-a.score).forEach(lv=>{
     const active=cur===lv.score;
     html+=`<div class="level-card${active?" active":""}" data-domain="${dom.id}" data-score="${lv.score}"><div class="level-num${active?" active":""}">${lv.score}</div><div><p class="level-title${active?" active":""}">${esc(lv.title)}</p><p class="level-desc">${esc(lv.description)}</p></div></div>`;
@@ -710,7 +850,6 @@ function saveTool5AndComplete(){
   const toolData={
     completed:true,
     timestamp:new Date().toISOString(),
-    caseType,
     scores:{...S.scores},
     vulnScores:{...S.vulnScores},
     fviFields:{...S.fviFields},
@@ -718,21 +857,47 @@ function saveTool5AndComplete(){
     primaryInstabilityDomains:weak,
     functionalVulnerabilityIndicator:fvi
   };
-  const _ts = window.CaseClarityTrialStorage;
-  localStorage.setItem(_ts.key(5, caseType, 'data'), JSON.stringify(toolData));
-  localStorage.setItem(_ts.key(5, caseType, 'complete'), 'true');
+  localStorage.setItem('tool5_data',JSON.stringify(toolData));
+  localStorage.setItem('tool5_complete','true');
   var snapshotHtml = buildFciDashboardSnapshot(minS, weak, fvi, toolData);
+  window.__fciLastSnapshotHtml = snapshotHtml;
   var fciHost = document.getElementById('fci-report-snapshot-host');
   if (fciHost) {
     fciHost.innerHTML = snapshotHtml;
     fciHost.innerHTML = '';
   }
-  localStorage.setItem(_ts.key(5, caseType, 'report_html'), snapshotHtml);
-  console.log('FCI report HTML saved, length:', localStorage.getItem(_ts.key(5, caseType, 'report_html')) ? localStorage.getItem(_ts.key(5, caseType, 'report_html')).length : 0);
+  localStorage.setItem('tool5_report_html', snapshotHtml);
+  console.log('FCI report HTML saved, length:', localStorage.getItem('tool5_report_html') ? localStorage.getItem('tool5_report_html').length : 0);
+
+  void paidPortalRecordCaseToolRunAsync({
+    toolKey: 'FCI',
+    scoreSummary: {
+      tool: 'FCI',
+      fciMinScore: minS,
+      functionalVulnerabilityIndicator: fvi,
+      primaryInstabilityDomains: weak
+    },
+    resultJson: toolData
+  });
 }
 
 function screenComplete(){
-  return appHeader()+`<div class="container">`+progressBar("complete")+`<div class="card" style="text-align:center;padding:40px 28px 48px"><span class="eyebrow">Assessment complete</span><h2 class="section-title" style="margin-top:12px">Functional Capacity Index</h2><p style="font-size:15px;color:#3a4a5a;line-height:1.85;margin:16px auto 0;max-width:520px">Your responses have been saved. Detailed analysis will be available on the dashboard after all assessments are complete.</p><div class="nav-row no-print" style="justify-content:center;margin-top:36px;flex-wrap:wrap;gap:16px"><button type="button" class="btn-ghost" onclick="returnToDashboard()">&larr; Return to Dashboard</button><button type="button" class="btn-primary" onclick="goToNext()">Next Assessment &rarr;</button></div></div></div>`;
+  var paidRef=new URLSearchParams(window.location.search).get('case_ref');
+  if(paidRef){
+    return appHeader()+`<div class="container fci-paid-complete-container">`+progressBar("complete")+`<div id="case-header-fields" class="no-print" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)"></div><div id="fci-paid-report-anchor"></div><div id="fci-paid-report-block" style="margin-top:0;text-align:left"><div id="fci-paid-report-visible" style="margin-top:0;text-align:left"></div></div><div class="no-print fci-paid-report-toolbar" style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;padding:10px 0 6px;border-top:1px solid #e8e3d8;margin-top:8px"><button type="button" class="btn-primary" onclick="fciScrollToPaidReport()">View Report</button><button type="button" class="btn-primary" onclick="window.print()">Print / Save PDF</button><a id="fci-paid-return-case" class="btn-ghost" href="/case-detail.html" style="display:inline-block;text-decoration:none;padding:10px 20px;border:1.5px solid #0c1c34;border-radius:4px;color:#0c1c34;font-weight:600">Return to Case</a><button type="button" class="btn-ghost" onclick="returnToDashboard()">Dashboard</button></div></div>`;
+  }
+  return appHeader()+`<div class="container fci-paid-complete-container">`+progressBar("complete")+`<div id="case-header-fields" class="no-print" style="margin-bottom:16px"></div><div id="fci-paid-report-anchor"></div><div id="fci-paid-report-block" style="margin-top:0;text-align:left"><div id="fci-paid-report-visible" style="margin-top:0;text-align:left"></div></div><div class="no-print fci-paid-report-toolbar" style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;padding:10px 0 6px;border-top:1px solid #e8e3d8;margin-top:8px"><button type="button" class="btn-ghost" onclick="returnToDashboard()">&larr; Return to Dashboard</button><button type="button" class="btn-primary" onclick="goToNext()">Next Assessment &rarr;</button></div></div>`;
+}
+
+function fciSyncPaidReportIdentity(){
+  var src=document.getElementById('case-header-fields');
+  if(!src) return;
+  var pairs=[['case_title','fci-report-id-case'],['client_name','fci-report-id-client'],['date_of_injury','fci-report-id-doi'],['case_status','fci-report-id-status']];
+  pairs.forEach(function(pair){
+    var sEl=src.querySelector('[data-case-identity="'+pair[0]+'"]');
+    var tEl=document.getElementById(pair[1]);
+    if(sEl&&tEl) tEl.textContent=sEl.textContent;
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -751,7 +916,26 @@ function render(){
 
   app.innerHTML=html;
   bindEvents();
+  if(sc==="complete"){
+    var pr=new URLSearchParams(window.location.search).get('case_ref');
+    var host=document.getElementById('fci-paid-report-visible');
+    if(host&&window.__fciLastSnapshotHtml){ host.innerHTML=window.__fciLastSnapshotHtml; }
+    if(window.caseClarityIdentity&&window.supabaseClient){
+      void window.caseClarityIdentity.mountToolPage(window.supabaseClient).then(function(){
+        fciSyncPaidReportIdentity();
+      });
+    } else {
+      fciSyncPaidReportIdentity();
+    }
+    var a=document.getElementById('fci-paid-return-case');
+    if(a&&pr){ a.setAttribute('href','/case-detail.html?case_ref='+encodeURIComponent(pr)); }
+  }
   window.scrollTo(0,0);
+}
+
+function fciScrollToPaidReport(){
+  var el=document.getElementById('fci-paid-report-block')||document.getElementById('fci-paid-report-anchor');
+  if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 function bindEvents(){
@@ -806,6 +990,9 @@ function bind(id,fn){ const el=document.getElementById(id); if(el) el.addEventLi
 
 // Initial render
 render();
+if(window.caseClarityIdentity&&window.supabaseClient){
+  void window.caseClarityIdentity.mountToolPage(window.supabaseClient);
+}
 </script>
 <script>
 function goToNext() {
@@ -851,6 +1038,5 @@ function returnToDashboard() {
 }
 </script>
 <script src="trial-pinned-banner.js"></script>
-<script src="js/case-identity.js"></script>
 </body>
 </html>
