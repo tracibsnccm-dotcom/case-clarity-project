@@ -1851,7 +1851,7 @@ const DOMAIN_DESCS  = {P1:'physical wellness',P2:'psychological wellness',P3:'ps
 ───────────────────────────────────────────────────────── */
 let step = 0;   // 0–5
 let currentQuestionIndex = 0;   // 0–4 within a P domain (resets when advancing to a new domain section)
-let hsiOpenDomain = 0;
+let hsiOpenDomain = -1;
 /** Per 4P domain: index of the one open question accordion, or -1 if none */
 let hsiOpenQiPerDomain = [-1, -1, -1, -1];
 /** Assess screen: Foundation Stability Model accordion */
@@ -1898,7 +1898,7 @@ function showScreen(id) {
    START
 ───────────────────────────────────────────────────────── */
 function startAssessment() {
-  step=0; currentQuestionIndex=0; hsiOpenDomain=0;
+  step=0; currentQuestionIndex=0; hsiOpenDomain=-1;
   hsiOpenQiPerDomain = [-1, -1, -1, -1];
   hsiFsmAssessOpen = false;
   showScreen('sc-assess');
@@ -1997,8 +1997,7 @@ function hsiEnsureBybAccOpen(key) {
 function render() {
   updateSidebar();
   updatePill();
-  const isLast = step===5;
-  document.getElementById('btnNext').textContent = isLast ? 'View Results →' : 'Continue →';
+  document.getElementById('btnNext').textContent = 'Continue →';
 
   if      (step<=3) renderAllDomains();
   else if (step===4) renderDrivers();
@@ -2025,27 +2024,6 @@ function updatePill() {
 ───────────────────────────────────────────────────────── */
 function renderQuestion() {
   renderAllDomains();
-}
-
-function advanceToNextDomain(nextDi) {
-  currentQuestionIndex = 0;
-  requestAnimationFrame(function () {
-    const sec = document.getElementById('dom-section-' + nextDi);
-    if (!sec) return;
-    sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
-}
-
-function computeFourPsSnapshot() {
-  const ds = DOMAINS.map(function (_, di) {
-    const vals = Object.values(A[di]);
-    if (vals.length < DOMAINS[di].questions.length) return null;
-    return Math.min.apply(null, vals);
-  });
-  if (ds.some(function (x) { return x === null; })) return null;
-  const minD = Math.min.apply(null, ds);
-  const pIdx = ds.findIndex(function (s) { return s === minD; });
-  return { intrinsic: minD, pIdx: pIdx, domain: DOMAINS[pIdx], badge: DOMAINS[pIdx].badge };
 }
 
 function renderAllDomains() {
@@ -2112,14 +2090,6 @@ function renderAllDomains() {
     </div>`;
   }).join('');
 
-  const fourPsSnap = computeFourPsSnapshot();
-  const snapHtml = fourPsSnap
-    ? '<div class="hsi-fourps-summary">' +
-      '<div class="row"><strong>Intrinsic (4Ps floor):</strong> ' + hsiScorePill(fourPsSnap.intrinsic) + '</div>' +
-      '<div class="row"><strong>Determining domain:</strong> ' + fourPsSnap.badge + ' ' + hsiScorePill(fourPsSnap.intrinsic) + '</div>' +
-      '</div>'
-    : '';
-
   const fsmAssessHdOpen = hsiFsmAssessOpen ? ' open' : '';
   const fsmAssessBdOpen = hsiFsmAssessOpen ? ' open' : '';
   const fsmAssessAria = hsiFsmAssessOpen ? 'true' : 'false';
@@ -2140,7 +2110,6 @@ function renderAllDomains() {
       <div class="d-title">Rate each domain below</div>
       <div style="font-size:13px;color:var(--gray-mid);margin-top:4px;">Open one 4P domain at a time. Inside each domain, expand one question at a time; after you select a score, that question collapses automatically.</div>
     </div>
-    ${snapHtml}
     <div class="hsi-assess-acc-wrap">
       ${fsmAssessBlock}
       ${sectionsHtml}
@@ -2217,16 +2186,9 @@ function pickDomainStage(val, el, di, qi) {
   const dom = DOMAINS[di];
   const allAnswered = dom.questions.every((_, q) => A[di][q] !== undefined);
   if (allAnswered) {
-    if (di < DOMAINS.length - 1) {
-      hsiOpenDomain = di + 1;
-    } else {
-      hsiOpenDomain = -1;
-    }
+    hsiOpenDomain = -1;
   }
   renderAllDomains();
-  if (allAnswered && di < DOMAINS.length - 1) {
-    advanceToNextDomain(di + 1);
-  }
 }
 
 function pickStageGrouped(val, el, qi) {
@@ -2352,6 +2314,9 @@ function renderDestab() {
         </div>
       </div>
     </div>`;
+  requestAnimationFrame(function () {
+    hsiEnsureBybAccOpen('cd');
+  });
 }
 
 function pickDestab(idx, val, btn) {
