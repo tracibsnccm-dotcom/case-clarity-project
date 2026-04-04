@@ -156,11 +156,40 @@ canvas{display:block}
   max-width:720px;margin:0 auto;
   width:100%;
 }
-.intro-lists-wrap{
-  max-width:920px;margin:0 auto;padding:8px 24px 32px;
-  width:100%;
-  display:grid;grid-template-columns:1fr 1fr;gap:32px 40px;
+.tool-hsi-hide-identity-shell{display:none!important}
+.fsm-section-heading{
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);
+  font-family:var(--fb);font-weight:700;margin-bottom:10px;
 }
+.intro-acc-wrap{
+  max-width:920px;margin:0 auto;padding:8px 24px 24px;
+  width:100%;
+  border:1px solid var(--border);border-radius:var(--r);
+  overflow:hidden;background:var(--white);
+}
+.intro-acc-wrap .byb-acc{border-bottom:1px solid var(--border)}
+.intro-acc-wrap .byb-acc:last-child{border-bottom:none}
+.intro-acc-wrap .byb-acc-hd{
+  width:100%;text-align:left;padding:1.05rem 1.5rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:var(--white);border:none;font:inherit;transition:background .15s;
+}
+.intro-acc-wrap .byb-acc-hd:hover{background:var(--gold-pale)}
+.intro-acc-wrap .byb-acc:nth-child(even) .byb-acc-hd:not(.open){background:var(--surface)}
+.intro-acc-wrap .byb-acc:nth-child(even) .byb-acc-hd:not(.open):hover{background:#f0efe9}
+.intro-acc-wrap .byb-acc-hd.open{background:var(--ink)}
+.intro-acc-wrap .byb-acc-title{
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);
+  font-family:var(--fb);
+}
+.intro-acc-wrap .byb-acc-hd.open .byb-acc-title{color:var(--gold-lt)}
+.intro-acc-wrap .byb-acc-cv{
+  width:14px;height:14px;color:var(--ink-mid);transition:transform .25s,color .15s;flex-shrink:0;
+}
+.intro-acc-wrap .byb-acc-hd.open .byb-acc-cv{transform:rotate(180deg);color:var(--gold)}
+.intro-acc-wrap .byb-acc-body{display:none;padding:1.1rem 1.5rem 1.25rem;background:var(--white)}
+.intro-acc-wrap .byb-acc:nth-child(even) .byb-acc-body{background:var(--surface)}
+.intro-acc-wrap .byb-acc-body.open{display:block}
 .intro-fsm-wrap{
   max-width:920px;margin:0 auto;padding:0 24px 72px;
   width:100%;
@@ -871,7 +900,6 @@ canvas{display:block}
    RESPONSIVE
 ═══════════════════════════════════════════════════ */
 @media(max-width:1080px){
-  .intro-lists-wrap{grid-template-columns:1fr;gap:28px}
   .intro-hero{padding:56px 24px 32px}
   .hero-h{font-size:48px}
   .assess-layout{grid-template-columns:1fr}
@@ -881,7 +909,7 @@ canvas{display:block}
 }
 @media(max-width:660px){
   .nav{padding:0 20px}
-  .intro-hero,.intro-lists-wrap,.intro-fsm-wrap{padding-left:20px;padding-right:20px}
+  .intro-hero,.intro-acc-wrap,.intro-fsm-wrap{padding-left:20px;padding-right:20px}
   .hero-h{font-size:38px}
   .assess-main{padding:28px 18px 56px}
   .results-wrap,.upgrade-wrap{padding:36px 18px 56px}
@@ -952,8 +980,9 @@ canvas{display:block}
 
 </style>
 </head>
-<body>
-<div class="trial-case-identity-shell">
+<body class="tool-hsi">
+<!-- Identifier is embedded in the generated report header only (not a separate floating card). -->
+<div class="trial-case-identity-shell tool-hsi-hide-identity-shell">
   <div id="case-header-fields"></div>
 </div>
 
@@ -981,29 +1010,40 @@ canvas{display:block}
         <p class="hero-note">Medical records are not required. Please answer based on the most accurate and current information available.</p>
       </div>
     </div>
-    <div class="intro-lists-wrap">
-      <div class="r-section">
-        <div class="r-title">What This Evaluates</div>
-        <ul class="r-list">
-          <li><span class="dot"></span>Physical wellness and injury-related functional capacity</li>
-          <li><span class="dot"></span>Psychological stability and behavioral health impact</li>
-          <li><span class="dot"></span>Psychosocial barriers and environmental pressures</li>
-          <li><span class="dot"></span>Professional role stability and vocational outlook</li>
-          <li><span class="dot"></span>Social drivers of health affecting recovery</li>
-        </ul>
-        <p class="r-time-note">Estimated completion time: 3–5 minutes</p>
+    <div class="intro-acc-wrap">
+      <div class="byb-acc">
+        <button type="button" class="byb-acc-hd open" id="hsi-intro-acc-hd-0" aria-expanded="true" onclick="hsiToggleIntroAcc(0)">
+          <span class="byb-acc-title">What This Evaluates</span>
+          <svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="byb-acc-body open" id="hsi-intro-acc-bd-0">
+          <ul class="r-list">
+            <li><span class="dot"></span>Physical wellness and injury-related functional capacity</li>
+            <li><span class="dot"></span>Psychological stability and behavioral health impact</li>
+            <li><span class="dot"></span>Psychosocial barriers and environmental pressures</li>
+            <li><span class="dot"></span>Professional role stability and vocational outlook</li>
+            <li><span class="dot"></span>Social drivers of health affecting recovery</li>
+          </ul>
+          <p class="r-time-note">Estimated completion time: 3–5 minutes</p>
+        </div>
       </div>
-      <div class="r-section">
-        <div class="r-title">What You Will Receive</div>
-        <ul class="r-list">
-          <li><span class="dot"></span>Holistic Stability Index™ score</li>
-          <li><span class="dot"></span>Foundation Stability Model™ visualization</li>
-          <li><span class="dot"></span>Primary vulnerability domain identification</li>
-          <li><span class="dot"></span>Clinical Destabilizer Profile (Pain, Depression, Anxiety indicators)</li>
-        </ul>
+      <div class="byb-acc">
+        <button type="button" class="byb-acc-hd" id="hsi-intro-acc-hd-1" aria-expanded="false" onclick="hsiToggleIntroAcc(1)">
+          <span class="byb-acc-title">What You Will Receive</span>
+          <svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="byb-acc-body" id="hsi-intro-acc-bd-1">
+          <ul class="r-list">
+            <li><span class="dot"></span>Holistic Stability Index™ score</li>
+            <li><span class="dot"></span>Foundation Stability Model™ visualization</li>
+            <li><span class="dot"></span>Primary vulnerability domain identification</li>
+            <li><span class="dot"></span>Clinical Destabilizer Profile (Pain, Depression, Anxiety indicators)</li>
+          </ul>
+        </div>
       </div>
     </div>
     <div class="intro-fsm-wrap">
+      <div class="fsm-section-heading">Foundation Stability Model™</div>
       <div class="slab-preview">
         <div class="slab-preview-divider"></div>
         <div class="slab-preview-lbl">Foundation Stability Model™ Preview</div>
@@ -1080,6 +1120,16 @@ function getFsmExplainBulletsHtml() {
     '<li>Higher pillars indicate stronger stability on that dimension.</li>' +
     '<li>Level foundations are not necessarily an indication of health and progress, especially if the leveling occurs at lower levels of the slab.</li>' +
     '</ul>';
+}
+
+function hsiToggleIntroAcc(idx) {
+  var hd = document.getElementById('hsi-intro-acc-hd-' + idx);
+  var bd = document.getElementById('hsi-intro-acc-bd-' + idx);
+  if (!hd || !bd) return;
+  var willOpen = !bd.classList.contains('open');
+  bd.classList.toggle('open', willOpen);
+  hd.classList.toggle('open', willOpen);
+  hd.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -1750,6 +1800,80 @@ function score() {
 function escHsi(s) {
   return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
+
+function hsiReadCasePayloadForReport() {
+  var params = new URLSearchParams(window.location.search);
+  var ct =
+    params.get('caseType') ||
+    (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('tool_caseType') : null) ||
+    'active';
+  var v = String(ct == null ? '' : ct).toLowerCase();
+  var scope = v === 'retrospective' || v === 'retro' || v === 'closed' ? 'retro' : 'active';
+  var key = scope === 'retro' ? 'dashboard_case_retro' : 'dashboard_case_active';
+  var raw = null;
+  try {
+    raw = localStorage.getItem(key);
+  } catch (e) {}
+  var data = {};
+  if (raw) {
+    try {
+      data = JSON.parse(raw) || {};
+    } catch (e) {}
+  }
+  var statusLabel = scope === 'retro' ? 'Retrospective (closed)' : 'Active';
+  return { scope: scope, data: data, statusLabel: statusLabel };
+}
+
+function hsiFormatDateReport(iso) {
+  if (!iso) return '';
+  var d = String(iso).trim();
+  if (!d) return '';
+  var m = d.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) {
+    try {
+      var dt = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+      if (!isNaN(dt.getTime())) {
+        return dt.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+      }
+    } catch (e) {}
+  }
+  return escHsi(d);
+}
+
+function hsiBuildReportHeaderIdentifierHtml() {
+  var info = hsiReadCasePayloadForReport();
+  var d = info.data || {};
+  var dash = '\u2014';
+  var caseTitle = d.caseTitle ? escHsi(d.caseTitle) : dash;
+  var clientName = d.clientName ? escHsi(d.clientName) : dash;
+  var caseType = d.caseType ? escHsi(d.caseType) : dash;
+  var sysId = d.systemIdentifier ? escHsi(d.systemIdentifier) : d.nameCaseId ? escHsi(d.nameCaseId) : dash;
+  var doiRaw = d.dateOfInjury;
+  var doi = doiRaw ? hsiFormatDateReport(doiRaw) || escHsi(String(doiRaw)) : dash;
+  var status = escHsi(info.statusLabel);
+  var created = d.creationDate ? hsiFormatDateReport(d.creationDate) || escHsi(String(d.creationDate)) : dash;
+  function row(label, valHtml) {
+    return (
+      '<div style="opacity:0.78">' +
+      escHsi(label) +
+      '</div><div style="font-weight:600">' +
+      valHtml +
+      '</div>'
+    );
+  }
+  return (
+    '<div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.28)">' +
+    '<div style="display:grid;grid-template-columns:minmax(118px,160px) 1fr;gap:6px 14px;font-size:11px;line-height:1.45;align-items:baseline">' +
+    row('Case Title', caseTitle) +
+    row('Client Name', clientName) +
+    row('Case Type', caseType) +
+    row('System Identifier', sysId) +
+    row('Date of Injury / Loss', doi) +
+    row('Status', status) +
+    row('Creation Date', created) +
+    '</div></div>'
+  );
+}
 function hsiValStyle(v) {
   const map = { 5:{bg:'#1e5c3a',fg:'#fff'}, 4:{bg:'#4a6741',fg:'#fff'}, 3:{bg:'#a8852b',fg:'#fff'}, 2:{bg:'#c45c1a',fg:'#fff'}, 1:{bg:'#8b1e1e',fg:'#fff'} };
   return map[v] || map[3];
@@ -1795,10 +1919,12 @@ function buildHsiReportSnapshotHtml(toolData) {
     '</div>';
 
   return '<div style="font-family:system-ui,Segoe UI,sans-serif;max-width:880px;margin:0 auto;background:#fff;border:1px solid #d6d0c4;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(14,28,46,0.08)">' +
-    '<div style="background:linear-gradient(135deg,#0e1c2e 0%,#1a3050 100%);padding:20px 24px;color:#fff">' +
+    '<div style="background:linear-gradient(135deg,#0e1c2e 0%,#1a3050 100%);padding:20px 24px 22px;color:#fff">' +
     '<div style="font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#e8c547;margin-bottom:6px">Holistic Stability Index™</div>' +
     '<h2 style="margin:0;font-size:22px;font-weight:800;letter-spacing:-0.02em">Stability assessment report</h2>' +
-    '<div style="font-size:12px;opacity:0.85;margin-top:8px">' + escHsi(new Date(toolData.timestamp).toLocaleString()) + ' · Case: ' + escHsi(toolData.caseType || '') + '</div></div>' +
+    '<div style="font-size:12px;opacity:0.88;margin-top:8px">' + escHsi(new Date(toolData.timestamp).toLocaleString()) + '</div>' +
+    hsiBuildReportHeaderIdentifierHtml() +
+    '</div>' +
     topSummary +
     slabHtml +
     bottomFourPs +
