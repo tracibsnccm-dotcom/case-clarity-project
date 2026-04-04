@@ -4,58 +4,67 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Case Complexity Index™</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="trial-pinned-banner.css"/>
 <link rel="stylesheet" href="css/case-identity.css"/>
+<link rel="stylesheet" href="css/theme.css"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#fff;color:#000;font-size:15px;line-height:1.7}
+:root{
+  --nv:#0a1628;--nv2:#152238;--nv3:#1e3352;
+  --gd:#c9a84c;--gd2:#e8c97a;--gd3:#f5e9c8;
+  --cr:#faf8f3;--wh:#ffffff;
+  --t1:#0a1628;--t2:#3a4a5c;--t3:#6b7a8d;
+  --bd:rgba(10,22,40,0.12);--bg:rgba(201,168,76,0.3);
+}
+html{background:#eceae3}
+body{background:transparent;color:#000;font-size:15px;line-height:1.7}
 
-/* ── EXPLAINER ─────────────────────────────────────── */
-#explainer{font-family:'DM Sans',sans-serif;padding:3.5rem 1.5rem 5rem}
-.ex-wrap{max-width:780px;margin:0 auto}
-.ex-eyebrow{font-size:10.5px;font-weight:500;color:#b09837;text-transform:uppercase;letter-spacing:0.14em;margin-bottom:1rem}
-.ex-header{border-bottom:2px solid #b09837;padding-bottom:2rem;margin-bottom:2.75rem}
-.ex-header h1{font-family:'Playfair Display',serif;font-size:38px;font-weight:500;color:#000;line-height:1.15;margin-bottom:0.5rem}
-.ex-header .subtitle{font-family:'Playfair Display',serif;font-size:17px;font-weight:400;color:#555;margin-bottom:1.75rem;line-height:1.5}
-.ex-intro{font-size:15px;color:#333;line-height:1.8;max-width:680px}
-.ex-section{margin-bottom:3rem}
-.ex-section-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:500;color:#000;margin-bottom:1.1rem;padding-bottom:0.5rem;border-bottom:1px solid #e8dfa0}
-.ex-section p{color:#333;margin-bottom:0.9rem;max-width:680px}
-.ex-section p:last-child{margin-bottom:0}
-.ex-dim-list{list-style:none;margin:0.75rem 0 0.5rem;padding:0}
-.ex-dim-list li{display:flex;align-items:flex-start;gap:10px;font-size:14.5px;color:#222;margin-bottom:5px;line-height:1.5}
-.ex-dot{width:5px;height:5px;border-radius:50%;background:#b09837;flex-shrink:0;margin-top:8px}
-.ex-domain-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:1.4rem}
-@media(max-width:640px){.ex-domain-grid{grid-template-columns:1fr}}
-.ex-domain-card{border:1px solid #e0d090;border-radius:7px;padding:1.25rem 1.1rem}
-.ex-domain-card-title{font-size:10px;font-weight:500;color:#b09837;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.65rem;padding-bottom:0.5rem;border-bottom:1px solid #eedfa0}
-.ex-domain-card p{font-size:13px;color:#444;line-height:1.6;margin-bottom:0.6rem}
-.ex-domain-card p:last-child{margin-bottom:0}
-.ex-domain-card ul{list-style:none;padding:0;margin:0.4rem 0 0}
-.ex-domain-card ul li{display:flex;align-items:flex-start;gap:7px;font-size:12.5px;color:#444;margin-bottom:3px;line-height:1.45}
-.ex-domain-card ul li:before{content:'';width:3px;height:3px;border-radius:50%;background:#b09837;flex-shrink:0;margin-top:7px}
-.ex-note-box{background:#fdf8e8;border:1.5px solid #b09837;border-radius:7px;padding:1.5rem 1.6rem;margin-top:1.25rem}
-.ex-note-box p{font-size:14px;color:#333;margin-bottom:0.8rem;line-height:1.7}
-.ex-note-box p:last-child{margin-bottom:0}
-.ex-note-box ul{list-style:none;padding:0;margin:0.5rem 0 0.85rem}
-.ex-note-box ul li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:#333;margin-bottom:5px;line-height:1.5}
-.ex-note-box ul li:before{content:'';width:4px;height:4px;border-radius:50%;background:#b09837;flex-shrink:0;margin-top:8px}
-.ex-note-time{font-size:13.5px;color:#7a6a22;font-weight:500;margin-top:0.85rem}
-.ex-conf{border-left:3px solid #b09837;padding:0.85rem 1.1rem;background:#fafafa;border-radius:0 5px 5px 0;margin-top:1.25rem}
-.ex-conf p{font-size:13.5px;color:#444;margin-bottom:0.4rem;line-height:1.6}
-.ex-conf p:last-child{margin-bottom:0}
-.ex-cta{margin-top:3.5rem;text-align:center;padding-top:2.5rem;border-top:1px solid #e8dfa0}
-.ex-cta-label{font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1.25rem}
-.ex-cta-btn{display:inline-block;padding:0.95rem 2.75rem;background:#b09837;color:#fff;border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;letter-spacing:0.05em;cursor:pointer;transition:background 0.15s}
-.ex-cta-btn:hover{background:#9a8430}
-.ex-cta-note{font-size:12px;color:#aaa;margin-top:1rem}
+/* ── EXPLAINER (CAF-aligned structure) ───────────────── */
+#explainer{background:#eceae3;padding:2rem 1rem 3rem;font-family:Georgia,'Times New Roman',serif}
+.page{max-width:860px;margin:0 auto;padding-bottom:3rem}
+.exp-hdr{background:var(--nv);padding:2rem 2.5rem;border-radius:12px 12px 0 0}
+.exp-tag{font-size:10px;letter-spacing:2.5px;color:var(--gd2);text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:12px}
+.exp-hdr h1{font-size:22px;font-weight:400;color:white;line-height:1.4;margin-bottom:12px;max-width:640px}
+.exp-hdr .sub{font-size:13px;color:rgba(255,255,255,0.55);font-family:Arial,sans-serif;line-height:1.65;max-width:600px}
+.exp-body{background:var(--cr);border:1px solid var(--bd);border-top:none;border-radius:0 0 12px 12px}
+.byb-acc-toolbar{display:flex;justify-content:flex-end;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 1.5rem 10px;border-bottom:1px solid var(--bd);background:var(--cr)}
+.byb-acc-bulk{font-size:11px;font-family:Arial,sans-serif;font-weight:500;color:var(--t3);background:transparent;border:1px solid var(--bd);padding:5px 12px;border-radius:4px;cursor:pointer;transition:color .15s,border-color .15s,background .15s}
+.byb-acc-bulk:hover{color:var(--nv);border-color:rgba(176,152,55,0.55);background:rgba(255,255,255,0.6)}
+.byb-acc{border-bottom:1px solid var(--bd)}
+.byb-acc:last-child{border-bottom:none}
+.byb-acc-hd{width:100%;text-align:left;padding:1.05rem 1.5rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--wh);border:none;font:inherit;transition:background .15s}
+.byb-acc-hd:hover{background:#f9f7f2}
+.byb-acc:nth-child(even) .byb-acc-hd:not(.open){background:#faf8f3}
+.byb-acc:nth-child(even) .byb-acc-hd:not(.open):hover{background:#f5f2eb}
+.byb-acc-hd.open{background:var(--nv)}
+.byb-acc-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gd);font-family:Arial,sans-serif}
+.byb-acc-hd.open .byb-acc-title{color:var(--gd2)}
+.byb-acc-cv{width:14px;height:14px;color:var(--t3);transition:transform .25s,color .15s;flex-shrink:0}
+.byb-acc-hd.open .byb-acc-cv{transform:rotate(180deg);color:var(--gd)}
+.byb-acc-body{display:none;padding:1.25rem 1.5rem 1.35rem;background:var(--wh)}
+.byb-acc:nth-child(even) .byb-acc-body{background:#faf8f3}
+.byb-acc-body.open{display:block}
+.byb-acc-body>p{font-size:14px;color:var(--t2);font-family:Arial,sans-serif;line-height:1.75;margin-bottom:.75rem}
+.byb-acc-body>p:last-child{margin-bottom:0}
+ul.byb-points{margin:.45rem 0 0;padding-left:1.2rem;font-size:13px;color:var(--t2);font-family:Arial,sans-serif;line-height:1.45}
+ul.byb-points li{margin-bottom:.35rem}
+ul.byb-points li:last-child{margin-bottom:0}
+ul.cci-domain-compact{margin:.5rem 0 0;padding-left:1.15rem;font-size:12px;color:var(--t3);font-family:Arial,sans-serif;line-height:1.45}
+ul.cci-domain-compact li{margin-bottom:.35rem}
+ul.cci-domain-compact strong{color:var(--nv);font-weight:600}
+.rule-box-mini{background:var(--nv2);border-radius:8px;padding:1rem 1.15rem;margin-top:.75rem}
+.rule-box-mini p{font-size:12px;color:rgba(255,255,255,0.7);font-family:Arial,sans-serif;line-height:1.65;margin-bottom:.45rem}
+.rule-box-mini p:last-child{margin-bottom:0}
+.cta-sec{padding:1.75rem 2rem;background:var(--nv2);border-radius:0 0 12px 12px;text-align:center}
+.cta-btn{display:inline-block;background:var(--gd);color:var(--nv);padding:14px 36px;font-size:14px;font-family:Arial,sans-serif;letter-spacing:.5px;border-radius:6px;cursor:pointer;border:none;transition:background .15s}
+.cta-btn:hover{background:var(--gd2)}
+.cta-note{font-size:11px;color:rgba(255,255,255,0.38);font-family:Arial,sans-serif;margin-top:10px;letter-spacing:.5px}
 .btn-primary{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;padding:10px 24px;background:#b09837;color:#fff;border:none;cursor:pointer;border-radius:4px}
 .btn-primary:hover{background:#9a8430}
 .btn-ghost{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;padding:10px 24px;background:#fff;color:#b09837;border:1.5px solid #b09837;cursor:pointer;border-radius:4px}
 
 /* ── ASSESSMENT ────────────────────────────────────── */
-#assessment{display:none;font-family:'Segoe UI',Arial,sans-serif;padding:2rem 1rem 3rem}
+#assessment{display:none;font-family:'Segoe UI',Arial,sans-serif;padding:2rem 1rem 3rem;background:#fff;color:#000}
 .wrap{max-width:900px;margin:0 auto}
 .page-header{padding-bottom:1.25rem;margin-bottom:0.5rem}
 .page-header h1{font-size:28px;font-weight:700;color:#000;letter-spacing:0.01em}
@@ -92,9 +101,37 @@ select:focus{outline:none;border-color:#b09837;box-shadow:0 0 0 2px rgba(176,152
 .domain-group{margin-bottom:1.1rem}
 .domain-group:last-child{margin-bottom:0}
 .domain-label{font-size:11px;font-weight:700;color:#7a6a22;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.4rem;padding-left:2px}
-.p-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem}
-@media(max-width:620px){.p-grid{grid-template-columns:1fr}}
+.cci-step2-card .cb-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+@media(max-width:520px){.cci-step2-card .cb-grid{grid-template-columns:1fr}}
+.cci-step2-card .cb-grid .cb-item{align-items:flex-start}
+.cci-step2-other-input{margin-top:10px;width:100%;box-sizing:border-box}
+.cci-step5-card .cb-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+@media(max-width:520px){.cci-step5-card .cb-grid{grid-template-columns:1fr}}
+.cci-step5-card .cb-grid .cb-item{align-items:flex-start}
+.cci-step5-card .sub-desc{margin-bottom:0.65rem}
+.cci-step5-card select{margin-top:0.35rem}
+/* Step 5: two independent columns — avoids shared grid rows so a tall left card does not push the right-column cards apart */
+.cci-step5-domain-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:0.45rem 0.65rem;
+  align-items:start;
+}
+.cci-step5-col{display:flex;flex-direction:column;gap:0.45rem;min-width:0}
+@media(max-width:700px){.cci-step5-domain-grid{grid-template-columns:1fr}}
+.cci-step5-card--referral-duration .sub{margin-bottom:1rem}
+.cci-step5-card--referral-duration .sub:last-child{margin-bottom:0}
+.cci-p-domain-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;align-items:start}
+@media(max-width:700px){.cci-p-domain-grid{grid-template-columns:1fr}}
 .p-block{border:1px solid #e0d090;border-radius:6px;padding:1rem 1rem 0.85rem}
+.p-block.cci-p-card{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+details.cci-p-sub{margin-top:0.6rem;border:1px solid #e8dfa0;border-radius:6px;background:#fdfcf8;overflow:hidden}
+details.cci-p-sub:first-of-type{margin-top:0.45rem}
+details.cci-p-sub > summary.cci-p-sub-summary{cursor:pointer;font-size:11px;font-weight:700;color:#7a6a22;text-transform:uppercase;letter-spacing:0.07em;padding:0.55rem 0.75rem;list-style:none;user-select:none}
+details.cci-p-sub > summary::-webkit-details-marker{display:none}
+details.cci-p-sub > summary::after{content:' \25BC';font-size:9px;opacity:0.65;margin-left:6px}
+details.cci-p-sub[open] > summary::after{content:' \25B2'}
+details.cci-p-sub .cb-grid{padding:0.45rem 0.65rem 0.75rem}
 .p-title{font-size:12px;font-weight:700;color:#b09837;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.3rem}
 .p-section-label{font-size:11px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:0.06em;margin:0.75rem 0 0.35rem;padding-left:2px}
 input[type=text]{width:100%;padding:0.45rem 0.7rem;font-size:13px;border:1px solid #c8b76a;border-radius:5px;background:#fff;color:#000;margin-top:4px}
@@ -104,14 +141,47 @@ input[type=text]::placeholder{color:#bbb}
 .calc-btn:hover{background:#9a8430}
 
 /* ── REPORT ─────────────────────────────────────────── */
-#trial-complete{display:none;font-family:'Segoe UI',Arial,sans-serif;padding:0 1rem 4rem}
+#trial-complete{display:none;font-family:'Segoe UI',Arial,sans-serif;padding:0 1rem 4rem;background:#fff}
+#paid-complete{display:none;font-family:'Segoe UI',Arial,sans-serif;padding:0 1rem 4rem;background:#fff}
 .report-wrap{max-width:900px;margin:0 auto}
+/* Case overview strip: screen spacing (print tightened below) */
+.cci-tool-page-overview{max-width:920px;margin:0 auto;padding:0 1.5rem 1.25rem}
+
+@media print{
+  html{background:#fff}
+  .no-print{display:none!important}
+  .portal-header{display:none!important}
+  #explainer,#assessment{display:none!important}
+  #trial-complete{display:none!important}
+  .cci-premium-report,.cci-premium-report *{
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
+  #paid-complete{padding-top:0;padding-bottom:1rem}
+}
+/* Report view: Case overview card hidden — identifiers are in the report header */
+body.cci-paid-mode .cci-tool-page-overview{display:none!important}
 
 /* Report Header */
-.rpt-header{background:#1a1a1a;border-radius:8px 8px 0 0;padding:1.1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem}
-.rpt-header-title{font-size:11px;font-weight:700;color:#b09837;text-transform:uppercase;letter-spacing:0.14em}
-.rpt-header-meta{font-size:11px;color:#888;text-align:right}
+.rpt-header{background:#1a1a1a;border-radius:8px 8px 0 0;padding:0.65rem 1.25rem 0.75rem;display:flex;flex-direction:column;align-items:stretch;gap:0}
+.rpt-header-top{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:0.35rem 0.75rem}
+.rpt-header-title{font-size:11px;font-weight:700;color:#b09837;text-transform:uppercase;letter-spacing:0.14em;flex:1;min-width:0}
+.rpt-header-meta{font-size:11px;color:#888;text-align:right;flex-shrink:0}
 .rpt-header-meta span{display:block}
+.cci-rpt-id-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:4px 10px;
+  margin-top:6px;
+  padding-top:7px;
+  border-top:1px solid rgba(176,152,55,0.28);
+}
+.cci-rpt-id-cell{display:flex;flex-direction:column;gap:1px;min-width:0}
+.cci-rpt-id-label{font-size:8px;font-weight:700;color:#b09837;text-transform:uppercase;letter-spacing:0.1em;line-height:1.15}
+.cci-rpt-id-val{font-size:11.5px;color:rgba(255,255,255,0.92);line-height:1.28;word-break:break-word}
+@media(max-width:680px){
+  .cci-rpt-id-grid{grid-template-columns:1fr}
+}
 
 /* Complexity Meter */
 .rpt-meter{background:#111;padding:1rem 1.5rem 0.9rem;border-bottom:1px solid #2a2a2a}
@@ -120,6 +190,15 @@ input[type=text]::placeholder{color:#bbb}
 .rpt-meter-seg{flex:1;height:7px;border-radius:3px;background:#2a2a2a;transition:background 0.3s}
 .rpt-meter-ticks{display:flex;justify-content:space-between}
 .rpt-meter-tick{font-size:9px;color:#444;text-transform:uppercase;letter-spacing:0.05em;transition:color 0.3s}
+.rpt-meter-seg.rpt-meter-on{background:#b09837!important}
+.cci-premium-report{
+  font-family:'Segoe UI',Arial,sans-serif;
+  border:1px solid #ddd;
+  border-radius:8px;
+  overflow:hidden;
+  background:#fff;
+  box-shadow:0 2px 12px rgba(0,0,0,0.06);
+}
 
 /* Banner */
 .rpt-banner{padding:1.4rem 1.5rem 0;background:#fff}
@@ -211,83 +290,198 @@ input[type=text]::placeholder{color:#bbb}
 .reset-btn{display:block;width:100%;padding:0.8rem;margin-top:1rem;background:#fff;border:1.5px solid #b09837;color:#b09837;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Segoe UI',Arial,sans-serif;transition:background 0.15s}
 .reset-btn:hover{background:#fdf8e8}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/auth-guard.js"></script>
+<script src="js/portal-header-nav.js"></script>
+<script>
+(function (w) {
+  w.paidPortalRecordCaseToolRunAsync = async function (opts) {
+    var toolKey = opts.toolKey;
+    var scoreSummary = opts.scoreSummary;
+    var resultJson = opts.resultJson;
+    try {
+      var params = new URLSearchParams(window.location.search);
+      var caseRef = params.get('case_ref');
+      if (!caseRef || !w.supabaseClient) return;
+      var client = w.supabaseClient;
+      var sessRes = await client.auth.getSession();
+      var session = sessRes.data.session;
+      if (!session) return;
+      var cq = await client
+        .from('case_cases')
+        .select('id, attorney_user_id')
+        .eq('case_ref', caseRef)
+        .eq('attorney_user_id', session.user.id)
+        .maybeSingle();
+      if (cq.error || !cq.data) {
+        if (cq.error) console.error('[paid-portal] case lookup', cq.error);
+        return;
+      }
+      var caseId = cq.data.id;
+      var attorneyUserId = cq.data.attorney_user_id;
+      var runNumber = 1;
+      var rpc = await client.rpc('get_next_tool_run_number', {
+        case_id: caseId,
+        tool_key: toolKey
+      });
+      if (rpc.error) {
+        console.warn('[paid-portal] get_next_tool_run_number RPC, using fallback', rpc.error);
+        var mx = await client
+          .from('case_tool_runs')
+          .select('run_number')
+          .eq('case_id', caseId)
+          .eq('tool_key', toolKey)
+          .order('run_number', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (mx.error) {
+          console.error('[paid-portal] run_number fallback failed', mx.error);
+          return;
+        }
+        runNumber = (mx.data && mx.data.run_number != null ? Number(mx.data.run_number) : 0) + 1;
+      } else {
+        var d = rpc.data;
+        runNumber = typeof d === 'number' ? d : (d != null ? parseInt(String(d), 10) : NaN);
+        if (!Number.isFinite(runNumber) || runNumber < 1) runNumber = 1;
+      }
+      var upd = await client
+        .from('case_tool_runs')
+        .update({ is_latest: false })
+        .eq('case_id', caseId)
+        .eq('tool_key', toolKey)
+        .eq('is_latest', true);
+      if (upd.error) console.warn('[paid-portal] is_latest update', upd.error);
+      var ins = await client.from('case_tool_runs').insert({
+        case_id: caseId,
+        attorney_user_id: attorneyUserId,
+        tool_key: toolKey,
+        run_number: runNumber,
+        is_latest: true,
+        completion_status: 'completed',
+        score_summary: scoreSummary,
+        result_json: resultJson
+      });
+      if (ins.error) console.error('[paid-portal] case_tool_runs insert', ins.error);
+    } catch (err) {
+      console.error('[paid-portal] recordCaseToolRun', err);
+    }
+  };
+})(window);
+</script>
+<script src="js/case-identity.js"></script>
 </head>
-<body>
-<div class="trial-case-identity-shell">
+<body class="with-portal-tool-header">
+
+<header class="portal-header no-print">
+  <a href="/index.html" class="portal-logo">
+    <div class="portal-logo-box"><span>C</span></div>
+    <div class="portal-logo-text">
+      <strong>C.A.S.E. Clarity</strong>
+      Reconcile Care Management Services
+    </div>
+  </a>
+  <div class="portal-header-right">
+    <a href="/case-detail.html" class="portal-nav-link" id="portal-nav-back-case">Back to Case</a>
+    <a href="/dashboard.html" class="portal-nav-link" id="portal-nav-back-dashboard">Back to Dashboard</a>
+    <span class="portal-user" id="user-email">Loading…</span>
+    <button type="button" class="btn-secondary" id="portal-nav-logout" disabled>Logout</button>
+  </div>
+</header>
+<script>
+(function () {
+  function boot() {
+    if (typeof initPortalHeaderNav === 'function') initPortalHeaderNav();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
+
+<div class="cci-tool-page-overview">
   <div id="case-header-fields"></div>
 </div>
 
 <!-- ══════════════════════════════════════════════════
-     EXPLAINER PAGE
+     EXPLAINER PAGE (CAF-aligned)
 ═══════════════════════════════════════════════════ -->
-<div id="explainer">
-<div class="ex-wrap">
-  <div class="ex-header">
-    <div class="ex-eyebrow">Reconcile Care Management Services</div>
-    <h1>Case Complexity Index™</h1>
-    <div class="subtitle">Understanding Case Severity, Recovery Disruption, and Coordination Demands</div>
-    <p class="ex-intro">The Case Complexity Index™ is a clinical assessment tool designed to help attorneys quickly understand the true complexity of an injury case. By evaluating injury severity, functional system disruption, and care coordination demands, the index provides a structured complexity level that helps guide case management strategy, recovery oversight, and litigation planning.</p>
+<div id="explainer" class="page">
+
+  <div class="exp-hdr">
+    <div class="exp-tag">Reconcile Care Management Services</div>
+    <h1>Before You Begin &mdash; Case Complexity Index™</h1>
+    <p class="sub">A structured read on injury severity, functional disruption (4Ps), and care coordination demands. The report supports strategy and oversight—not a substitute for medical judgment.</p>
   </div>
-  <div class="ex-section">
-    <div class="ex-section-title">Why This Tool Matters</div>
-    <p>Many injury cases appear straightforward at first glance but later develop complications that significantly affect recovery timelines, treatment coordination, and case value.</p>
-    <p>The Case Complexity Index helps identify those risks early by analyzing three core dimensions:</p>
-    <ul class="ex-dim-list">
-      <li><span class="ex-dot"></span><span>Injury Severity</span></li>
-      <li><span class="ex-dot"></span><span>Functional System Disruption (4Ps of Wellness)</span></li>
-      <li><span class="ex-dot"></span><span>Medical &amp; Care Coordination Demands</span></li>
-    </ul>
-    <p style="margin-top:0.75rem">Together, these factors create a clearer picture of the case trajectory and potential recovery challenges.</p>
-  </div>
-  <div class="ex-section">
-    <div class="ex-section-title">What the Assessment Evaluates</div>
-    <p>The Case Complexity Index examines the following three domains:</p>
-    <div class="ex-domain-grid">
-      <div class="ex-domain-card">
-        <div class="ex-domain-card-title">Injury Severity</div>
-        <p>The physiological seriousness of the injury, including catastrophic indicators such as neurologic compromise, organ failure, ventilator dependence, or major trauma.</p>
-        <p>Injury severity carries the greatest weight in the overall complexity determination.</p>
-      </div>
-      <div class="ex-domain-card">
-        <div class="ex-domain-card-title">Functional System Disruption (4Ps)</div>
-        <p>The extent to which the injury disrupts key life domains:</p>
-        <ul><li>Physical function</li><li>Psychological stability</li><li>Psychosocial stability</li><li>Professional and economic functioning</li></ul>
-        <p style="margin-top:0.6rem">These disruptions often determine whether recovery proceeds smoothly or becomes unstable.</p>
-      </div>
-      <div class="ex-domain-card">
-        <div class="ex-domain-card-title">Care Coordination Demands</div>
-        <p>The number of medical specialties involved, referral pathways, treatment barriers, and pre-existing medical conditions that may complicate recovery.</p>
-        <p>Cases with higher coordination demands often require structured oversight to prevent delays or fragmentation of care.</p>
+
+  <div class="exp-body">
+
+    <div class="byb-acc-toolbar no-print" role="toolbar" aria-label="Instruction sections">
+      <button type="button" class="byb-acc-bulk" onclick="cciBybExpandAll()">Expand All</button>
+      <button type="button" class="byb-acc-bulk" onclick="cciBybCollapseAll()">Collapse All</button>
+    </div>
+
+    <div class="byb-acc">
+      <button type="button" class="byb-acc-hd open" id="cci-byb-acc-hd-0" aria-expanded="true" onclick="cciToggleBybAcc(0)">
+        <span class="byb-acc-title">Purpose &amp; scope</span>
+        <svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="byb-acc-body open" id="cci-byb-acc-bd-0">
+        <p>The Case Complexity Index™ helps attorneys see how injury severity, multi-domain functional impact, and coordination load interact—so complications that affect timelines, treatment, and value are visible earlier.</p>
+        <ul class="byb-points">
+          <li>Answer from the case environment as it stands today.</li>
+          <li>Take enough time to be accurate; rushed input skews the picture.</li>
+          <li>Three core dimensions: <strong>injury severity</strong>, <strong>functional system disruption (4Ps)</strong>, and <strong>medical &amp; care coordination demands</strong>.</li>
+        </ul>
       </div>
     </div>
-  </div>
-  <div class="ex-section">
-    <div class="ex-section-title">Important Note Before Beginning</div>
-    <div class="ex-note-box">
-      <p>This assessment is only as accurate as the information entered. The tool should not be completed quickly or with partial information.</p>
-      <p>For best results:</p>
-      <ul>
-        <li>Review available medical records</li>
-        <li>Confirm major injuries and complications</li>
-        <li>Consider both injury-related and pre-existing conditions</li>
-        <li>Identify functional impacts across life domains</li>
-      </ul>
-      <p class="ex-note-time">Most assessments take approximately 5–10 minutes to complete.</p>
+
+    <div class="byb-acc">
+      <button type="button" class="byb-acc-hd" id="cci-byb-acc-hd-1" aria-expanded="false" onclick="cciToggleBybAcc(1)">
+        <span class="byb-acc-title">The three domains</span>
+        <svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="byb-acc-body" id="cci-byb-acc-bd-1">
+        <p><strong>Injury severity</strong> carries the greatest weight in the overall complexity level. The index blends all three domains into one structured complexity level.</p>
+        <ul class="cci-domain-compact">
+          <li><strong>1. Injury severity</strong> — Physiologic seriousness, including catastrophic indicators (e.g., major neurologic compromise, organ failure, ventilator dependence, severe trauma).</li>
+          <li><strong>2. Functional disruption (4Ps)</strong> — Physical, psychological, psychosocial, and professional/economic impacts that shape whether recovery stays stable.</li>
+          <li><strong>3. Care coordination</strong> — Specialties, referrals, barriers, and pre-existing conditions that raise oversight and fragmentation risk.</li>
+        </ul>
+      </div>
     </div>
-  </div>
-  <div class="ex-section">
-    <div class="ex-section-title">Confidentiality</div>
-    <div class="ex-conf">
-      <p>This tool does not store or transmit case data.</p>
-      <p>All information entered into the assessment remains within the user's session. Only the user sees the results.</p>
+
+    <div class="byb-acc">
+      <button type="button" class="byb-acc-hd" id="cci-byb-acc-hd-2" aria-expanded="false" onclick="cciToggleBybAcc(2)">
+        <span class="byb-acc-title">Preparation</span>
+        <svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="byb-acc-body" id="cci-byb-acc-bd-2">
+        <p>Output quality depends on complete, accurate input—avoid rushing or omitting material facts.</p>
+        <div class="rule-box-mini">
+          <p><strong style="color:var(--gd2)">Before you begin</strong></p>
+          <p>Review records where available; confirm major injuries and complications; weigh injury-related and pre-existing factors; note functional impacts across life domains.</p>
+        </div>
+        <p style="margin-top:.75rem;font-size:12px;color:var(--t3);font-family:Arial,sans-serif">Typical completion time: approximately 5–10 minutes.</p>
+      </div>
     </div>
+
+    <div class="byb-acc">
+      <button type="button" class="byb-acc-hd" id="cci-byb-acc-hd-3" aria-expanded="false" onclick="cciToggleBybAcc(3)">
+        <span class="byb-acc-title">Confidentiality</span>
+        <svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="byb-acc-body" id="cci-byb-acc-bd-3">
+        <p>This tool does not store or transmit case data.</p>
+        <p>All information entered into the assessment remains within the user's session. Only the user sees the results.</p>
+      </div>
+    </div>
+
+    <div class="cta-sec">
+      <button class="cta-btn" onclick="startAssessment()">Start Case Complexity Assessment</button>
+      <div class="cta-note">Five steps · ~5–10 minutes</div>
+    </div>
+
   </div>
-  <div class="ex-cta">
-    <div class="ex-cta-label">Ready to begin</div>
-    <button class="ex-cta-btn" onclick="startAssessment()">Start Case Complexity Assessment</button>
-    <p class="ex-cta-note">You will be taken to the five-step CCI assessment.</p>
-  </div>
-</div>
 </div>
 
 <!-- ══════════════════════════════════════════════════
@@ -311,7 +505,7 @@ input[type=text]::placeholder{color:#bbb}
   <div class="step-body" id="body-step1">
     <div class="sub">
       <div class="sub-label">Primary Injury Region</div>
-      <select id="primary-region" onchange="updateSpecific()">
+      <select id="primary-region" onchange="updateSpecific();">
         <option value="">— Select primary injury region —</option>
         <option value="brain">Brain / Head</option>
         <option value="cervical">Cervical Spine</option>
@@ -329,7 +523,7 @@ input[type=text]::placeholder{color:#bbb}
     </div>
     <div class="sub">
       <div class="sub-label">Specific Injury / Condition</div>
-      <select id="specific-injury"><option value="">— Select primary injury region first —</option></select>
+      <select id="specific-injury" onchange="cciMaybeAdvanceFromStep1()"><option value="">— Select primary injury region first —</option></select>
     </div>
   </div>
 </div>
@@ -342,61 +536,63 @@ input[type=text]::placeholder{color:#bbb}
   </div>
   <div class="step-body" id="body-step2">
     <div class="sub-desc">Select all that apply. Catastrophic indicators automatically escalate severity.</div>
-    <div class="domain-group">
-      <div class="domain-label">Neurologic</div>
-      <div class="cb-grid">
-        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Coma"><label>Coma</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="cat" value="Loss of consciousness"><label>Loss of consciousness</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Anoxic brain injury"><label>Anoxic brain injury</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Severe TBI with neurologic deficit"><label>Severe TBI with neurologic deficit</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Diffuse axonal injury"><label>Diffuse axonal injury</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Permanent loss of sight"><label>Permanent loss of sight</label></label>
+    <div class="cci-p-domain-grid">
+      <div class="p-block cci-p-card cci-step2-card">
+        <div class="p-title">Neurologic</div>
+        <div class="cb-grid">
+          <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Coma"><label>Coma</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="cat" value="Loss of consciousness"><label>Loss of consciousness</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Anoxic brain injury"><label>Anoxic brain injury</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Severe TBI with neurologic deficit"><label>Severe TBI with neurologic deficit</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Diffuse axonal injury"><label>Diffuse axonal injury</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Permanent loss of sight"><label>Permanent loss of sight</label></label>
+        </div>
       </div>
-    </div>
-    <div class="domain-group">
-      <div class="domain-label">Respiratory / Life Support</div>
-      <div class="cb-grid">
-        <label class="cb-item"><input type="checkbox" data-g="cat" value="ICU admission"><label>ICU admission</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Ventilator dependence"><label>Ventilator dependence</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="ECMO"><label>ECMO (Extracorporeal Membrane Oxygenation)</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="cat" value="Acute respiratory distress syndrome (ARDS)"><label>Acute respiratory distress syndrome (ARDS)</label></label>
+      <div class="p-block cci-p-card cci-step2-card">
+        <div class="p-title">Respiratory / Life Support</div>
+        <div class="cb-grid">
+          <label class="cb-item"><input type="checkbox" data-g="cat" value="ICU admission"><label>ICU admission</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Ventilator dependence"><label>Ventilator dependence</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="ECMO"><label>ECMO (Extracorporeal Membrane Oxygenation)</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="cat" value="Acute respiratory distress syndrome (ARDS)"><label>Acute respiratory distress syndrome (ARDS)</label></label>
+        </div>
       </div>
-    </div>
-    <div class="domain-group">
-      <div class="domain-label">Trauma / Structural Injury</div>
-      <div class="cb-grid">
-        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Spinal cord injury with paralysis"><label>Spinal cord injury with paralysis</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Paraplegia"><label>Paraplegia</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Quadriplegia"><label>Quadriplegia</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Polytrauma with physiologic instability"><label>Polytrauma with physiologic instability</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Burns ≥25% body surface area"><label>Burns ≥25% body surface area</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Burns with airway compromise"><label>Burns with airway compromise</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="cat" value="Traumatic amputation"><label>Traumatic amputation</label></label>
+      <div class="p-block cci-p-card cci-step2-card">
+        <div class="p-title">Trauma / Structural Injury</div>
+        <div class="cb-grid">
+          <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Spinal cord injury with paralysis"><label>Spinal cord injury with paralysis</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Paraplegia"><label>Paraplegia</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Quadriplegia"><label>Quadriplegia</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Polytrauma with physiologic instability"><label>Polytrauma with physiologic instability</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Burns ≥25% body surface area"><label>Burns ≥25% body surface area</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Burns with airway compromise"><label>Burns with airway compromise</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="cat" value="Traumatic amputation"><label>Traumatic amputation</label></label>
+        </div>
       </div>
-    </div>
-    <div class="domain-group">
-      <div class="domain-label">Cardiovascular / Systemic Collapse</div>
-      <div class="cb-grid">
-        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Cardiac arrest with resuscitation"><label>Cardiac arrest with resuscitation</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Heart failure requiring mechanical support"><label>Heart failure requiring mechanical support</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Multi-organ failure"><label>Multi-organ failure</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Acute liver failure"><label>Acute liver failure</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Sepsis with septic shock"><label>Sepsis with septic shock</label></label>
+      <div class="p-block cci-p-card cci-step2-card">
+        <div class="p-title">Cardiovascular / Systemic Collapse</div>
+        <div class="cb-grid">
+          <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Cardiac arrest with resuscitation"><label>Cardiac arrest with resuscitation</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Heart failure requiring mechanical support"><label>Heart failure requiring mechanical support</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Multi-organ failure"><label>Multi-organ failure</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Acute liver failure"><label>Acute liver failure</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Sepsis with septic shock"><label>Sepsis with septic shock</label></label>
+        </div>
       </div>
-    </div>
-    <div class="domain-group">
-      <div class="domain-label">Recovery Status Indicators</div>
-      <div class="cb-grid">
-        <label class="cb-item"><input type="checkbox" data-g="cat" value="Emergency surgery"><label>Emergency surgery</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="cat" value="Neurosurgical intervention"><label>Neurosurgical intervention</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Permanent nursing home / long-term care placement"><label>Permanent nursing home / long-term care placement</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Hospice placement"><label>Hospice placement</label></label>
+      <div class="p-block cci-p-card cci-step2-card">
+        <div class="p-title">Recovery Status Indicators</div>
+        <div class="cb-grid">
+          <label class="cb-item"><input type="checkbox" data-g="cat" value="Emergency surgery"><label>Emergency surgery</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="cat" value="Neurosurgical intervention"><label>Neurosurgical intervention</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Permanent nursing home / long-term care placement"><label>Permanent nursing home / long-term care placement</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="cat" data-cat="1" value="Hospice placement"><label>Hospice placement</label></label>
+        </div>
       </div>
-    </div>
-    <div class="domain-group">
-      <div class="domain-label">Other</div>
-      <label class="cb-item" style="margin-bottom:6px"><input type="checkbox" data-g="cat" data-cat="1" value="Other catastrophic medical event"><label>Other catastrophic medical event</label></label>
-      <input type="text" id="other-cat-text" placeholder="Describe other catastrophic event (optional)" style="margin-left:22px;width:calc(100% - 22px)"/>
+      <div class="p-block cci-p-card cci-step2-card">
+        <div class="p-title">Other</div>
+        <label class="cb-item" style="margin-bottom:6px"><input type="checkbox" data-g="cat" data-cat="1" value="Other catastrophic medical event"><label>Other catastrophic medical event</label></label>
+        <input type="text" id="other-cat-text" class="cci-step2-other-input" placeholder="Describe other catastrophic event (optional)"/>
+      </div>
     </div>
   </div>
 </div>
@@ -431,71 +627,89 @@ input[type=text]::placeholder{color:#bbb}
   </div>
   <div class="step-body" id="body-step4">
     <div class="sub-desc" style="margin-bottom:1.1rem">Select all that apply across each functional domain.</div>
-    <div class="p-grid">
-      <div class="p-block">
+    <div class="cci-p-domain-grid">
+      <div class="p-block cci-p-card">
         <div class="p-title">P1 — Physical</div>
-        <div class="p-section-label">Injury-Related Impacts</div>
-        <div class="cb-grid one-col">
-          <label class="cb-item"><input type="checkbox" data-p="ph" value="Mobility limitation"><label>Mobility limitation</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="ph" data-high="1" value="Paralysis or severe neurologic deficit"><label>Paralysis or severe neurologic deficit</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="ph" value="Chronic or severe pain"><label>Chronic or severe pain</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="ph" data-high="1" value="Loss of independence with daily activities"><label>Loss of independence with daily activities</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="ph" value="Assistive device required"><label>Assistive device required</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="ph" data-high="1" value="Requires caregiver assistance"><label>Requires caregiver assistance</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="ph" value="Long-term rehabilitation required"><label>Long-term rehabilitation required</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="ph" value="Loss of sensory function"><label>Loss of sensory function</label></label>
-        </div>
-        <div class="p-section-label">Pre-Existing Conditions Affecting Recovery</div>
-        <div class="cb-grid one-col">
-          <label class="cb-item"><input type="checkbox" data-p="ph" value="Diabetes mellitus"><label>Diabetes mellitus</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="ph" value="Hypertension"><label>Hypertension</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="ph" value="Chronic lung disease (COPD / severe asthma)"><label>Chronic lung disease (COPD / severe asthma)</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="ph" value="Chronic kidney disease / dialysis"><label>Chronic kidney disease / dialysis</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="ph" value="Cardiovascular disease (CAD, CHF)"><label>Cardiovascular disease (CAD, CHF)</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="ph" value="Severe obesity affecting recovery"><label>Severe obesity affecting recovery</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="ph" value="Immunocompromised state"><label>Immunocompromised state</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="ph" value="Multiple chronic medical conditions"><label>Multiple chronic medical conditions</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="ph" value="History of stroke or neurologic disease"><label>History of stroke or neurologic disease</label></label>
-        </div>
+        <details class="cci-p-sub">
+          <summary class="cci-p-sub-summary">Injury-Related Impacts</summary>
+          <div class="cb-grid one-col">
+            <label class="cb-item"><input type="checkbox" data-p="ph" value="Mobility limitation"><label>Mobility limitation</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="ph" data-high="1" value="Paralysis or severe neurologic deficit"><label>Paralysis or severe neurologic deficit</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="ph" value="Chronic or severe pain"><label>Chronic or severe pain</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="ph" data-high="1" value="Loss of independence with daily activities"><label>Loss of independence with daily activities</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="ph" value="Assistive device required"><label>Assistive device required</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="ph" data-high="1" value="Requires caregiver assistance"><label>Requires caregiver assistance</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="ph" value="Long-term rehabilitation required"><label>Long-term rehabilitation required</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="ph" value="Loss of sensory function"><label>Loss of sensory function</label></label>
+          </div>
+        </details>
+        <details class="cci-p-sub">
+          <summary class="cci-p-sub-summary">Pre-Existing Conditions Affecting Recovery</summary>
+          <div class="cb-grid one-col">
+            <label class="cb-item"><input type="checkbox" data-p="ph" value="Diabetes mellitus"><label>Diabetes mellitus</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="ph" value="Hypertension"><label>Hypertension</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="ph" value="Chronic lung disease (COPD / severe asthma)"><label>Chronic lung disease (COPD / severe asthma)</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="ph" value="Chronic kidney disease / dialysis"><label>Chronic kidney disease / dialysis</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="ph" value="Cardiovascular disease (CAD, CHF)"><label>Cardiovascular disease (CAD, CHF)</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="ph" value="Severe obesity affecting recovery"><label>Severe obesity affecting recovery</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="ph" value="Immunocompromised state"><label>Immunocompromised state</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="ph" value="Multiple chronic medical conditions"><label>Multiple chronic medical conditions</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="ph" value="History of stroke or neurologic disease"><label>History of stroke or neurologic disease</label></label>
+          </div>
+        </details>
       </div>
-      <div class="p-block">
+      <div class="p-block cci-p-card">
         <div class="p-title">P2 — Psychological</div>
-        <div class="p-section-label">Injury-Related Psychological Effects</div>
-        <div class="cb-grid one-col">
-          <label class="cb-item"><input type="checkbox" data-p="ps" value="PTSD / trauma response"><label>PTSD / trauma response</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="ps" value="Depression related to injury"><label>Depression related to injury</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="ps" value="Anxiety affecting treatment participation"><label>Anxiety affecting treatment participation</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="ps" data-high="1" value="Cognitive impairment"><label>Cognitive impairment</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="ps" value="Emotional instability interfering with recovery"><label>Emotional instability interfering with recovery</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="ps" value="Fear / avoidance affecting recovery engagement"><label>Fear / avoidance affecting recovery engagement</label></label>
-        </div>
-        <div class="p-section-label">Pre-Existing Psychological Complexity</div>
-        <div class="cb-grid one-col">
-          <label class="cb-item"><input type="checkbox" data-p="ps" value="Serious pre-existing psychiatric illness affecting recovery"><label>Serious pre-existing psychiatric illness affecting recovery</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="ps" value="History of psychiatric hospitalization or crisis"><label>History of psychiatric hospitalization or crisis</label></label>
-        </div>
-        <div class="p-title" style="margin-top:1.1rem">P3 — Psychosocial</div>
-        <div class="cb-grid one-col" style="margin-top:0.4rem">
-          <label class="cb-item"><input type="checkbox" data-p="so" value="Housing instability"><label>Housing instability</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="so" value="Food insecurity"><label>Food insecurity</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="so" value="Caregiver strain within household"><label>Caregiver strain within household</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="so" value="Family disruption due to injury"><label>Family disruption due to injury</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="so" value="Vulnerability to exploitation or abuse"><label>Vulnerability to exploitation or abuse</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="so" data-high="1" value="Minor children at risk of placement or custody disruption"><label>Minor children at risk of placement or custody disruption</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="so" value="Loss of social support system"><label>Loss of social support system</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="so" value="Social isolation due to injury"><label>Social isolation due to injury</label></label>
-        </div>
-        <div class="p-title" style="margin-top:1.1rem">P4 — Professional</div>
-        <div class="cb-grid one-col" style="margin-top:0.4rem">
-          <label class="cb-item"><input type="checkbox" data-p="pr" data-high="1" value="Unable to return to work"><label>Unable to return to work</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="pr" value="Reduced earning capacity"><label>Reduced earning capacity</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="pr" value="Loss of career trajectory"><label>Loss of career trajectory</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="pr" value="Financial instability due to wage loss"><label>Financial instability due to wage loss</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="pr" value="No short-term disability coverage"><label>No short-term disability coverage</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="pr" value="No long-term disability coverage"><label>No long-term disability coverage</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="pr" value="Occupational displacement"><label>Occupational displacement</label></label>
-          <label class="cb-item"><input type="checkbox" data-p="pr" data-high="1" value="Significant reduction in household income"><label>Significant reduction in household income</label></label>
-        </div>
+        <details class="cci-p-sub">
+          <summary class="cci-p-sub-summary">Injury-Related Psychological Effects</summary>
+          <div class="cb-grid one-col">
+            <label class="cb-item"><input type="checkbox" data-p="ps" value="PTSD / trauma response"><label>PTSD / trauma response</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="ps" value="Depression related to injury"><label>Depression related to injury</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="ps" value="Anxiety affecting treatment participation"><label>Anxiety affecting treatment participation</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="ps" data-high="1" value="Cognitive impairment"><label>Cognitive impairment</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="ps" value="Emotional instability interfering with recovery"><label>Emotional instability interfering with recovery</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="ps" value="Fear / avoidance affecting recovery engagement"><label>Fear / avoidance affecting recovery engagement</label></label>
+          </div>
+        </details>
+        <details class="cci-p-sub">
+          <summary class="cci-p-sub-summary">Pre-Existing Psychological Complexity</summary>
+          <div class="cb-grid one-col">
+            <label class="cb-item"><input type="checkbox" data-p="ps" value="Serious pre-existing psychiatric illness affecting recovery"><label>Serious pre-existing psychiatric illness affecting recovery</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="ps" value="History of psychiatric hospitalization or crisis"><label>History of psychiatric hospitalization or crisis</label></label>
+          </div>
+        </details>
+      </div>
+      <div class="p-block cci-p-card">
+        <div class="p-title">P3 — Psychosocial</div>
+        <details class="cci-p-sub">
+          <summary class="cci-p-sub-summary">Psychosocial factors</summary>
+          <div class="cb-grid one-col">
+            <label class="cb-item"><input type="checkbox" data-p="so" value="Housing instability"><label>Housing instability</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="so" value="Food insecurity"><label>Food insecurity</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="so" value="Caregiver strain within household"><label>Caregiver strain within household</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="so" value="Family disruption due to injury"><label>Family disruption due to injury</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="so" value="Vulnerability to exploitation or abuse"><label>Vulnerability to exploitation or abuse</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="so" data-high="1" value="Minor children at risk of placement or custody disruption"><label>Minor children at risk of placement or custody disruption</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="so" value="Loss of social support system"><label>Loss of social support system</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="so" value="Social isolation due to injury"><label>Social isolation due to injury</label></label>
+          </div>
+        </details>
+      </div>
+      <div class="p-block cci-p-card">
+        <div class="p-title">P4 — Professional</div>
+        <details class="cci-p-sub">
+          <summary class="cci-p-sub-summary">Professional and economic impacts</summary>
+          <div class="cb-grid one-col">
+            <label class="cb-item"><input type="checkbox" data-p="pr" data-high="1" value="Unable to return to work"><label>Unable to return to work</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="pr" value="Reduced earning capacity"><label>Reduced earning capacity</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="pr" value="Loss of career trajectory"><label>Loss of career trajectory</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="pr" value="Financial instability due to wage loss"><label>Financial instability due to wage loss</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="pr" value="No short-term disability coverage"><label>No short-term disability coverage</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="pr" value="No long-term disability coverage"><label>No long-term disability coverage</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="pr" value="Occupational displacement"><label>Occupational displacement</label></label>
+            <label class="cb-item"><input type="checkbox" data-p="pr" data-high="1" value="Significant reduction in household income"><label>Significant reduction in household income</label></label>
+          </div>
+        </details>
       </div>
     </div>
   </div>
@@ -508,77 +722,82 @@ input[type=text]::placeholder{color:#bbb}
     <span class="step-chevron" id="chevron-step5">▼</span>
   </div>
   <div class="step-body" id="body-step5">
-    <div class="sub">
-      <div class="sub-label">Specialty Physician Involvement</div>
-      <div class="sub-desc">Select all specialty physicians involved. Do not include PT, OT, chiropractic, speech therapy, or vocational rehab.</div>
-      <div class="cb-grid">
-        <label class="cb-item"><input type="checkbox" data-g="spec" value="Orthopedics"><label>Orthopedics</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="spec" value="Neurology"><label>Neurology</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="spec" value="Neurosurgery"><label>Neurosurgery</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="spec" value="Trauma Surgery"><label>Trauma Surgery</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="spec" value="Pain Management"><label>Pain Management</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="spec" value="Psychiatry"><label>Psychiatry</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="spec" value="Physiatry"><label>Physiatry</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="spec" value="Cardiology"><label>Cardiology</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="spec" value="Pulmonology"><label>Pulmonology</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="spec" value="Gastroenterology"><label>Gastroenterology</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="spec" value="Endocrinology"><label>Endocrinology</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="spec" value="Vascular Surgery"><label>Vascular Surgery</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="spec" value="Infectious Disease"><label>Infectious Disease</label></label>
+    <div class="cci-step5-domain-grid">
+      <div class="cci-step5-col">
+      <div class="p-block cci-p-card cci-step5-card">
+        <div class="p-title">Specialty Physician Involvement</div>
+        <div class="sub-desc">Select all specialty physicians involved. Do not include PT, OT, chiropractic, speech therapy, or vocational rehab.</div>
+        <div class="cb-grid">
+          <label class="cb-item"><input type="checkbox" data-g="spec" value="Orthopedics"><label>Orthopedics</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="spec" value="Neurology"><label>Neurology</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="spec" value="Neurosurgery"><label>Neurosurgery</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="spec" value="Trauma Surgery"><label>Trauma Surgery</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="spec" value="Pain Management"><label>Pain Management</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="spec" value="Psychiatry"><label>Psychiatry</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="spec" value="Physiatry"><label>Physiatry</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="spec" value="Cardiology"><label>Cardiology</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="spec" value="Pulmonology"><label>Pulmonology</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="spec" value="Gastroenterology"><label>Gastroenterology</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="spec" value="Endocrinology"><label>Endocrinology</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="spec" value="Vascular Surgery"><label>Vascular Surgery</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="spec" value="Infectious Disease"><label>Infectious Disease</label></label>
+        </div>
       </div>
-    </div>
-    <hr class="div"/>
-    <div class="sub">
-      <div class="sub-label">Supporting / Rehabilitation Providers</div>
-      <div class="sub-desc">Select all supporting or rehabilitation providers involved.</div>
-      <div class="cb-grid">
-        <label class="cb-item"><input type="checkbox" data-g="rehab" value="Physical Therapy"><label>Physical Therapy</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="rehab" value="Occupational Therapy"><label>Occupational Therapy</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="rehab" value="Chiropractic"><label>Chiropractic</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="rehab" value="Speech Therapy"><label>Speech Therapy</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="rehab" value="Behavioral Therapy"><label>Behavioral Therapy</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="rehab" value="Vocational Rehabilitation"><label>Vocational Rehabilitation</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="rehab" value="Case Management / Care Coordination"><label>Case Management / Care Coordination</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="rehab" value="Home Health"><label>Home Health</label></label>
+      <div class="p-block cci-p-card cci-step5-card cci-step5-card--referral-duration">
+        <div class="p-title">Referral &amp; treatment horizon</div>
+        <div class="sub">
+          <div class="sub-label">Referral Chain Depth</div>
+          <select id="referral">
+            <option value="0">— Select referral chain depth —</option>
+            <option value="1">Single provider care</option>
+            <option value="2">Limited referrals</option>
+            <option value="3">Multi-step referral chain</option>
+            <option value="4">Ongoing multidisciplinary referrals</option>
+          </select>
+        </div>
+        <div class="sub">
+          <div class="sub-label">Treatment Duration / Monitoring Horizon</div>
+          <select id="duration">
+            <option value="0">— Select expected duration of coordinated treatment needs —</option>
+            <option value="1">Short-term episode</option>
+            <option value="2">Moderate treatment course</option>
+            <option value="3">Extended rehabilitation</option>
+            <option value="4">Long-term medical management</option>
+            <option value="5">Lifelong care coordination</option>
+          </select>
+        </div>
       </div>
-    </div>
-    <hr class="div"/>
-    <div class="sub">
-      <div class="sub-label">Referral Chain Depth</div>
-      <select id="referral">
-        <option value="0">— Select referral chain depth —</option>
-        <option value="1">Single provider care</option>
-        <option value="2">Limited referrals</option>
-        <option value="3">Multi-step referral chain</option>
-        <option value="4">Ongoing multidisciplinary referrals</option>
-      </select>
-    </div>
-    <hr class="div"/>
-    <div class="sub">
-      <div class="sub-label">Evidence-Based Treatment Alignment Issues</div>
-      <div class="sub-desc">Select all treatment alignment or access issues that apply.</div>
-      <div class="cb-grid">
-        <label class="cb-item"><input type="checkbox" data-g="align" value="Medically necessary treatment denied"><label>Medically necessary treatment denied</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="align" value="Diagnostic imaging delayed or denied"><label>Diagnostic imaging delayed or denied</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="align" value="Surgery delayed or denied"><label>Surgery delayed or denied</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="align" value="Specialist referral delayed"><label>Specialist referral delayed</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="align" value="Utilization review barriers"><label>Utilization review barriers</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="align" value="Deviation from evidence-based pathway"><label>Deviation from evidence-based pathway</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="align" value="Repeated authorization barriers"><label>Repeated authorization barriers</label></label>
-        <label class="cb-item"><input type="checkbox" data-g="align" value="Care altered due to payer restrictions"><label>Care altered due to payer restrictions</label></label>
       </div>
-    </div>
-    <hr class="div"/>
-    <div class="sub">
-      <div class="sub-label">Treatment Duration / Monitoring Horizon</div>
-      <select id="duration">
-        <option value="0">— Select expected duration of coordinated treatment needs —</option>
-        <option value="1">Short-term episode</option>
-        <option value="2">Moderate treatment course</option>
-        <option value="3">Extended rehabilitation</option>
-        <option value="4">Long-term medical management</option>
-        <option value="5">Lifelong care coordination</option>
-      </select>
+      <div class="cci-step5-col">
+      <div class="p-block cci-p-card cci-step5-card">
+        <div class="p-title">Supporting / Rehabilitation Providers</div>
+        <div class="sub-desc">Select all supporting or rehabilitation providers involved.</div>
+        <div class="cb-grid">
+          <label class="cb-item"><input type="checkbox" data-g="rehab" value="Physical Therapy"><label>Physical Therapy</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="rehab" value="Occupational Therapy"><label>Occupational Therapy</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="rehab" value="Chiropractic"><label>Chiropractic</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="rehab" value="Speech Therapy"><label>Speech Therapy</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="rehab" value="Behavioral Therapy"><label>Behavioral Therapy</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="rehab" value="Vocational Rehabilitation"><label>Vocational Rehabilitation</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="rehab" value="Case Management / Care Coordination"><label>Case Management / Care Coordination</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="rehab" value="Home Health"><label>Home Health</label></label>
+        </div>
+      </div>
+      <div class="p-block cci-p-card cci-step5-card">
+        <div class="p-title">Evidence-Based Treatment Alignment Issues</div>
+        <div class="sub-desc">Select all treatment alignment or access issues that apply.</div>
+        <div class="cb-grid">
+          <label class="cb-item"><input type="checkbox" data-g="align" value="Medically necessary treatment denied"><label>Medically necessary treatment denied</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="align" value="Diagnostic imaging delayed or denied"><label>Diagnostic imaging delayed or denied</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="align" value="Surgery delayed or denied"><label>Surgery delayed or denied</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="align" value="Specialist referral delayed"><label>Specialist referral delayed</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="align" value="Utilization review barriers"><label>Utilization review barriers</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="align" value="Deviation from evidence-based pathway"><label>Deviation from evidence-based pathway</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="align" value="Repeated authorization barriers"><label>Repeated authorization barriers</label></label>
+          <label class="cb-item"><input type="checkbox" data-g="align" value="Care altered due to payer restrictions"><label>Care altered due to payer restrictions</label></label>
+        </div>
+      </div>
+      </div>
     </div>
   </div>
 </div>
@@ -591,37 +810,108 @@ input[type=text]::placeholder{color:#bbb}
 <div id="trial-complete" style="display:none">
   <div style="max-width:720px;margin:0 auto;text-align:center;padding:2rem 0 3rem">
     <h2 style="color:#1a1a1a;font-weight:600;margin:0 0 12px">Assessment complete</h2>
-    <p style="color:#555;line-height:1.65;margin:0;font-size:15px">Your responses have been saved. The full formatted report appears only in your dashboard after all six instruments are complete.</p>
+    <p style="color:#555;line-height:1.65;margin:0;font-size:15px">Your responses have been recorded. Review the summary below.</p>
     <div style="display:flex;gap:16px;justify-content:center;margin-top:40px;flex-wrap:wrap">
       <button type="button" onclick="returnToDashboard()" class="btn-ghost">← Return to Dashboard</button>
       <button type="button" onclick="goToNext()" class="btn-primary">Continue to Next Assessment →</button>
     </div>
   </div>
 </div>
+
+<div id="paid-complete" style="display:none">
+  <div style="max-width:920px;margin:0 auto;padding:1.5rem 0 3rem">
+    <h2 class="no-print" style="color:#1a1a1a;font-weight:600;margin:0 0 10px">Assessment complete</h2>
+    <p class="no-print" style="color:#555;line-height:1.65;margin:0 0 1.25rem;font-size:15px">Your Case Complexity Index report is ready below. You can print or save a PDF, then return to this case or the dashboard.</p>
+    <div class="paid-complete-actions no-print" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:1.5rem;align-items:center">
+      <button type="button" class="btn-primary" onclick="cciScrollToPaidReport()">View Report</button>
+      <button type="button" class="btn-primary" onclick="cciPrintPaidReport()">Print / Save PDF</button>
+      <a id="paid-cci-return-case" class="btn-ghost" href="/case-detail.html" style="display:inline-block;text-decoration:none;padding:10px 24px;border:1.5px solid #b09837;border-radius:4px;color:#b09837;font-family:'Segoe UI',Arial,sans-serif;font-size:13px;font-weight:600">Return to Case</a>
+      <button type="button" onclick="returnToDashboard()" class="btn-ghost">Dashboard</button>
+    </div>
+    <div id="cci-paid-report-block" style="width:100%;max-width:920px;margin:0 auto">
+    <div id="cci-paid-report-visible" class="complexity-report report-view results-display" style="position:relative;left:auto;top:auto;width:100%;max-width:920px;margin:0 auto;pointer-events:auto"></div>
+    </div>
+  </div>
+</div>
 <div id="cci-report-snapshot" class="complexity-report report-view results-display" aria-hidden="true" style="position:absolute;left:-9999px;top:0;width:920px;overflow:visible;pointer-events:none"></div>
 
-<script src="js/trial-tool-storage.js"></script>
 <script>
 
-// Read case type from portal launch URL (?caseType=active|retrospective|closed)
-const caseType = new URLSearchParams(window.location.search).get('caseType') || sessionStorage.getItem('tool_caseType') || 'active';
-if (new URLSearchParams(window.location.search).get('caseType')) {
-  try { sessionStorage.setItem('tool_caseType', String(new URLSearchParams(window.location.search).get('caseType'))); } catch (e) {}
-}
+// Read case type from portal launch URL (?caseType=active|closed)
+const caseType = new URLSearchParams(window.location.search).get('caseType') || 'active';
 
-// ── Accordion ─────────────────────────────────────────
+// ── Before You Begin accordions (mirrors CAF) ─────────
+var CCI_BYB_ACC_COUNT=4;
+function cciToggleBybAcc(i){
+  var hd=document.getElementById('cci-byb-acc-hd-'+i);
+  var bd=document.getElementById('cci-byb-acc-bd-'+i);
+  if(!hd||!bd)return;
+  var willOpen=!bd.classList.contains('open');
+  hd.classList.toggle('open',willOpen);
+  bd.classList.toggle('open',willOpen);
+  hd.setAttribute('aria-expanded',willOpen?'true':'false');
+}
+function cciBybSetAllPanels(open){
+  for(var i=0;i<CCI_BYB_ACC_COUNT;i++){
+    var hd=document.getElementById('cci-byb-acc-hd-'+i);
+    var bd=document.getElementById('cci-byb-acc-bd-'+i);
+    if(!hd||!bd)continue;
+    hd.classList.toggle('open',open);
+    bd.classList.toggle('open',open);
+    hd.setAttribute('aria-expanded',open?'true':'false');
+  }
+}
+function cciBybExpandAll(){cciBybSetAllPanels(true);}
+function cciBybCollapseAll(){cciBybSetAllPanels(false);}
+
+// ── Assessment steps: exclusive open + auto-advance from Step 1 (CAF/CSA-style) ──
+var cciPrevStep1Complete=false;
+function cciStep1IsComplete(){
+  var r=document.getElementById('primary-region').value;
+  var s=document.getElementById('specific-injury').value;
+  return !!(r&&s);
+}
+function cciSetStepOpenExclusive(stepId){
+  ['step1','step2','step3','step4','step5'].forEach(function(sid){
+    var body=document.getElementById('body-'+sid);
+    var chev=document.getElementById('chevron-'+sid);
+    var on=(sid===stepId);
+    if(body) body.classList.toggle('open',on);
+    if(chev) chev.classList.toggle('open',on);
+  });
+}
 function toggleStep(id){
-  const body=document.getElementById('body-'+id);
-  const chev=document.getElementById('chevron-'+id);
-  const isOpen=body.classList.contains('open');
-  body.classList.toggle('open',!isOpen);
-  chev.classList.toggle('open',!isOpen);
+  var body=document.getElementById('body-'+id);
+  var chev=document.getElementById('chevron-'+id);
+  if(!body||!chev)return;
+  var isOpen=body.classList.contains('open');
+  if(isOpen){
+    body.classList.remove('open');
+    chev.classList.remove('open');
+  } else {
+    cciSetStepOpenExclusive(id);
+  }
+}
+function cciMaybeAdvanceFromStep1(){
+  var now=cciStep1IsComplete();
+  if(now && !cciPrevStep1Complete){
+    cciPrevStep1Complete=true;
+    cciSetStepOpenExclusive('step2');
+    requestAnimationFrame(function(){
+      var el=document.getElementById('step2');
+      if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+    });
+  } else if(!now){
+    cciPrevStep1Complete=false;
+  }
 }
 
 // ── Start assessment ──────────────────────────────────
 function startAssessment(){
   document.getElementById('explainer').style.display='none';
   document.getElementById('assessment').style.display='block';
+  cciPrevStep1Complete=cciStep1IsComplete();
+  cciSetStepOpenExclusive('step1');
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -645,6 +935,7 @@ function updateSpecific(){
   const sel=document.getElementById('specific-injury');
   sel.innerHTML='<option value="">— Select specific injury / condition —</option>';
   (injuryMap[r]||[]).forEach(o=>{const el=document.createElement('option');el.value=el.textContent=o;sel.appendChild(el);});
+  cciMaybeAdvanceFromStep1();
 }
 
 // ── Checkbox visual toggle ────────────────────────────
@@ -658,53 +949,79 @@ function escSnap(s){
   return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-function buildCciReportSnapshotHtml(ad,toolData,level,cmg){
+function buildCciReportIdentityGridHtml(row){
+  var ci=window.caseClarityIdentity;
+  var title='—';
+  var client='—';
+  var ctype='—';
+  var sys='—';
+  var doi='—';
+  var rpt=escSnap(new Date().toLocaleString());
+  if(row){
+    if(row.case_title) title=escSnap(row.case_title);
+    if(row.client_name) client=escSnap(row.client_name);
+    if(ci&&typeof ci.formatCaseType==='function') ctype=escSnap(ci.formatCaseType(row.case_type));
+    else if(row.case_type!=null&&row.case_type!=='') ctype=escSnap(String(row.case_type));
+    if(row.case_ref!=null) sys=escSnap(String(row.case_ref));
+    if(ci&&typeof ci.formatInjuryDate==='function') doi=escSnap(ci.formatInjuryDate(row.date_of_injury));
+    else if(row.date_of_injury) doi=escSnap(String(row.date_of_injury));
+  }
+  function cell(lab,val){
+    return '<div class="cci-rpt-id-cell"><span class="cci-rpt-id-label">'+escSnap(lab)+'</span><span class="cci-rpt-id-val">'+val+'</span></div>';
+  }
+  return '<div class="cci-rpt-id-grid">'+
+    cell('Case title',title)+cell('Client name',client)+cell('Case type',ctype)+
+    cell('System identifier',sys)+cell('Date of injury',doi)+cell('Report date',rpt)+
+    '</div>';
+}
+
+/** Premium CCI report: uses page CSS (.rpt-header, .r-card, …). No weighted-composite / domain-tier snapshot strip. */
+function buildCciReportPremiumHtml(ad,toolData,level,cmg,identityRow){
   var d=ad.drivers||{};
   function driversCol(title,arr){
     var items=(arr||[]).map(function(x){
-      return '<div style="display:flex;gap:8px;margin-bottom:6px;font-size:13px;color:#1a1a1a;line-height:1.45"><span style="width:6px;height:6px;border-radius:50%;background:#b09837;margin-top:6px;flex-shrink:0"></span><span>'+escSnap(x)+'</span></div>';
+      return '<div class="driver-item"><span class="driver-dot"></span><span>'+escSnap(x)+'</span></div>';
     }).join('');
-    if(!items) items='<div style="font-size:12px;color:#bbb;font-style:italic">None listed</div>';
-    return '<div style="background:#fafafa;border:1px solid #e0d090;border-radius:6px;padding:14px 16px"><div style="font-size:9px;font-weight:700;color:#7a6a22;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #ecdfa0">'+escSnap(title)+'</div>'+items+'</div>';
+    if(!items) items='<div class="r-card-empty">None listed</div>';
+    return '<div class="r-card"><div class="r-card-label">'+escSnap(title)+'</div>'+items+'</div>';
   }
-  var meter='';
+  var meterSegs='';
   for(var i=1;i<=5;i++){
-    meter+='<div style="flex:1;height:8px;border-radius:3px;margin-right:4px;background:'+(i<=level?'#b09837':'#2a2a2a')+'"></div>';
+    meterSegs+='<div class="rpt-meter-seg'+(i<=level?' rpt-meter-on':'')+'"></div>';
   }
   var guid=(cmg.guidance||[]).map(function(g){
-    return '<li style="display:flex;gap:8px;font-size:13px;color:#1a1a1a;margin-bottom:5px;line-height:1.5;list-style:none"><span style="width:5px;height:5px;border-radius:50%;background:#b09837;margin-top:7px;flex-shrink:0"></span><span>'+escSnap(g)+'</span></li>';
+    return '<li>'+escSnap(g)+'</li>';
   }).join('');
-  var arColor=ad.coord&&ad.coord.authRisk==='HIGH'?'#c0392b':(ad.coord&&ad.coord.authRisk==='MODERATE'?'#b09837':'#2e7d32');
-  return '<div style="font-family:Segoe UI,Arial,sans-serif;max-width:900px;margin:0 auto;background:#fff;border-radius:8px;overflow:hidden;border:1px solid #ddd">'+
-    '<div style="background:#1a1a1a;padding:16px 20px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;align-items:flex-start">'+
-    '<div style="font-size:11px;font-weight:700;color:#b09837;letter-spacing:0.14em;text-transform:uppercase">Case Complexity Index™ — Full Report</div>'+
-    '<div style="font-size:11px;color:#888;text-align:right"><span>Snapshot</span><span style="display:block;color:#aaa">'+escSnap(new Date().toLocaleString())+'</span></div></div>'+
-    '<div style="background:#111;padding:14px 20px 12px;border-bottom:1px solid #2a2a2a">'+
-    '<div style="font-size:9px;font-weight:700;color:#555;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px">Complexity spectrum (Level 1 = highest complexity)</div>'+
-    '<div style="display:flex;gap:5px">'+meter+'</div>'+
-    '<div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font-size:9px;color:#444">L1</span><span style="font-size:9px;color:#444">L2</span><span style="font-size:9px;color:#444">L3</span><span style="font-size:9px;color:#444">L4</span><span style="font-size:9px;color:#444">L5</span></div></div>'+
-    '<div style="padding:20px 22px;background:#fff">'+
-    '<div style="font-size:26px;font-weight:700;color:#1a1a1a;margin-bottom:6px">Level '+level+' — '+escSnap(ad.levelName)+'</div>'+
-    '<div style="font-size:13px;color:#555;line-height:1.55;margin-bottom:16px">'+escSnap(ad.levelSub)+'</div>'+
-    '<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#1a1a1a;border-radius:6px;margin-bottom:20px;flex-wrap:wrap">'+
-    '<span style="font-size:10px;font-weight:700;color:#888;letter-spacing:0.1em;text-transform:uppercase">Recommended review interval</span>'+
-    '<span style="background:#b09837;color:#fff;font-size:13px;font-weight:700;padding:6px 14px;border-radius:4px">'+escSnap(ad.interval)+'</span></div>'+
-    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">'+driversCol('Injury drivers',d.injury)+driversCol('Functional drivers',d.functional)+driversCol('Coordination drivers',d.coordination)+'</div>'+
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">'+
-    '<div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:5px;padding:10px 12px"><div style="font-size:9px;font-weight:700;color:#888;text-transform:uppercase;margin-bottom:4px">Referral pattern</div><div style="font-size:13px;font-weight:600;color:#1a1a1a">'+escSnap(ad.coord&&ad.coord.ref)+'</div></div>'+
-    '<div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:5px;padding:10px 12px"><div style="font-size:9px;font-weight:700;color:#888;text-transform:uppercase;margin-bottom:4px">Treatment course</div><div style="font-size:13px;font-weight:600;color:#1a1a1a">'+escSnap(ad.coord&&ad.coord.dur)+'</div></div>'+
-    '<div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:5px;padding:10px 12px"><div style="font-size:9px;font-weight:700;color:#888;text-transform:uppercase;margin-bottom:4px">Authorization risk</div><div style="font-size:13px;font-weight:600;color:'+arColor+'">'+escSnap(ad.coord&&ad.coord.authRisk)+'</div></div>'+
-    '<div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:5px;padding:10px 12px"><div style="font-size:9px;font-weight:700;color:#888;text-transform:uppercase;margin-bottom:4px">Specialty count factor</div><div style="font-size:13px;font-weight:600;color:#1a1a1a">—</div></div></div>'+
-    '<div style="border-left:4px solid #b09837;background:#fdf8e8;padding:14px 16px;border-radius:0 6px 6px 0;margin-bottom:14px">'+
-    '<div style="font-size:9px;font-weight:700;color:#7a6a22;text-transform:uppercase;margin-bottom:6px">Priority action</div>'+
-    '<p style="font-size:13px;color:#333;line-height:1.6;margin:0">'+escSnap(ad.priorityAction)+'</p></div>'+
-    '<div style="border-left:4px solid #b09837;background:#fdf8e8;padding:14px 16px;border-radius:0 6px 6px 0;margin-bottom:18px">'+
-    '<div style="font-size:9px;font-weight:700;color:#7a6a22;text-transform:uppercase;margin-bottom:6px">Documentation focus</div>'+
-    '<p style="font-size:13px;color:#333;line-height:1.6;margin:0">'+escSnap(ad.docFocus)+'</p></div>'+
-    '<div style="font-size:10px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">Monitoring guidance</div>'+
-    '<ul style="list-style:none;padding:0;margin:0 0 16px">'+guid+'</ul>'+
+  var arClass=ad.coord&&ad.coord.authRisk==='HIGH'?'risk-high':(ad.coord&&ad.coord.authRisk==='MODERATE'?'risk-mod':'risk-low');
+  return '<div class="report-wrap cci-premium-report" id="cci-premium-report-root">'+
+    '<div class="rpt-header">'+
+    '<div class="rpt-header-top">'+
+    '<div class="rpt-header-title">Case Complexity Index™ — Full Report</div>'+
+    '<div class="rpt-header-meta"><span>Clinical complexity report</span></div></div>'+
+    buildCciReportIdentityGridHtml(identityRow||null)+
     '</div>'+
-    '<div style="background:#f5f5f5;padding:14px 22px;border-top:1px solid #eee"><p style="font-size:12px;color:#777;line-height:1.65;margin:0">Case Clarity trial capture — for use in the consolidated dashboard report only.</p></div></div>';
+    '<div class="rpt-meter">'+
+    '<div class="rpt-meter-label">Complexity spectrum (Level 1 = highest complexity)</div>'+
+    '<div class="rpt-meter-track">'+meterSegs+'</div>'+
+    '<div class="rpt-meter-ticks"><span class="rpt-meter-tick">L1</span><span class="rpt-meter-tick">L2</span><span class="rpt-meter-tick">L3</span><span class="rpt-meter-tick">L4</span><span class="rpt-meter-tick">L5</span></div></div>'+
+    '<div class="rpt-banner">'+
+    '<div class="rpt-banner-level">Level '+level+' — '+escSnap(ad.levelName)+'</div>'+
+    '<div class="rpt-banner-sub">'+escSnap(ad.levelSub)+'</div>'+
+    '<div class="rpt-banner-interval">'+
+    '<span class="rpt-banner-interval-label">Recommended review interval</span>'+
+    '<span class="rpt-banner-interval-badge">'+escSnap(ad.interval)+'</span></div></div>'+
+    '<div style="padding:0 1.5rem 1.25rem;background:#fff">'+
+    '<div class="r-cards">'+driversCol('Injury drivers',d.injury)+driversCol('Functional drivers',d.functional)+driversCol('Coordination drivers',d.coordination)+'</div>'+
+    '<div class="coord-grid" style="margin-top:1rem">'+
+    '<div class="coord-stat"><div class="coord-stat-label">Referral pattern</div><div class="coord-stat-value">'+escSnap(ad.coord&&ad.coord.ref)+'</div></div>'+
+    '<div class="coord-stat"><div class="coord-stat-label">Treatment course</div><div class="coord-stat-value">'+escSnap(ad.coord&&ad.coord.dur)+'</div></div>'+
+    '<div class="coord-stat"><div class="coord-stat-label">Authorization risk</div><div class="coord-stat-value '+arClass+'">'+escSnap(ad.coord&&ad.coord.authRisk)+'</div></div>'+
+    '<div class="coord-stat"><div class="coord-stat-label">Specialty count factor</div><div class="coord-stat-value">'+escSnap(ad.coord&&ad.coord.specCount!=null?String(ad.coord.specCount):'—')+'</div></div></div>'+
+    '<div class="priority-box" style="margin-top:1rem"><div class="priority-box-label">Priority action</div><p style="margin:0;font-size:13px;color:#333;line-height:1.6">'+escSnap(ad.priorityAction)+'</p></div>'+
+    '<div class="priority-box"><div class="priority-box-label">Documentation focus</div><p style="margin:0;font-size:13px;color:#333;line-height:1.6">'+escSnap(ad.docFocus)+'</p></div>'+
+    '<div class="cmg-sub-label">Monitoring guidance</div>'+
+    '<ul class="cmg-list">'+guid+'</ul></div>'+
+    '<div class="rpt-scope"><div class="rpt-scope-label">Assessment scope</div><p>This Case Complexity Index™ report reflects documented selections at the time of calculation. Interpret alongside medical records and case developments.</p></div></div>';
 }
 
 // ── Calculate ─────────────────────────────────────────
@@ -858,12 +1175,61 @@ function calculate(){
     psAffected,
     assessmentData
   };
-  const _ts = window.CaseClarityTrialStorage;
-  localStorage.setItem(_ts.key(1, caseType, 'data'), JSON.stringify(toolData));
-  localStorage.setItem(_ts.key(1, caseType, 'complete'), 'true');
+  localStorage.setItem('tool1_data',JSON.stringify(toolData));
+  localStorage.setItem('tool1_complete','true');
 
   document.getElementById('assessment').style.display='none';
-  document.getElementById('trial-complete').style.display='block';
+
+  void cciFinalizeReportAndUI(assessmentData,toolData,level,cmg,levelNames,composite);
+}
+
+async function cciFinalizeReportAndUI(assessmentData,toolData,level,cmg,levelNames,composite){
+  var paidCaseRef=new URLSearchParams(window.location.search).get('case_ref');
+  var identityRow=null;
+  if(paidCaseRef&&window.supabaseClient&&window.caseClarityIdentity){
+    try{
+      var sessRes=await window.supabaseClient.auth.getSession();
+      var session=sessRes.data&&sessRes.data.session;
+      if(session){
+        var cq=await window.supabaseClient
+          .from('case_cases')
+          .select(window.caseClarityIdentity.SELECT)
+          .eq('case_ref',paidCaseRef)
+          .eq('attorney_user_id',session.user.id)
+          .maybeSingle();
+        identityRow=cq.data;
+      }
+    }catch(err){
+      console.warn('[CCI] case identity for report header',err);
+    }
+  }
+
+  var snapEl=document.getElementById('cci-report-snapshot');
+  var reportHtml='';
+  if(snapEl){
+    snapEl.innerHTML=buildCciReportPremiumHtml(assessmentData,toolData,level,cmg,identityRow);
+    snapEl.className='complexity-report report-view results-display';
+    reportHtml=snapEl.innerHTML;
+    localStorage.setItem('tool1_report_html',snapEl.outerHTML);
+    console.log('CCI report HTML saved, length:', localStorage.getItem('tool1_report_html')?localStorage.getItem('tool1_report_html').length:0);
+  } else {
+    console.warn('CCI: cci-report-snapshot host missing; report HTML not saved.');
+  }
+
+  if(paidCaseRef){
+    document.body.classList.add('cci-paid-mode');
+    document.getElementById('trial-complete').style.display='none';
+    var paidHost=document.getElementById('cci-paid-report-visible');
+    if(paidHost){paidHost.innerHTML=reportHtml;}
+    var retCase=document.getElementById('paid-cci-return-case');
+    if(retCase){retCase.href='/case-detail.html?case_ref='+encodeURIComponent(paidCaseRef);}
+    document.getElementById('paid-complete').style.display='block';
+  } else {
+    document.body.classList.remove('cci-paid-mode');
+    document.getElementById('paid-complete').style.display='none';
+    document.getElementById('trial-complete').style.display='block';
+  }
+
   window.scrollTo({top:0,behavior:'smooth'});
 
   if(window.opener&&!window.opener.closed){
@@ -873,15 +1239,29 @@ function calculate(){
     window.markAssessmentComplete(assessmentData);
   }
 
-  var snapEl=document.getElementById('cci-report-snapshot');
-  if(snapEl){
-    snapEl.innerHTML=buildCciReportSnapshotHtml(assessmentData,toolData,level,cmg);
-    snapEl.className='complexity-report report-view results-display';
-    localStorage.setItem(_ts.key(1, caseType, 'report_html'), snapEl.outerHTML);
-    console.log('CCI report HTML saved, length:', localStorage.getItem(_ts.key(1, caseType, 'report_html')) ? localStorage.getItem(_ts.key(1, caseType, 'report_html')).length : 0);
-  } else {
-    console.warn('CCI: cci-report-snapshot host missing; report HTML not saved.');
-  }
+  void paidPortalRecordCaseToolRunAsync({
+    toolKey: 'CCI',
+    scoreSummary: {
+      tool: 'CCI',
+      level: level,
+      levelName: levelNames[level],
+      composite: composite,
+      caseType: caseType
+    },
+    resultJson: toolData
+  });
+}
+
+function cciScrollToPaidReport(){
+  var block=document.getElementById('cci-paid-report-block');
+  var vis=document.getElementById('cci-paid-report-visible');
+  var root=document.getElementById('cci-premium-report-root');
+  var el=block||root||(vis&&vis.firstElementChild)||vis;
+  if(el){el.scrollIntoView({behavior:'smooth',block:'start'});}
+}
+
+function cciPrintPaidReport(){
+  window.print();
 }
 
 // ── Reset ─────────────────────────────────────────────
@@ -892,12 +1272,16 @@ function resetAll(){
   document.getElementById('referral').value='0';
   document.getElementById('duration').value='0';
   document.getElementById('other-cat-text').value='';
-  // Collapse all steps
-  ['step1','step2','step3','step4','step5'].forEach(id=>{
-    document.getElementById('body-'+id).classList.remove('open');
-    document.getElementById('chevron-'+id).classList.remove('open');
-  });
+  cciPrevStep1Complete=false;
+  cciSetStepOpenExclusive('step1');
+  document.body.classList.remove('cci-paid-mode');
   document.getElementById('trial-complete').style.display='none';
+  document.getElementById('paid-complete').style.display='none';
+  var paidRep=document.getElementById('cci-paid-report-visible');
+  if(paidRep){paidRep.innerHTML='';}
+  if(window.caseClarityIdentity&&window.supabaseClient){
+    void window.caseClarityIdentity.mountToolPage(window.supabaseClient);
+  }
   document.getElementById('assessment').style.display='none';
   document.getElementById('explainer').style.display='block';
   window.scrollTo({top:0,behavior:'smooth'});
@@ -948,7 +1332,13 @@ function returnToDashboard() {
     window.location.href = 'dashboard.html';
 }
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  if (window.caseClarityIdentity && window.supabaseClient) {
+    void window.caseClarityIdentity.mountToolPage(window.supabaseClient);
+  }
+});
+</script>
 <script src="trial-pinned-banner.js"></script>
-<script src="js/case-identity.js"></script>
 </body>
 </html>
