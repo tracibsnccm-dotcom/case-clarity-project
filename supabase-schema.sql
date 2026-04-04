@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS trial_users (
     trial_start_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     status TEXT NOT NULL DEFAULT 'trial_active',
     completed_tools JSONB NOT NULL DEFAULT '{}'::jsonb,
+    trial_still_active_email_sent BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     CONSTRAINT trial_users_email_unique UNIQUE (email),
     CONSTRAINT trial_users_ccp_unique UNIQUE (ccp)

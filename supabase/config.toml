@@ -3,3 +3,6 @@ verify_jwt = false
 
 [functions.send-ghl-trial-sample]
 verify_jwt = false
+
+[functions.send-ghl-trial-still-active]
+verify_jwt = false
