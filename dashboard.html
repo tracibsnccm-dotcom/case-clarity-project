@@ -1371,13 +1371,6 @@
         }
 
         function updateTrialReportUI() {
-            var prog = document.getElementById('trial-local-progress');
-            var wrap = document.getElementById('trial-generate-wrap');
-            if (!prog || !wrap) return;
-            var na = countLocalToolsComplete('active');
-            var nr = countLocalToolsComplete('retro');
-            prog.textContent = 'Instruments saved in this browser — Workflow: ' + na + '/6 · Retrospective: ' + nr + '/6';
-            wrap.style.display = allToolsComplete() ? 'block' : 'none';
             syncToolCompletionsToSupabase();
         }
 
@@ -1623,7 +1616,7 @@
                 <div class="timer-card">
                     <div>
                         <span class="timer-label">${timerLabel}</span>
-                        <div style="font-size:12px;color:#6a7a8a;margin-top:8px;max-width:520px;line-height:1.5;">7-day trial from first login on this device. Portal session may differ; tools lock when the trial ends.</div>
+                        <div style="font-size:12px;color:#6a7a8a;margin-top:8px;max-width:520px;line-height:1.5;">Your 7-day trial begins at first login on this device. You may assess as many cases as you like during this access window. Portal session timing may differ; tools lock when the trial ends.</div>
                     </div>
                     <span id="trial-countdown-card" class="timer-value trial-countdown-clock ${timerClass}" aria-live="polite">7d 00h 00m 00s</span>
                 </div>
@@ -1649,33 +1642,18 @@
                       <div id="countdown-timer" style="font-size: 32px; font-weight: bold;">Calculating...</div>
                   </div>
                   
-                  <p style="margin: 20px 0 0; line-height: 1.6; color: #3d4a5c;"><strong>Access &amp; scope.</strong> Your 7-day window is active; progress is saved automatically and you may log out and return before it ends. These instruments are not simple calculators—each evaluates structural case progression, treatment sequencing, and recovery dynamics.</p>
+                  <p style="margin: 20px 0 0; line-height: 1.6; color: #3d4a5c;"><strong>Access &amp; scope.</strong> Your 7-day trial begins at first login on this device. You may assess as many cases as you like during this access window. Portal session timing may differ; tools lock when the trial ends. Progress is saved automatically and you may log out and return before the window ends. These instruments are not simple calculators—each evaluates structural case progression, treatment sequencing, and recovery dynamics.</p>
                 </div>
 
                 <h1 class="dashboard-heading">C.A.S.E. Clarity Assessments — Forensic Intelligence System</h1>
-
-                <div id="trial-complete-report-panel" class="trial-report-panel">
-                    <h2>Complete trial report</h2>
-                    <p class="trial-report-lead">After you finish all six instruments in this browser, generate a single consolidated report from the data saved on your device (localStorage). Use <strong>Print Report</strong> to print or save as PDF.</p>
-                    <p class="trial-report-progress" id="trial-local-progress">Instruments saved in this browser: —/6</p>
-                    <div id="trial-generate-wrap" style="display:none;">
-                        <button type="button" class="btn-generate-complete" id="btn-generate-complete-report">Generate Complete Report</button>
-                    </div>
-                    <div id="trial-report-output" class="trial-report-output trial-print-root" style="display:none;">
-                        <div class="trial-report-toolbar no-print">
-                            <button type="button" class="btn-print-trial" id="btn-print-trial-report">Print Report</button>
-                        </div>
-                        <p class="trial-report-meta" id="trial-report-generated-at"></p>
-                        <div id="trial-report-body" class="trial-report-body"></div>
-                    </div>
-                </div>
 
             `;
 
             // Assessment Tools: case entry, instruments, and reports (single workflow section)
             html += `
-                <div class="case-section case-section-active">
+                <div id="assessment-tools-anchor" class="case-section case-section-active">
                     <h2 style="font-size: 20px; margin: 32px 0 12px;">Assessment Tools</h2>
+                    <p style="margin: 0 0 16px; font-size: 14px; color: #4a5568; line-height: 1.6; max-width: 720px;">Complete all six instruments in this browser to generate a single consolidated report. Use <strong>Print Report</strong> to print or save as PDF.</p>
                     <p style="margin-bottom: 24px; font-size: 14px; color: #6a7a8a;">Instruments completed: <span id="active-progress">${localActive}/6</span></p>
 
                 <!-- CASE ENTRY SECTION (side by side) -->
@@ -1789,8 +1767,8 @@
             if (trialUrlParams.get('complete') === 'true') {
                 updateTrialReportUI();
                 if (allToolsComplete()) {
-                    var trialPanel = document.getElementById('trial-complete-report-panel');
-                    if (trialPanel) trialPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    var assessmentAnchor = document.getElementById('assessment-tools-anchor');
+                    if (assessmentAnchor) assessmentAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
                 if (window.history && window.history.replaceState) {
                     window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
