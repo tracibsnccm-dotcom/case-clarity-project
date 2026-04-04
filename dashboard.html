@@ -1618,8 +1618,6 @@
             const rcType = locR.caseType === 'PI' || locR.caseType === 'WC' || locR.caseType === 'Disability' ? locR.caseType : '';
             const sel = function (cur, val) { return cur === val ? ' selected' : ''; };
             const activePrintReady = localActive === 6;
-            const retroPrintReady = localRetro === 6;
-            var trialRetroLocked = !trialExpired && localActive < 6;
 
             let html = `
                 <div class="timer-card">
@@ -1785,50 +1783,6 @@
                     </div>
                 </div>`;
 
-            // Retrospective Case Section
-            html += `
-                <div class="case-section case-section-retro">
-                    <h2 style="font-size: 20px; margin: 48px 0 16px;">Retrospective Case</h2>
-                    <p style="margin-bottom: 24px; color: #4a5568; line-height: 1.6; padding: 16px; background: #faf6f0; border-left: 3px solid #8b6914;">For cases that have already settled, this review may identify factors that could have influenced the outcome or settlement value.</p>
-                    <div class="collapsible-section">
-                      <div class="collapsible-header" onclick="toggleSection('retro-tools')">
-                        <span style="display: flex; align-items: center; gap: 12px;">
-                          <span class="arrow" id="arrow-retro">▶</span>
-                          <span>Retrospective Case Tools (<span id="retro-progress">${localRetro}/6</span> completed)</span>
-                        </span>
-                      </div>
-                      <div id="retro-preview" class="tool-preview" style="margin: 4px 0 8px 24px; font-size: 13px; color: #8a9aa8;">
-                        CCI · CSA · CAF · HSI · FCI · RRF
-                      </div>
-                      <div class="collapsible-content" id="retro-tools">
-                    <div class="tools-grid">
-            `;
-
-            const retroAssessments = session.retrospective_case?.assessments || {};
-            TOOL_ORDER.forEach(toolKey => {
-                const tool = TOOL_INFO[toolKey];
-                const status = retroAssessments[toolKey]?.status || 'not_started';
-                const retroLocked = trialRetroLocked;
-                html += getToolCard(toolKey, tool, status, 'retrospective', {
-                    displayName: tool.name,
-                    cardClass: 'tool-card-retro',
-                    trialExpired: trialExpired,
-                    lockedBySequence: retroLocked
-                });
-            });
-
-            html += `</div>
-                    <div class="inline-reports-card">
-                      <h4 style="font-size: 15px; color: #0c1c34; margin-bottom: 12px;">Retrospective Case Reports</h4>
-                      <p style="font-size: 14px; color: #4a5568; margin-bottom: 10px; line-height: 1.5;">Reports available when all 6 Retrospective assessments are complete.</p>
-                      <p style="font-size: 14px; color: #b8922a; margin-bottom: 8px;">Progress: <span id="retro-assessment-report-progress">${localRetro}</span>/6</p>
-                      <p id="report-retro-capture" style="font-size: 12px; color: #6a7a8a; margin-bottom: 14px; line-height: 1.4;">${retroPrintReady ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localRetro + '/6. Complete all six to unlock downloads.')}</p>
-                      <button type="button" class="btn-report" data-report-btn="retro" id="btn-download-retro-all" ${(localRetro === 6 && !trialExpired) ? '' : 'disabled'} onclick="printRetroReports()">Download All Retro Reports</button>
-                    </div>
-                      </div>
-                    </div>
-                </div>`;
-
             container.innerHTML = html;
 
             if (window.CaseClarityTrial && window.CaseClarityTrial.refreshCountdown) {
@@ -1840,7 +1794,6 @@
             wireDashboardCaseAutoSave();
             updateReportUI();
             updateCollapsibleProgress(localActive, localRetro);
-            syncCollapsiblePreview('retro-tools');
             syncCollapsiblePreview('active-tools');
 
             bindTrialReportHandlers();
