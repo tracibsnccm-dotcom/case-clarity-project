@@ -1,0 +1,140 @@
+/* Paid / hybrid tool shell — portal header (used by tool3-caf.html). Trial case overview uses css/case-identity.css separately. */
+:root {
+  --portal-gold: #b09837;
+  --portal-black: #0d0d0d;
+  --portal-white: #ffffff;
+  --portal-ui: "Jost", "Segoe UI", system-ui, sans-serif;
+  --portal-display: "Playfair Display", Georgia, "Times New Roman", serif;
+}
+
+.portal-header {
+  background: var(--portal-black);
+  border-bottom: 3px solid var(--portal-gold);
+  padding: 0 clamp(16px, 4vw, 40px);
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-sizing: border-box;
+}
+
+.portal-header a.portal-logo {
+  text-decoration: none;
+  color: inherit;
+}
+
+.portal-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.portal-logo-box {
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid var(--portal-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.portal-logo-box span {
+  font-family: var(--portal-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--portal-gold);
+}
+
+.portal-logo-text {
+  font-family: var(--portal-ui);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+}
+
+.portal-logo-text strong {
+  display: block;
+  color: var(--portal-white);
+  font-weight: 600;
+}
+
+.portal-header-right {
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 2vw, 24px);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.portal-nav-link {
+  font-family: var(--portal-ui);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+  text-decoration: none;
+  transition: color 0.15s;
+  white-space: nowrap;
+}
+
+.portal-nav-link:hover {
+  color: var(--portal-gold);
+}
+
+.portal-user {
+  font-family: var(--portal-ui);
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.06em;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.portal-header .btn-secondary {
+  display: inline-block;
+  font-family: var(--portal-ui);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.92);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.portal-header .btn-secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--portal-gold);
+  color: var(--portal-white);
+}
+
+.portal-header .btn-secondary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Full-width header: remove horizontal body padding when portal shell is present */
+body.with-portal-tool-header {
+  padding-left: 0;
+  padding-right: 0;
+  padding-top: 0;
+}
+
+body.with-portal-tool-header .trial-case-identity-shell {
+  margin-top: 0;
+}

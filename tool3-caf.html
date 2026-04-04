@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>C.A.R.E. Access Friction Score™</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="trial-pinned-banner.css">
 <link rel="stylesheet" href="css/case-identity.css">
 <link rel="stylesheet" href="css/theme.css">
@@ -322,7 +325,10 @@ body.caf-paid-mode #case-header-fields{display:none !important}
 <script>
 (function () {
   function boot() {
-    if (typeof initPortalHeaderNav === 'function') initPortalHeaderNav();
+    if (typeof initPortalHeaderNav === 'function') {
+      var p = initPortalHeaderNav();
+      if (p && typeof p.then === 'function') p.catch(function () {});
+    }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
