@@ -1859,8 +1859,6 @@
     const narrative = toolData.branch === 'WC' ? wcNarrative(toolData.level) : piNarrative(toolData.level);
     const care = careTieIn(toolData.level);
     const st = rrfTierStyle(toolData.level);
-    const dm = Number(toolData.durationMult);
-    const dmStr = Number.isFinite(dm) ? dm.toFixed(2) : String(toolData.durationMult);
 
     const html =
       '<div class="rrf-report rrf-dashboard-snapshot" style="font-family:system-ui,Segoe UI,sans-serif;max-width:860px;margin:0 auto;background:#fff;border:1px solid #d6d0c4;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(14,28,46,0.08)">' +
@@ -1879,7 +1877,7 @@
       '<div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:16px;margin-top:8px">' +
       '<span style="font-size:32px;font-weight:900;color:' + st.pill + '">' + escRrf(toolData.level) + '</span>' +
       '<span style="font-size:15px;font-weight:700;color:#333">Score ' + toolData.total + ' / 100</span></div>' +
-      '<p style="margin:12px 0 0;font-size:13px;color:#444;line-height:1.55"><strong>Illustrative treatment duration index:</strong> ' + toolData.predictedDays + ' days <span style="color:#777">(modifier × ' + escRrf(dmStr) + ')</span></p></div>' +
+      '<p style="margin:12px 0 0;font-size:13px;color:#444;line-height:1.55"><strong>Illustrative treatment duration index:</strong> ' + toolData.predictedDays + ' days</p></div>' +
       '<div style="padding:20px 24px">' +
       '<div style="padding:18px 20px;background:#f5f9ff;border-radius:10px;border-left:4px solid #1e88e5">' +
       '<div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#1565c0;margin-bottom:8px">C.A.R.E. coordination focus</div>' +
