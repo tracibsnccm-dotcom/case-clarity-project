@@ -954,7 +954,7 @@
 
         window.printActiveReports = async function() {
             if (countLocalToolsComplete('active') < 6) {
-                alert('Download requires all 6 Active-case instruments to be completed in this browser. Saved: ' + countLocalToolsComplete('active') + '/6.');
+                alert('Download requires all 6 assessment instruments to be completed in this browser. Saved: ' + countLocalToolsComplete('active') + '/6.');
                 return;
             }
             var data = buildTrialPrintPayloadFromLocal('active');
@@ -1376,7 +1376,7 @@
             if (!prog || !wrap) return;
             var na = countLocalToolsComplete('active');
             var nr = countLocalToolsComplete('retro');
-            prog.textContent = 'Instruments saved in this browser — Active: ' + na + '/6 · Retrospective: ' + nr + '/6';
+            prog.textContent = 'Instruments saved in this browser — Workflow: ' + na + '/6 · Retrospective: ' + nr + '/6';
             wrap.style.display = allToolsComplete() ? 'block' : 'none';
             syncToolCompletionsToSupabase();
         }
@@ -1741,18 +1741,18 @@
 
             `;
 
-            // Active Case Section
+            // Recommended assessment workflow section
             html += `
                 <div class="case-section case-section-active">
-                    <h2 style="font-size: 20px; margin: 32px 0 16px;">Active Case — Recommended Order</h2>
+                    <h2 style="font-size: 20px; margin: 32px 0 16px;">Recommended Assessment Workflow</h2>
                     <p style="margin-bottom: 20px; color: #4a5568; line-height: 1.6;">It is recommended that you complete in order, but you may choose any sequence. Reports will unlock for download once all assessments in this section are completed.</p>
                     <p style="margin-bottom: 24px; color: #4a5568; line-height: 1.6; padding: 16px; background: #f4f6f8; border-left: 3px solid #0c1c34;">Consider beginning with a case that has stalled or where clinical direction is unclear. This process also provides a framework for new cases, offering guidance from the outset.</p>
-                    <p style="margin-bottom: 12px; font-size: 15px; color: #0c1c34; font-weight: 600;">Start here with your Active Case</p>
+                    <p style="margin-bottom: 12px; font-size: 15px; color: #0c1c34; font-weight: 600;">Start here to run your assessments</p>
                     <div class="collapsible-section">
                       <div class="collapsible-header" onclick="toggleSection('active-tools')">
                         <span style="display: flex; align-items: center; gap: 12px;">
                           <span class="arrow expanded" id="arrow-active">▶</span>
-                          <span>Active Case Tools (<span id="active-progress">${localActive}/6</span> completed)</span>
+                          <span>Assessment Tools (<span id="active-progress">${localActive}/6</span> completed)</span>
                         </span>
                       </div>
                       <div class="collapsible-content expanded" id="active-tools">
@@ -1773,11 +1773,11 @@
 
             html += `</div>
                     <div class="inline-reports-card">
-                      <h4 style="font-size: 15px; color: #0c1c34; margin-bottom: 12px;">Active Case Reports</h4>
-                      <p style="font-size: 14px; color: #4a5568; margin-bottom: 10px; line-height: 1.5;">Reports available when all 6 Active assessments are complete.</p>
+                      <h4 style="font-size: 15px; color: #0c1c34; margin-bottom: 12px;">Assessment Reports</h4>
+                      <p style="font-size: 14px; color: #4a5568; margin-bottom: 10px; line-height: 1.5;">Reports available when all 6 assessments are complete.</p>
                       <p style="font-size: 14px; color: #b8922a; margin-bottom: 8px;">Progress: <span id="active-assessment-report-progress">${localActive}</span>/6</p>
                       <p id="report-active-capture" style="font-size: 12px; color: #6a7a8a; margin-bottom: 14px; line-height: 1.4;">${activePrintReady ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localActive + '/6. Complete all six to unlock downloads.')}</p>
-                      <button type="button" class="btn-report" data-report-btn="active" id="btn-download-active-all" ${(localActive === 6 && !trialExpired) ? '' : 'disabled'} onclick="printActiveReports()">Download All Active Reports</button>
+                      <button type="button" class="btn-report" data-report-btn="active" id="btn-download-active-all" ${(localActive === 6 && !trialExpired) ? '' : 'disabled'} onclick="printActiveReports()">Download All Assessment Reports</button>
                     </div>
                       </div>
                     </div>
@@ -1887,7 +1887,7 @@
             } else if (effectiveDone) {
                 btnLabel = 'Completed';
             } else if (opts.lockedBySequence) {
-                btnLabel = caseType === 'active' ? 'Complete previous step first' : 'Complete Active Case first';
+                btnLabel = caseType === 'active' ? 'Complete previous step first' : 'Complete the assessment workflow first';
             }
 
             return `
