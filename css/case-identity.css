@@ -1,0 +1,77 @@
+/* Trial portal — Case Overview / identifier card (dashboard_case_* localStorage) */
+.trial-case-identity-shell {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 0 1.5rem 1.25rem;
+  box-sizing: border-box;
+}
+
+.case-identity-card {
+  background: #faf8f4;
+  border: 1px solid #d6d0c4;
+  border-left: 3px solid #b8922a;
+  border-radius: 6px;
+  padding: 1rem 1.25rem 1.15rem;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.case-identity-heading {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #0c1c34;
+  margin: 0 0 0.35rem;
+}
+
+.case-identity-scope {
+  font-size: 12px;
+  color: #6a7a8a;
+  margin: 0 0 0.85rem;
+}
+
+.case-identity-dl {
+  margin: 0;
+  padding: 0;
+}
+
+.case-identity-row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 10px 16px;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 0.45rem;
+}
+
+.case-identity-row:last-child {
+  margin-bottom: 0;
+}
+
+.case-identity-row dt {
+  font-weight: 600;
+  color: #0c1c34;
+  margin: 0;
+}
+
+.case-identity-row dd {
+  margin: 0;
+  color: #222;
+}
+
+.case-identity-hint {
+  margin: 0.75rem 0 0;
+  padding-top: 0.65rem;
+  border-top: 1px solid #e8e4dc;
+  font-size: 12px;
+  color: #6a7a8a;
+  font-style: italic;
+  line-height: 1.45;
+}
+
+@media (max-width: 560px) {
+  .case-identity-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+}

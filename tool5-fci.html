@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Functional Capacity Index | Reconcile Care Management Services</title>
   <link rel="stylesheet" href="trial-pinned-banner.css">
+  <link rel="stylesheet" href="css/case-identity.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
@@ -369,6 +370,9 @@
   </style>
 </head>
 <body>
+<div class="trial-case-identity-shell">
+  <div id="case-header-fields"></div>
+</div>
 <div id="app"></div>
 <div id="fci-report-snapshot-host" style="position:absolute;left:-9999px;top:0;width:1px;height:1px;overflow:hidden" aria-hidden="true"></div>
 
@@ -847,5 +851,6 @@ function returnToDashboard() {
 }
 </script>
 <script src="trial-pinned-banner.js"></script>
+<script src="js/case-identity.js"></script>
 </body>
 </html>
