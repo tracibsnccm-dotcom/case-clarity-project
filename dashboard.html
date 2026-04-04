@@ -1832,6 +1832,8 @@
             const localDone = isLocalToolComplete(toolKey, caseType);
             const sessionDone = status === 'complete';
             const effectiveDone = localDone || sessionDone;
+            // TEMP QA: allow reopening HSI from dashboard when marked complete (no storage wipe; inspection only)
+            const hsiQaAllowReopen = toolKey === 'HSI' && caseType === 'active';
 
             let statusClass = 'status-not-started';
             let statusText = 'NOT STARTED';
@@ -1840,7 +1842,7 @@
                 statusText = '✓ COMPLETED';
             }
 
-            let launchDisabled = trialExpired || effectiveDone;
+            let launchDisabled = trialExpired || (effectiveDone && !hsiQaAllowReopen);
             if (caseType === 'retrospective' && opts.lockedBySequence && !effectiveDone) {
                 launchDisabled = true;
             }
@@ -1848,6 +1850,8 @@
             let btnLabel = 'Launch Assessment';
             if (trialExpired) {
                 btnLabel = 'Trial expired';
+            } else if (effectiveDone && hsiQaAllowReopen) {
+                btnLabel = 'Reopen assessment (QA)';
             } else if (effectiveDone) {
                 btnLabel = 'Completed';
             } else if (opts.lockedBySequence) {
