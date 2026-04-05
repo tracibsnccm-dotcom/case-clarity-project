@@ -1,134 +1,298 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Thank You — C.A.S.E. Clarity Subscription</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --gold: #9a7e1e;
-    --gold-light: #b09837;
-    --navy: #1e2a4a;
-    --page-bg: #f8f9fb;
-    --text: #1a1a1a;
-    --text-muted: #4a5568;
-    --green: #1a7a4a;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--page-bg);
-    color: var(--text);
-    font-size: 15px;
-    line-height: 1.65;
-    -webkit-font-smoothing: antialiased;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-  .topbar {
-    background: var(--navy);
-    border-bottom: 1px solid rgba(154,126,30,0.3);
-    padding: 12px 24px;
-  }
-  .topbar-inner {
-    max-width: 720px;
-    margin: 0 auto;
-  }
-  .topbar-brand {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--gold-light);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-  main {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 48px 24px 64px;
-  }
-  .card {
-    max-width: 520px;
-    width: 100%;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 24px rgba(30,42,74,0.08);
-    border: 1px solid rgba(30,42,74,0.08);
-    padding: 40px 36px;
-    text-align: center;
-  }
-  .eyebrow {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--green);
-    margin-bottom: 16px;
-  }
-  h1 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(26px, 4vw, 34px);
-    font-weight: 400;
-    color: var(--navy);
-    margin-bottom: 14px;
-    line-height: 1.2;
-  }
-  p {
-    color: var(--text-muted);
-    margin-bottom: 28px;
-    font-size: 15px;
-  }
-  .cta {
-    display: inline-block;
-    background: var(--gold);
-    color: #fff;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
-    padding: 14px 28px;
-    border-radius: 6px;
-    transition: background 0.2s;
-  }
-  .cta:hover { background: var(--gold-light); }
-  .sub-cta {
-    display: block;
-    margin-top: 16px;
-    font-size: 13px;
-    color: var(--text-muted);
-  }
-  .sub-cta a { color: var(--navy); }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Purchase Successful — C.A.S.E. Clarity System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold:       #b09837;
+      --gold-light: #c9b05a;
+      --navy:       #0d1f3c;
+      --navy-mid:   #1a3055;
+      --bg:         #f7f6f2;
+      --surface:    #ffffff;
+      --text:       #1c1c1c;
+      --muted:      #5a5a5a;
+      --border:     #e2ddd4;
+      --success:    #2d7a4f;
+      --success-bg: #edf7f1;
+    }
+
+    html, body {
+      min-height: 100vh;
+      background: var(--bg);
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+    }
+
+    /* ── TOP BANNER ── */
+    .top-bar {
+      background: var(--navy);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .top-bar .brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 0.04em;
+    }
+    .top-bar .brand span {
+      color: #ffffff;
+      font-weight: 400;
+    }
+
+    /* ── MAIN WRAPPER ── */
+    .page-wrapper {
+      max-width: 660px;
+      margin: 60px auto 80px;
+      padding: 0 24px;
+    }
+
+    /* ── SUCCESS BADGE ── */
+    .success-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--success-bg);
+      border: 1px solid #b0dcc2;
+      border-radius: 6px;
+      padding: 12px 18px;
+      margin-bottom: 36px;
+    }
+    .success-badge .icon {
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+      color: var(--success);
+    }
+    .success-badge p {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--success);
+      letter-spacing: 0.01em;
+    }
+
+    /* ── HEADLINE ── */
+    .headline {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.6rem;
+      font-weight: 600;
+      color: var(--navy);
+      line-height: 1.15;
+      margin-bottom: 10px;
+    }
+    .subhead {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--gold);
+      margin-bottom: 32px;
+      letter-spacing: 0.02em;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0 0 32px;
+    }
+
+    /* ── CONFIRMATION CARD ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 32px 36px;
+      margin-bottom: 28px;
+    }
+    .card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--navy);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .confirm-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .confirm-row:last-child { border-bottom: none; }
+
+    .confirm-row .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      margin-top: 6px;
+      flex-shrink: 0;
+    }
+    .confirm-row p {
+      font-size: 0.95rem;
+      color: var(--text);
+      line-height: 1.55;
+    }
+    .confirm-row p strong {
+      color: var(--navy);
+      font-weight: 500;
+    }
+
+    /* ── PIN NOTE ── */
+    .pin-note {
+      background: #f3f0e8;
+      border-left: 3px solid var(--gold);
+      border-radius: 0 6px 6px 0;
+      padding: 14px 18px;
+      margin-top: 8px;
+      font-size: 0.9rem;
+      color: var(--navy-mid);
+      line-height: 1.5;
+    }
+
+    /* ── PORTAL BUTTON ── */
+    .portal-block {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .portal-btn {
+      display: inline-block;
+      background: var(--navy);
+      color: #ffffff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 15px 42px;
+      border-radius: 4px;
+      transition: background 0.2s ease, box-shadow 0.2s ease;
+    }
+    .portal-btn:hover {
+      background: var(--navy-mid);
+      box-shadow: 0 4px 16px rgba(13, 31, 60, 0.22);
+    }
+    .portal-sub {
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* ── SUPPORT NOTE ── */
+    .support-note {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 22px 28px;
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.65;
+      text-align: center;
+    }
+    .support-note a {
+      color: var(--gold);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .support-note a:hover { text-decoration: underline; }
+
+    /* ── FOOTER ── */
+    .footer {
+      margin-top: 52px;
+      text-align: center;
+      font-size: 0.78rem;
+      color: #9a9589;
+      letter-spacing: 0.02em;
+    }
+
+    @media (max-width: 520px) {
+      .headline { font-size: 2rem; }
+      .card { padding: 24px 20px; }
+      .portal-btn { width: 100%; text-align: center; }
+    }
+  </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="topbar-brand">C.A.S.E. Clarity</div>
-    </div>
+
+  <!-- TOP BAR -->
+  <header class="top-bar">
+    <div class="brand">C.A.S.E. Clarity System <span>| Reconcile Care Management Services</span></div>
   </header>
-  <main>
-    <div class="card">
-      <div class="eyebrow">Subscription active</div>
-      <h1>Thank you for subscribing</h1>
-      <p>Your subscription is confirmed. Billing and access details are tied to your account. Open the portal to use all six tools across your active case capacity.</p>
-      <a class="cta" href="case-clarity-portal.html">Go to portal</a>
-      <span class="sub-cta">Questions? <a href="mailto:traci.johnson@rcmspllc.com">Contact RCMS</a></span>
+
+  <!-- PAGE CONTENT -->
+  <main class="page-wrapper">
+
+    <!-- SUCCESS BADGE -->
+    <div class="success-badge">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+        <polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+      <p>Payment received and confirmed</p>
     </div>
+
+    <!-- HEADLINE -->
+    <h1 class="headline">Purchase Successful</h1>
+    <p class="subhead">Welcome to the C.A.S.E. Clarity System</p>
+    <hr class="divider" />
+
+    <!-- CONFIRMATION DETAILS -->
+    <div class="card">
+      <p class="card-title">What Happens Next</p>
+
+      <div class="confirm-row">
+        <div class="dot"></div>
+        <p><strong>Payment received.</strong> Your subscription purchase has been processed and a confirmation will be sent to the email on file.</p>
+      </div>
+
+      <div class="confirm-row">
+        <div class="dot"></div>
+        <p><strong>Access recorded.</strong> Your subscription has been activated and your account is ready. You may log in to the portal below at any time.</p>
+      </div>
+
+      <div class="confirm-row">
+        <div class="dot"></div>
+        <p><strong>Your credentials carry over.</strong></p>
+      </div>
+
+      <div class="pin-note">
+        Your current ID/PIN will still work in the new portal. No new credentials are required.
+      </div>
+    </div>
+
+    <!-- PORTAL CTA -->
+    <div class="portal-block">
+      <a href="#" class="portal-btn">Access the C.A.S.E. Clarity Portal</a>
+      <p class="portal-sub">Use your existing ID and PIN to log in.</p>
+    </div>
+
+    <!-- SUPPORT NOTE -->
+    <div class="support-note">
+      Questions about your subscription or access?<br />
+      Contact RCMS support at <a href="mailto:traci.johnson@rcmspllc.com">traci.johnson@rcmspllc.com</a><br />
+      and our team will respond within one business day.
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      &copy; 2025 Reconcile Care Management Services &nbsp;|&nbsp; C.A.S.E. Clarity System™
+    </div>
+
   </main>
-  <script>
-    (function () {
-      var p = new URLSearchParams(window.location.search);
-      var uid = p.get('uid');
-      if (uid) {
-        try {
-          sessionStorage.setItem('case_clarity_checkout_uid', uid);
-        } catch (e) { /* ignore */ }
-      }
-    })();
-  </script>
+
 </body>
 </html>

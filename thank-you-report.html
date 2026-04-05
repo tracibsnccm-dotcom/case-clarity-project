@@ -1,134 +1,264 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Thank You — C.A.S.E. Clarity</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --gold: #9a7e1e;
-    --gold-light: #b09837;
-    --navy: #1e2a4a;
-    --page-bg: #f8f9fb;
-    --text: #1a1a1a;
-    --text-muted: #4a5568;
-    --green: #1a7a4a;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--page-bg);
-    color: var(--text);
-    font-size: 15px;
-    line-height: 1.65;
-    -webkit-font-smoothing: antialiased;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-  .topbar {
-    background: var(--navy);
-    border-bottom: 1px solid rgba(154,126,30,0.3);
-    padding: 12px 24px;
-  }
-  .topbar-inner {
-    max-width: 720px;
-    margin: 0 auto;
-  }
-  .topbar-brand {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--gold-light);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-  main {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 48px 24px 64px;
-  }
-  .card {
-    max-width: 520px;
-    width: 100%;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 24px rgba(30,42,74,0.08);
-    border: 1px solid rgba(30,42,74,0.08);
-    padding: 40px 36px;
-    text-align: center;
-  }
-  .eyebrow {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--green);
-    margin-bottom: 16px;
-  }
-  h1 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(26px, 4vw, 34px);
-    font-weight: 400;
-    color: var(--navy);
-    margin-bottom: 14px;
-    line-height: 1.2;
-  }
-  p {
-    color: var(--text-muted);
-    margin-bottom: 28px;
-    font-size: 15px;
-  }
-  .cta {
-    display: inline-block;
-    background: var(--gold);
-    color: #fff;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
-    padding: 14px 28px;
-    border-radius: 6px;
-    transition: background 0.2s;
-  }
-  .cta:hover { background: var(--gold-light); }
-  .sub-cta {
-    display: block;
-    margin-top: 16px;
-    font-size: 13px;
-    color: var(--text-muted);
-  }
-  .sub-cta a { color: var(--navy); }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Report Access Activated — C.A.S.E. Clarity</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --gold: #b09837;
+      --gold-light: #c9b05a;
+      --gold-faint: #f5f0e0;
+      --navy: #1a2340;
+      --navy-mid: #2c3a5e;
+      --white: #ffffff;
+      --off-white: #fafaf8;
+      --text-dark: #1e1e1e;
+      --text-mid: #4a4a4a;
+      --text-light: #6e6e6e;
+      --border: #e0d9c8;
+      --success-green: #2e7d5b;
+      --success-bg: #edf7f2;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background-color: var(--off-white);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 0 1rem 3rem;
+    }
+    .top-bar {
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(90deg, var(--navy) 0%, var(--gold) 60%, var(--gold-light) 100%);
+    }
+    .brand-header {
+      width: 100%;
+      max-width: 660px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2.2rem 0 0;
+      gap: 0.75rem;
+    }
+    .brand-wordmark {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--navy);
+      letter-spacing: 0.04em;
+    }
+    .brand-wordmark span { color: var(--gold); }
+    .brand-divider { width: 1px; height: 22px; background: var(--border); }
+    .brand-sub {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-light);
+    }
+    .card {
+      width: 100%;
+      max-width: 580px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--gold);
+      border-radius: 4px;
+      padding: 2.8rem 2.6rem 2.4rem;
+      margin-top: 2rem;
+      box-shadow: 0 4px 24px rgba(26, 35, 64, 0.07);
+    }
+    .success-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--success-bg);
+      color: var(--success-green);
+      border: 1px solid #b6dece;
+      border-radius: 20px;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 1.4rem;
+    }
+    .success-badge::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--success-green);
+      flex-shrink: 0;
+    }
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.15rem;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.15;
+      margin-bottom: 0.6rem;
+      letter-spacing: -0.01em;
+    }
+    .sub-headline {
+      font-size: 0.9rem;
+      color: var(--text-mid);
+      line-height: 1.55;
+      margin-bottom: 1.8rem;
+      font-weight: 400;
+    }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 1.6rem 0; }
+    .confirm-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      margin-bottom: 0;
+    }
+    .confirm-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.7rem;
+      font-size: 0.87rem;
+      line-height: 1.5;
+      color: var(--text-dark);
+    }
+    .confirm-list li .icon {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--gold-faint);
+      border: 1.5px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+    .confirm-list li .icon svg {
+      width: 9px;
+      height: 9px;
+      stroke: var(--gold);
+      stroke-width: 2.5;
+      fill: none;
+    }
+    .confirm-list li strong { font-weight: 600; color: var(--navy); }
+    .notice-box {
+      background: #f7f4ec;
+      border-left: 3px solid var(--gold);
+      border-radius: 2px;
+      padding: 1rem 1.2rem;
+      margin: 1.6rem 0;
+    }
+    .notice-box p { font-size: 0.84rem; color: var(--text-mid); line-height: 1.55; margin: 0; }
+    .notice-box p + p { margin-top: 0.5rem; }
+    .notice-box strong { color: var(--navy); font-weight: 600; }
+    .cta-btn {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: var(--navy);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      padding: 0.95rem 1.5rem;
+      border-radius: 3px;
+      margin-top: 1.8rem;
+      transition: background 0.18s ease, transform 0.12s ease;
+    }
+    .cta-btn:hover { background: var(--navy-mid); transform: translateY(-1px); }
+    .cta-btn:active { transform: translateY(0); }
+    .support-note {
+      margin-top: 1.6rem;
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-light);
+      line-height: 1.55;
+    }
+    .support-note a { color: var(--gold); text-decoration: none; font-weight: 500; }
+    .support-note a:hover { text-decoration: underline; }
+    .page-footer {
+      margin-top: 2.5rem;
+      text-align: center;
+      font-size: 0.7rem;
+      color: #aaaaaa;
+      letter-spacing: 0.04em;
+    }
+    @media (max-width: 620px) {
+      .card { padding: 2rem 1.4rem 2rem; }
+      h1 { font-size: 1.75rem; }
+    }
+  </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="topbar-brand">C.A.S.E. Clarity</div>
-    </div>
+
+  <div class="top-bar"></div>
+
+  <header class="brand-header">
+    <div class="brand-wordmark">C.A.S.E. <span>Clarity</span></div>
+    <div class="brand-divider"></div>
+    <div class="brand-sub">RCMS Clinical-Legal Platform</div>
   </header>
-  <main>
-    <div class="card">
-      <div class="eyebrow">Purchase complete</div>
-      <h1>Thank you for your purchase</h1>
-      <p>Your one-time Foundation access is confirmed. You can open the portal to continue with your cases and tools.</p>
-      <a class="cta" href="case-clarity-portal.html">Go to portal</a>
-      <span class="sub-cta">Questions? <a href="mailto:traci.johnson@rcmspllc.com">Contact RCMS</a></span>
+
+  <main class="card">
+
+    <div class="success-badge">Payment Received</div>
+
+    <h1>Report Access<br>Activated</h1>
+    <p class="sub-headline">
+      Your one-report purchase has been processed and your access has been recorded.
+    </p>
+
+    <hr class="divider" />
+
+    <ul class="confirm-list">
+      <li>
+        <span class="icon">
+          <svg viewBox="0 0 10 10"><polyline points="2,5 4.5,7.5 8,3"/></svg>
+        </span>
+        <span><strong>Payment confirmed.</strong> Your transaction has been successfully received.</span>
+      </li>
+      <li>
+        <span class="icon">
+          <svg viewBox="0 0 10 10"><polyline points="2,5 4.5,7.5 8,3"/></svg>
+        </span>
+        <span><strong>One-report access recorded.</strong> You are authorized to generate and view one report within this window.</span>
+      </li>
+      <li>
+        <span class="icon">
+          <svg viewBox="0 0 10 10"><polyline points="2,5 4.5,7.5 8,3"/></svg>
+        </span>
+        <span><strong>No new account or ID has been created.</strong> Your existing client ID and PIN remain unchanged.</span>
+      </li>
+    </ul>
+
+    <div class="notice-box">
+      <p>Use your <strong>current ID and PIN</strong> to return to C.A.S.E. Clarity and access your report.</p>
+      <p>Your <strong>report access window remains available for 5 days</strong> from the date of purchase.</p>
     </div>
+
+    <a href="#" class="cta-btn">Return to C.A.S.E. Clarity &#8594;</a>
+
+    <p class="support-note">
+      Questions about your purchase?<br>
+      Contact RCMS support at <a href="/cdn-cgi/l/email-protection#5c282e3d3f3572363334322f33321c2e3f312f2c30303f723f3331"><span class="__cf_email__" data-cfemail="4c383e2d2f2562262324223f23220c3e2f213f3c20202f622f2321">[email&#160;protected]</span></a>
+    </p>
+
   </main>
-  <script>
-    (function () {
-      var p = new URLSearchParams(window.location.search);
-      var uid = p.get('uid');
-      if (uid) {
-        try {
-          sessionStorage.setItem('case_clarity_checkout_uid', uid);
-        } catch (e) { /* ignore */ }
-      }
-    })();
-  </script>
-</body>
-</html>
+
+  <footer class="page-footer">
+    &copy; 2025 Reconcile Care Management Services &nbsp;|&nbsp; All Rights Reserved
+  </footer>
+
+  <p style="font-size:12px; text-align:center; margin-top:25px;">
+    <a href="https://docs.google.com/document/d/e/2PACX-1vSH16l7HniLFfeTlPa-7b5RUqS6MLmZriX1HxcxdRYroAmDXKBwF8vYaNAicF2UuYG82XbDnQTuPxMD/pub" target="_blank" rel="noopener noref
