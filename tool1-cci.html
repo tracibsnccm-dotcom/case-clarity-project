@@ -362,7 +362,19 @@ body.cci-paid-mode .cci-tool-page-overview{display:none!important}
         score_summary: scoreSummary,
         result_json: resultJson
       });
-      if (ins.error) console.error('[paid-portal] case_tool_runs insert', ins.error);
+      if (ins.error) {
+        console.error('[paid-portal] case_tool_runs insert', ins.error);
+      } else {
+        var delDraft = await client
+          .from('case_tool_drafts')
+          .delete()
+          .eq('case_id', caseId)
+          .eq('attorney_user_id', attorneyUserId)
+          .eq('tool_key', toolKey);
+        if (delDraft.error) {
+          console.warn('[paid-portal] case_tool_drafts delete after run', delDraft.error);
+        }
+      }
     } catch (err) {
       console.error('[paid-portal] recordCaseToolRun', err);
     }
@@ -906,6 +918,306 @@ function cciMaybeAdvanceFromStep1(){
   }
 }
 
+// ── Paid portal: draft autosave (case_tool_drafts, CCI only) ──
+var cciDraftSaveTimer = null;
+var cciDraftHydrateLock = false;
+var cciDraftListenersAttached = false;
+/** Must match js/portal-header-nav.js — used when CCI is opened without ?case_ref= */
+var CCI_LAST_CASE_REF_KEY = 'caseClarityLastCaseRef';
+
+function cciResolvePaidCaseRef() {
+  try {
+    var p = new URLSearchParams(window.location.search);
+    var ref = p.get('case_ref');
+    if (ref != null && String(ref).trim() !== '') return String(ref).trim();
+    if (window.localStorage) {
+      var last = window.localStorage.getItem(CCI_LAST_CASE_REF_KEY);
+      if (last != null && String(last).trim() !== '') return String(last).trim();
+    }
+  } catch (e) {}
+  return '';
+}
+
+function cciParseDraftJson(raw) {
+  if (raw == null || raw === '') return null;
+  if (typeof raw === 'object' && raw !== null && !Array.isArray(raw)) return raw;
+  if (typeof raw === 'string') {
+    try {
+      var o = JSON.parse(raw);
+      return typeof o === 'object' && o !== null && !Array.isArray(o) ? o : null;
+    } catch (e) {
+      return null;
+    }
+  }
+  return null;
+}
+
+function cciDraftJsonHasAnswers(d) {
+  if (!d || typeof d !== 'object') return false;
+  if (d.primaryRegion || d.specificInjury) return true;
+  var groups = ['cat', 'rec', 'ph', 'ps', 'so', 'pr', 'spec', 'rehab', 'align'];
+  for (var i = 0; i < groups.length; i++) {
+    var g = d[groups[i]];
+    if (Array.isArray(g) && g.length) return true;
+  }
+  if (d.referral && String(d.referral) !== '0') return true;
+  if (d.duration && String(d.duration) !== '0') return true;
+  if (d.otherCatText && String(d.otherCatText).trim()) return true;
+  return false;
+}
+
+function cciClearAssessmentInputsOnly() {
+  document.querySelectorAll('#assessment input[type=checkbox]').forEach(function (c) {
+    c.checked = false;
+    var item = c.closest('.cb-item');
+    if (item) item.classList.remove('selected');
+  });
+  var pr = document.getElementById('primary-region');
+  var si = document.getElementById('specific-injury');
+  if (pr) pr.value = '';
+  if (si) {
+    si.innerHTML = '<option value="">— Select primary injury region first —</option>';
+  }
+  var ref = document.getElementById('referral');
+  var dur = document.getElementById('duration');
+  var ot = document.getElementById('other-cat-text');
+  if (ref) ref.value = '0';
+  if (dur) dur.value = '0';
+  if (ot) ot.value = '';
+}
+
+function cciApplyCheckboxList(cssSel, values) {
+  if (!Array.isArray(values)) values = [];
+  var set = {};
+  for (var i = 0; i < values.length; i++) set[values[i]] = true;
+  document.querySelectorAll(cssSel).forEach(function (inp) {
+    inp.checked = !!set[inp.value];
+    var item = inp.closest('.cb-item');
+    if (item) item.classList.toggle('selected', inp.checked);
+  });
+}
+
+function cciApplyDraftJson(d) {
+  cciDraftHydrateLock = true;
+  try {
+    cciClearAssessmentInputsOnly();
+    var prEl = document.getElementById('primary-region');
+    var pr = d.primaryRegion || '';
+    if (prEl) prEl.value = pr;
+    updateSpecific();
+    var si = d.specificInjury || '';
+    var specSel = document.getElementById('specific-injury');
+    if (specSel && si) {
+      var found = false;
+      for (var oi = 0; oi < specSel.options.length; oi++) {
+        if (specSel.options[oi].value === si) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        var opt = document.createElement('option');
+        opt.value = opt.textContent = si;
+        specSel.appendChild(opt);
+      }
+      specSel.value = si;
+    }
+    cciApplyCheckboxList('#assessment input[type=checkbox][data-g="cat"]', d.cat);
+    cciApplyCheckboxList('#assessment input[type=checkbox][data-g="rec"]', d.rec);
+    cciApplyCheckboxList('#assessment input[type=checkbox][data-p="ph"]', d.ph);
+    cciApplyCheckboxList('#assessment input[type=checkbox][data-p="ps"]', d.ps);
+    cciApplyCheckboxList('#assessment input[type=checkbox][data-p="so"]', d.so);
+    cciApplyCheckboxList('#assessment input[type=checkbox][data-p="pr"]', d.pr);
+    cciApplyCheckboxList('#assessment input[type=checkbox][data-g="spec"]', d.spec);
+    cciApplyCheckboxList('#assessment input[type=checkbox][data-g="rehab"]', d.rehab);
+    cciApplyCheckboxList('#assessment input[type=checkbox][data-g="align"]', d.align);
+    if (d.referral != null) {
+      var rEl = document.getElementById('referral');
+      if (rEl) rEl.value = String(d.referral);
+    }
+    if (d.duration != null) {
+      var dEl = document.getElementById('duration');
+      if (dEl) dEl.value = String(d.duration);
+    }
+    if (d.otherCatText != null) {
+      var tEl = document.getElementById('other-cat-text');
+      if (tEl) tEl.value = String(d.otherCatText);
+    }
+    cciPrevStep1Complete = cciStep1IsComplete();
+    var ex = document.getElementById('explainer');
+    var as = document.getElementById('assessment');
+    if (ex) ex.style.display = 'none';
+    if (as) as.style.display = 'block';
+    cciSetStepOpenExclusive('step1');
+  } finally {
+    requestAnimationFrame(function () {
+      cciDraftHydrateLock = false;
+    });
+  }
+}
+
+function cciCollectDraftJson() {
+  function checkedVals(sel) {
+    return Array.prototype.map
+      .call(document.querySelectorAll(sel), function (inp) {
+        return inp.value;
+      })
+      .filter(Boolean);
+  }
+  return {
+    v: 1,
+    primaryRegion: document.getElementById('primary-region')
+      ? document.getElementById('primary-region').value
+      : '',
+    specificInjury: document.getElementById('specific-injury')
+      ? document.getElementById('specific-injury').value
+      : '',
+    cat: checkedVals('#assessment input[type=checkbox][data-g="cat"]:checked'),
+    rec: checkedVals('#assessment input[type=checkbox][data-g="rec"]:checked'),
+    ph: checkedVals('#assessment input[type=checkbox][data-p="ph"]:checked'),
+    ps: checkedVals('#assessment input[type=checkbox][data-p="ps"]:checked'),
+    so: checkedVals('#assessment input[type=checkbox][data-p="so"]:checked'),
+    pr: checkedVals('#assessment input[type=checkbox][data-p="pr"]:checked'),
+    spec: checkedVals('#assessment input[type=checkbox][data-g="spec"]:checked'),
+    rehab: checkedVals('#assessment input[type=checkbox][data-g="rehab"]:checked'),
+    align: checkedVals('#assessment input[type=checkbox][data-g="align"]:checked'),
+    referral: document.getElementById('referral') ? document.getElementById('referral').value : '0',
+    duration: document.getElementById('duration') ? document.getElementById('duration').value : '0',
+    otherCatText: document.getElementById('other-cat-text')
+      ? document.getElementById('other-cat-text').value
+      : ''
+  };
+}
+
+async function cciSaveDraftNow() {
+  var ctx = window.cciPaidDraftContext;
+  if (!ctx || !ctx.active || !window.supabaseClient) return;
+  if (cciDraftHydrateLock) return;
+  var client = window.supabaseClient;
+  var sessRes = await client.auth.getSession();
+  var session = sessRes.data && sessRes.data.session;
+  if (!session || session.user.id !== ctx.attorneyUserId) return;
+  var payload = cciCollectDraftJson();
+  var up = await client.from('case_tool_drafts').upsert(
+    {
+      case_id: ctx.caseId,
+      attorney_user_id: ctx.attorneyUserId,
+      tool_key: ctx.toolKey,
+      draft_json: payload,
+      updated_at: new Date().toISOString()
+    },
+    { onConflict: 'case_id,attorney_user_id,tool_key' }
+  );
+  if (up.error) console.warn('[paid-portal] case_tool_drafts upsert', up.error);
+}
+
+function cciScheduleDraftSave() {
+  var ctx = window.cciPaidDraftContext;
+  if (!ctx || !ctx.active) return;
+  if (cciDraftHydrateLock) return;
+  clearTimeout(cciDraftSaveTimer);
+  cciDraftSaveTimer = setTimeout(function () {
+    void cciSaveDraftNow();
+  }, 400);
+}
+
+async function cciFlushPendingDraftSave() {
+  clearTimeout(cciDraftSaveTimer);
+  cciDraftSaveTimer = null;
+  await cciSaveDraftNow();
+}
+window.cciFlushPendingDraftSave = cciFlushPendingDraftSave;
+
+function cciWireDraftUnloadFlush() {
+  if (cciWireDraftUnloadFlush._done) return;
+  cciWireDraftUnloadFlush._done = true;
+  window.addEventListener('pagehide', function () {
+    clearTimeout(cciDraftSaveTimer);
+    cciDraftSaveTimer = null;
+    void cciSaveDraftNow();
+  });
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') {
+      clearTimeout(cciDraftSaveTimer);
+      cciDraftSaveTimer = null;
+      void cciSaveDraftNow();
+    }
+  });
+}
+
+function cciWirePaidDraftExitHooks() {
+  var dash = document.getElementById('portal-nav-back-dashboard');
+  if (dash && !dash.getAttribute('data-cci-draft-exit')) {
+    dash.setAttribute('data-cci-draft-exit', '1');
+    dash.addEventListener('click', function (e) {
+      var ctx = window.cciPaidDraftContext;
+      if (!ctx || !ctx.active) return;
+      e.preventDefault();
+      var href = dash.getAttribute('href') || 'dashboard.html';
+      void cciFlushPendingDraftSave().finally(function () {
+        window.location.href = href;
+      });
+    });
+  }
+}
+
+function cciAttachDraftAutosave() {
+  if (cciDraftListenersAttached) return;
+  var assessment = document.getElementById('assessment');
+  if (!assessment) return;
+  cciDraftListenersAttached = true;
+  assessment.addEventListener('change', cciScheduleDraftSave, true);
+  assessment.addEventListener('input', cciScheduleDraftSave, true);
+}
+
+async function cciPaidDraftBootstrap() {
+  var caseRef = cciResolvePaidCaseRef();
+  if (!caseRef || !window.supabaseClient) {
+    window.cciPaidDraftContext = { active: false };
+    return;
+  }
+  var client = window.supabaseClient;
+  var sessRes = await client.auth.getSession();
+  var session = sessRes.data && sessRes.data.session;
+  if (!session) {
+    window.cciPaidDraftContext = { active: false };
+    return;
+  }
+  var cq = await client
+    .from('case_cases')
+    .select('id, attorney_user_id')
+    .eq('case_ref', caseRef)
+    .eq('attorney_user_id', session.user.id)
+    .maybeSingle();
+  if (cq.error || !cq.data) {
+    if (cq.error) console.warn('[paid-portal] draft case lookup', cq.error);
+    window.cciPaidDraftContext = { active: false };
+    return;
+  }
+  window.cciPaidDraftContext = {
+    active: true,
+    caseId: cq.data.id,
+    attorneyUserId: cq.data.attorney_user_id,
+    toolKey: 'CCI'
+  };
+  var dr = await client
+    .from('case_tool_drafts')
+    .select('draft_json')
+    .eq('case_id', cq.data.id)
+    .eq('attorney_user_id', session.user.id)
+    .eq('tool_key', 'CCI')
+    .maybeSingle();
+  if (dr.error) console.warn('[paid-portal] draft load', dr.error);
+  var raw = dr.data && dr.data.draft_json;
+  var d = cciParseDraftJson(raw);
+  if (d && cciDraftJsonHasAnswers(d)) {
+    cciApplyDraftJson(d);
+  }
+  cciAttachDraftAutosave();
+  cciWireDraftUnloadFlush();
+  cciWirePaidDraftExitHooks();
+}
+
 // ── Start assessment ──────────────────────────────────
 function startAssessment(){
   document.getElementById('explainer').style.display='none';
@@ -913,6 +1225,9 @@ function startAssessment(){
   cciPrevStep1Complete=cciStep1IsComplete();
   cciSetStepOpenExclusive('step1');
   window.scrollTo({top:0,behavior:'smooth'});
+  if (window.cciPaidDraftContext && window.cciPaidDraftContext.active) {
+    cciScheduleDraftSave();
+  }
 }
 
 // ── Dependent dropdowns ───────────────────────────────
@@ -1026,6 +1341,8 @@ function buildCciReportPremiumHtml(ad,toolData,level,cmg,identityRow){
 
 // ── Calculate ─────────────────────────────────────────
 function calculate(){
+  clearTimeout(cciDraftSaveTimer);
+  cciDraftSaveTimer = null;
   // DOMAIN 1
   const catAll=checked('data-g','cat');
   const catTriggers=catAll.filter(c=>c.dataset.cat==='1');
@@ -1328,15 +1645,22 @@ function goToNext() {
     }
 }
 
-function returnToDashboard() {
+async function returnToDashboard() {
+    if (typeof window.cciFlushPendingDraftSave === 'function') {
+        await window.cciFlushPendingDraftSave();
+    }
     window.location.href = 'dashboard.html';
 }
 </script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+  var p = Promise.resolve();
   if (window.caseClarityIdentity && window.supabaseClient) {
-    void window.caseClarityIdentity.mountToolPage(window.supabaseClient);
+    p = Promise.resolve(window.caseClarityIdentity.mountToolPage(window.supabaseClient));
   }
+  void p.then(function () {
+    void cciPaidDraftBootstrap();
+  });
 });
 </script>
 <script src="trial-pinned-banner.js"></script>
