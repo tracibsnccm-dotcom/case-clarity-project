@@ -1742,7 +1742,7 @@
                     <div class="tools-grid">
             `;
 
-            const activeAssessments = session.active_case?.assessments || {};
+            const activeAssessments = (typeof session !== 'undefined' && session && session.active_case && session.active_case.assessments) || {};
             TOOL_ORDER.forEach((toolKey) => {
                 const tool = TOOL_INFO[toolKey];
                 const status = activeAssessments[toolKey]?.status || 'not_started';
@@ -1785,7 +1785,7 @@
                     <div class="tools-grid">
             `;
 
-            const retroAssessments = session.retrospective_case?.assessments || {};
+            const retroAssessments = (typeof session !== 'undefined' && session && session.retrospective_case && session.retrospective_case.assessments) || {};
             TOOL_ORDER.forEach(toolKey => {
                 const tool = TOOL_INFO[toolKey];
                 const status = retroAssessments[toolKey]?.status || 'not_started';
