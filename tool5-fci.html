@@ -548,7 +548,7 @@
 <script>
 (function () {
   async function boot() {
-    const ok = await requireAuth();
+    const ok = (function(){ if (!localStorage.getItem('user_logged_in')) { window.location.href='login.html'; return false; } return true; })();
     if (!ok) return;
     if (typeof initPortalHeaderNav === 'function') initPortalHeaderNav();
   }
