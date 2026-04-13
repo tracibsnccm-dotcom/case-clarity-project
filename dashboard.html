@@ -1488,7 +1488,7 @@
             window._beforeYouBeginCountdownInterval = setInterval(updateRealCountdown, 3600000);
         }
 
-        document.getElementById('assessment-id-display').textContent = assessmentId;
+        try { var _aidEl = document.getElementById('assessment-id-display'); if (_aidEl) _aidEl.textContent = (typeof assessmentId !== 'undefined' ? assessmentId : (localStorage.getItem('ccp') || '')); } catch(e) {}
 
         window.toggleSection = function (sectionId) {
             var content = document.getElementById(sectionId);
