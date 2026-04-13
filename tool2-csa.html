@@ -7,7 +7,8 @@
 <meta http-equiv="Pragma" content="no-cache" />
 <title>C.A.R.E. Clinical Sequencing Auditor™ | Reconcile Care Management Services</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="trial-pinned-banner.css">
+<link rel="stylesheet" href="css/case-identity.css">
+<link rel="stylesheet" href="css/theme.css">
 <style>
   :root {
     --navy: #0d2240;
@@ -48,8 +49,8 @@
   header::before {
     content: '';
     position: absolute;
-    top: -60px; right: -60px;
-    width: 280px; height: 280px;
+    top: -42px; right: -42px;
+    width: 180px; height: 180px;
     border-radius: 50%;
     background: var(--amber);
     opacity: 0.07;
@@ -57,8 +58,8 @@
   header::after {
     content: '';
     position: absolute;
-    bottom: -50px; left: 25%;
-    width: 200px; height: 200px;
+    bottom: -36px; left: 25%;
+    width: 130px; height: 130px;
     border-radius: 50%;
     background: var(--navy-light);
     opacity: 0.4;
@@ -66,19 +67,19 @@
   .header-inner {
     max-width: 900px;
     margin: 0 auto;
-    padding: 40px 24px 36px;
+    padding: 18px 24px 16px;
     position: relative;
     z-index: 1;
   }
   .logo-badge {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     background: rgba(255,255,255,0.08);
     border: 1px solid rgba(255,255,255,0.18);
     border-radius: 6px;
-    padding: 7px 16px 7px 10px;
-    margin-bottom: 24px;
+    padding: 6px 14px 6px 9px;
+    margin-bottom: 10px;
   }
   .logo-icon {
     width: 34px; height: 34px;
@@ -93,12 +94,12 @@
   .logo-text span { display: block; color: rgba(255,255,255,0.55); font-size: 10px; font-weight: 400; letter-spacing: 0.06em; margin-top: 1px; }
 
   .positioning-line {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     color: rgba(255,255,255,0.6);
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    margin-bottom: 14px;
+    margin-bottom: 6px;
     padding-left: 2px;
     border-left: 3px solid var(--amber);
     padding-left: 10px;
@@ -113,37 +114,37 @@
     font-style: italic;
   }
   .header-eyebrow {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.14em;
     color: var(--amber-light);
-    margin-bottom: 10px;
+    margin-bottom: 4px;
   }
   h1 {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(24px, 4.5vw, 40px);
+    font-size: clamp(22px, 3.6vw, 32px);
     font-weight: 900;
     color: var(--white);
-    line-height: 1.15;
-    margin-bottom: 6px;
+    line-height: 1.1;
+    margin-bottom: 2px;
   }
   h1 em { color: var(--amber-light); font-style: normal; }
-  .tm { font-size: 11px; vertical-align: super; color: var(--amber-light); }
+  .tm { font-size: 10px; vertical-align: super; color: var(--amber-light); }
   .header-divider {
-    width: 48px; height: 3px;
+    width: 40px; height: 2px;
     background: var(--amber);
     border-radius: 2px;
-    margin: 18px 0;
+    margin: 8px 0 10px;
   }
   .header-body {
     max-width: 600px;
   }
   .header-p {
     color: rgba(255,255,255,0.82);
-    font-size: 15px;
-    line-height: 1.75;
-    margin-bottom: 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 6px;
   }
   .header-p:last-child { margin-bottom: 0; }
   .header-p strong { color: var(--amber-light); font-weight: 600; }
@@ -268,6 +269,12 @@
   .right-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--amber); margin-bottom: 3px; }
   .right-title { font-family: 'Playfair Display', serif; font-size: 19px; color: var(--navy); font-weight: 700; margin-bottom: 4px; }
   .right-desc { font-size: 13px; color: var(--gray-mid); line-height: 1.65; }
+  .right-desc-body {
+    font-size: 13px; color: var(--gray-dark); line-height: 1.65;
+    padding: 0 0 16px; margin-bottom: 16px; border-bottom: 1px solid var(--gray-light);
+  }
+  .audit-cards-stack .right-card { margin-bottom: 12px; }
+  .audit-cards-stack .card-header { padding: 16px 20px; }
   .completion-pill {
     font-size: 11px; font-weight: 700;
     padding: 4px 11px; border-radius: 20px;
@@ -276,7 +283,8 @@
     align-self: flex-start; margin-top: 4px;
     transition: all 0.3s;
   }
-  .completion-pill.done { background: #edfaf4; color: #1a5c3a; }
+  .completion-pill.done,
+  .completion-pill.complete { background: #edfaf4; color: #1a5c3a; }
 
   /* ── Sub-questions ── */
   .sub-questions { padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 12px; }
@@ -397,6 +405,62 @@
   .submit-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--navy); margin-bottom: 8px; }
   .submit-sub { font-size: 13px; color: var(--gray-mid); margin-bottom: 22px; line-height: 1.6; max-width: 480px; margin-left: auto; margin-right: auto; }
 
+  /* Report completion actions — override portal theme .btn-primary so controls stay visible */
+  .csa-report-completion-actions {
+    display: flex !important;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 28px;
+    align-items: center;
+  }
+  .csa-report-completion-actions .btn-primary {
+    background: var(--navy) !important;
+    color: var(--white) !important;
+    border: none !important;
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.01em !important;
+    text-transform: none !important;
+    padding: 15px 40px !important;
+  }
+  .csa-report-completion-actions .btn-primary:hover {
+    background: var(--navy-light) !important;
+  }
+  .csa-report-completion-actions .btn-ghost-on-light {
+    background: transparent;
+    color: var(--navy);
+    border: 1.5px solid rgba(13, 34, 64, 0.35);
+    padding: 11px 22px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .csa-report-completion-actions .btn-ghost-on-light:hover {
+    border-color: var(--navy);
+    color: var(--navy-mid);
+  }
+  .submit-wrap .btn-ghost-on-light {
+    background: transparent;
+    color: var(--navy);
+    border: 1.5px solid rgba(13, 34, 64, 0.35);
+    padding: 11px 22px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .submit-wrap .btn-ghost-on-light:hover {
+    border-color: var(--navy);
+    color: var(--navy-mid);
+  }
+
   /* ── Results ── */
   #results-section { display: none; }
   .action-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 22px; }
@@ -504,6 +568,9 @@
   /* ── Footer ── */
   footer { background: var(--navy); text-align: center; padding: 28px 24px; color: rgba(255,255,255,0.45); font-size: 11.5px; line-height: 1.9; border-top: 1px solid rgba(255,255,255,0.08); }
   footer strong { color: var(--amber-light); }
+  body.csa-paid-mode footer { display: none; }
+  /* Paid completion: report opens in a separate window — hide inline host on screen */
+  body.csa-paid-mode .csa-paid-report-host { display: none !important; }
 
   /* ── Animations ── */
   @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
@@ -512,9 +579,22 @@
   /* ── Print ── */
   @media print {
     header, .progress-wrap, .action-bar, .cta-card, #lead-section,
-    #checker-section, .instruction-banner, footer, .float-ref-btn,
+    #checker-section:not(.csa-paid-print), .instruction-banner, footer, .float-ref-btn,
     .ref-panel, #before-you-begin, .card-definition-panel,
     .btn-secondary, .btn-primary { display: none !important; }
+
+    #checker-section.csa-paid-print { display: block !important; }
+    #checker-section.csa-paid-print #cards-container,
+    #checker-section.csa-paid-print #csa-submit-trial { display: none !important; }
+    #checker-section.csa-paid-print #csa-submit-paid > .submit-title,
+    #checker-section.csa-paid-print #csa-submit-paid > .submit-sub,
+    #checker-section.csa-paid-print #csa-submit-paid > .no-print,
+    #checker-section.csa-paid-print #csa-submit-paid > #csa-paid-report-anchor { display: none !important; }
+    #checker-section.csa-paid-print .no-print { display: none !important; }
+    #case-header-fields,
+    #case-header-fields *,
+    #checker-section.csa-paid-print #csa-paid-report-visible,
+    #checker-section.csa-paid-print #csa-paid-report-visible * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
     .print-framework-note { display: block !important; }
     .print-hide-email { display: none !important; }
@@ -639,6 +719,28 @@
   .byb-def-term { font-weight: 700; color: var(--navy); }
   .byb-rights-preview { margin-top: 4px; }
   .byb-start-row { margin-top: 28px; padding-top: 24px; border-top: 2px solid var(--gray-light); text-align: center; }
+  .byb-lead {
+    font-size: 14px; color: var(--gray-dark); line-height: 1.65; margin-bottom: 18px;
+    padding: 14px 16px; background: var(--gray-light); border-radius: 8px; border-left: 3px solid var(--amber);
+  }
+  .byb-details {
+    border: 1.5px solid #e5e7eb; border-radius: 10px; margin-bottom: 10px; background: var(--white);
+    overflow: hidden;
+  }
+  .byb-details summary {
+    list-style: none; cursor: pointer; padding: 14px 18px; font-size: 12.5px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.06em; color: var(--navy);
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    background: linear-gradient(180deg, #fafbfc 0%, #f4f5f7 100%);
+    border-bottom: 1px solid transparent;
+  }
+  .byb-details summary::-webkit-details-marker { display: none; }
+  .byb-details summary::after { content: '▼'; font-size: 10px; color: var(--gray-mid); flex-shrink: 0; }
+  .byb-details[open] summary { border-bottom-color: #e5e7eb; }
+  .byb-details[open] summary::after { content: '▲'; }
+  .byb-details-body { padding: 16px 18px 18px; }
+  .byb-details .byb-block { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+  .byb-rights-preview.byb-details { margin-top: 8px; }
   .byb-acknowledge {
     display: flex; align-items: flex-start; gap: 10px;
     margin-bottom: 16px; cursor: pointer; text-align: left;
@@ -784,6 +886,132 @@
     .ref-panel { width: 100%; right: -100%; }
     .float-ref-btn { bottom: 16px; right: 16px; font-size: 12px; padding: 10px 14px; }
   }
+
+  /* ── INSTRUCTIONS DRAWER ────────────────────────────── */
+  .csa-drawer-trigger {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 8px 16px;
+    background: var(--white);
+    color: var(--navy);
+    border: 1.5px solid var(--amber);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+  }
+  .csa-drawer-trigger:hover { background: var(--amber-pale); color: var(--navy); }
+
+  .csa-drawer-trigger-row {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 14px 24px 0;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .csa-drawer-completion-trigger-wrap {
+    display: inline-flex;
+  }
+
+  .csa-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(13, 34, 64, 0.45);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s, visibility 0.25s;
+    z-index: 9998;
+  }
+  .csa-drawer-backdrop.open { opacity: 1; visibility: visible; }
+
+  .csa-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 420px;
+    max-width: 100vw;
+    background: var(--gray-light);
+    box-shadow: -4px 0 24px rgba(13, 34, 64, 0.18);
+    transform: translateX(100%);
+    transition: transform 0.28s ease;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .csa-drawer.open { transform: translateX(0); }
+
+  .csa-drawer-head {
+    background: var(--navy);
+    padding: 18px 22px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-shrink: 0;
+    border-bottom: 3px solid var(--amber);
+  }
+  .csa-drawer-head-text { flex: 1; min-width: 0; }
+  .csa-drawer-tag {
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    color: var(--amber-light);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+  .csa-drawer-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.3;
+  }
+  .csa-drawer-close {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--white);
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    padding: 6px 12px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    transition: background 0.15s;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+  }
+  .csa-drawer-close:hover { background: rgba(255, 255, 255, 0.22); }
+
+  .csa-drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--white);
+    padding: 20px 22px 24px;
+  }
+  .csa-drawer-body .byb-lead {
+    font-size: 13.5px;
+    margin-bottom: 16px;
+    padding: 12px 14px;
+  }
+
+  /* Mobile: full-width drawer */
+  @media (max-width: 900px) {
+    .csa-drawer { width: 100vw; }
+  }
+
+  /* Print: hide drawer entirely */
+  @media print {
+    .csa-drawer,
+    .csa-drawer-backdrop,
+    .csa-drawer-trigger,
+    .csa-drawer-trigger-row { display: none !important; }
+  }
+
   /* ── Summary Page ── */
   .report-framework-line {
     font-size: 11px; color: rgba(255,255,255,0.55); font-style: italic;
@@ -1176,8 +1404,41 @@
     margin-bottom: 8px;
   }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/auth-guard.js"></script>
+<script src="js/portal-header-nav.js"></script>
+<script src="js/paid-portal-tool-run.js"></script>
+<script src="js/case-identity.js"></script>
 </head>
-<body>
+<body class="with-portal-tool-header">
+
+<header class="portal-header no-print">
+  <a href="/index.html" class="portal-logo">
+    <div class="portal-logo-box"><span>C</span></div>
+    <div class="portal-logo-text">
+      <strong>C.A.S.E. Clarity</strong>
+      Reconcile Care Management Services
+    </div>
+  </a>
+  <div class="portal-header-right">
+    <a href="/case-detail.html" class="portal-nav-link" id="portal-nav-back-case">Back to Case</a>
+    <a href="/dashboard.html" class="portal-nav-link" id="portal-nav-back-dashboard">Back to Dashboard</a>
+    <span class="portal-user" id="user-email">Loading…</span>
+    <button type="button" class="btn-secondary" id="portal-nav-logout" disabled>Logout</button>
+  </div>
+</header>
+<script>
+(function () {
+  async function boot() {
+    const ok = await requireAuth();
+    if (!ok) return;
+    if (typeof initPortalHeaderNav === 'function') initPortalHeaderNav();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { void boot(); });
+  else void boot();
+})();
+</script>
 
 <!-- ═══════════════════════════════════════════════════
      HEADER
@@ -1202,6 +1463,14 @@
     </div>
   </div>
 </header>
+
+<div class="csa-drawer-trigger-row no-print">
+  <button type="button" class="csa-drawer-trigger" onclick="csaOpenInstructionsDrawer()">View Instructions — Clinical Sequencing Auditor</button>
+</div>
+
+<div style="max-width:960px;margin:0 auto;padding:0 24px 1.25rem">
+  <div id="case-header-fields"></div>
+</div>
 
 <!-- ═══════════════════════════════════════════════════
      PROGRESS BAR
@@ -1233,49 +1502,89 @@
       </div>
       <div class="byb-body">
 
-        <div class="byb-block">
-          <div class="byb-block-title">Instrument Design</div>
-          <p class="byb-p">The Audit is designed as a structural diagnostic instrument. Its analytical accuracy depends on the precision of the information entered. Responses should reflect documented file content rather than anticipated, assumed, or informal understanding.</p>
-          <p class="byb-p">For purposes of this assessment, <strong>"present"</strong> means explicitly documented in the file — not assumed, anticipated, or verbally communicated.</p>
-          <p class="byb-p">This tool provides structural analysis and does not constitute legal strategy or clinical direction.</p>
-        </div>
+        <p class="byb-lead">Read the short intro below, then expand any section for full detail. Audit accuracy depends on the precision of your responses.</p>
 
-        <div class="byb-block">
-          <div class="byb-block-title">Purpose of This Assessment</div>
-          <p class="byb-p">It is common for well-managed cases to demonstrate partial misalignment in one or more domains. The purpose of this assessment is identification of structural refinement opportunities — not evaluation of performance.</p>
-        </div>
+        <details class="byb-details">
+          <summary>Instrument Design</summary>
+          <div class="byb-details-body">
+            <div class="byb-block">
+              <p class="byb-p">The Audit is designed as a structural diagnostic instrument. Its analytical accuracy depends on the precision of the information entered. Responses should reflect documented file content rather than anticipated, assumed, or informal understanding.</p>
+              <p class="byb-p">For purposes of this assessment, <strong>"present"</strong> means explicitly documented in the file — not assumed, anticipated, or verbally communicated.</p>
+              <p class="byb-p">This tool provides structural analysis and does not constitute legal strategy or clinical direction.</p>
+            </div>
+          </div>
+        </details>
 
-        <div class="byb-block">
-          <div class="byb-block-title">How to Answer</div>
-          <p class="byb-p">When uncertain, select the more conservative response.</p>
-          <p class="byb-p">If treatment is early or ongoing, use this as a strategic roadmap to prevent weaknesses before they are exposed in litigation.</p>
-        </div>
+        <details class="byb-details">
+          <summary>Purpose of This Assessment</summary>
+          <div class="byb-details-body">
+            <div class="byb-block">
+              <p class="byb-p">It is common for well-managed cases to demonstrate partial misalignment in one or more domains. The purpose of this assessment is identification of structural refinement opportunities — not evaluation of performance.</p>
+            </div>
+          </div>
+        </details>
 
-        <div class="byb-block">
-          <div class="byb-block-title">Clinical Definitions for This Framework</div>
-          <div class="byb-def"><span class="byb-def-term">Objective clinical findings</span> refer to documented measurable physical exam findings, diagnostic imaging results, or quantifiable functional limitations recorded in the medical record. Verbal reports, subjective complaints alone, or anticipated findings do not meet this threshold.</div>
-          <div class="byb-def"><span class="byb-def-term">Guideline alignment</span> refers to consistency with nationally recognized utilization review frameworks — such as ODG, MCG, or applicable state standards.</div>
-          <div class="byb-def"><span class="byb-def-term">Sequencing</span> refers to the logical progression of evaluation and treatment based on documented findings and established clinical criteria.</div>
-          <div class="byb-def"><span class="byb-def-term">Emergency Department and Urgent Care visits</span> are clinically significant for establishing treatment initiation timing under Right #6. They do not independently satisfy Right #1 or Right #2 requirements.</div>
-        </div>
+        <details class="byb-details">
+          <summary>How to Answer</summary>
+          <div class="byb-details-body">
+            <div class="byb-block">
+              <p class="byb-p">When uncertain, select the more conservative response.</p>
+              <p class="byb-p">If treatment is early or ongoing, use this as a strategic roadmap to prevent weaknesses before they are exposed in litigation.</p>
+            </div>
+          </div>
+        </details>
 
-        <div class="byb-block">
-          <div class="byb-block-title">Risk Category Meaning</div>
-          <p class="byb-p">Each risk category indicates structural variables that may influence payer scrutiny, IME interpretation, or settlement positioning — not a judgment of case quality or attorney performance.</p>
-        </div>
+        <details class="byb-details">
+          <summary>Clinical Definitions for This Framework</summary>
+          <div class="byb-details-body">
+            <div class="byb-block">
+              <div class="byb-def"><span class="byb-def-term">Objective clinical findings</span> refer to documented measurable physical exam findings, diagnostic imaging results, or quantifiable functional limitations recorded in the medical record. Verbal reports, subjective complaints alone, or anticipated findings do not meet this threshold.</div>
+              <div class="byb-def"><span class="byb-def-term">Guideline alignment</span> refers to consistency with nationally recognized utilization review frameworks — such as ODG, MCG, or applicable state standards.</div>
+              <div class="byb-def"><span class="byb-def-term">Sequencing</span> refers to the logical progression of evaluation and treatment based on documented findings and established clinical criteria.</div>
+              <div class="byb-def"><span class="byb-def-term">Emergency Department and Urgent Care visits</span> are clinically significant for establishing treatment initiation timing under Right #6. They do not independently satisfy Right #1 or Right #2 requirements.</div>
+            </div>
+          </div>
+        </details>
 
-        <div class="byb-rights-preview">
-          <div class="byb-block-title">The 7 Rights of Injury Management™ — Reference Overview</div>
-          <p class="byb-p" style="margin-bottom:16px;">Each Right below defines the structural standard being evaluated. Expand any Right to review its definition, clarifications, and examples before beginning.</p>
-          <div id="rights-accordion"></div>
-        </div>
+        <details class="byb-details">
+          <summary>Risk Category Meaning</summary>
+          <div class="byb-details-body">
+            <div class="byb-block">
+              <p class="byb-p">Each risk category indicates structural variables that may influence payer scrutiny, IME interpretation, or settlement positioning — not a judgment of case quality or attorney performance.</p>
+            </div>
+          </div>
+        </details>
+
+        <details class="byb-details">
+          <summary>Follow-up &amp; Re-Run Guidance</summary>
+          <div class="byb-details-body">
+            <div class="byb-block">
+              <p class="byb-p">The structural alignment status produced by this audit reflects the case as documented at the time of evaluation. The triggers below indicate circumstances that may justify an off-cycle re-run of the audit before the next routine review point.</p>
+              <p class="byb-p" style="margin-top:12px;"><strong style="color:var(--navy);">Re-run this assessment when:</strong></p>
+              <ul class="byb-clar-list" style="margin-top:8px;">
+                <li class="byb-clar-item">Additional medical records are received that may change the structural alignment of any of the 7 Rights</li>
+                <li class="byb-clar-item">A new treating provider is established or the primary provider relationship changes</li>
+                <li class="byb-clar-item">A specialty referral is completed and a new diagnosis is established or clarified</li>
+                <li class="byb-clar-item">Diagnostic imaging or testing results materially change the clinical picture</li>
+                <li class="byb-clar-item">The treatment plan is modified, escalated, or interrupted</li>
+                <li class="byb-clar-item">A causation narrative or physician summary is requested or received</li>
+                <li class="byb-clar-item">Documentation patterns change, including identification of templated or copied-forward notes</li>
+                <li class="byb-clar-item">The case is approaching deposition, IME, or settlement positioning, where structural defensibility should be re-verified</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+
+        <details class="byb-details byb-rights-preview">
+          <summary>The 7 Rights of Injury Management™ — Reference Overview</summary>
+          <div class="byb-details-body">
+            <p class="byb-p" style="margin-bottom:16px;">Each Right below defines the structural standard being evaluated. Expand any Right to review its definition, clarifications, and examples before beginning.</p>
+            <div id="rights-accordion"></div>
+          </div>
+        </details>
 
         <div class="byb-start-row">
-          <label class="byb-acknowledge">
-            <input type="checkbox" id="byb-checkbox" onchange="toggleBeginBtn()">
-            <span>I confirm that I am a legal professional or member of a law firm and that the information provided is accurate.</span>
-          </label>
-          <button class="btn-primary" id="begin-audit-btn" type="button" onclick="startAudit()" disabled style="opacity:0.45; cursor:not-allowed;">I Have Reviewed the Protocol — Begin the Audit →</button>
+          <button class="btn-primary" id="begin-audit-btn" type="button" onclick="startAudit()">BEGIN THE AUDIT →</button>
         </div>
 
       </div>
@@ -1317,14 +1626,35 @@
 
   <!-- Checker -->
   <div id="checker-section" style="display:none;">
-    <div id="cards-container"></div>
+    <div id="cards-container" class="audit-cards-stack"></div>
     <div id="csa-report-for-storage" class="results results-summary alignment-report report-content" aria-hidden="true" style="position:absolute;left:-9999px;top:0;width:960px;pointer-events:none;overflow:visible"></div>
-    <div class="submit-wrap" id="submit-wrap">
-      <div class="submit-title">Assessment Complete</div>
-      <p class="submit-sub">All 7 Clinical Rights have been evaluated. Use the options below to return to the dashboard or continue to the next assessment in your sequence.</p>
-      <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 40px;">
-        <button type="button" onclick="returnToDashboard()" class="btn-ghost">← Return to Dashboard</button>
-        <button type="button" onclick="goToNext()" class="btn-primary">Continue to Next Assessment →</button>
+    <div class="submit-wrap" id="submit-wrap" style="display:none">
+      <div id="csa-submit-trial">
+        <div class="submit-title">Assessment Complete</div>
+        <p class="submit-sub">All 7 Clinical Rights have been evaluated. Open the full two-page report below, or use the dashboard / next assessment options.</p>
+        <div class="csa-report-completion-actions no-print">
+          <button type="button" class="btn-primary" onclick="csaOpenReportWindow()">View Report</button>
+          <button type="button" class="btn-primary" onclick="csaPrintPaidReport()">Print / Save PDF</button>
+        </div>
+        <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 24px;">
+          <button type="button" onclick="returnToDashboard()" class="btn-ghost-on-light">← Return to Dashboard</button>
+          <button type="button" onclick="goToNext()" class="btn-primary">Continue to Next Assessment →</button>
+        </div>
+      </div>
+      <div id="csa-submit-paid" style="display:none">
+        <div class="submit-title">Assessment Complete</div>
+        <p class="submit-sub no-print">Your Clinical Sequencing Auditor report is ready. Open it in a new tab to review the full two-page report, or print / save as PDF from there.</p>
+        <div class="csa-report-completion-actions no-print">
+          <button type="button" class="btn-primary" onclick="csaOpenReportWindow()">View Report</button>
+          <button type="button" class="btn-primary" onclick="csaPrintPaidReport()">Print / Save PDF</button>
+          <button type="button" class="csa-drawer-trigger" onclick="csaOpenInstructionsDrawer()">View Instructions</button>
+          <a id="csa-paid-return-case" class="btn-ghost-on-light" href="/case-detail.html">Return to Case</a>
+          <button type="button" onclick="returnToDashboard()" class="btn-ghost-on-light">Dashboard</button>
+        </div>
+        <div id="csa-paid-report-anchor"></div>
+        <div id="csa-paid-report-block" class="csa-paid-report-host" style="max-width:900px;margin-left:auto;margin-right:auto">
+        <div id="csa-paid-report-visible" style="margin-top:0;text-align:left;max-width:900px;margin-left:auto;margin-right:auto" aria-hidden="true"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -1344,19 +1674,197 @@
 // ─────────────────────────────────────────────────────────────────────────────
 let answers = {};
 
-function toggleBeginBtn() {
-  const cb = document.getElementById('byb-checkbox');
-  const btn = document.getElementById('begin-audit-btn');
-  if (!cb || !btn) return;
-  if (cb.checked) {
-    btn.disabled = false;
-    btn.style.opacity = '1';
-    btn.style.cursor = 'pointer';
-  } else {
-    btn.disabled = true;
-    btn.style.opacity = '0.45';
-    btn.style.cursor = 'not-allowed';
+// ── Paid portal: case_tool_drafts (CSA) ─────────────────────────────────────
+var csaDraftSaveTimer = null;
+var csaDraftDirty = false;
+var csaDraftApplying = false;
+var csaDraftAutosaveDisabled = false;
+var csaDraftLockedAfterRun = false;
+var CSA_DRAFT_DEBOUNCE_MS = 900;
+
+function csaResolveCaseRef() {
+  return typeof window.caseClarityResolveCaseRef === 'function' ? window.caseClarityResolveCaseRef() : null;
+}
+
+async function csaResolvePaidCaseRow(client) {
+  var caseRef = csaResolveCaseRef();
+  if (!caseRef || !client) return null;
+  var gu = await client.auth.getUser();
+  var user = gu.data && gu.data.user;
+  if (gu.error || !user) return null;
+  var cq = await client
+    .from('case_cases')
+    .select('id, attorney_user_id')
+    .eq('case_ref', caseRef)
+    .eq('attorney_user_id', user.id)
+    .maybeSingle();
+  if (cq.error || !cq.data) {
+    if (cq.error) console.error('[CSA] case lookup for draft', cq.error);
+    return null;
   }
+  return cq.data;
+}
+
+function csaDraftHasMeaningfulState(d) {
+  if (!d || d.v !== 1 || !d.answers || typeof d.answers !== 'object') return false;
+  var a = d.answers;
+  for (var ri = 0; ri < 7; ri++) {
+    var block = a[ri] !== undefined ? a[ri] : a[String(ri)];
+    if (!block || typeof block !== 'object') continue;
+    if (Object.keys(block).length > 0) return true;
+  }
+  return false;
+}
+
+function csaCollectDraftJson() {
+  return { v: 1, answers: JSON.parse(JSON.stringify(answers)) };
+}
+
+async function saveCsaDraft() {
+  if (csaDraftApplying || csaDraftAutosaveDisabled || csaDraftLockedAfterRun) return;
+  var client = window.supabaseClient;
+  if (!client) return;
+  var rowCtx = await csaResolvePaidCaseRow(client);
+  if (!rowCtx) return;
+  var draftJson = csaCollectDraftJson();
+  if (!csaDraftHasMeaningfulState(draftJson)) return;
+  var payload = {
+    case_id: rowCtx.id,
+    attorney_user_id: rowCtx.attorney_user_id,
+    tool_key: 'CSA',
+    draft_json: draftJson,
+    updated_at: new Date().toISOString()
+  };
+  var up = await client.from('case_tool_drafts').upsert(payload, {
+    onConflict: 'case_id,attorney_user_id,tool_key'
+  });
+  if (up.error) console.error('[CSA] case_tool_drafts upsert failed', up.error);
+  else {
+    console.log('[CSA] draft save ok');
+    csaDraftDirty = false;
+  }
+}
+
+function scheduleCsaDraftSave() {
+  if (csaDraftApplying || csaDraftAutosaveDisabled || csaDraftLockedAfterRun) return;
+  if (!new URLSearchParams(window.location.search).get('case_ref') || !window.supabaseClient) return;
+  csaDraftDirty = true;
+  clearTimeout(csaDraftSaveTimer);
+  csaDraftSaveTimer = setTimeout(function () {
+    csaDraftSaveTimer = null;
+    void saveCsaDraft();
+  }, CSA_DRAFT_DEBOUNCE_MS);
+}
+
+async function flushCsaDraftSave() {
+  if (csaDraftLockedAfterRun) return;
+  clearTimeout(csaDraftSaveTimer);
+  csaDraftSaveTimer = null;
+  if (csaDraftDirty) await saveCsaDraft();
+}
+
+function csaMergeDraftJsonIntoAnswers(d) {
+  if (!d || typeof d !== 'object') return;
+  var src = d.answers !== undefined ? d.answers : d;
+  if (!src || typeof src !== 'object') return;
+  answers = {};
+  for (var ri = 0; ri < 7; ri++) {
+    var block = src[ri] !== undefined ? src[ri] : src[String(ri)];
+    answers[ri] = {};
+    if (!block || typeof block !== 'object') continue;
+    Object.keys(block).forEach(function (qiStr) {
+      var qi = parseInt(qiStr, 10);
+      var qv = block[qiStr];
+      if (!Number.isFinite(qi) || !qv || qv.value == null) return;
+      answers[ri][qi] = { value: qv.value };
+    });
+  }
+}
+
+async function loadCsaDraft() {
+  if (!new URLSearchParams(window.location.search).get('case_ref')) return;
+  var client = window.supabaseClient;
+  if (!client) return;
+  csaDraftApplying = true;
+  try {
+    var rowCtx = await csaResolvePaidCaseRow(client);
+    if (!rowCtx) {
+      console.warn('[CSA] draft load skipped (no case row)');
+      return;
+    }
+    var dr = await client
+      .from('case_tool_drafts')
+      .select('draft_json')
+      .eq('case_id', rowCtx.id)
+      .eq('tool_key', 'CSA')
+      .maybeSingle();
+    if (dr.error) {
+      console.error('[CSA] case_tool_drafts select failed', dr.error);
+      return;
+    }
+    var dj = dr.data && dr.data.draft_json;
+    if (!dj || !csaDraftHasMeaningfulState(dj)) {
+      console.log('[CSA] draft load: none or empty');
+      return;
+    }
+    csaMergeDraftJsonIntoAnswers(dj);
+    console.log('[CSA] draft loaded');
+  } finally {
+    csaDraftApplying = false;
+  }
+}
+
+async function deleteCsaDraft() {
+  var client = window.supabaseClient;
+  if (!client) return false;
+  var gu = await client.auth.getUser();
+  var user = gu.data && gu.data.user;
+  if (gu.error || !user) {
+    console.error('[CSA] delete draft getUser', gu.error);
+    return false;
+  }
+  var uid = user.id;
+  var caseRef = csaResolveCaseRef();
+  if (!caseRef) return false;
+  var cq = await client
+    .from('case_cases')
+    .select('id')
+    .eq('case_ref', caseRef)
+    .eq('attorney_user_id', uid)
+    .maybeSingle();
+  if (cq.error || !cq.data) return false;
+  var del = await client
+    .from('case_tool_drafts')
+    .delete()
+    .eq('case_id', cq.data.id)
+    .eq('attorney_user_id', uid)
+    .eq('tool_key', 'CSA');
+  if (del.error) {
+    console.error('[CSA] case_tool_drafts delete failed', del.error);
+    return false;
+  }
+  console.log('[CSA] draft delete ok');
+  csaDraftDirty = false;
+  return true;
+}
+
+function csaLockDraftAutosaveForCompletion() {
+  csaDraftAutosaveDisabled = true;
+  clearTimeout(csaDraftSaveTimer);
+  csaDraftSaveTimer = null;
+  csaDraftDirty = false;
+}
+
+function csaInitPaidDraftPersistence() {
+  if (!new URLSearchParams(window.location.search).get('case_ref')) return;
+  if (window.__csaDraftEventsBound) return;
+  window.__csaDraftEventsBound = true;
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') void flushCsaDraftSave();
+  });
+  window.addEventListener('pagehide', function () {
+    void flushCsaDraftSave();
+  });
 }
 
 function startAudit() {
@@ -1368,6 +1876,12 @@ function startAudit() {
   document.getElementById('float-ref-btn').style.display = 'flex';
   buildRefRightsList();
   buildCards();
+  csaApplyAllAnswersToUiFromState();
+  csaUpdateGlobalProgressFromAnswers();
+  const allDone = RIGHTS.every(
+    (r, i) => Object.keys(answers[i] || {}).length === r.questions.length
+  );
+  if (allDone) void csaOnAllRightsComplete();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1450,7 +1964,7 @@ function buildCards() {
   const container = document.getElementById('cards-container');
   container.innerHTML = '';
   RIGHTS.forEach((right, ri) => {
-    answers[ri] = {};
+    if (!answers[ri]) answers[ri] = {};
     const card = document.createElement('div');
     card.className = 'right-card animate-in';
     card.id = `card-${ri}`;
@@ -1493,7 +2007,6 @@ function buildCards() {
         <div class="card-title-wrap">
           <div class="right-label">${right.label}</div>
           <div class="right-title">The ${right.title}</div>
-          <div class="right-desc">${right.desc}</div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;">
           <div class="completion-pill" id="pill-${ri}">0 / ${right.questions.length}</div>
@@ -1501,6 +2014,7 @@ function buildCards() {
         </div>
       </div>
       <div class="card-body-wrap card-collapsed" id="card-body-${ri}">
+        <div class="right-desc-body">${right.desc}</div>
         <div class="card-definition-panel">
           <button class="card-def-toggle" onclick="event.stopPropagation();toggleDef(${ri})">
             <span>📖 View Definition, Clarifications &amp; Examples</span>
@@ -1535,75 +2049,187 @@ function buildCards() {
 // ─────────────────────────────────────────────────────────────────────────────
 // INTERACTION
 // ─────────────────────────────────────────────────────────────────────────────
-function selectSub(ri, qi, value) {
+/** Collapse or expand audit card body; keeps hint text in sync with toggleCard(). */
+function setAuditCardCollapsed(ri, collapsed) {
+  const body = document.getElementById('card-body-' + ri);
+  const hint = document.getElementById('card-hint-' + ri);
+  if (!body) return;
+  body.classList.toggle('card-collapsed', collapsed);
+  if (hint) hint.textContent = collapsed ? '▼ Expand' : '▲ Collapse';
+}
+
+/** Apply one answer to the DOM (used by selectSub and draft restore). */
+function csaApplyAnswerVisualOnly(ri, qi, value, opts) {
+  opts = opts || {};
+  const silentBatch = opts.silentBatch === true;
+  const prevAnsweredCount =
+    opts.prevAnsweredCount !== undefined
+      ? opts.prevAnsweredCount
+      : Object.keys(answers[ri] || {}).length;
+  if (!answers[ri]) answers[ri] = {};
   answers[ri][qi] = { value };
 
-  ['yes','not-sure','no'].forEach(v => {
-    document.getElementById(`opt-${ri}-${qi}-${v}`).classList.remove('active-yes','active-not-sure','active-no');
+  ['yes', 'not-sure', 'no'].forEach((v) => {
+    const el = document.getElementById(`opt-${ri}-${qi}-${v}`);
+    if (el) el.classList.remove('active-yes', 'active-not-sure', 'active-no');
   });
-  document.getElementById(`opt-${ri}-${qi}-${value}`).classList.add(`active-${value}`);
+  const activeOpt = document.getElementById(`opt-${ri}-${qi}-${value}`);
+  if (activeOpt) activeOpt.classList.add(`active-${value}`);
 
   const subq = document.getElementById(`subq-${ri}-${qi}`);
-  subq.classList.remove('answered-yes','answered-not-sure','answered-no');
-  subq.classList.add(`answered-${value}`);
+  if (subq) {
+    subq.classList.remove('answered-yes', 'answered-not-sure', 'answered-no');
+    subq.classList.add(`answered-${value}`);
+  }
 
-  // Flag logic
   const flag = document.getElementById(`flag-${ri}-${qi}`);
-  if (flag) {
-    const triggers = RIGHTS[ri].questions[qi].flag.triggerOn;
+  const qMeta = RIGHTS[ri].questions[qi];
+  if (flag && qMeta.flag) {
+    const triggers = qMeta.flag.triggerOn;
     const shouldShow = Array.isArray(triggers) ? triggers.includes(value) : value === triggers;
     flag.classList.toggle('visible', shouldShow);
   }
 
-  // Update pill and card state
   const answered = Object.keys(answers[ri]).length;
   const total = RIGHTS[ri].questions.length;
   const pill = document.getElementById(`pill-${ri}`);
-  pill.textContent = `${answered} / ${total}`;
   const cardEl = document.getElementById(`card-${ri}`);
-  if (answered === total) {
-    cardEl.classList.remove('partially-answered');
-    cardEl.classList.add('fully-answered');
-    pill.classList.add('complete');
-  } else if (answered > 0) {
-    cardEl.classList.add('partially-answered');
+  if (pill && cardEl) {
+    if (answered === total) {
+      cardEl.classList.remove('partially-answered');
+      cardEl.classList.add('fully-answered');
+      pill.classList.add('complete');
+      pill.textContent = 'Complete';
+    } else if (answered > 0) {
+      cardEl.classList.add('partially-answered');
+      cardEl.classList.remove('fully-answered');
+      pill.classList.remove('complete');
+      pill.textContent = `${answered} / ${total}`;
+    } else {
+      cardEl.classList.remove('partially-answered', 'fully-answered');
+      pill.classList.remove('complete');
+      pill.textContent = `0 / ${total}`;
+    }
   }
 
-  // Update progress bar
+  if (!silentBatch) {
+    const justCompleted = answered === total && prevAnsweredCount < total;
+    if (justCompleted) {
+      setAuditCardCollapsed(ri, true);
+      if (ri < RIGHTS.length - 1) {
+        setAuditCardCollapsed(ri + 1, false);
+        const nextCard = document.getElementById(`card-${ri + 1}`);
+        if (nextCard) {
+          requestAnimationFrame(function () {
+            nextCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
+        }
+      }
+    }
+  }
+}
+
+function csaUpdateGlobalProgressFromAnswers() {
   const totalQ = RIGHTS.reduce((acc, r) => acc + r.questions.length, 0);
   const totalAnswered = Object.values(answers).reduce((acc, qs) => acc + Object.keys(qs).length, 0);
-  const rightsComplete = RIGHTS.filter((r, i) => Object.keys(answers[i] || {}).length === r.questions.length).length;
-  document.getElementById('progress-fill').style.width = `${(totalAnswered / totalQ) * 100}%`;
-  document.getElementById('progress-count').textContent = `${rightsComplete} of 7 Rights evaluated`;
+  const rightsComplete = RIGHTS.filter(
+    (r, i) => Object.keys(answers[i] || {}).length === r.questions.length
+  ).length;
+  const pf = document.getElementById('progress-fill');
+  const pc = document.getElementById('progress-count');
+  if (pf) pf.style.width = `${(totalAnswered / totalQ) * 100}%`;
+  if (pc) pc.textContent = `${rightsComplete} of 7 Rights evaluated`;
+}
 
-  // Show completion + notify dashboard when all Rights answered
+function csaApplyAllAnswersToUiFromState() {
+  for (var ri = 0; ri < RIGHTS.length; ri++) {
+    var block = answers[ri];
+    if (!block) continue;
+    Object.keys(block).forEach(function (qiStr) {
+      var qi = parseInt(qiStr, 10);
+      var val = block[qi] && block[qi].value;
+      if (!Number.isFinite(qi) || val == null) return;
+      csaApplyAnswerVisualOnly(ri, qi, val, { silentBatch: true });
+    });
+  }
+}
+
+async function csaOnAllRightsComplete() {
+  csaLockDraftAutosaveForCompletion();
+  const submitWrap = document.getElementById('submit-wrap');
+  if (submitWrap) submitWrap.style.display = 'block';
+  const paidCaseRef = new URLSearchParams(window.location.search).get('case_ref');
+  const trialEl = document.getElementById('csa-submit-trial');
+  const paidEl = document.getElementById('csa-submit-paid');
+  const retCase = document.getElementById('csa-paid-return-case');
+  var checkerSec = document.getElementById('checker-section');
+  if (paidCaseRef) {
+    document.body.classList.add('csa-paid-mode');
+    if (trialEl) trialEl.style.display = 'none';
+    if (paidEl) paidEl.style.display = 'block';
+    if (retCase) retCase.setAttribute('href', '/case-detail.html?case_ref=' + encodeURIComponent(paidCaseRef));
+    if (checkerSec) checkerSec.classList.add('csa-paid-print');
+  } else {
+    document.body.classList.remove('csa-paid-mode');
+    if (trialEl) trialEl.style.display = 'block';
+    if (paidEl) paidEl.style.display = 'none';
+    if (checkerSec) checkerSec.classList.remove('csa-paid-print');
+  }
+  const assessmentData = buildAssessmentData();
+  const toolData = {
+    completed: true,
+    timestamp: new Date().toISOString(),
+    data: assessmentData
+  };
+  localStorage.setItem('tool2_data', JSON.stringify(toolData));
+  localStorage.setItem('tool2_complete', 'true');
+  if (typeof window.markAssessmentComplete === 'function') {
+    window.markAssessmentComplete(assessmentData);
+  }
+  renderCsaResultsCapture();
+  const csaHost = document.getElementById('csa-report-for-storage');
+  if (csaHost) {
+    localStorage.setItem('tool2_report_html', csaHost.outerHTML);
+    console.log('CSA report HTML saved, length:', localStorage.getItem('tool2_report_html') ? localStorage.getItem('tool2_report_html').length : 0);
+  } else {
+    console.warn('CSA: csa-report-for-storage host missing; report HTML not saved.');
+  }
+  if (paidCaseRef && !window.__paidPortalCSARecorded) {
+    const r = computeResults();
+    var recorded = await paidPortalRecordCaseToolRunAsync({
+      toolKey: 'CSA',
+      scoreSummary: {
+        tool: 'CSA',
+        overallKey: r.overallKey,
+        overallLabel: r.overall.label,
+        alignmentPercent: computeAlignmentIndicator()
+      },
+      resultJson: { assessmentData, toolData, answers: JSON.parse(JSON.stringify(answers)) }
+    });
+    if (recorded === true) {
+      window.__paidPortalCSARecorded = true;
+      await deleteCsaDraft();
+      csaDraftLockedAfterRun = true;
+    } else {
+      console.warn('[CSA] case_tool_runs insert failed; draft retained');
+      csaDraftAutosaveDisabled = false;
+    }
+  }
+  if (submitWrap) setTimeout(() => submitWrap.scrollIntoView({ behavior: 'smooth', block: 'center' }), 200);
+}
+
+function selectSub(ri, qi, value) {
+  const prevAnsweredCount = Object.keys(answers[ri] || {}).length;
+  csaApplyAnswerVisualOnly(ri, qi, value, { prevAnsweredCount });
+  csaUpdateGlobalProgressFromAnswers();
   const allAnswered = RIGHTS.every((r, i) => Object.keys(answers[i] || {}).length === r.questions.length);
   const submitWrap = document.getElementById('submit-wrap');
   if (allAnswered) {
-    submitWrap.style.display = 'block';
-    const assessmentData = buildAssessmentData();
-    const toolData = {
-      completed: true,
-      timestamp: new Date().toISOString(),
-      data: assessmentData
-    };
-    localStorage.setItem('tool2_data', JSON.stringify(toolData));
-    localStorage.setItem('tool2_complete', 'true');
-    if (typeof window.markAssessmentComplete === 'function') {
-      window.markAssessmentComplete(assessmentData);
-    }
-    renderCsaResultsCapture();
-    const csaHost = document.getElementById('csa-report-for-storage');
-    if (csaHost) {
-      localStorage.setItem('tool2_report_html', csaHost.outerHTML);
-      console.log('CSA report HTML saved, length:', localStorage.getItem('tool2_report_html') ? localStorage.getItem('tool2_report_html').length : 0);
-    } else {
-      console.warn('CSA: csa-report-for-storage host missing; report HTML not saved.');
-    }
-    setTimeout(() => submitWrap.scrollIntoView({ behavior: 'smooth', block: 'center' }), 200);
-  } else {
+    void csaOnAllRightsComplete();
+  } else if (submitWrap) {
     submitWrap.style.display = 'none';
   }
+  scheduleCsaDraftSave();
 }
 
 function buildAssessmentData() {
@@ -1872,7 +2498,7 @@ const STATUS_CONFIG = {
     icon: '✓',
     interpretation: 'The case structure reflects appropriate provider authority, diagnostic specificity, guideline alignment, and continuity of care. Structural defensibility is established across all evaluated domains. Cases with this profile carry reduced payer scrutiny risk and present a predictable documentation foundation for deposition, IME review, and settlement evaluation.',
     ctaHeadline: 'Maintaining Structural Alignment Through Resolution',
-    ctaBody: 'Maintaining structural alignment through resolution requires consistent oversight — not just a strong starting position. Reconcile C.A.R.E. provides structured RN clinical oversight that monitors provider alignment, documentation continuity, and guideline adherence from evaluation through settlement.'
+    ctaBody: 'Sustaining alignment through case resolution depends on ongoing attention to appropriate provider scope, visit-level documentation continuity, and guideline-consistent sequencing—not only at initial evaluation. Maintaining these elements reduces vulnerability to scrutiny under payer review, independent medical examination, and record-focused inquiry as the case progresses.'
   },
   partial: {
     label: 'Partially Aligned',
@@ -1882,7 +2508,7 @@ const STATUS_CONFIG = {
     icon: '◑',
     interpretation: 'The case demonstrates foundational structural elements with identifiable documentation gaps remaining. These gaps represent an early correction window — addressing them before deposition, IME, or settlement review strengthens structural defensibility and reduces the risk of incremental leverage erosion. Reinforcement of uncertain or unconfirmed criteria is recommended.',
     ctaHeadline: 'Correct Structural Gaps Before Scrutiny Intensifies',
-    ctaBody: 'Identified gaps in this profile represent an early correction window. Reconcile C.A.R.E. provides structured RN clinical oversight that targets documentation reinforcement, provider alignment, and guideline consistency — before deposition, IME, or settlement evaluation.'
+    ctaBody: 'Gaps reflected in this profile are most modifiable before scrutiny intensifies under deposition, independent medical examination, or settlement review. Priority should be given to clarifying uncertain criteria, strengthening visit-specific documentation, and aligning clinical decisions with applicable evidence-based standards.'
   },
   misaligned: {
     label: 'Structurally Misaligned',
@@ -1892,7 +2518,7 @@ const STATUS_CONFIG = {
     icon: '✗',
     interpretation: 'One or more structural domains are misaligned with recognized injury management standards. Cases with this profile carry elevated IME vulnerability and increased risk of negotiation leverage erosion. Opposing counsel may exploit identified gaps in provider authority, documentation specificity, or care continuity. Corrective structural review is recommended prior to deposition, independent medical examination, or settlement positioning.',
     ctaHeadline: 'Structural Realignment Required Before Litigation Exposure',
-    ctaBody: 'Institutional clinical oversight can restore alignment and strengthen defensibility. Reconcile C.A.R.E. provides structured RN clinical oversight that aligns providers, reinforces evidence-based standards, and ensures documentation supports both medical necessity and litigation strategy.'
+    ctaBody: 'Structural correction should prioritize provider authority appropriate to injury complexity, evidence-based care sequencing, and documentation that clearly supports medical necessity and defensibility. Addressing these issues prospectively limits vulnerability when the record is examined under independent review or adversarial inquiry.'
   },
   'partial-r1': {
     label: 'Partially Aligned',
@@ -1902,7 +2528,7 @@ const STATUS_CONFIG = {
     icon: '◑',
     interpretation: 'Provider Authority criteria are partially unconfirmed. Because Right #1 is foundational to all downstream structural alignment, uncertainty at this level warrants priority clarification. The remaining Rights have been evaluated and may reflect independent gaps; however, provider scope clarification should precede reliance on any downstream alignment status.',
     ctaHeadline: 'Correct Structural Gaps Before Scrutiny Intensifies',
-    ctaBody: 'Identified gaps in this profile represent an early correction window. Reconcile C.A.R.E. provides structured RN clinical oversight that targets documentation reinforcement, provider alignment, and guideline consistency — before deposition, IME, or settlement evaluation.'
+    ctaBody: 'Gaps reflected in this profile are most modifiable before scrutiny intensifies under deposition, independent medical examination, or settlement review. Priority should be given to clarifying uncertain criteria, strengthening visit-specific documentation, and aligning clinical decisions with applicable evidence-based standards.'
   },
   'misaligned-r1': {
     label: 'Structurally Misaligned',
@@ -1912,7 +2538,7 @@ const STATUS_CONFIG = {
     icon: '✗',
     interpretation: null, // Right #1 trigger uses Interruption Notice instead
     ctaHeadline: 'Structural Realignment Required Before Litigation Exposure',
-    ctaBody: 'Institutional clinical oversight can restore alignment and strengthen defensibility. Reconcile C.A.R.E. provides structured RN clinical oversight that aligns providers, reinforces evidence-based standards, and ensures documentation supports both medical necessity and litigation strategy.'
+    ctaBody: 'Structural correction should prioritize provider authority appropriate to injury complexity, evidence-based care sequencing, and documentation that clearly supports medical necessity and defensibility. Addressing these issues prospectively limits vulnerability when the record is examined under independent review or adversarial inquiry.'
   }
 };
 
@@ -1932,29 +2558,8 @@ function escCsaRep(s) {
   return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-function buildCsaFullReportHtml() {
+function buildCsaReportRightsHtml() {
   const r = computeResults();
-  const d = buildAssessmentData();
-  const overallKey = d.overallKey;
-  const borderColor = overallKey === 'aligned' ? '#2ecc71' : (overallKey === 'misaligned' || overallKey === 'misaligned-r1') ? '#c0392b' : '#f0a030';
-  const heroBg = overallKey === 'aligned' ? '#f2fbf6' : (overallKey === 'misaligned' || overallKey === 'misaligned-r1') ? '#fdf3f3' : '#fffbf0';
-  const badgeStyle = overallKey === 'aligned'
-    ? 'background:#edfaf4;color:#1a5c3a;border:2px solid #2ecc71'
-    : (overallKey === 'partial' || overallKey === 'partial-r1')
-    ? 'background:#fff8e6;color:#7a4a00;border:2px solid #f0a030'
-    : 'background:#fdf0f0;color:#7a1a1a;border:2px solid #c0392b';
-
-  let interp = r.overall && r.overall.interpretation ? r.overall.interpretation : '';
-  if (!interp && overallKey === 'misaligned-r1') {
-    interp = 'Right #1 (Provider Authority) is structurally misaligned. When the primary managing provider lacks scope consistent with injury complexity, downstream rights cannot compensate for that foundational gap. Corrective structural review of provider authority and care oversight is indicated.';
-  }
-  const pct = d.alignmentPercent != null ? d.alignmentPercent : 0;
-  const careWarn = pct <= 40 ? (
-    '<div style="margin-top:16px;padding:14px 18px;background:#fff5f5;border:2px solid #c0392b;border-left:5px solid #c0392b;border-radius:8px">' +
-    '<div style="font-size:11px;font-weight:800;color:#c0392b;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Indicator note</div>' +
-    '<div style="font-size:13px;font-style:italic;color:#7a1a1a;line-height:1.65">A lower alignment percentage does not override the structural determination shown above. Treat the overall status badge and each right status as primary.</div></div>'
-  ) : '';
-
   let rightsHtml = '';
   RIGHTS.forEach((right, ri) => {
     const st = r.rightStatuses[ri];
@@ -1983,42 +2588,307 @@ function buildCsaFullReportHtml() {
       '<span style="font-size:11px;font-weight:700;padding:6px 12px;border-radius:20px;text-transform:uppercase;letter-spacing:0.04em;background:' + stBg + ';color:' + stFg + ';border:1px solid ' + rowBorder + '">' + stLabel + '</span></div>' +
       '<div>' + qs + '</div></div>';
   });
+  return rightsHtml;
+}
 
+/** Resolves the interval band for a given CSA overall key. Shared between the
+ *  status badge block (Page 1 top) and any future consumer that needs the same
+ *  status -> cadence mapping. Right #1 override keys follow their base tier. */
+function resolveCsaIntervalConfig(overallKey) {
+  var tier;
+  if (overallKey === 'misaligned' || overallKey === 'misaligned-r1') tier = 'misaligned';
+  else if (overallKey === 'partial' || overallKey === 'partial-r1') tier = 'partial';
+  else tier = 'aligned';
+  return {
+    misaligned: {
+      label: 'Every 7\u201314 days',
+      sub: 'Structurally Misaligned cases require the tightest monitoring cadence.',
+      accent: '#c0392b',
+      bg: '#fdf3f3'
+    },
+    partial: {
+      label: 'Every 21\u201328 days',
+      sub: 'Partially Aligned cases benefit from focused re-evaluation within this window.',
+      accent: '#f0a030',
+      bg: '#fffbf0'
+    },
+    aligned: {
+      label: 'At minimum every 30 days',
+      sub: 'Aligned cases remain subject to change; periodic verification is essential.',
+      accent: '#2ecc71',
+      bg: '#f2fbf6'
+    }
+  }[tier];
+}
+
+/** Operational guidance: Interval + Recommended Actions + Trigger Events.
+ *  Status routing: misaligned-r1 uses misaligned content; partial-r1 uses partial content
+ *  (Right #1 physician/provider authority is the determining factor per CSA scoring logic).
+ *  Aligned includes the Important Note; other statuses omit it (their names already imply follow-up).
+ *  Trigger Events list merges prior Follow-Up guidance with new CSA trigger spec. */
+function buildCsaOperationalGuidanceHtml(overallKey) {
+  var tier;
+  if (overallKey === 'misaligned' || overallKey === 'misaligned-r1') tier = 'misaligned';
+  else if (overallKey === 'partial' || overallKey === 'partial-r1') tier = 'partial';
+  else tier = 'aligned';
+
+  var actionsConfig = {
+    misaligned: [
+      'Conduct a structured review of provider authority and referral order to identify foundational sequencing conflicts',
+      'Confirm that diagnostic services required to guide treatment decisions have been completed',
+      'Verify that current treating providers have appropriate authority to manage the conditions being addressed',
+      'Identify any services occurring prematurely or without appropriate referral support',
+      'Initiate corrective referral actions when sequencing gaps or authority conflicts are identified'
+    ],
+    partial: [
+      'Review current provider relationships to confirm that care progression follows recommended sequencing',
+      'Verify that pending referrals and specialty consultations are progressing in the correct order',
+      'Monitor for delays in diagnostic confirmation that could affect treatment direction',
+      'Confirm that future appointments support logical progression of care',
+      'Reassess sequencing alignment within the recommended interval'
+    ],
+    aligned: [
+      'Maintain current provider sequencing structure',
+      'Monitor for new referrals or treatment changes that may alter sequencing alignment',
+      'Verify that scheduled services continue to follow established care progression',
+      'Reassess alignment periodically to confirm continued sequencing stability'
+    ]
+  }[tier];
+
+  var mergedTriggers = [
+    'A new provider is added to the care team or the primary provider relationship changes',
+    'A surgical or procedural intervention is scheduled',
+    'A referral is delayed, denied, or redirected',
+    'A new diagnosis changes the treatment direction, or a specialty referral clarifies an existing diagnosis',
+    'Treatment progression stops, deviates from expected sequence, or is escalated or interrupted',
+    'A provider recommends new specialty involvement',
+    'Additional medical records are received that may change the structural alignment of any of the 7 Rights',
+    'Diagnostic imaging or testing results materially change the clinical picture',
+    'A causation narrative or physician summary is requested or received',
+    'Documentation patterns change, including identification of templated or copied-forward notes',
+    'The case is approaching deposition, IME, or settlement positioning, where structural defensibility should be re-verified'
+  ];
+
+  var actionsListHtml = actionsConfig.map(function (item) {
+    return '<li style="margin-bottom:5px">' + escCsaRep(item) + '</li>';
+  }).join('');
+  var triggersListHtml = mergedTriggers.map(function (item) {
+    return '<li style="margin-bottom:5px">' + escCsaRep(item) + '</li>';
+  }).join('');
+
+  var importantNoteHtml = '';
+  if (tier === 'aligned') {
+    importantNoteHtml =
+      '<div style="margin-top:10px;padding:10px 12px;background:#fff8e6;border:1.5px solid #f0a030;border-left:4px solid #f0a030;border-radius:6px">' +
+      '<div style="font-size:10px;font-weight:800;color:#7a4a00;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:5px">Important note</div>' +
+      '<p style="font-size:12px;font-style:italic;color:#5a3a00;line-height:1.55;margin:0">' +
+      'Alignment today does not guarantee continued alignment in the future. Changes in providers, referrals, or treatment direction can introduce unexpected sequencing gaps. ' +
+      'It is important to re-run this assessment at a minimum of every 30 days to detect emerging issues early. This is especially important for physician oversight and evidence-based reviews, as undetected sequencing gaps can significantly affect the trajectory of a case.' +
+      '</p></div>';
+  }
+
+  var actionsBlock =
+    '<div style="background:#fff;border:1.5px solid #e5e7eb;border-radius:8px;padding:10px 12px;margin-bottom:10px">' +
+    '<div style="font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:#0d2240;margin-bottom:6px;padding-bottom:4px;border-bottom:1.5px solid #d4820a">Recommended next actions</div>' +
+    '<ul style="margin:0;padding-left:18px;font-size:12.5px;line-height:1.55;color:#3a3f4a">' + actionsListHtml + '</ul>' +
+    importantNoteHtml +
+    '</div>';
+
+  var triggersBlock =
+    '<div style="background:#fff;border:1.5px solid #e5e7eb;border-radius:8px;padding:10px 12px;margin-bottom:10px">' +
+    '<div style="font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:#0d2240;margin-bottom:6px;padding-bottom:4px;border-bottom:1.5px solid #d4820a">Trigger events</div>' +
+    '<p style="font-size:12px;line-height:1.5;color:#3a3f4a;margin:0 0 6px;font-weight:600">Re-run this assessment sooner than scheduled if any of the following occur:</p>' +
+    '<ul style="margin:0;padding-left:18px;font-size:12.5px;line-height:1.55;color:#3a3f4a">' + triggersListHtml + '</ul>' +
+    '</div>';
+
+  return actionsBlock + triggersBlock;
+}
+
+/** Page 1 \u2014 summary (identity optional for standalone report window) */
+function buildCsaReportPage1Html(identityHtml) {
+  const r = computeResults();
+  const d = buildAssessmentData();
+  const overallKey = d.overallKey;
+  const borderColor = overallKey === 'aligned' ? '#2ecc71' : (overallKey === 'misaligned' || overallKey === 'misaligned-r1') ? '#c0392b' : '#f0a030';
+  const heroBg = overallKey === 'aligned' ? '#f2fbf6' : (overallKey === 'misaligned' || overallKey === 'misaligned-r1') ? '#fdf3f3' : '#fffbf0';
+  const badgeStyle = overallKey === 'aligned'
+    ? 'background:#edfaf4;color:#1a5c3a;border:2px solid #2ecc71'
+    : (overallKey === 'partial' || overallKey === 'partial-r1')
+    ? 'background:#fff8e6;color:#7a4a00;border:2px solid #f0a030'
+    : 'background:#fdf0f0;color:#7a1a1a;border:2px solid #c0392b';
+
+  let interp = r.overall && r.overall.interpretation ? r.overall.interpretation : '';
+  if (!interp && overallKey === 'misaligned-r1') {
+    interp = 'Right #1 (Provider Authority) is structurally misaligned. When the primary managing provider lacks scope consistent with injury complexity, downstream rights cannot compensate for that foundational gap. Corrective structural review of provider authority and care oversight is indicated.';
+  }
   const ctaBlock = r.overall && (r.overall.ctaHeadline || r.overall.ctaBody) ? (
-    '<div style="background:linear-gradient(135deg,#0d2240 0%,#163566 100%);border-radius:12px;padding:24px 28px;margin-bottom:20px;color:#fff">' +
-    '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#f0a030;margin-bottom:8px">Strategic takeaway</div>' +
-    (r.overall.ctaHeadline ? '<h3 style="font-family:Georgia,serif;font-size:20px;font-weight:700;margin:0 0 10px;color:#fff;line-height:1.25">' + escCsaRep(r.overall.ctaHeadline) + '</h3>' : '') +
-    (r.overall.ctaBody ? '<p style="font-size:14px;line-height:1.75;color:rgba(255,255,255,0.82);margin:0">' + escCsaRep(r.overall.ctaBody) + '</p>' : '') +
+    '<div style="background:linear-gradient(135deg,#0d2240 0%,#163566 100%);border-radius:8px;padding:10px 14px;margin-bottom:0;color:#fff">' +
+    '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#f0a030;margin-bottom:4px">Strategic takeaway</div>' +
+    (r.overall.ctaHeadline ? '<h3 style="font-family:Georgia,serif;font-size:16px;font-weight:700;margin:0 0 4px;color:#fff;line-height:1.2">' + escCsaRep(r.overall.ctaHeadline) + '</h3>' : '') +
+    (r.overall.ctaBody ? '<p style="font-size:12px;line-height:1.4;color:rgba(255,255,255,0.88);margin:0">' + escCsaRep(r.overall.ctaBody) + '</p>' : '') +
     '</div>'
   ) : '';
 
-  return '<div class="results-summary alignment-report report-content" style="font-family:\'DM Sans\',system-ui,sans-serif;max-width:900px;margin:0;padding:0;color:#3a3f4a">' +
-    '<div style="background:#fff;border-radius:12px;padding:24px 28px;margin-bottom:20px;box-shadow:0 2px 10px rgba(13,34,64,0.1);border-top:4px solid #0d2240">' +
-    '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#d4820a;margin-bottom:6px">Clinical Sequencing Auditor™</div>' +
-    '<div style="font-family:Georgia,\'Playfair Display\',serif;font-size:26px;font-weight:900;color:#0d2240;margin-bottom:8px;line-height:1.15">Structural Alignment Report</div>' +
-    '<div style="font-size:12px;color:#6b7280">Full formatted output · ' + escCsaRep(new Date().toLocaleString()) + '</div></div>' +
-    '<div style="text-align:center;padding:28px 24px;border-radius:12px;border:2px solid ' + borderColor + ';background:' + heroBg + ';margin-bottom:20px">' +
-    '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#6b7280;margin-bottom:12px">Overall structural status</div>' +
-    '<div style="display:inline-block;font-family:Georgia,serif;font-size:26px;font-weight:900;padding:12px 28px;border-radius:50px;margin-bottom:12px;' + badgeStyle + '">' + escCsaRep(d.overallLabel) + '</div>' +
-    '<p style="font-size:12px;color:#6b7280;line-height:1.65;max-width:540px;margin:0 auto">Determined from all seven rights using the C.S.A. structural logic (not the percentage alone).</p></div>' +
-    '<div style="background:#fff;border:1.5px solid #1e4a8c;border-radius:12px;padding:22px 26px;margin-bottom:20px">' +
-    '<div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;color:#0d2240;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid #d4820a">C.A.R.E. alignment indicator</div>' +
-    '<div style="font-family:Georgia,serif;font-size:44px;font-weight:700;color:#0d2240;line-height:1">' + pct + '%</div>' +
-    '<div style="font-size:12px;font-weight:600;color:#d4820a;margin-bottom:8px">Weighted response distribution (informational)</div>' +
-    '<p style="font-size:13px;color:#6b7280;line-height:1.65;margin:0">Informational only — does not override structural status.</p>' + careWarn + '</div>' +
-    '<div style="background:#fff;border:1.5px solid #e5e7eb;border-radius:10px;padding:20px 24px;margin-bottom:20px">' +
-    '<div style="font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;color:#0d2240;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #d4820a">Clinical interpretation</div>' +
-    '<div style="font-size:14px;line-height:1.75;color:#3a3f4a;font-weight:500">' + escCsaRep(interp) + '</div></div>' +
-    ctaBlock +
+  const operationalGuidance = buildCsaOperationalGuidanceHtml(overallKey);
+
+  const identityInHeader = identityHtml ? '<div class="csa-report-identity-wrap">' + identityHtml + '</div>' : '';
+  const assessmentComplete = '<div class="csa-report-screen-only-banner"><div style="text-align:center;padding:8px 12px;margin-bottom:10px;background:#f4fbf7;border:1.5px solid #2ecc71;border-radius:8px;font-size:13px;font-weight:800;color:#0d2240;letter-spacing:0.02em">Assessment Complete</div></div>';
+  const pageLabel = '<div class="csa-report-page-label" style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#6b7280;margin-bottom:8px">Summary report \u00b7 Page 1 of 2</div>';
+  const titleCard =
+    '<div class="csa-report-title-header" style="background:#fff;border-radius:8px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 6px rgba(13,34,64,0.08);border-top:3px solid #0d2240">' +
+    '<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#d4820a;margin-bottom:4px">Clinical Sequencing Auditor\u2122</div>' +
+    '<div style="font-family:Georgia,\'Playfair Display\',serif;font-size:20px;font-weight:900;color:#0d2240;margin-bottom:4px;line-height:1.12">Structural Alignment Report</div>' +
+    '<div style="font-size:11px;color:#6b7280;margin-bottom:0">Full formatted output \u00b7 ' + escCsaRep(new Date().toLocaleString()) + '</div>' +
+    identityInHeader +
+    '</div>';
+
+  const intervalConfig = resolveCsaIntervalConfig(overallKey);
+  const statusBadgeBlock =
+    '<div style="padding:14px 18px 14px;border-radius:8px;border:2px solid ' + borderColor + ';background:' + heroBg + ';margin-bottom:10px">' +
+    '<div style="text-align:center">' +
+    '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6b7280;margin-bottom:6px">Overall structural status</div>' +
+    '<div style="display:inline-block;font-family:Georgia,serif;font-size:20px;font-weight:900;padding:8px 18px;border-radius:40px;margin-bottom:6px;' + badgeStyle + '">' + escCsaRep(d.overallLabel) + '</div>' +
+    '<p style="font-size:11px;color:#6b7280;line-height:1.4;max-width:560px;margin:0 auto 10px">Determined from all seven rights using the C.S.A. structural logic. Interval below reflects status-driven monitoring cadence.</p>' +
+    '</div>' +
+    '<div style="border-top:1.5px dashed ' + borderColor + ';padding-top:10px;margin-top:2px;display:flex;align-items:baseline;justify-content:center;flex-wrap:wrap;gap:6px 14px">' +
+    '<span style="font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:#0d2240">Minimum re-run interval</span>' +
+    '<span style="font-family:Georgia,serif;font-size:18px;font-weight:900;color:' + intervalConfig.accent + ';line-height:1.1">' + escCsaRep(intervalConfig.label) + '</span>' +
+    '</div>' +
+    '<div style="font-size:11px;color:#6b7280;line-height:1.45;text-align:center;margin-top:4px">' + escCsaRep(intervalConfig.sub) + '</div>' +
+    '</div>';
+
+  const interpretationBlock =
+    '<div style="background:#fafbfc;border:1.5px solid #cbd5e1;border-left:5px solid #0d2240;border-radius:8px;padding:14px 18px;margin-bottom:10px;box-shadow:0 1px 4px rgba(13,34,64,0.08)">' +
+    '<div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;color:#0d2240;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #d4820a">Clinical interpretation</div>' +
+    '<div style="font-size:13.5px;line-height:1.6;color:#1a202c;font-weight:500">' + escCsaRep(interp) + '</div></div>';
+
+  // Page 1 order: page label, complete banner, title card, status badge
+  // (now includes Minimum Re-Run Interval), clinical interpretation,
+  // operational guidance (actions + triggers), strategic takeaway.
+  // C.A.R.E. Alignment Indicator removed from visible report (still computed
+  // and stored in assessment data for internal/dashboard use).
+  return '<section id="csa-report-page-summary" class="results-summary alignment-report report-content csa-report-page csa-report-page--summary" style="font-family:\'DM Sans\',system-ui,sans-serif;max-width:900px;margin:0 auto;padding:0;color:#3a3f4a">' +
+    pageLabel +
+    assessmentComplete +
+    titleCard +
+    statusBadgeBlock +
+    interpretationBlock +
+    operationalGuidance +
+    (ctaBlock ? '<div style="margin-top:0;margin-bottom:10px">' + ctaBlock + '</div>' : '') +
+    '</section>';
+}
+
+/** Page 2 — detailed findings */
+function buildCsaReportPage2Html() {
+  const rightsHtml = buildCsaReportRightsHtml();
+  const legend =
     '<div style="padding:16px 20px;background:#f4f5f7;border-radius:9px;margin-bottom:20px">' +
     '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#6b7280;margin-bottom:10px">Color legend</div>' +
     '<div style="display:flex;flex-wrap:wrap;gap:18px;font-size:12px;color:#3a3f4a">' +
     '<span><strong style="color:#1a5c3a">●</strong> Aligned</span>' +
     '<span><strong style="color:#7a4a00">●</strong> Partial</span>' +
-    '<span><strong style="color:#c0392b">●</strong> Misaligned</span></div></div>' +
-    '<div style="margin-bottom:12px;font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:#0d2240">Detailed findings — each right &amp; criterion</div>' +
+    '<span><strong style="color:#c0392b">●</strong> Misaligned</span></div></div>';
+  return '<section id="csa-report-page-detail" class="results-summary alignment-report report-content csa-report-page csa-report-page--detail" style="font-family:\'DM Sans\',system-ui,sans-serif;max-width:900px;margin:0 auto;padding:0;color:#3a3f4a">' +
+    '<div class="csa-report-page-label" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:#6b7280;margin-bottom:10px">Detailed findings · Page 2 of 2</div>' +
+    '<div style="margin-bottom:12px;font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:#0d2240">Each right &amp; criterion</div>' +
+    legend +
     rightsHtml +
-    '<div style="padding:14px 18px;background:#f4f5f7;border-radius:8px;font-size:12px;color:#6b7280;line-height:1.65;border-left:3px solid #94a3b8;font-style:italic">Reconcile C.A.R.E. · Trial capture for consolidated dashboard report.</div></div>';
+    '<p style="margin:18px 0 0;font-size:11px;line-height:1.5;color:#888">Clinical care management tool for case coordination and documentation. Not a scientific instrument, predictive model, or substitute for medical or legal judgment.</p>' +
+    '</section>';
+}
+
+function buildCsaFullReportHtml() {
+  return '<div class="csa-report-document">' + buildCsaReportPage1Html('') + buildCsaReportPage2Html() + '</div>';
+}
+
+/* Sanitize injected HTML so embedded closing-script sequences cannot break the parent document when building strings. */
+function csaSanitizeReportHtmlFragment(html) {
+  if (!html) return '';
+  return String(html).replace(/<\/script/gi, '<\\/script');
+}
+
+function csaGetReportDocumentHtml() {
+  const identityEl = document.getElementById('case-header-fields');
+  const identityHtml = identityEl && identityEl.innerHTML ? csaSanitizeReportHtmlFragment(identityEl.innerHTML) : '';
+  return '<div class="csa-report-document">' + buildCsaReportPage1Html(identityHtml) + buildCsaReportPage2Html() + '</div>';
+}
+
+function csaGetReportStandaloneStyles() {
+  return `body{margin:0;padding:0;background:#fff;color:#3a3f4a;font-family:'DM Sans',system-ui,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.csa-report-toolbar{position:sticky;top:0;z-index:100;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;padding:10px 14px;background:#f4f5f7;border-bottom:2px solid #0d2240;box-shadow:0 2px 8px rgba(13,34,64,0.08);}
+.csa-report-toolbar button{font-family:'DM Sans',system-ui,sans-serif;font-size:12px;font-weight:600;padding:8px 18px;border-radius:8px;border:none;cursor:pointer;background:#0d2240;color:#fff;}
+.csa-report-toolbar button:hover{background:#163566;}
+.csa-report-document{max-width:900px;margin:0 auto;padding:10px 14px 28px;box-sizing:border-box;}
+.csa-report-title-header .csa-report-identity-wrap{margin:0!important;padding:6px 0 0!important;}
+.csa-report-title-header .csa-report-identity-wrap .case-clarity-identity-card{padding:0!important;margin:0!important;border-radius:5px!important;overflow:hidden!important;box-shadow:none!important;border:1px solid #e2e8f0!important;background:linear-gradient(180deg,#fafbfc 0%,#f4f6f8 100%)!important;}
+.csa-report-title-header .csa-report-identity-wrap .case-clarity-identity-card-head{padding:3px 10px 2px!important;border-bottom:1px solid rgba(176,152,55,0.35)!important;}
+.csa-report-title-header .csa-report-identity-wrap .case-clarity-identity-card-title{margin:0!important;font-size:7.5px!important;letter-spacing:0.16em!important;}
+.csa-report-title-header .csa-report-identity-wrap .case-clarity-identity-primary{padding:4px 10px 3px!important;border-bottom:1px solid rgba(10,22,40,0.06)!important;display:flex!important;align-items:baseline!important;gap:10px!important;flex-wrap:wrap!important;}
+.csa-report-title-header .csa-report-identity-wrap .case-clarity-identity-hero-value{font-size:0.95rem!important;line-height:1.2!important;}
+.csa-report-title-header .csa-report-identity-wrap .case-clarity-identity-secondary{padding:4px 10px!important;gap:2px 14px!important;display:flex!important;flex-wrap:wrap!important;}
+.csa-report-title-header .csa-report-identity-wrap .case-clarity-identity-meta{padding:3px 10px 4px!important;gap:2px 14px!important;display:flex!important;flex-wrap:wrap!important;}
+.csa-report-title-header .csa-report-identity-wrap .case-clarity-identity-line{font-size:10px!important;margin:0!important;line-height:1.3!important;white-space:nowrap!important;}
+.csa-report-page--summary{display:block;padding-bottom:16px;margin:0;border-bottom:3px solid #0d2240;}
+.csa-report-page--detail{display:block;margin-top:28px;padding-top:20px;border-top:4px double #cbd5e1;}
+@media print{
+  .csa-report-toolbar{display:none!important;}
+  .csa-report-screen-only-banner{display:none!important;}
+  body{padding:0;}
+  .csa-report-document{max-width:100%;padding:6px 8px 8px;}
+  .csa-report-title-header{padding:8px 10px!important;margin-bottom:6px!important;box-shadow:none!important;}
+  .csa-report-title-header .csa-report-identity-wrap{padding:4px 0 0!important;}
+  .csa-report-title-header .csa-report-identity-wrap .case-clarity-identity-card-head{padding:2px 9px 2px!important;}
+  .csa-report-title-header .csa-report-identity-wrap .case-clarity-identity-primary{padding:3px 9px 3px!important;}
+  .csa-report-title-header .csa-report-identity-wrap .case-clarity-identity-secondary{padding:3px 9px!important;gap:2px 12px!important;}
+  .csa-report-title-header .csa-report-identity-wrap .case-clarity-identity-meta{padding:3px 9px 4px!important;}
+  .csa-report-title-header .csa-report-identity-wrap .case-clarity-identity-line{font-size:9px!important;line-height:1.25!important;}
+  .csa-report-page--summary{
+    page-break-after:always;
+    break-after:page;
+    border-bottom:none!important;
+    padding-bottom:0!important;
+  }
+  .csa-report-page--detail{
+    page-break-before:always;
+    break-before:page;
+    margin-top:0!important;
+    padding-top:10px!important;
+    border-top:none!important;
+  }
+}`;
+}
+
+function csaGetReportToolbarHtml() {
+  return '<div class="csa-report-toolbar" role="toolbar" aria-label="Report actions">' +
+    '<button type="button" onclick="document.getElementById(\'csa-report-page-summary\').scrollIntoView({block:\'start\',behavior:\'smooth\'})">View Report</button>' +
+    '<button type="button" onclick="window.print()">Print / Save PDF</button>' +
+    '</div>';
+}
+
+var csaReportWin = null;
+function csaOpenReportWindow() {
+  const inner = csaGetReportDocumentHtml();
+  if (!inner || !inner.trim()) {
+    alert('Report content is not available yet. If you just finished the audit, wait a moment and try again.');
+    return;
+  }
+  const docHtml = '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Clinical Sequencing Auditor Report</title><style>' + csaGetReportStandaloneStyles() + '</style></head><body>' + csaGetReportToolbarHtml() + inner + '</body></html>';
+  const blob = new Blob([docHtml], { type: 'text/html;charset=UTF-8' });
+  const url = URL.createObjectURL(blob);
+  /* Do not pass noopener in the feature string: in Chromium, that returns null from window.open, so document.write never runs and the tab stays blank. */
+  const w = window.open(url, '_blank');
+  csaReportWin = w;
+  if (!w) {
+    URL.revokeObjectURL(url);
+    alert('Please allow pop-ups for this site to view the report in a new tab.');
+    return;
+  }
+  function revokeWhenLoaded() {
+    try { URL.revokeObjectURL(url); } catch (e) {}
+  }
+  w.addEventListener('load', revokeWhenLoaded, { once: true });
+  setTimeout(revokeWhenLoaded, 60000);
+  try { w.focus(); } catch (e) {}
 }
 
 function renderCsaResultsCapture() {
@@ -2044,7 +2914,77 @@ function toggleCard(ri) {
 
 document.addEventListener('DOMContentLoaded', () => {
   buildAccordion();
+  if (window.caseClarityIdentity && window.supabaseClient) {
+    void window.caseClarityIdentity.mountToolPage(window.supabaseClient);
+  }
+  csaInitPaidDraftPersistence();
+  void loadCsaDraft();
 });
+
+// ── Instructions drawer (Option X: clone at runtime, static sections only) ──
+var csaDrawerHydrated = false;
+
+function csaHydrateDrawerContent() {
+  if (csaDrawerHydrated) return;
+  var src = document.querySelector('#before-you-begin .byb-body');
+  var dest = document.getElementById('csa-drawer-body');
+  if (!src || !dest) return;
+  // Clone the entire body, then strip what we don't want in the drawer
+  var clone = src.cloneNode(true);
+  // Remove the start-audit row (drawer is reference-only)
+  var startRow = clone.querySelector('.byb-start-row');
+  if (startRow) startRow.parentNode.removeChild(startRow);
+  // Remove the dynamic 7 Rights Reference Overview — CSA already has a separate floating reference button for this
+  var rightsRef = clone.querySelector('.byb-rights-preview');
+  if (rightsRef) rightsRef.parentNode.removeChild(rightsRef);
+  // Rewrite IDs to avoid conflicts with the originals
+  clone.querySelectorAll('[id]').forEach(function (el) {
+    el.id = 'csa-drawer-clone-' + el.id;
+  });
+  // Default all <details> to closed inside the drawer
+  clone.querySelectorAll('details').forEach(function (d) {
+    d.removeAttribute('open');
+  });
+  dest.appendChild(clone);
+  csaDrawerHydrated = true;
+}
+
+function csaOpenInstructionsDrawer() {
+  csaHydrateDrawerContent();
+  var d = document.getElementById('csa-drawer');
+  var b = document.getElementById('csa-drawer-backdrop');
+  if (d) { d.classList.add('open'); d.setAttribute('aria-hidden', 'false'); }
+  if (b) { b.classList.add('open'); b.setAttribute('aria-hidden', 'false'); }
+  document.body.style.overflow = 'hidden';
+}
+
+function csaCloseInstructionsDrawer() {
+  var d = document.getElementById('csa-drawer');
+  var b = document.getElementById('csa-drawer-backdrop');
+  if (d) { d.classList.remove('open'); d.setAttribute('aria-hidden', 'true'); }
+  if (b) { b.classList.remove('open'); b.setAttribute('aria-hidden', 'true'); }
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') {
+    var d = document.getElementById('csa-drawer');
+    if (d && d.classList.contains('open')) csaCloseInstructionsDrawer();
+  }
+});
+
+function csaPrintPaidReport() {
+  if (!csaReportWin || csaReportWin.closed) csaOpenReportWindow();
+  if (!csaReportWin || csaReportWin.closed) return;
+  try {
+    csaReportWin.focus();
+  } catch (e) {}
+  setTimeout(function () {
+    try {
+      if (csaReportWin && !csaReportWin.closed) csaReportWin.print();
+    } catch (e) {}
+  }, 400);
+}
 </script>
 <script>
 function goToNext() {
@@ -2089,6 +3029,16 @@ function returnToDashboard() {
     window.location.href = 'dashboard.html';
 }
 </script>
-<script src="trial-pinned-banner.js"></script>
+<div class="csa-drawer-backdrop" id="csa-drawer-backdrop" onclick="csaCloseInstructionsDrawer()" aria-hidden="true"></div>
+<aside class="csa-drawer" id="csa-drawer" role="dialog" aria-modal="true" aria-labelledby="csa-drawer-title-text" aria-hidden="true">
+  <div class="csa-drawer-head">
+    <div class="csa-drawer-head-text">
+      <div class="csa-drawer-tag">Reconcile Care Management Services</div>
+      <div class="csa-drawer-title" id="csa-drawer-title-text">Before You Begin — Clinical Sequencing Auditor™</div>
+    </div>
+    <button type="button" class="csa-drawer-close" onclick="csaCloseInstructionsDrawer()" aria-label="Close instructions">✕ Close</button>
+  </div>
+  <div class="csa-drawer-body" id="csa-drawer-body"></div>
+</aside>
 </body>
 </html>
