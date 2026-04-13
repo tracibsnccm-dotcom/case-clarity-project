@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>C.A.R.E. Access Friction Score™</title>
-<link rel="stylesheet" href="trial-pinned-banner.css">
+<link rel="stylesheet" href="css/case-identity.css">
+<link rel="stylesheet" href="css/theme.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -33,6 +34,14 @@ body{background:transparent;font-family:Georgia,'Times New Roman',serif;color:va
 .sec-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gd);font-family:Arial,sans-serif;margin-bottom:.625rem}
 .sec p{font-size:14px;color:var(--t2);font-family:Arial,sans-serif;line-height:1.75;margin-bottom:.875rem}
 .sec p:last-child{margin-bottom:0}
+.exp-body .sec--tight{padding:1.35rem 2rem}
+.exp-body .sec--tight p{margin-bottom:.5rem}
+.exp-body ul.byb-points{margin:.5rem 0 0;padding-left:1.2rem;font-size:13px;color:var(--t2);font-family:Arial,sans-serif;line-height:1.45}
+.exp-body ul.byb-points li{margin-bottom:.4rem}
+.exp-body ul.byb-points li:last-child{margin-bottom:0}
+.exp-body ul.caf-domain-compact{margin:.6rem 0 0;padding-left:1.15rem;font-size:12px;color:var(--t3);font-family:Arial,sans-serif;line-height:1.45}
+.exp-body ul.caf-domain-compact li{margin-bottom:.35rem}
+.exp-body ul.caf-domain-compact strong{color:var(--nv);font-weight:600}
 .domain-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:1.25rem}
 @media(max-width:560px){.domain-grid{grid-template-columns:1fr}}
 .dom-card{background:var(--wh);border:1px solid var(--bd);border-radius:8px;padding:1rem 1.125rem}
@@ -59,6 +68,27 @@ body{background:transparent;font-family:Georgia,'Times New Roman',serif;color:va
 .cta-btn{display:inline-block;background:var(--gd);color:var(--nv);padding:14px 36px;font-size:14px;font-family:Arial,sans-serif;letter-spacing:.5px;border-radius:6px;cursor:pointer;border:none;transition:background .15s}
 .cta-btn:hover{background:var(--gd2)}
 .cta-note{font-size:11px;color:rgba(255,255,255,0.38);font-family:Arial,sans-serif;margin-top:10px;letter-spacing:.5px}
+
+/* ── Before You Begin — intro accordions (multi-open; mirrors assessment .dh/.dbody) ── */
+.byb-acc{border-bottom:1px solid var(--bd)}
+.byb-acc:last-child{border-bottom:none}
+.byb-acc-hd{width:100%;text-align:left;padding:1.05rem 1.5rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--wh);border:none;font:inherit;transition:background .15s}
+.byb-acc-hd:hover{background:#f9f7f2}
+.byb-acc:nth-child(even) .byb-acc-hd:not(.open){background:#faf8f3}
+.byb-acc:nth-child(even) .byb-acc-hd:not(.open):hover{background:#f5f2eb}
+.byb-acc-hd.open{background:var(--nv)}
+.byb-acc-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gd);font-family:Arial,sans-serif}
+.byb-acc-hd.open .byb-acc-title{color:var(--gd2)}
+.byb-acc-cv{width:14px;height:14px;color:var(--t3);transition:transform .25s,color .15s;flex-shrink:0}
+.byb-acc-hd.open .byb-acc-cv{transform:rotate(180deg);color:var(--gd)}
+.byb-acc-body{display:none;padding:1.35rem 2rem;background:var(--wh)}
+.byb-acc:nth-child(even) .byb-acc-body{background:#faf8f3}
+.byb-acc-body.open{display:block}
+.byb-acc-body>p{font-size:14px;color:var(--t2);font-family:Arial,sans-serif;line-height:1.75;margin-bottom:.875rem}
+.byb-acc-body>p:last-child{margin-bottom:0}
+.byb-acc-toolbar{display:flex;justify-content:flex-end;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 1.5rem 10px;border-bottom:1px solid var(--bd);background:var(--cr)}
+.byb-acc-bulk{font-size:11px;font-family:Arial,sans-serif;font-weight:500;color:var(--t3);background:transparent;border:1px solid var(--bd);padding:5px 12px;border-radius:4px;cursor:pointer;transition:color .15s,border-color .15s,background .15s}
+.byb-acc-bulk:hover{color:var(--nv);border-color:rgba(176,152,55,0.55);background:rgba(255,255,255,0.6)}
 
 /* ── ASSESSMENT ── */
 .asx-hdr{background:var(--nv);padding:2rem 2.5rem;border-radius:12px 12px 0 0}
@@ -165,18 +195,154 @@ body{background:transparent;font-family:Georgia,'Times New Roman',serif;color:va
 .mn p{font-size:12px;color:rgba(255,255,255,0.5);font-family:Arial,sans-serif;line-height:1.65}
 .pr{padding:1rem 2.5rem;background:var(--cr);border-top:1px solid var(--bd);display:flex;gap:10px;flex-wrap:wrap}
 .rf{background:var(--nv);color:rgba(255,255,255,0.28);font-size:10px;font-family:Arial,sans-serif;padding:.875rem 2.5rem;line-height:1.65}
+body.caf-paid-mode #caf-submit-paid>p:first-child{display:none}
+/* Report view: case identity lives in the report header — hide duplicate Case Overview above */
+body.caf-paid-mode #case-header-fields{display:none !important}
+
+/* ─── Voice/View vs Clinical/System group subheaders ─── */
+.grp-hdr{display:flex;align-items:center;gap:10px;margin:1.75rem 2.5rem 1rem;padding:10px 14px;border-radius:6px;font-family:'Segoe UI',Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase}
+.grp-hdr:first-child{margin-top:1rem}
+.grp-hdr .grp-ico{font-size:14px;line-height:1}
+.grp-voice{background:rgba(232,197,71,0.12);color:#8a7420;border-left:3px solid #e8c547}
+.grp-clinical{background:rgba(14,28,46,0.06);color:#0e1c2e;border-left:3px solid #0e1c2e}
+
+/* ─── View Instructions button + panel ─── */
+.vi-btn{position:fixed;top:80px;right:20px;z-index:90;background:#0e1c2e;color:#e8c547;border:1px solid #e8c547;padding:10px 16px;font-family:'Segoe UI',Arial,sans-serif;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border-radius:6px;box-shadow:0 4px 12px rgba(14,28,46,0.18);transition:all .15s}
+.vi-btn:hover{background:#1a3050;color:#fff}
+.vi-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(14,28,46,0.58);z-index:200;align-items:flex-start;justify-content:center;overflow-y:auto;padding:40px 20px}
+.vi-overlay.open{display:flex}
+.vi-panel{background:#fff;max-width:780px;width:100%;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden;margin:auto 0}
+.vi-panel-hdr{background:linear-gradient(135deg,#0e1c2e 0%,#1a3050 100%);color:#fff;padding:20px 28px;display:flex;align-items:center;justify-content:space-between}
+.vi-panel-hdr h2{margin:0;font-size:20px;font-weight:700;letter-spacing:-0.01em}
+.vi-panel-hdr .vi-tag{font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#e8c547;margin-bottom:4px}
+.vi-close{background:transparent;border:1px solid rgba(255,255,255,0.35);color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center}
+.vi-close:hover{background:rgba(255,255,255,0.12)}
+.vi-body{padding:24px 28px;max-height:70vh;overflow-y:auto;font-family:'Segoe UI',Arial,sans-serif;color:#0e1c2e;line-height:1.65}
+.vi-body h3{font-size:15px;font-weight:700;color:#0e1c2e;margin:1.5rem 0 0.5rem;letter-spacing:-0.01em}
+.vi-body h3:first-child{margin-top:0}
+.vi-body h4{font-size:13px;font-weight:700;color:#0e1c2e;margin:1.25rem 0 0.4rem;letter-spacing:0.04em}
+.vi-body p{font-size:13.5px;margin:0 0 0.75rem;color:#333}
+.vi-body ul{font-size:13px;margin:0 0 0.75rem;padding-left:1.25rem;color:#333}
+.vi-body li{margin-bottom:4px}
+.vi-block{background:#f8f6f1;border-left:3px solid #e8c547;padding:14px 18px;border-radius:6px;margin:0.75rem 0}
+.vi-block-legal{background:#fff5f0;border-left:3px solid #d55427}
+.vi-block h4{margin-top:0}
+.vi-block-title{font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#8a5a20;margin-bottom:8px}
+.vi-block-legal .vi-block-title{color:#8b1a1a}
+.vi-disc{font-size:11.5px;color:#666;font-style:italic;margin-top:8px}
+
+/* ─── Critical domain inline marker + recommended response block (report) ─── */
+.caf-cd-banner{margin:0 0 14px;padding:14px 18px;background:#fff5f0;border:2px solid #c0392b;border-radius:10px;color:#5c2a2a;font-family:system-ui,Segoe UI,sans-serif}
+.caf-cd-banner-title{font-size:11px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#c0392b;margin-bottom:6px}
+.caf-cd-banner-body{font-size:13px;line-height:1.55}
+.caf-cd-chip{display:inline-block;font-size:10px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;background:#c0392b;color:#fff;padding:3px 9px;border-radius:4px;margin-right:8px;vertical-align:middle}
+/* Tiered level chips — label mirrors SCALE descriptors, color mirrors levelColor */
+.caf-tier-chip{display:inline-block;font-size:10px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:#fff;padding:3px 9px;border-radius:4px;margin-right:8px;vertical-align:middle;min-width:72px;text-align:center}
+.caf-tier-severe{background:#c0392b;color:#fff}
+.caf-tier-significant{background:#e67e22;color:#fff}
+.caf-tier-moderate{background:#e8b43a;color:#3a2a00}
+.caf-tier-minor{background:#9bbd3f;color:#1f3300}
+.caf-tier-none{background:#2e7d32;color:#fff}
+.caf-rr-block{background:#fff8f0;border:1px solid #e8a04a;border-radius:8px;padding:12px 14px;margin:10px 0 0;font-family:system-ui,Segoe UI,sans-serif}
+.caf-rr-title{font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#8a5a20;margin-bottom:6px}
+.caf-rr-body{font-size:12.5px;color:#4a3a20;line-height:1.55}
+.caf-rr-disc{font-size:11px;color:#7a6a50;font-style:italic;margin-top:6px}
+.caf-cl-block{background:#fdf3f1;border:1px solid #c75a42;border-radius:8px;padding:12px 14px;margin:8px 0 0;font-family:system-ui,Segoe UI,sans-serif}
+.caf-cl-title{font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#8b1a1a;margin-bottom:6px}
+.caf-cl-body{font-size:12.5px;color:#4a1e1a;line-height:1.55}
+.caf-cl-disc{font-size:11px;color:#7a4a42;font-style:italic;margin-top:6px}
 
 @media print{
   html{background:white}
   body{padding:0}
   #explainer{display:none !important}
-  .pr,.prog,.ar,.back-link{display:none}
+  .pr,.prog,.ar,.back-link,.vi-btn,.vi-overlay{display:none !important}
   .rpt{border:none}
   .dbody{display:block !important}
+  .no-print{display:none !important}
+  body.caf-paid-print .portal-header,
+  body.caf-paid-print .asx-hdr,
+  body.caf-paid-print .prog,
+  body.caf-paid-print .doms,
+  body.caf-paid-print .ar,
+  body.caf-paid-print #caf-submit-trial,
+  body.caf-paid-print #caf-submit-paid>p,
+  body.caf-paid-print #caf-submit-paid>#caf-paid-report-anchor{display:none !important}
+  body.caf-paid-print #caf-complete{display:block !important;border:none !important;padding:0 !important;background:#fff !important}
+  body.caf-paid-print #caf-submit-paid{display:block !important}
+  body.caf-paid-print #caf-paid-report-visible,
+  body.caf-paid-print #caf-paid-report-visible *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
+
+/* ═══════════════════════════════════════════════════
+   CAF Recommended Next Actions + Domain Reinforcement Blocks
+═══════════════════════════════════════════════════ */
+.caf-na-wrap{margin:0 0 16px;padding:16px 18px;background:#fdf8e8;border:2px solid #b09837;border-left:6px solid #b09837;border-radius:8px;font-family:system-ui,Segoe UI,sans-serif;box-shadow:0 1px 4px rgba(176,152,55,0.15)}
+.caf-na-title{font-size:11.5px;font-weight:800;color:#7a6a22;text-transform:uppercase;letter-spacing:0.13em;margin-bottom:10px;padding-bottom:7px;border-bottom:1.5px solid rgba(176,152,55,0.35);display:flex;align-items:center;gap:8px}
+.caf-na-title .ico{display:inline-block;width:18px;height:18px;background:#b09837;color:#fff;border-radius:50%;text-align:center;line-height:18px;font-size:11px;font-weight:900}
+.caf-na-intro{font-size:12.5px;color:#555;line-height:1.55;margin-bottom:10px;font-style:italic}
+.caf-na-list{list-style:none;padding:0;margin:0 0 14px}
+.caf-na-list li{font-size:13px;line-height:1.6;color:#1a1a1a;padding:6px 0 6px 20px;position:relative}
+.caf-na-list li::before{content:'';position:absolute;left:4px;top:14px;width:6px;height:6px;background:#b09837;border-radius:50%}
+.caf-na-priority,.caf-na-docfocus{background:#fff;border:1px solid #d4c890;border-radius:6px;padding:10px 12px;margin-top:8px}
+.caf-na-priority-lbl,.caf-na-docfocus-lbl{font-size:10.5px;font-weight:800;color:#7a6a22;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px}
+.caf-na-priority-body,.caf-na-docfocus-body{font-size:12.5px;color:#333;line-height:1.55}
+
+/* Domain reinforcement alert blocks */
+.caf-reinf{margin:10px 0 0;padding:12px 14px;border-radius:8px;font-family:system-ui,Segoe UI,sans-serif}
+.caf-reinf-d2{background:#fdf0ea;border:1px solid #c75a42;border-left:4px solid #c75a42}
+.caf-reinf-d3{background:#fff5e8;border:1px solid #d4820a;border-left:4px solid #d4820a}
+.caf-reinf-d4{background:#f3f1ec;border:1px solid #0c1c34;border-left:4px solid #0c1c34}
+.caf-reinf-title{font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px}
+.caf-reinf-d2 .caf-reinf-title{color:#7a2e10}
+.caf-reinf-d3 .caf-reinf-title{color:#7a4a00}
+.caf-reinf-d4 .caf-reinf-title{color:#0c1c34}
+.caf-reinf-body{font-size:12.5px;line-height:1.6;color:#222}
+.caf-reinf-body p{margin:0 0 6px}
+.caf-reinf-body p:last-child{margin-bottom:0}
+.caf-reinf-body ul{margin:4px 0 6px;padding-left:20px}
+.caf-reinf-body li{margin-bottom:3px}
+
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/auth-guard.js"></script>
+<script src="js/portal-header-nav.js"></script>
+<script src="js/paid-portal-tool-run.js"></script>
+<script src="js/case-identity.js"></script>
 </head>
-<body>
+<body class="with-portal-tool-header">
+
+<header class="portal-header no-print">
+  <a href="/index.html" class="portal-logo">
+    <div class="portal-logo-box"><span>C</span></div>
+    <div class="portal-logo-text">
+      <strong>C.A.S.E. Clarity</strong>
+      Reconcile Care Management Services
+    </div>
+  </a>
+  <div class="portal-header-right">
+    <a href="/case-detail.html" class="portal-nav-link" id="portal-nav-back-case">Back to Case</a>
+    <a href="/dashboard.html" class="portal-nav-link" id="portal-nav-back-dashboard">Back to Dashboard</a>
+    <span class="portal-user" id="user-email">Loading…</span>
+    <button type="button" class="btn-secondary" id="portal-nav-logout" disabled>Logout</button>
+  </div>
+</header>
+<script>
+(function () {
+  async function boot() {
+    const ok = await requireAuth();
+    if (!ok) return;
+    if (typeof initPortalHeaderNav === 'function') initPortalHeaderNav();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { void boot(); });
+  else void boot();
+})();
+</script>
+
+<div style="max-width:920px;margin:0 auto;padding:0 1.5rem 1.25rem">
+  <div id="case-header-fields"></div>
+</div>
 
 <!-- ═══════════════════════════════ EXPLAINER PAGE ═══════════════════════════════ -->
 <div id="explainer" class="page">
@@ -184,111 +350,155 @@ body{background:transparent;font-family:Georgia,'Times New Roman',serif;color:va
   <div class="exp-hdr">
     <div class="exp-tag">Reconcile C.A.R.E. &mdash; Clinical Analysis Instrument</div>
     <h1>Before You Begin &mdash; Understanding the C.A.R.E. Access Friction Score™</h1>
-    <p class="sub">A structured assessment designed to identify systemic barriers that may disrupt treatment continuity, documentation integrity, and recovery progression in injury cases.</p>
+    <p class="sub">Twenty-five questions across five domains. The report highlights systemic barriers to access and continuity—not individual blame. Goal: clarity, not speed.</p>
   </div>
 
   <div class="exp-body">
 
-    <div class="sec sec-alt">
-      <div class="sec-label">About This Assessment</div>
-      <p>Many treatment disruptions are not caused by the client or the provider alone, but by friction within the healthcare and insurance systems.</p>
-      <p>The purpose of this assessment is to help identify those barriers early so they can be addressed and documented appropriately, reducing the risk of treatment gaps that can ultimately undermine the strength of a case.</p>
-      <p>The C.A.R.E. Access Friction Score™ is part of the Reconcile C.A.R.E. (Clinical Analysis &amp; Recovery Entitlements) methodology, developed by RN Care Managers to help attorneys identify and monitor systemic barriers that interfere with treatment continuity and recovery progression.</p>
+    <div class="byb-acc-toolbar no-print" role="toolbar" aria-label="Instruction sections">
+      <button type="button" class="byb-acc-bulk" onclick="cafBybExpandAll()">Expand All</button>
+      <button type="button" class="byb-acc-bulk" onclick="cafBybCollapseAll()">Collapse All</button>
     </div>
 
-    <div class="sec">
-      <div class="sec-label">About the Assessment Process</div>
-      <p>This assessment is designed to provide a structured evaluation of potential barriers affecting treatment continuity in injury cases.</p>
-      <p>While the assessment can be completed in several minutes, it was not designed to be rushed. Thoughtful responses will produce a more accurate picture of where systemic barriers may be affecting recovery and documentation.</p>
-      <div class="pullout"><p class="highlight">The goal is not speed, but clarity.</p></div>
-    </div>
-
-    <div class="sec sec-alt">
-      <div class="sec-label">What This Assessment Evaluates</div>
-      <p>The C.A.R.E. Access Friction Score™ evaluates five domains that commonly interfere with treatment continuity and case stability.</p>
-      <div class="domain-grid">
-        <div class="dom-card">
-          <div class="dom-num">1</div>
-          <div class="dom-name">Provider Access</div>
-          <div class="dom-desc">Evaluates whether appropriate medical providers are realistically available to treat the injuries involved in the case, including specialist availability, referral access, and whether providers are willing to treat in litigation or lien-based environments.</div>
-        </div>
-        <div class="dom-card">
-          <div class="dom-num">2</div>
-          <div class="dom-name">Insurance &amp; Authorization Barriers</div>
-          <div class="dom-desc">Evaluates whether payer requirements, authorization delays, utilization review decisions, or administrative denials are preventing treatment from occurring when medically necessary.</div>
-        </div>
-        <div class="dom-card">
-          <div class="dom-num">3</div>
-          <div class="dom-name">Transportation &amp; Travel Access</div>
-          <div class="dom-desc">Evaluates whether the client can reliably attend appointments due to transportation availability, travel distance, mobility limitations, or logistical barriers.</div>
-        </div>
-        <div class="dom-card">
-          <div class="dom-num">4</div>
-          <div class="dom-name">Administrative &amp; Documentation Integrity</div>
-          <div class="dom-desc">Evaluates administrative issues that may interfere with treatment progression, including incorrect identifying information, documentation delays, incomplete records, or claim identification problems.</div>
-        </div>
-        <div class="dom-card full">
-          <div class="dom-num">5</div>
-          <div class="dom-name">Care Coordination</div>
-          <div class="dom-desc">Evaluates whether treating providers are communicating and coordinating effectively so referrals, treatment progression, and documentation remain consistent throughout the case.</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="sec">
-      <div class="sec-label">How the C.A.R.E. Framework Interprets Scores</div>
-      <p>In economic contexts, the difference between $4.99 and $5.00 is essentially meaningless. One cent rarely determines whether someone buys an item. In terms of money, those two numbers are practically the same.</p>
-      <div class="pullout"><p class="highlight">Human capability and functioning do not work that way.</p></div>
-      <p>When we evaluate human capability or system stability, for example, 4.99 and 5 are not the same state. A level 5 represents full stability. A level 4.99 may be close, but it is still not the same level of capability.</p>
-      <p>In the C.A.R.E. framework, everything behind the decimal point is simply noise. When we focus too heavily on decimals or percentages, we can lose sight of what the base number actually represents.</p>
-      <div class="callout">
-        <p>Whether a value is 4.00, 4.50, or 4.99, the functional state is still 4. That means the system is operating at roughly 80% capacity, not 5, which represents full stability.</p>
-      </div>
-      <div class="sec-label" style="margin-top:1.5rem">Why This Distinction Matters</div>
-      <ul class="numbered-list">
-        <li>
-          <div class="nl-num">1</div>
-          <div class="nl-body"><strong>Capability Changes Between Levels</strong>What a person or system can sustain at 80% capacity versus 100% capacity can be dramatically different.</div>
-        </li>
-        <li>
-          <div class="nl-num">2</div>
-          <div class="nl-body"><strong>Operating Above True Capacity Creates Risk</strong>Attempting to operate at a level the underlying conditions cannot support increases the risk of instability, reinjury, or system breakdown.</div>
-        </li>
-        <li>
-          <div class="nl-num">3</div>
-          <div class="nl-body"><strong>Inflated Scores Create False Stability</strong>Overstating stability can create a false sense of progress. Clients, providers, and payors may begin to believe the situation is more stable than it actually is.</div>
-        </li>
+    <div class="byb-acc">
+      <button type="button" class="byb-acc-hd open" id="byb-acc-hd-0" aria-expanded="true" onclick="cafToggleBybAcc(0)">
+        <span class="byb-acc-title">Purpose &amp; process</span>
+        <svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="byb-acc-body open" id="byb-acc-bd-0">
+      <p>Disruptions often come from payer, authorization, logistics, and documentation friction—not from a single person. This tool helps you spot those barriers early for monitoring and file documentation.</p>
+      <ul class="byb-points">
+        <li>Answer from the case environment as it stands today.</li>
+        <li>Take enough time to be accurate; rushed answers skew the picture.</li>
+        <li>Reconcile C.A.R.E. (Clinical Analysis &amp; Recovery Entitlements) is the broader methodology; this score is one structured lens on access friction.</li>
       </ul>
-      <p>If a system is truly operating at a higher level of stability, the assessment results should demonstrate that. Advancing to the next level should occur because the underlying conditions support it — not because numbers were rounded to reach a higher score.</p>
-      <p>For this reason, the C.A.R.E. methodology evaluates stability using whole-number functional levels rather than decimals or percentages.</p>
-      <p>It is also important to recognize that reaching the highest level is not always possible. In clinical recovery, a patient may reach Maximum Medical Improvement below full function. The same principle applies when evaluating case environments: a system may stabilize below the maximum possible score.</p>
-      <div class="pullout"><p>The purpose of the assessment is not to inflate the score, but to accurately identify the system's true level of stability so informed decisions can be made.</p></div>
-    </div>
-
-    <div class="sec sec-alt">
-      <div class="sec-label">Important Scoring Note</div>
-      <div class="rule-box">
-        <p>Each domain is scored independently based on the five responses within that section.</p>
-        <p>The domain total is converted to a <strong>whole-number functional level by rounding down</strong>.</p>
-        <p>The overall C.A.R.E. Access Friction Score™ is then determined by the <strong>lowest domain level</strong>, because system stability cannot exceed its weakest barrier.</p>
       </div>
     </div>
 
-    <div class="sec">
-      <div class="sec-label">Why This Matters to Attorneys</div>
-      <p>System barriers can delay treatment, interrupt referrals, complicate documentation, and create gaps that later appear to be non-compliance or poor recovery progression.</p>
-      <p>This assessment helps attorneys identify those barriers earlier so they can monitor the case more effectively, narrow their focus sooner, and address issues before they create larger treatment or documentation problems.</p>
+    <div class="byb-acc">
+      <button type="button" class="byb-acc-hd" id="byb-acc-hd-1" aria-expanded="false" onclick="cafToggleBybAcc(1)">
+        <span class="byb-acc-title">Two observation lenses</span>
+        <svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="byb-acc-body" id="byb-acc-bd-1">
+      <p>Each domain separates questions into two observation types. <strong>Voice / View &mdash; Client Experience</strong> captures what the client reports (difficulties they describe, barriers they encounter). <strong>Clinical / System Review</strong> captures what the record shows (timelines, documentation patterns, authorization sequences).</p>
+      <p>Both contribute to the score. The distinction helps clarify which barriers were <em>reported</em> and which were <em>observed</em>.</p>
+      </div>
     </div>
 
-    <div class="sec sec-alt">
-      <div class="sec-label">About Reconcile C.A.R.E.</div>
-      <p>The issues highlighted in this assessment are the very types of barriers Reconcile C.A.R.E. was designed to identify, monitor, and help resolve.</p>
-      <p>The C.A.R.E. methodology focuses on improving care coordination, identifying treatment barriers early, supporting documentation integrity, and helping attorneys maintain treatment continuity throughout the life of a case.</p>
+    <div class="byb-acc">
+      <button type="button" class="byb-acc-hd" id="byb-acc-hd-2" aria-expanded="false" onclick="cafToggleBybAcc(2)">
+        <span class="byb-acc-title">The five domains</span>
+        <svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="byb-acc-body" id="byb-acc-bd-2">
+      <p>Each domain maps to common failure points in treatment access. The <strong>lowest</strong> domain level drives the overall friction level.</p>
+      <ul class="caf-domain-compact">
+        <li><strong>1. Provider Access</strong> — availability, referrals, willingness to treat in litigation/lien contexts.</li>
+        <li><strong>2. Insurance &amp; authorization</strong> — payer rules, UR, delays, denials.</li>
+        <li><strong>3. Transportation &amp; travel</strong> — getting to appointments reliably.</li>
+        <li><strong>4. Administrative &amp; documentation</strong> — IDs, records, billing, timeliness.</li>
+        <li><strong>5. Care coordination</strong> — communication across providers and the plan of care.</li>
+      </ul>
+      </div>
     </div>
 
-    <div class="cta-sec">
+    <div class="byb-acc">
+      <button type="button" class="byb-acc-hd" id="byb-acc-hd-3" aria-expanded="false" onclick="cafToggleBybAcc(3)">
+        <span class="byb-acc-title">How scores are read</span>
+        <svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="byb-acc-body" id="byb-acc-bd-3">
+      <p>Functional stability is expressed in <strong>whole-number levels</strong>, not decimals—small fractional differences do not change the interpreted level. Capability at one level versus the next can differ materially; the assessment avoids false precision.</p>
+      <ul class="byb-points">
+        <li>Higher levels are not always achievable (e.g., MMI below “full” function applies to environments too).</li>
+        <li>The aim is an accurate stability picture for decisions—not inflating the score.</li>
+      </ul>
+      </div>
+    </div>
+
+    <div class="byb-acc">
+      <button type="button" class="byb-acc-hd" id="byb-acc-hd-4" aria-expanded="false" onclick="cafToggleBybAcc(4)">
+        <span class="byb-acc-title">Important scoring note</span>
+        <svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="byb-acc-body" id="byb-acc-bd-4">
+      <div class="rule-box" style="margin-top:0.5rem">
+        <p>Each domain uses its five answers only. Domain totals convert to a <strong>whole-number level by rounding down</strong>.</p>
+        <p>The overall Access Friction Score™ follows the <strong>lowest</strong> domain—the weakest barrier caps system stability.</p>
+      </div>
+      </div>
+    </div>
+
+    <div class="byb-acc">
+      <button type="button" class="byb-acc-hd" id="byb-acc-hd-5" aria-expanded="false" onclick="cafToggleBybAcc(5)">
+        <span class="byb-acc-title">For attorneys</span>
+        <svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="byb-acc-body" id="byb-acc-bd-5">
+      <p>Barriers can look like non-compliance or poor progress later if they stay invisible. Use this to monitor the file, tighten focus, and document systemic friction while treatment is ongoing. Reconcile C.A.R.E. is built to track and address these same issues across the life of a case.</p>
+      </div>
+    </div>
+
+    <div class="byb-acc">
+      <button type="button" class="byb-acc-hd" id="byb-acc-hd-6" aria-expanded="false" onclick="cafToggleBybAcc(6)">
+        <span class="byb-acc-title">Follow-up &amp; re-run guidance</span>
+        <svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="byb-acc-body" id="byb-acc-bd-6">
+        <p>The friction level provides the baseline monitoring cadence for this tool. The triggers below indicate circumstances that may justify an off-cycle re-run before the next scheduled review point.</p>
+        <p style="margin-top:.75rem"><strong style="color:var(--nv)">Level-based review cadence:</strong></p>
+        <table style="width:100%;border-collapse:collapse;margin:.5rem 0 .75rem;font-family:Arial,sans-serif;font-size:13px">
+          <thead>
+            <tr style="background:#f8f6f1;border-bottom:1px solid #d6d0c4">
+              <th style="text-align:left;padding:8px 10px;color:#0e1c2e;font-weight:700">Friction Level</th>
+              <th style="text-align:left;padding:8px 10px;color:#0e1c2e;font-weight:700">Re-run cadence</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid #eee">
+              <td style="padding:8px 10px;color:#0e1c2e"><strong>Severe (1)</strong> &mdash; Transportation or Insurance</td>
+              <td style="padding:8px 10px;color:#0e1c2e"><strong>3&ndash;7 days, re-run until resolved</strong></td>
+            </tr>
+            <tr style="border-bottom:1px solid #eee">
+              <td style="padding:8px 10px;color:#0e1c2e"><strong>Severe (1)</strong> &mdash; any other section</td>
+              <td style="padding:8px 10px;color:#0e1c2e">7 days</td>
+            </tr>
+            <tr style="border-bottom:1px solid #eee">
+              <td style="padding:8px 10px;color:#0e1c2e"><strong>Significant (2)</strong> &mdash; any section</td>
+              <td style="padding:8px 10px;color:#0e1c2e">10&ndash;14 days</td>
+            </tr>
+            <tr style="border-bottom:1px solid #eee">
+              <td style="padding:8px 10px;color:#0e1c2e"><strong>Moderate (3)</strong> &mdash; any section</td>
+              <td style="padding:8px 10px;color:#0e1c2e">30 days</td>
+            </tr>
+            <tr style="border-bottom:1px solid #eee">
+              <td style="padding:8px 10px;color:#0e1c2e"><strong>Minor (4)</strong> &mdash; any section</td>
+              <td style="padding:8px 10px;color:#0e1c2e">45 days</td>
+            </tr>
+            <tr>
+              <td style="padding:8px 10px;color:#0e1c2e"><strong>None (5)</strong> &mdash; any section</td>
+              <td style="padding:8px 10px;color:#0e1c2e">60 days</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="margin-top:.75rem"><strong style="color:var(--nv)">Re-run this assessment when:</strong></p>
+        <ul class="byb-points">
+          <li>An authorization denial is received or the payer changes position</li>
+          <li>Transportation arrangement changes (provider change, loss of coverage, new geographic constraint)</li>
+          <li>The client reports a new access barrier not captured at last assessment</li>
+          <li>Treatment delay exceeds the expected interval between scheduled visits</li>
+          <li>A new specialist or referral is added to the care plan</li>
+          <li>A provider withdraws or refuses continued treatment</li>
+          <li>The case transitions between pre-litigation, litigation, and settlement phases</li>
+          <li>Case type or claim status changes materially (e.g., WC claim accepted or denied, PI subrogation added)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="cta-sec" style="padding:1.75rem 2rem">
       <button class="cta-btn" onclick="showAssessment()">Begin the C.A.R.E. Access Friction Score™</button>
-      <div class="cta-note">Assessment length: 25 questions across 5 domains</div>
+      <div class="cta-note">25 questions · 5 domains · ~several minutes</div>
     </div>
 
   </div>
@@ -296,6 +506,130 @@ body{background:transparent;font-family:Georgia,'Times New Roman',serif;color:va
 
 <!-- ═══════════════════════════════ ASSESSMENT PAGE ═══════════════════════════════ -->
 <div id="assessment" class="page hidden">
+
+  <button type="button" class="vi-btn no-print" onclick="cafOpenInstructions()" aria-label="View Instructions">📖 View Instructions</button>
+
+  <!-- Instructions overlay — standing guidance for attorneys, available throughout assessment -->
+  <div id="caf-vi-overlay" class="vi-overlay no-print" onclick="if(event.target===this)cafCloseInstructions()" role="dialog" aria-labelledby="caf-vi-title" aria-modal="true">
+    <div class="vi-panel">
+      <div class="vi-panel-hdr">
+        <div>
+          <div class="vi-tag">C.A.R.E. Access Friction Score™</div>
+          <h2 id="caf-vi-title">How to Use This Assessment</h2>
+        </div>
+        <button type="button" class="vi-close" onclick="cafCloseInstructions()" aria-label="Close instructions">✕</button>
+      </div>
+      <div class="vi-body">
+
+        <h3>Two Observation Lenses</h3>
+        <p>Each domain separates questions into two observation types so the assessment captures both what the client describes and what the record shows.</p>
+        <ul>
+          <li><strong>Voice / View — Client Experience:</strong> what the client reports about their own access to care (e.g., difficulty obtaining appointments, transportation challenges).</li>
+          <li><strong>Clinical / System Review:</strong> observations drawn from the record itself (e.g., authorization timelines, documentation gaps, coordination patterns).</li>
+        </ul>
+        <p>Both lenses contribute to the same score. The distinction helps the attorney understand which barriers were reported and which were observed.</p>
+
+        <h3>What to Look For — by Section</h3>
+
+        <div class="vi-block">
+          <div class="vi-block-title">Section 1 — Provider Access</div>
+          <p>Focus on whether the client is able to access appropriate providers within reasonable timeframes.</p>
+          <p><strong>Pay close attention to:</strong></p>
+          <ul>
+            <li>Delays in obtaining appointments</li>
+            <li>Provider refusal due to litigation or payment issues</li>
+            <li>Limited specialist availability</li>
+            <li>Geographic barriers</li>
+            <li>Scheduling delays beyond expected intervals</li>
+          </ul>
+          <p>Access barriers may delay diagnosis and treatment progression.</p>
+        </div>
+
+        <div class="vi-block">
+          <div class="vi-block-title">Section 2 — Insurance & Authorization</div>
+          <p>Focus on whether treatment approvals are occurring without unnecessary delay.</p>
+          <p><strong>Pay close attention to:</strong></p>
+          <ul>
+            <li>Authorization delays</li>
+            <li>Denials for medical necessity</li>
+            <li>Missing appeals</li>
+            <li>Referral gaps</li>
+            <li>Repeated utilization review interruptions</li>
+          </ul>
+          <p>Authorization failures may interrupt treatment continuity.</p>
+        </div>
+
+        <div class="vi-block">
+          <div class="vi-block-title">Section 3 — Transportation & Travel Access</div>
+          <p>Transportation reliability directly affects treatment attendance and continuity.</p>
+          <p><strong>Pay close attention to:</strong></p>
+          <ul>
+            <li>Missed visits due to transportation failure</li>
+            <li>Long travel distances</li>
+            <li>Inconsistent ride availability</li>
+            <li>Appointment cancellations</li>
+            <li>Changes in transportation reliability</li>
+          </ul>
+          <p>Transportation failures may result in treatment gaps that affect recovery and case credibility.</p>
+        </div>
+
+        <div class="vi-block">
+          <div class="vi-block-title">Section 4 — Administrative & Documentation Integrity</div>
+          <p>Focus on whether documentation supports medical necessity using clear and specific language.</p>
+          <p><strong>Pay close attention to:</strong></p>
+          <ul>
+            <li>Vague clinical language</li>
+            <li>Missing measurable findings</li>
+            <li>Inconsistent diagnostic terms</li>
+            <li>Incomplete documentation</li>
+            <li>Administrative errors</li>
+          </ul>
+          <p>Weak documentation may result in treatment denials and delays.</p>
+        </div>
+
+        <div class="vi-block">
+          <div class="vi-block-title">Section 5 — Care Coordination</div>
+          <p>Focus on whether treatment activities are progressing in a structured and coordinated manner.</p>
+          <p><strong>Pay close attention to:</strong></p>
+          <ul>
+            <li>Referral delays</li>
+            <li>Communication gaps</li>
+            <li>Duplicated services</li>
+            <li>Conflicting treatment plans</li>
+            <li>Missing follow-through</li>
+          </ul>
+          <p>Poor coordination may delay recovery progression.</p>
+        </div>
+
+        <h3>Clinical-Legal Considerations</h3>
+
+        <div class="vi-block vi-block-legal">
+          <div class="vi-block-title">⚠ Litigation & Treatment Risk — Denials</div>
+          <p>When treatment is denied as "Not Medically Necessary," best-practice clinical-legal response includes prompt appeal of the denial.</p>
+          <p>Unchallenged denials may be interpreted as acceptance of the payor's treatment decision — in effect, aligning with the payor rather than the treating provider. Failure to appeal may create the appearance that the treatment was not necessary, because if it had been, the treating provider would have challenged the denial.</p>
+          <p>This pattern may weaken the medical foundation of the case and affect future treatment authorization. Response decisions remain at attorney discretion.</p>
+        </div>
+
+        <div class="vi-block vi-block-legal">
+          <div class="vi-block-title">🚗 Transportation Verification — Best Practice</div>
+          <p>Best-practice clinical-legal standards recommend verifying transportation availability at least 48 hours before scheduled appointments. Advance verification reduces missed visits and preserves documentation of treatment attendance.</p>
+          <p>Verification practices remain at attorney discretion.</p>
+        </div>
+
+        <div class="vi-block vi-block-legal">
+          <div class="vi-block-title">⚠ Litigation Risk — Transportation</div>
+          <p>Missed visits may be interpreted as treatment non-compliance. Transportation failures warrant early attention to prevent credibility challenges later in the case.</p>
+        </div>
+
+        <div class="vi-block vi-block-legal">
+          <div class="vi-block-title">⚠ Care Coordination Advisory — PI vs Workers' Comp</div>
+          <p>In personal injury cases, coordination across providers may be limited.</p>
+          <p>In workers' compensation cases, assigned care managers represent the employer or payor and may influence care direction. Care progression should be monitored to ensure decisions support the client's recovery needs.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
 
   <div class="asx-hdr">
     <button class="back-link" onclick="showExplainer()">&#8592; Back to Overview</button>
@@ -317,11 +651,27 @@ body{background:transparent;font-family:Georgia,'Times New Roman',serif;color:va
   </div>
 
   <div id="caf-complete" style="display:none;margin-top:1.5rem;padding:28px 20px;border:1px solid var(--bd);border-radius:12px;text-align:center;background:#fafafa">
-    <p style="margin:0 0 8px;font-size:16px;color:#0e1c2e;font-weight:600">All questions answered</p>
-    <p style="margin:0;font-size:14px;color:#555;line-height:1.6">Your responses have been saved. The detailed friction report appears only on the dashboard after all six instruments are complete.</p>
-    <div style="display:flex;gap:16px;justify-content:center;margin-top:28px;flex-wrap:wrap">
-      <button type="button" class="btn-ghost" onclick="returnToDashboard()">← Return to Dashboard</button>
-      <button type="button" class="btn-primary" onclick="goToNext()">Continue to Next Assessment →</button>
+    <div id="caf-submit-trial">
+      <p style="margin:0 0 8px;font-size:16px;color:#0e1c2e;font-weight:600">All questions answered</p>
+      <p style="margin:0;font-size:14px;color:#555;line-height:1.6">Your responses have been recorded. Review the access friction summary below.</p>
+      <div style="display:flex;gap:16px;justify-content:center;margin-top:28px;flex-wrap:wrap">
+        <button type="button" class="btn-ghost" onclick="returnToDashboard()">← Return to Dashboard</button>
+        <button type="button" class="btn-primary" onclick="goToNext()">Continue to Next Assessment →</button>
+      </div>
+    </div>
+    <div id="caf-submit-paid" style="display:none">
+      <p style="margin:0 0 8px;font-size:16px;color:#0e1c2e;font-weight:600">All questions answered</p>
+      <p class="no-print" style="margin:0;font-size:14px;color:#555;line-height:1.6">Your access friction report is ready below. You may print or save a PDF, then return to this case or the dashboard.</p>
+      <div class="no-print" style="display:flex;gap:12px;justify-content:center;margin-top:28px;flex-wrap:wrap;align-items:center">
+        <button type="button" class="btn-primary" onclick="cafScrollToPaidReport()">View Report</button>
+        <button type="button" class="btn-primary" onclick="cafPrintPaidReport()">Print / Save PDF</button>
+        <a id="caf-paid-return-case" class="btn-ghost" href="/case-detail.html" style="display:inline-block;text-decoration:none;padding:10px 20px;border-radius:6px;font-weight:600">Return to Case</a>
+        <button type="button" class="btn-ghost" onclick="returnToDashboard()">Dashboard</button>
+      </div>
+      <div id="caf-paid-report-anchor"></div>
+      <div id="caf-paid-report-block" style="max-width:880px;margin-left:auto;margin-right:auto">
+      <div id="caf-paid-report-visible" style="margin-top:0;text-align:left;max-width:880px;margin-left:auto;margin-right:auto"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -342,6 +692,31 @@ function showExplainer(){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
+/** Intro panels: independent toggles (multi-open). Mirrors domain accordion interaction. */
+function cafToggleBybAcc(i){
+  var hd=document.getElementById('byb-acc-hd-'+i);
+  var bd=document.getElementById('byb-acc-bd-'+i);
+  if(!hd||!bd)return;
+  var willOpen=!bd.classList.contains('open');
+  hd.classList.toggle('open',willOpen);
+  bd.classList.toggle('open',willOpen);
+  hd.setAttribute('aria-expanded',willOpen?'true':'false');
+}
+
+var CAF_BYB_ACC_COUNT=7;
+function cafBybSetAllPanels(open){
+  for(var i=0;i<CAF_BYB_ACC_COUNT;i++){
+    var hd=document.getElementById('byb-acc-hd-'+i);
+    var bd=document.getElementById('byb-acc-bd-'+i);
+    if(!hd||!bd)continue;
+    hd.classList.toggle('open',open);
+    bd.classList.toggle('open',open);
+    hd.setAttribute('aria-expanded',open?'true':'false');
+  }
+}
+function cafBybExpandAll(){cafBybSetAllPanels(true);}
+function cafBybCollapseAll(){cafBybSetAllPanels(false);}
+
 const DOMS=[
   {id:'D1',n:'1',title:'Provider Access',
    desc:'Evaluates whether the client can access appropriate providers in a timely manner and whether providers are willing to treat within litigation environments.',wc:null,
@@ -352,7 +727,8 @@ const DOMS=[
     'Have provider availability limitations caused delays in diagnostic testing, specialist referrals, or treatment progression?',
     'Have provider scheduling limitations created gaps between recommended treatment visits?'
    ],
-   flags:[{qi:1,lbl:'Provider refusal to treat due to litigation, liens, or third-party payment'},{qi:3,lbl:'Provider availability causing delays in diagnostics, referrals, or treatment progression'}]
+   flags:[{qi:1,lbl:'Provider refusal to treat due to litigation, liens, or third-party payment'},{qi:3,lbl:'Provider availability causing delays in diagnostics, referrals, or treatment progression'}],
+   groups:{voice:[0,1,2],clinical:[3,4]}
   },
   {id:'D2',n:'2',title:'Insurance & Authorization Barriers',
    desc:'Evaluates delays, denials, and authorization barriers that may prevent treatment from occurring when medically necessary.',wc:null,
@@ -363,7 +739,8 @@ const DOMS=[
     'Have utilization review or payer authorization requirements caused delays in treatment sequencing?',
     'Have insurance or payer administrative processes created gaps between referral and approved treatment?'
    ],
-   flags:[{qi:0,lbl:'Insurance authorization actively delaying medically necessary treatment'},{qi:1,lbl:'Treatment denials due to administrative identification or claim errors'}]
+   flags:[{qi:0,lbl:'Insurance authorization actively delaying medically necessary treatment'},{qi:1,lbl:'Treatment denials due to administrative identification or claim errors'}],
+   groups:{voice:[],clinical:[0,1,2,3,4]}
   },
   {id:'D3',n:'3',title:'Transportation & Travel Access',
    desc:'Evaluates whether the client can reliably attend appointments due to transportation or logistical barriers.',
@@ -375,7 +752,8 @@ const DOMS=[
     'Are transportation services (rideshare, medical transport, family support) available when the client cannot drive?',
     'Have travel limitations prevented the client from attending specialist consultations or diagnostic testing?'
    ],
-   flags:[{qi:1,lbl:'Transportation limitations causing missed or delayed medical visits'},{qi:4,lbl:'Travel limitations preventing specialist consultations or diagnostic testing'}]
+   flags:[{qi:1,lbl:'Transportation limitations causing missed or delayed medical visits'},{qi:4,lbl:'Travel limitations preventing specialist consultations or diagnostic testing'}],
+   groups:{voice:[0,1,2,3,4],clinical:[]}
   },
   {id:'D4',n:'4',title:'Administrative & Documentation Integrity',
    desc:'Evaluates administrative barriers that may interfere with treatment progression, including incorrect identifying information, documentation delays, or claim identification problems.',wc:null,
@@ -386,7 +764,8 @@ const DOMS=[
     'Have administrative errors (incorrect identifiers, claim mismatches, missing authorizations) delayed treatment or billing processing?',
     'Are medical reports being produced in a timeframe that supports legal documentation and case preparation?'
    ],
-   flags:[{qi:2,lbl:'Provider documentation is incomplete, inconsistent, or missing critical information'},{qi:3,lbl:'Administrative errors delaying treatment or billing processing'}]
+   flags:[{qi:2,lbl:'Provider documentation is incomplete, inconsistent, or missing critical information'},{qi:3,lbl:'Administrative errors delaying treatment or billing processing'}],
+   groups:{voice:[],clinical:[0,1,2,3,4]}
   },
   {id:'D5',n:'5',title:'Care Coordination',
    desc:'Evaluates whether treating providers are communicating and coordinating effectively so referrals, treatment progression, and documentation remain consistent throughout the case.',wc:null,
@@ -397,14 +776,208 @@ const DOMS=[
     'Are multiple providers involved in the case operating within a coordinated treatment plan?',
     'Has the lack of coordinated care created delays in treatment progression or documentation continuity?'
    ],
-   flags:[{qi:2,lbl:'Gaps between referral and actual specialist evaluation'},{qi:4,lbl:'Lack of coordinated care causing treatment delays or documentation gaps'}]
+   flags:[{qi:2,lbl:'Gaps between referral and actual specialist evaluation'},{qi:4,lbl:'Lack of coordinated care causing treatment delays or documentation gaps'}],
+   groups:{voice:[],clinical:[0,1,2,3,4]}
   }
 ];
 
-const TIE_ORDER=['D1','D3','D5','D2','D4'];
+// Tie-break order when multiple domains share the lowest level:
+// 1. Provider Access (D1)
+// 2. Transportation & Travel Access (D3)
+// 3. Insurance & Authorization Barriers (D2)
+// 4. Care Coordination (D5)
+// 5. Administrative & Documentation Integrity (D4)
+const TIE_ORDER=['D1','D3','D2','D5','D4'];
 const SCALE=[{val:5,desc:'No barrier'},{val:4,desc:'Minor barrier'},{val:3,desc:'Moderate'},{val:2,desc:'Significant'},{val:1,desc:'Severe barrier'}];
 let ans={};
 let cafSaved=false;
+/** Skip auto-completion while applying a loaded draft (avoids duplicate case_tool_runs). */
+var cafHydratingFromDraft=false;
+
+// ── Paid portal: case_tool_drafts (CAF) ─────────────────────────────────────
+var cafDraftSaveTimer=null;
+var cafDraftDirty=false;
+var cafDraftApplying=false;
+var cafDraftAutosaveDisabled=false;
+var cafDraftLockedAfterRun=false;
+var CAF_DRAFT_DEBOUNCE_MS=900;
+
+function cafResolveCaseRef(){
+  return typeof window.caseClarityResolveCaseRef==='function'?window.caseClarityResolveCaseRef():null;
+}
+
+async function cafResolvePaidCaseRow(client){
+  var caseRef=cafResolveCaseRef();
+  if(!caseRef||!client) return null;
+  var gu=await client.auth.getUser();
+  var user=gu.data&&gu.data.user;
+  if(gu.error||!user) return null;
+  var cq=await client
+    .from('case_cases')
+    .select('id, attorney_user_id')
+    .eq('case_ref',caseRef)
+    .eq('attorney_user_id',user.id)
+    .maybeSingle();
+  if(cq.error||!cq.data){
+    if(cq.error) console.error('[CAF] case lookup for draft',cq.error);
+    return null;
+  }
+  return cq.data;
+}
+
+function cafDraftHasMeaningfulState(d){
+  return !!(d&&d.v===1&&d.answers&&typeof d.answers==='object'&&Object.keys(d.answers).length>0);
+}
+
+function cafCollectDraftJson(){
+  return {v:1,answers:JSON.parse(JSON.stringify(ans))};
+}
+
+async function saveCafDraft(){
+  if(cafDraftApplying||cafDraftAutosaveDisabled||cafDraftLockedAfterRun) return;
+  var client=window.supabaseClient;
+  if(!client) return;
+  var rowCtx=await cafResolvePaidCaseRow(client);
+  if(!rowCtx) return;
+  var draftJson=cafCollectDraftJson();
+  if(!cafDraftHasMeaningfulState(draftJson)) return;
+  var payload={
+    case_id:rowCtx.id,
+    attorney_user_id:rowCtx.attorney_user_id,
+    tool_key:'CAF',
+    draft_json:draftJson,
+    updated_at:new Date().toISOString()
+  };
+  var up=await client.from('case_tool_drafts').upsert(payload,{onConflict:'case_id,attorney_user_id,tool_key'});
+  if(up.error) console.error('[CAF] case_tool_drafts upsert failed',up.error);
+  else{
+    console.log('[CAF] draft save ok');
+    cafDraftDirty=false;
+  }
+}
+
+function scheduleCafDraftSave(){
+  if(cafDraftApplying||cafDraftAutosaveDisabled||cafDraftLockedAfterRun) return;
+  if(!new URLSearchParams(window.location.search).get('case_ref')||!window.supabaseClient) return;
+  cafDraftDirty=true;
+  clearTimeout(cafDraftSaveTimer);
+  cafDraftSaveTimer=setTimeout(function(){
+    cafDraftSaveTimer=null;
+    void saveCafDraft();
+  },CAF_DRAFT_DEBOUNCE_MS);
+}
+
+async function flushCafDraftSave(){
+  if(cafDraftLockedAfterRun) return;
+  clearTimeout(cafDraftSaveTimer);
+  cafDraftSaveTimer=null;
+  if(cafDraftDirty) await saveCafDraft();
+}
+
+function cafMergeDraftJsonIntoAnswers(d){
+  if(!cafDraftHasMeaningfulState(d)) return;
+  ans={};
+  Object.keys(d.answers).forEach(function(k){
+    var v=d.answers[k];
+    if(v===undefined||v===null) return;
+    var n=typeof v==='number'?v:parseInt(String(v),10);
+    if(!Number.isFinite(n)) return;
+    ans[k]=n;
+  });
+}
+
+async function loadCafDraft(){
+  if(!new URLSearchParams(window.location.search).get('case_ref')) return;
+  var client=window.supabaseClient;
+  if(!client) return;
+  cafDraftApplying=true;
+  try{
+    var rowCtx=await cafResolvePaidCaseRow(client);
+    if(!rowCtx){
+      console.log('[CAF] draft load: none');
+      return;
+    }
+    var dr=await client
+      .from('case_tool_drafts')
+      .select('draft_json')
+      .eq('case_id',rowCtx.id)
+      .eq('tool_key','CAF')
+      .maybeSingle();
+    if(dr.error){
+      console.error('[CAF] draft load failed',dr.error);
+      return;
+    }
+    var dj=dr.data&&dr.data.draft_json;
+    if(!dj||!cafDraftHasMeaningfulState(dj)){
+      console.log('[CAF] draft load: none or empty');
+      return;
+    }
+    cafMergeDraftJsonIntoAnswers(dj);
+    console.log('[CAF] draft loaded');
+  } finally{
+    cafDraftApplying=false;
+  }
+}
+
+async function deleteCafDraft(){
+  var client=window.supabaseClient;
+  if(!client) return false;
+  var gu=await client.auth.getUser();
+  var user=gu.data&&gu.data.user;
+  if(gu.error||!user){
+    console.error('[CAF] delete draft getUser',gu.error);
+    return false;
+  }
+  var uid=user.id;
+  var caseRef=cafResolveCaseRef();
+  if(!caseRef) return false;
+  var cq=await client
+    .from('case_cases')
+    .select('id')
+    .eq('case_ref',caseRef)
+    .eq('attorney_user_id',uid)
+    .maybeSingle();
+  if(cq.error||!cq.data) return false;
+  var del=await client
+    .from('case_tool_drafts')
+    .delete()
+    .eq('case_id',cq.data.id)
+    .eq('attorney_user_id',uid)
+    .eq('tool_key','CAF');
+  if(del.error){
+    console.error('[CAF] case_tool_drafts delete failed',del.error);
+    return false;
+  }
+  console.log('[CAF] draft delete ok');
+  cafDraftDirty=false;
+  return true;
+}
+
+function cafLockDraftAutosaveForCompletion(){
+  cafDraftAutosaveDisabled=true;
+  clearTimeout(cafDraftSaveTimer);
+  cafDraftSaveTimer=null;
+  cafDraftDirty=false;
+}
+
+function cafInitPaidDraftPersistence(){
+  if(!new URLSearchParams(window.location.search).get('case_ref')) return;
+  if(window.__cafDraftEventsBound) return;
+  window.__cafDraftEventsBound=true;
+  document.addEventListener('visibilitychange',function(){
+    if(document.visibilityState==='hidden') void flushCafDraftSave();
+  });
+  window.addEventListener('pagehide',function(){ void flushCafDraftSave(); });
+}
+
+function cafApplyAnswersToUiFromAns(){
+  Object.keys(ans).forEach(function(qid){
+    var val=ans[qid];
+    if(val===undefined||val===null) return;
+    var inp=document.getElementById(qid+'_'+val);
+    if(inp) inp.checked=true;
+  });
+}
 
 function domLvl(raw){return Math.floor(raw/5);}
 
@@ -417,17 +990,44 @@ function build(){
     hdr.onclick=()=>tog(di);
     const body=document.createElement('div');body.className='dbody';body.id='bd-'+di;
     let html=`<div class="ddesc">${d.desc}${d.wc?'<div class="wc-note">'+d.wc+'</div>':''}</div>`;
-    d.qs.forEach((q,qi)=>{
+    // Render questions grouped by Voice/View vs Clinical/System. Does NOT change stored keys (D1_Q0 etc.) or scoring.
+    const groups=d.groups||{voice:[],clinical:d.qs.map((_,i)=>i)};
+    function renderQ(qi){
+      const q=d.qs[qi];
       const qid=`${d.id}_Q${qi}`;
       let sc='<div class="sc">';
       SCALE.forEach(s=>{sc+=`<div class="so"><input type="radio" name="${qid}" id="${qid}_${s.val}" value="${s.val}" onchange="onA('${qid}',${s.val})"><label for="${qid}_${s.val}"><span class="sn">${s.val}</span><span class="sd">${s.desc}</span></label></div>`;});
       sc+='</div>';
-      html+=`<div class="qb"><div class="ql"><span class="qn">Q${di*5+qi+1}.</span>${q}</div>${sc}</div>`;
-    });
+      return `<div class="qb"><div class="ql"><span class="qn">Q${di*5+qi+1}.</span>${q}</div>${sc}</div>`;
+    }
+    if(groups.voice&&groups.voice.length){
+      html+='<div class="grp-hdr grp-voice"><span class="grp-ico">👤</span><span class="grp-lbl">Voice / View — Client Experience</span></div>';
+      groups.voice.forEach(qi=>{html+=renderQ(qi);});
+    }
+    if(groups.clinical&&groups.clinical.length){
+      html+='<div class="grp-hdr grp-clinical"><span class="grp-ico">📋</span><span class="grp-lbl">Clinical / System Review</span></div>';
+      groups.clinical.forEach(qi=>{html+=renderQ(qi);});
+    }
     body.innerHTML=html;sec.appendChild(hdr);sec.appendChild(body);w.appendChild(sec);
   });
-  tog(0);
+  cafSetAllDomainsCollapsed();
 }
+
+function cafOpenInstructions(){
+  var ov=document.getElementById('caf-vi-overlay');
+  if(ov){ov.classList.add('open');document.body.style.overflow='hidden';}
+}
+function cafCloseInstructions(){
+  var ov=document.getElementById('caf-vi-overlay');
+  if(ov){ov.classList.remove('open');document.body.style.overflow='';}
+}
+// ESC key closes the instructions overlay
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){
+    var ov=document.getElementById('caf-vi-overlay');
+    if(ov&&ov.classList.contains('open'))cafCloseInstructions();
+  }
+});
 
 function tog(idx){
   DOMS.forEach((_,di)=>{
@@ -437,28 +1037,300 @@ function tog(idx){
   });
 }
 
-function onA(qid,val){ans[qid]=parseInt(val);updProg();updBadges();}
+/** Collapse all domain accordions (mirrors CSA default: no section open on load). */
+function cafSetAllDomainsCollapsed(){
+  DOMS.forEach((_,di)=>{
+    const h=document.querySelector('#d-'+di+' .dh'),b=document.getElementById('bd-'+di);
+    if(h) h.classList.remove('open');
+    if(b) b.classList.remove('open');
+  });
+}
+
+/** Expand exactly one domain; collapse others (exclusive accordion). */
+function cafSetDomainExpanded(di){
+  DOMS.forEach((_,dii)=>{
+    const h=document.querySelector('#d-'+dii+' .dh'),b=document.getElementById('bd-'+dii);
+    const on=dii===di;
+    if(h) h.classList.toggle('open',on);
+    if(b) b.classList.toggle('open',on);
+  });
+}
+
+function domainIndexFromQid(qid){
+  var prefix=String(qid).split('_Q')[0];
+  for(var i=0;i<DOMS.length;i++){
+    if(DOMS[i].id===prefix) return i;
+  }
+  return 0;
+}
+
+function onA(qid,val){
+  var di=domainIndexFromQid(qid);
+  var d=DOMS[di];
+  var keysForDomain=d.qs.map(function(_,qi){return d.id+'_Q'+qi;});
+  var prevAnswered=keysForDomain.filter(function(k){return ans[k]!==undefined;}).length;
+  ans[qid]=parseInt(val);
+  var nowAnswered=keysForDomain.filter(function(k){return ans[k]!==undefined;}).length;
+  updProg();
+  updBadges();
+  scheduleCafDraftSave();
+  var justCompleted=nowAnswered===5&&prevAnswered===4;
+  if(justCompleted){
+    if(di<DOMS.length-1){
+      cafSetDomainExpanded(di+1);
+      requestAnimationFrame(function(){
+        var el=document.getElementById('d-'+(di+1));
+        if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+      });
+    } else {
+      cafSetAllDomainsCollapsed();
+    }
+  }
+}
 
 function escCaf(s){
   return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 function levelColor(lvl){
-  if(lvl<=0)return'#2e7d32';
-  if(lvl===1)return'#b8922a';
-  if(lvl===2)return'#e67e22';
-  return'#c0392b';
+  // CAF scale: 5 = No barrier (best) → 1 = Severe barrier (worst)
+  // Five-step ramp: red → orange → amber → light green → green
+  if(lvl>=5)return'#2e7d32'; // green — no barrier
+  if(lvl===4)return'#9bbd3f'; // yellow-green — minor barrier
+  if(lvl===3)return'#e8b43a'; // amber — moderate
+  if(lvl===2)return'#e67e22'; // orange — significant barrier
+  return'#c0392b'; // red — severe barrier (level 1 or below)
 }
 
-function buildCafSnapshotHtml(toolData,minLvl,flags){
-  var rows=toolData.domainScores.map(function(s){
+function buildCafIdentityHeaderHtml(row,includeIdentity){
+  if(!includeIdentity)return'';
+  var ci=window.caseClarityIdentity;
+  var title=row&&row.case_title?escCaf(row.case_title):'—';
+  var client=row&&row.client_name?escCaf(row.client_name):'—';
+  var ctype='—';
+  if(row&&ci&&typeof ci.formatCaseType==='function')ctype=escCaf(ci.formatCaseType(row.case_type));
+  else if(row&&row.case_type!=null&&row.case_type!=='')ctype=escCaf(String(row.case_type));
+  var doi='—';
+  if(row&&ci&&typeof ci.formatInjuryDate==='function')doi=escCaf(ci.formatInjuryDate(row.date_of_injury));
+  else if(row&&row.date_of_injury)doi=escCaf(String(row.date_of_injury));
+  var st='—';
+  if(row&&row.case_status)st=escCaf(row.case_status.charAt(0).toUpperCase()+row.case_status.slice(1));
+  var sys=row&&row.case_ref!=null?escCaf(String(row.case_ref)):'—';
+  return '<div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(232,197,71,0.28);color:rgba(255,255,255,0.94);font-size:13px;line-height:1.5">'+
+    '<div style="font-size:16px;font-weight:700;letter-spacing:-0.02em;margin-bottom:8px">'+title+'</div>'+
+    '<div style="opacity:0.95;margin-bottom:6px">'+client+' <span style="opacity:0.45">|</span> '+ctype+'</div>'+
+    '<div style="opacity:0.88;font-size:12px;margin-bottom:6px">DOI: '+doi+' <span style="opacity:0.45">|</span> Status: '+st+'</div>'+
+    '<div style="opacity:0.85;font-size:12px">System ID: '+sys+'</div>'+
+    '</div>';
+}
+
+/* ─── CAF Recommended Next Actions by friction level ─── */
+function cafBuildNextActionsHtml(minLvl){
+  var byLevel = {
+    1: {
+      tierLabel: 'SEVERE (Critical Friction)',
+      cadence: '24–48 hours',
+      intro: 'This level indicates a breakdown in treatment access. Immediate verification and coordination are required to prevent treatment disruption and documentation gaps that may later be misinterpreted as non-compliance.',
+      actions: [
+        'Identify the determining friction domain immediately and confirm the specific barrier preventing treatment access (provider availability, authorization denial, transportation failure, coordination breakdown, or client capacity limitation).',
+        'Contact the client within 24–48 hours to verify whether appointments have been missed, delayed, or canceled due to access barriers.',
+        'If Insurance or Authorization (D2) caused the score, confirm whether the treating provider has been engaged to pursue reconsideration of denied treatment.',
+        'If Transportation (D3) caused the score, confirm transportation arrangements for all upcoming appointments and coordinate identification of backup transportation resources if reliability is uncertain.',
+        'Document confirmed barriers and missed-care events immediately, including dates, provider interactions, and steps taken to resolve access limitations.'
+      ],
+      priority: 'Contact the client within 24–48 hours to verify the exact barrier preventing treatment and initiate corrective coordination based on the determining friction domain.',
+      docFocus: 'Document the specific barrier preventing treatment, including missed appointments, denied services, or failed access points, along with actions taken to resolve the issue.'
+    },
+    2: {
+      tierLabel: 'SIGNIFICANT',
+      cadence: '3–7 days',
+      intro: 'This level indicates persistent barriers that may not yet have halted care but are interfering with consistent treatment progression.',
+      actions: [
+        'Confirm the determining friction domain and identify whether the barrier is ongoing or newly emerging.',
+        'Contact the client within 3–7 days to confirm whether scheduled visits occurred as planned and whether access barriers remain unresolved.',
+        'If Insurance or Authorization (D2) contributed to the score, verify the status of pending approvals or appeals and confirm follow-through with the treating provider.',
+        'If Transportation (D3) contributed to the score, confirm transportation reliability for upcoming appointments and address recurring logistical challenges.',
+        'Document ongoing access challenges and note any pattern of delayed visits, incomplete referrals, or inconsistent care progression.'
+      ],
+      priority: 'Confirm whether the identified barrier is still interfering with scheduled treatment and take steps to prevent escalation into missed or delayed care.',
+      docFocus: 'Document ongoing access barriers and any steps taken to stabilize treatment attendance and authorization continuity.'
+    },
+    3: {
+      tierLabel: 'MODERATE',
+      cadence: '14 days',
+      intro: 'This level indicates manageable barriers that require monitoring to prevent deterioration into more severe access disruption.',
+      actions: [
+        'Review the determining domain and confirm that previously identified barriers are improving or stabilizing.',
+        'Verify with the client that scheduled appointments are occurring consistently, without emerging delays or cancellations.',
+        'If Insurance (D2) issues were previously identified, confirm that authorizations are progressing without interruption.',
+        'If Transportation (D3) challenges exist, confirm upcoming appointment transportation at least 48 hours in advance.',
+        'Document improvement trends or recurring friction, noting whether barriers appear isolated or systemic.'
+      ],
+      priority: 'Confirm that treatment access remains stable and that previously identified barriers are not worsening.',
+      docFocus: 'Document stability or recurrence of friction factors, including patterns that may signal early deterioration.'
+    },
+    4: {
+      tierLabel: 'MINOR',
+      cadence: '30 days',
+      intro: 'This level indicates minimal friction, with treatment generally progressing as expected.',
+      actions: [
+        'Confirm that treatment appointments continue to occur as scheduled without unexpected delays.',
+        'Review the determining domain to ensure minor barriers are not increasing in frequency or severity.',
+        'Verify that referrals and authorizations continue progressing without interruption.',
+        'If Transportation considerations exist, confirm reliability prior to scheduled visits when possible.',
+        'Document minor delays or isolated issues, ensuring they do not represent early warning signs of larger breakdowns.'
+      ],
+      priority: 'Confirm that minor barriers remain isolated and do not progress into repeat access disruptions.',
+      docFocus: 'Document minor access issues and note whether they resolve without recurring impact on treatment flow.'
+    },
+    5: {
+      tierLabel: 'NONE (No Meaningful Friction)',
+      cadence: '60 days',
+      intro: 'This level indicates treatment access is functioning as expected. Continued monitoring is still necessary to detect emerging issues early.',
+      actions: [
+        'Confirm that treatment continues without interruption and that appointments are being attended as scheduled.',
+        'Review the determining domain periodically to ensure no emerging barriers are developing.',
+        'Maintain communication with the client at routine intervals to confirm ongoing treatment stability.',
+        'Verify that referrals and provider coordination remain active and uninterrupted.',
+        'Document continued treatment consistency, including confirmation of ongoing attendance and progression.'
+      ],
+      priority: 'Maintain periodic contact to confirm continued treatment stability and detect emerging barriers early.',
+      docFocus: 'Document confirmation of ongoing treatment continuity and absence of meaningful access barriers.'
+    }
+  };
+  var g = byLevel[minLvl] || byLevel[3];
+  var actionItems = g.actions.map(function(a){ return '<li>'+escCaf(a)+'</li>'; }).join('');
+  return '<div class="caf-na-wrap">'+
+    '<div class="caf-na-title"><span class="ico">!</span>Recommended Next Actions — Level '+minLvl+' '+escCaf(g.tierLabel)+' &middot; Follow-up: '+escCaf(g.cadence)+'</div>'+
+    '<div class="caf-na-intro">'+escCaf(g.intro)+'</div>'+
+    '<ul class="caf-na-list">'+actionItems+'</ul>'+
+    '<div class="caf-na-priority">'+
+      '<div class="caf-na-priority-lbl">Priority Action</div>'+
+      '<div class="caf-na-priority-body">'+escCaf(g.priority)+'</div>'+
+    '</div>'+
+    '<div class="caf-na-docfocus">'+
+      '<div class="caf-na-docfocus-lbl">Documentation Focus</div>'+
+      '<div class="caf-na-docfocus-body">'+escCaf(g.docFocus)+'</div>'+
+    '</div>'+
+    '</div>';
+}
+
+/* ─── CAF Domain-Specific Reinforcement Blocks (D2/D3/D4 at Levels 1–2) ─── */
+function cafBuildReinforcementBlocksHtml(domainScores){
+  var triggered = { D2:false, D3:false, D4:false };
+  domainScores.forEach(function(s){
+    var lv = s.level!=null ? s.level : s.lvl;
+    if (lv<=2 && (s.domain==='D2' || s.domain==='D3' || s.domain==='D4')) {
+      triggered[s.domain] = true;
+    }
+  });
+  if (!triggered.D2 && !triggered.D3 && !triggered.D4) return '';
+
+  var html = '';
+  if (triggered.D2) {
+    html += '<div class="caf-reinf caf-reinf-d2">'+
+      '<div class="caf-reinf-title">⚠ Insurance Denial Response Alert</div>'+
+      '<div class="caf-reinf-body">'+
+        '<p>If treatment has been denied as not medically necessary, verify that an appeal has been requested or is in process.</p>'+
+        '<p>Failure to challenge denials may create the impression that the treatment really was not needed &mdash; because if it had been necessary, the treating provider would have pursued reconsideration.</p>'+
+        '<p>Unchallenged denials may be interpreted as acceptance of the payor\'s treatment decision, which may weaken the medical foundation of the case and affect future treatment authorization and overall case credibility.</p>'+
+      '</div>'+
+    '</div>';
+  }
+  if (triggered.D3) {
+    html += '<div class="caf-reinf caf-reinf-d3">'+
+      '<div class="caf-reinf-title">⚠ Transportation Reliability Alert</div>'+
+      '<div class="caf-reinf-body">'+
+        '<p>Missed visits caused by transportation failure may be interpreted as treatment non-compliance. Transportation barriers should be addressed immediately.</p>'+
+        '<p>Verify transportation availability at least 48 hours before scheduled visits, and confirm reliable attendance for all upcoming appointments.</p>'+
+        '<p>Unresolved transportation failures increase the risk of missed visits, delayed recovery progression, and documentation patterns that may be interpreted negatively by insurance payors or opposing counsel.</p>'+
+      '</div>'+
+    '</div>';
+  }
+  if (triggered.D4) {
+    html += '<div class="caf-reinf caf-reinf-d4">'+
+      '<div class="caf-reinf-title">⚠ Documentation Quality Alert</div>'+
+      '<div class="caf-reinf-body">'+
+        '<p>Incomplete, inconsistent, or vague clinical documentation may result in treatment delays, denials, or reduced care progression.</p>'+
+        '<p>Identify gaps in clinical documentation that may affect treatment authorization or case defensibility. Common gaps include:</p>'+
+        '<ul>'+
+          '<li>Measurable findings not documented</li>'+
+          '<li>Diagnostic terminology lacks specificity</li>'+
+          '<li>Treatment rationale not clearly stated</li>'+
+          '<li>Progress notes do not reflect functional change</li>'+
+        '</ul>'+
+        '<p>Strong documentation supports medical necessity and reduces authorization challenges. Weak documentation increases the likelihood of denials and delayed treatment progression.</p>'+
+      '</div>'+
+    '</div>';
+  }
+  return html;
+}
+
+function buildCafSnapshotHtml(toolData,minLvl,flags,identityRow,opts){
+  var includeIdentity=opts&&opts.includeIdentity;
+  // Identify critical domains (level 1 or 2) for top banner and inline row markers
+  var criticalDomains=toolData.domainScores.filter(function(s){
+    var lv=s.level!=null?s.level:s.lvl;
+    return lv<=2;
+  });
+  var criticalBanner='';
+  if(criticalDomains.length){
+    var names=criticalDomains.map(function(s){return escCaf(s.title);}).join(', ');
+    criticalBanner=
+      '<div class="caf-cd-banner">'+
+        '<div class="caf-cd-banner-title">⚠ Critical Domain'+(criticalDomains.length>1?'s':'')+' Identified</div>'+
+        '<div class="caf-cd-banner-body">The following domain'+(criticalDomains.length>1?'s scored':' scored')+' at a level warranting immediate clinical and legal review: <strong>'+names+'</strong>.</div>'+
+      '</div>';
+  }
+  // Sort rows by friction level (worst first). Ties resolved by TIE_ORDER:
+  // Provider Access, Transportation, Insurance, Care Coordination, Administrative.
+  // Determining domain naturally lands at position 1.
+  var sortedScores=toolData.domainScores.slice().sort(function(a,b){
+    var la=a.level!=null?a.level:a.lvl;
+    var lb=b.level!=null?b.level:b.lvl;
+    if(la!==lb)return la-lb;
+    return TIE_ORDER.indexOf(a.domain)-TIE_ORDER.indexOf(b.domain);
+  });
+  var rows=sortedScores.map(function(s){
     var lv=s.level!=null?s.level:s.lvl;
     var c=levelColor(lv);
-    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #eee;background:#fafafa">'+
-      '<div style="font-size:14px;font-weight:600;color:#0e1c2e">'+escCaf(s.title)+'</div>'+
-      '<div style="display:flex;align-items:center;gap:10px">'+
-      '<span style="font-size:12px;color:#666">Raw '+s.raw+'/25</span>'+
-      '<span style="font-size:13px;font-weight:800;padding:6px 14px;border-radius:6px;background:'+c+';color:#fff">Level '+lv+'</span></div></div>';
+    // Tier chip on every row — label mirrors SCALE descriptors, color mirrors levelColor
+    var tierLabel='';
+    var tierClass='';
+    if(lv<=1){tierLabel='SEVERE';tierClass='caf-tier-severe';}
+    else if(lv===2){tierLabel='SIGNIFICANT';tierClass='caf-tier-significant';}
+    else if(lv===3){tierLabel='MODERATE';tierClass='caf-tier-moderate';}
+    else if(lv===4){tierLabel='MINOR';tierClass='caf-tier-minor';}
+    else {tierLabel='NONE';tierClass='caf-tier-none';}
+    var chip='<span class="caf-tier-chip '+tierClass+'">'+tierLabel+'</span>';
+    var badgeTextColor=(lv===3||lv===4)?'#3a2a00':'#fff';
+    var row='<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #eee;background:#fafafa">'+
+      '<div style="font-size:14px;font-weight:600;color:#0e1c2e">'+chip+escCaf(s.title)+'</div>'+
+      '<span style="font-size:13px;font-weight:800;padding:6px 14px;border-radius:6px;background:'+c+';color:'+badgeTextColor+'">Level '+lv+'</span></div>';
+    // Recommended Response Timeframe — only for Insurance (D2) or Transportation (D3) at level 1–2
+    if(lv<=2&&(s.domain==='D2'||s.domain==='D3')){
+      var domainLabel=s.domain==='D2'?'Insurance & Authorization':'Transportation';
+      row+='<div class="caf-rr-block">'+
+        '<div class="caf-rr-title">⚠ Recommended Response Timeframe — Best Practice</div>'+
+        '<div class="caf-rr-body">When access friction reaches this level in '+domainLabel+', best-practice clinical-legal response is follow-up within 24–48 hours. Timeframe reflects recognized standards for preventing treatment gaps and preserving case credibility.</div>'+
+        '<div class="caf-rr-disc">Response decisions remain at attorney discretion.</div>'+
+      '</div>';
+      // Clinical-Legal Consideration — domain-specific, stacked below the timeframe block
+      if(s.domain==='D2'){
+        row+='<div class="caf-cl-block">'+
+          '<div class="caf-cl-title">⚠ Clinical-Legal Consideration — Treatment Denials</div>'+
+          '<div class="caf-cl-body">When treatment is denied as "Not Medically Necessary," best-practice clinical-legal response includes prompt appeal of the denial. Unchallenged denials may be interpreted as acceptance of the payor\'s treatment decision — in effect, aligning with the payor rather than the treating provider. This pattern may weaken the medical foundation of the case and affect future treatment authorization.</div>'+
+          '<div class="caf-cl-disc">Response decisions remain at attorney discretion.</div>'+
+        '</div>';
+      } else {
+        row+='<div class="caf-cl-block">'+
+          '<div class="caf-cl-title">⚠ Clinical-Legal Consideration — Transportation & Credibility</div>'+
+          '<div class="caf-cl-body">Missed visits stemming from transportation failures may be interpreted as treatment non-compliance. Early attention to transportation barriers helps prevent credibility challenges later in the case.</div>'+
+          '<div class="caf-cl-disc">Response decisions remain at attorney discretion.</div>'+
+        '</div>';
+      }
+    }
+    return row;
   }).join('');
   var flagBlock=flags.length?(
     '<div style="margin-top:18px;padding:16px 18px;background:#fff5f5;border:2px solid #e74c3c;border-radius:10px">'+
@@ -466,20 +1338,29 @@ function buildCafSnapshotHtml(toolData,minLvl,flags){
     '<ul style="margin:0;padding-left:1.2em;font-size:13px;color:#5c2a2a;line-height:1.55">'+
     flags.map(function(f){return '<li>'+escCaf(f)+'</li>';}).join('')+'</ul></div>'
   ):'';
+  var idBlock=buildCafIdentityHeaderHtml(identityRow,includeIdentity);
   return '<div style="font-family:system-ui,Segoe UI,sans-serif;max-width:820px;margin:0 auto;background:#fff;border:1px solid #d6d0c4;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(14,28,46,0.08)">'+
     '<div style="background:linear-gradient(135deg,#0e1c2e 0%,#1a3050 100%);padding:20px 24px;color:#fff">'+
     '<div style="font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#e8c547;margin-bottom:6px">C.A.R.E. Access Friction Score™</div>'+
     '<h2 style="margin:0;font-size:22px;font-weight:800;letter-spacing:-0.02em">Access friction report</h2>'+
-    '<div style="font-size:12px;opacity:0.85;margin-top:8px">'+escCaf(new Date().toLocaleString())+'</div></div>'+
+    '<div style="font-size:12px;opacity:0.85;margin-top:8px">'+escCaf(new Date().toLocaleString())+'</div>'+
+    idBlock+'</div>'+
     '<div style="padding:22px 24px;background:#f8f6f1;border-bottom:1px solid #e0dcd4">'+
+    criticalBanner+
     '<div style="font-size:13px;color:#555;margin-bottom:10px"><strong style="color:#0e1c2e">Determining domain:</strong> '+escCaf(toolData.determiningDomainTitle)+'</div>'+
-    '<div style="display:inline-block;font-size:28px;font-weight:900;padding:12px 22px;border-radius:8px;background:'+levelColor(minLvl)+';color:#fff">Friction level '+minLvl+'</div></div>'+
+    '<div style="display:inline-block;font-size:28px;font-weight:900;padding:12px 22px;border-radius:8px;background:'+levelColor(minLvl)+';color:'+((minLvl===3||minLvl===4)?'#3a2a00':'#fff')+'">Friction level '+minLvl+'</div></div>'+
+    '<div style="padding:20px 24px 6px;background:#fff">'+
+      cafBuildNextActionsHtml(minLvl)+
+      cafBuildReinforcementBlocksHtml(toolData.domainScores)+
+    '</div>'+
     '<div style="padding:0">'+rows+'</div>'+flagBlock+
-    '<div style="padding:14px 20px;background:#f4f2ec;font-size:12px;color:#666;line-height:1.6;border-top:1px solid #e0dcd4">Trial capture for dashboard consolidated report.</div></div>';
+    '<p style="margin:0;padding:14px 24px 18px;font-size:11px;line-height:1.5;color:#888;background:#fff;border-top:1px solid #eee">Clinical care management tool for case coordination and documentation. Not a scientific instrument, predictive model, or substitute for medical or legal judgment.</p>'+
+    '</div>';
 }
 
-function saveCafComplete(){
+async function saveCafComplete(){
   if(Object.keys(ans).length<25||cafSaved)return;
+  cafLockDraftAutosaveForCompletion();
   cafSaved=true;
   const scores=calcAll();
   const sorted=sortedDomains(scores);
@@ -499,18 +1380,72 @@ function saveCafComplete(){
   };
   localStorage.setItem('tool3_data',JSON.stringify(toolData));
   localStorage.setItem('tool3_complete','true');
+  var paidCafRef=new URLSearchParams(window.location.search).get('case_ref');
+  var identityRow=null;
+  if(paidCafRef&&window.supabaseClient&&window.caseClarityIdentity){
+    try{
+      var sessRes=await window.supabaseClient.auth.getSession();
+      var session=sessRes.data&&sessRes.data.session;
+      if(session){
+        var cq=await window.supabaseClient
+          .from('case_cases')
+          .select(window.caseClarityIdentity.SELECT)
+          .eq('case_ref',paidCafRef)
+          .eq('attorney_user_id',session.user.id)
+          .maybeSingle();
+        identityRow=cq.data;
+      }
+    }catch(err){
+      console.warn('[CAF] case identity for report header',err);
+    }
+  }
   var snap=document.getElementById('caf-report-snapshot');
+  var reportOpts={includeIdentity:!!paidCafRef};
   if(snap){
-    snap.innerHTML=buildCafSnapshotHtml(toolData,minLvl,flags);
+    snap.innerHTML=buildCafSnapshotHtml(toolData,minLvl,flags,identityRow,reportOpts);
     snap.className='caf-report findings results-display';
     localStorage.setItem('tool3_report_html',snap.outerHTML);
     console.log('CAF report HTML saved, length:', localStorage.getItem('tool3_report_html')?localStorage.getItem('tool3_report_html').length:0);
   } else {
     console.warn('CAF: caf-report-snapshot host missing; report HTML not saved.');
   }
+  var trialBlk=document.getElementById('caf-submit-trial');
+  var paidBlk=document.getElementById('caf-submit-paid');
+  var retCaf=document.getElementById('caf-paid-return-case');
+  var paidVis=document.getElementById('caf-paid-report-visible');
+  if(paidCafRef){
+    document.body.classList.add('caf-paid-mode','caf-paid-print');
+    if(trialBlk) trialBlk.style.display='none';
+    if(paidBlk) paidBlk.style.display='block';
+    if(retCaf) retCaf.setAttribute('href','/case-detail.html?case_ref='+encodeURIComponent(paidCafRef));
+    if(snap&&paidVis) paidVis.innerHTML=snap.innerHTML;
+  } else {
+    document.body.classList.remove('caf-paid-mode','caf-paid-print');
+    if(trialBlk) trialBlk.style.display='block';
+    if(paidBlk) paidBlk.style.display='none';
+  }
   document.getElementById('caf-complete').style.display='block';
   if(typeof window.markAssessmentComplete==='function'){
     window.markAssessmentComplete({instrument:'CAF',finalLevel:minLvl,flags,domainScores:toolData.domainScores});
+  }
+  if(paidCafRef&&!window.__paidPortalCAFRecorded){
+    var recorded=await paidPortalRecordCaseToolRunAsync({
+      toolKey:'CAF',
+      scoreSummary:{
+        tool:'CAF',
+        finalLevel:minLvl,
+        determiningDomainTitle:toolData.determiningDomainTitle
+      },
+      resultJson:toolData
+    });
+    if(recorded===true){
+      window.__paidPortalCAFRecorded=true;
+      await deleteCafDraft();
+      cafDraftLockedAfterRun=true;
+    } else {
+      console.warn('[CAF] case_tool_runs insert failed; draft retained');
+      cafDraftAutosaveDisabled=false;
+    }
   }
   document.getElementById('caf-complete').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
@@ -520,8 +1455,14 @@ function updProg(){
   document.getElementById('pf').style.width=(a/tot*100)+'%';
   document.getElementById('pl').textContent=a+' of '+tot+' answered';
   const n=document.getElementById('an');
-  if(a===tot){n.textContent='All questions answered.';n.style.color='#0a5c2e';saveCafComplete();}
-  else{n.textContent=(tot-a)+' question'+(tot-a!==1?'s':'')+' remaining.';n.style.color='';}
+  if(a===tot){
+    n.textContent='All questions answered.';
+    n.style.color='#0a5c2e';
+    if(!cafHydratingFromDraft) void saveCafComplete();
+  } else {
+    n.textContent=(tot-a)+' question'+(tot-a!==1?'s':'')+' remaining.';
+    n.style.color='';
+  }
 }
 
 function updBadges(){
@@ -559,16 +1500,55 @@ function sortedDomains(scores){
 function resetTool(){
   ans={};
   cafSaved=false;
+  cafDraftLockedAfterRun=false;
+  cafDraftAutosaveDisabled=false;
+  clearTimeout(cafDraftSaveTimer);
+  cafDraftSaveTimer=null;
+  cafDraftDirty=false;
+  window.__paidPortalCAFRecorded=false;
   const cc=document.getElementById('caf-complete');
   if(cc) cc.style.display='none';
+  const trialBlk=document.getElementById('caf-submit-trial');
+  const paidBlk=document.getElementById('caf-submit-paid');
+  const paidVis=document.getElementById('caf-paid-report-visible');
+  document.body.classList.remove('caf-paid-mode','caf-paid-print');
+  if(trialBlk) trialBlk.style.display='';
+  if(paidBlk) paidBlk.style.display='none';
+  if(paidVis) paidVis.innerHTML='';
+  if(window.caseClarityIdentity&&window.supabaseClient){
+    void window.caseClarityIdentity.mountToolPage(window.supabaseClient);
+  }
   document.querySelectorAll('input[type=radio]').forEach(r=>r.checked=false);
   updProg();
   DOMS.forEach((_,di)=>{document.getElementById('b-'+di).textContent='Not scored';});
-  DOMS.forEach((_,di)=>{document.querySelector('#d-'+di+' .dh').classList.remove('open');document.getElementById('bd-'+di).classList.remove('open');});
-  tog(0);
+  cafSetAllDomainsCollapsed();
 }
 
-build();
+async function cafDomReady(){
+  if(window.caseClarityIdentity&&window.supabaseClient){
+    await window.caseClarityIdentity.mountToolPage(window.supabaseClient);
+  }
+  cafInitPaidDraftPersistence();
+  await loadCafDraft();
+  cafHydratingFromDraft=Object.keys(ans).length===25;
+  build();
+  cafApplyAnswersToUiFromAns();
+  updProg();
+  updBadges();
+  cafHydratingFromDraft=false;
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  void cafDomReady();
+});
+
+function cafScrollToPaidReport(){
+  var el=document.getElementById('caf-paid-report-block')||document.getElementById('caf-paid-report-visible');
+  if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function cafPrintPaidReport(){
+  window.print();
+}
 </script>
 <script>
 function goToNext() {
@@ -613,6 +1593,5 @@ function returnToDashboard() {
     window.location.href = 'dashboard.html';
 }
 </script>
-<script src="trial-pinned-banner.js"></script>
 </body>
 </html>
