@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Functional Capacity Index | Reconcile Care Management Services</title>
-  <link rel="stylesheet" href="trial-pinned-banner.css">
+    <link rel="stylesheet" href="css/case-identity.css">
+  <link rel="stylesheet" href="css/theme.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
@@ -32,6 +33,11 @@
       .print-summary-tile { background: #fff !important; border: 1px solid #aaa !important; border-top: 3px solid #333 !important; }
       .print-bullet { color: #333 !important; }
       .print-footer { display: block !important; }
+      #case-header-fields,
+      #case-header-fields * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
       @page { margin: 0.75in 0.75in 0.85in 0.75in; size: letter portrait; }
     }
 
@@ -53,6 +59,28 @@
     .app-header-div { color: #3a5070; }
 
     .container { max-width: 860px; margin: 0 auto; padding: 48px 32px 80px; }
+
+    /* FCI intro: main explainer card + action row only (no case overview on this page) */
+    .fci-intro-page {
+      display: block;
+    }
+    .fci-intro-case-overview {
+      margin-bottom: 24px;
+    }
+    .fci-action-row.nav-row {
+      margin-top: 16px;
+      padding-top: 18px;
+      border-top: 1px solid #e8e3d8;
+    }
+
+    /* FCI completion (paid + non-paid report view): report first, compact actions below */
+    .fci-paid-complete-container {
+      padding-top: 12px;
+      padding-bottom: 48px;
+    }
+    .fci-paid-complete-container .progress-bar.no-print {
+      margin-bottom: 20px;
+    }
 
     .card {
       background: #fff;
@@ -366,11 +394,203 @@
       .report-header { padding: 24px 20px; }
       .final-nav-bar { padding: 12px 20px; flex-direction: column; gap: 10px; align-items: flex-start; }
     }
+
+    /* ═══════════════════════════════════════════════════
+       FCI ENHANCEMENTS — Tier chips, banners, overlay
+    ═══════════════════════════════════════════════════ */
+
+    /* Tier chips — uppercase, compact; colors mirror FCI_TIER */
+    .fci-tier-chip{
+      display:inline-block;font-family:Georgia,'Times New Roman',serif;font-size:10px;font-weight:800;
+      letter-spacing:0.08em;padding:4px 10px;border-radius:3px;text-transform:uppercase;
+      vertical-align:middle;white-space:nowrap;
+    }
+    .fci-tier-stable   { background:#1e5c3a; color:#fff; }
+    .fci-tier-mild     { background:#3d5c1e; color:#fff; }
+    .fci-tier-moderate { background:#6b4a10; color:#fff; }
+    .fci-tier-severe   { background:#7a2e10; color:#fff; }
+    .fci-tier-critical { background:#7a1010; color:#fff; }
+
+    /* Critical Domain banner — fires when any P <= 2 */
+    .fci-cd-banner{
+      margin:0 0 16px;padding:14px 18px;border-left:4px solid #7a1010;
+      background:#fdf0f0;border-radius:4px;
+    }
+    .fci-cd-banner-title{
+      font-family:Georgia,serif;font-weight:800;font-size:12px;color:#7a1010;
+      letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;
+    }
+    .fci-cd-banner-body{
+      font-family:Georgia,serif;font-size:13px;color:#3a1010;line-height:1.55;
+    }
+
+    /* Recommended Response Timeframe banner — intrinsic-crisis triggers */
+    .fci-rr-banner{
+      margin:10px 0 0;padding:14px 18px;border-left:4px solid #7a2e10;
+      background:#fdf0ea;border-radius:4px;
+    }
+    .fci-rr-title{
+      font-family:Georgia,serif;font-weight:800;font-size:12px;color:#7a2e10;
+      letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;
+    }
+    .fci-rr-body{ font-family:Georgia,serif;font-size:13px;color:#3a2410;line-height:1.6; }
+
+    /* P3/P4 follow-up banner — lighter weight, 3-7 day cadence */
+    .fci-p34-banner{
+      margin:10px 0 0;padding:13px 17px;border-left:4px solid #6b4a10;
+      background:#fdf5e6;border-radius:4px;
+    }
+    .fci-p34-title{
+      font-family:Georgia,serif;font-weight:700;font-size:12px;color:#6b4a10;
+      letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;
+    }
+    .fci-p34-body{ font-family:Georgia,serif;font-size:12.5px;color:#3a2f0f;line-height:1.6; }
+
+    /* Clinical Consideration blocks — per P when P <= 2 */
+    .fci-cl-block{
+      margin:10px 0 0;padding:13px 17px;border-left:3px solid #0c1c34;
+      background:#f6f3ed;border-radius:4px;
+    }
+    .fci-cl-title{
+      font-family:Georgia,serif;font-weight:700;font-size:11px;color:#0c1c34;
+      letter-spacing:0.06em;text-transform:uppercase;margin-bottom:5px;
+    }
+    .fci-cl-body{ font-family:Georgia,serif;font-size:12.5px;color:#222;line-height:1.65; }
+
+    /* FCI/FVI mismatch callout */
+    .fci-mm-callout{
+      margin:14px 0 0;padding:13px 17px;border:1px solid #b8922a;
+      background:#fbf6e6;border-radius:4px;
+    }
+    .fci-mm-title{
+      font-family:Georgia,serif;font-weight:700;font-size:11px;color:#6b4a10;
+      letter-spacing:0.06em;text-transform:uppercase;margin-bottom:5px;
+    }
+    .fci-mm-body{ font-family:Georgia,serif;font-size:12.5px;color:#222;line-height:1.65; }
+
+    /* FVI reasoning transparency block */
+    .fci-fvi-reasoning{
+      margin-top:10px;padding-top:10px;border-top:1px dashed rgba(255,255,255,0.35);
+      font-family:Georgia,serif;font-size:12px;line-height:1.55;
+    }
+    .fci-fvi-reasoning strong{ font-weight:700; }
+
+    /* View Instructions overlay button + panel */
+    .fci-vi-btn{
+      position:fixed;top:110px;right:18px;z-index:40;
+      padding:9px 14px;font-family:Georgia,serif;font-size:12px;font-weight:600;
+      background:#0c1c34;color:#fff;border:1px solid #b8922a;border-radius:4px;
+      cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.15);
+    }
+    .fci-vi-btn:hover{ background:#1a3050; }
+    .fci-vi-overlay{
+      display:none;position:fixed;inset:0;z-index:60;background:rgba(12,28,52,0.55);
+      align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto;
+    }
+    .fci-vi-overlay.open{ display:flex; }
+    .fci-vi-panel{
+      background:#fff;max-width:720px;width:100%;border-radius:6px;
+      box-shadow:0 8px 40px rgba(0,0,0,0.25);padding:28px 32px;font-family:Georgia,serif;
+    }
+    .fci-vi-panel h2{
+      font-family:Georgia,serif;font-size:24px;font-weight:600;color:#0c1c34;
+      margin-bottom:6px;
+    }
+    .fci-vi-panel h3{
+      font-family:Georgia,serif;font-size:13px;font-weight:700;color:#0c1c34;
+      letter-spacing:0.04em;text-transform:uppercase;margin:18px 0 8px;
+    }
+    .fci-vi-panel p, .fci-vi-panel li{
+      font-size:13.5px;color:#222;line-height:1.65;
+    }
+    .fci-vi-panel ul{ padding-left:20px;margin-bottom:10px; }
+    .fci-vi-panel li{ margin-bottom:5px; }
+    .fci-vi-close{
+      float:right;background:transparent;border:1px solid #d0d0ce;border-radius:3px;
+      padding:4px 10px;font-size:12px;cursor:pointer;color:#555;
+    }
+    .fci-vi-close:hover{ background:#f6f3ed; }
+
+    @media print{
+      .fci-vi-btn, .fci-vi-overlay{ display:none !important; }
+      /* Force Clinical Considerations accordions open when printing */
+      details{ display:block !important; }
+      details > summary{ list-style:none !important; }
+      details > summary span[aria-hidden]{ display:none !important; }
+      details > *{ display:block !important; }
+    }
+
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth-guard.js"></script>
+  <script src="js/portal-header-nav.js"></script>
+  <script src="js/paid-portal-tool-run.js"></script>
+  <script src="js/case-identity.js"></script>
 </head>
-<body>
+<body class="with-portal-tool-header">
+
+<header class="portal-header no-print">
+  <a href="/index.html" class="portal-logo">
+    <div class="portal-logo-box"><span>C</span></div>
+    <div class="portal-logo-text">
+      <strong>C.A.S.E. Clarity</strong>
+      Reconcile Care Management Services
+    </div>
+  </a>
+  <div class="portal-header-right">
+    <a href="/case-detail.html" class="portal-nav-link" id="portal-nav-back-case">Back to Case</a>
+    <a href="/dashboard.html" class="portal-nav-link" id="portal-nav-back-dashboard">Back to Dashboard</a>
+    <span class="portal-user" id="user-email">Loading…</span>
+    <button type="button" class="btn-secondary" id="portal-nav-logout" disabled>Logout</button>
+  </div>
+</header>
+<script>
+(function () {
+  async function boot() {
+    const ok = await requireAuth();
+    if (!ok) return;
+    if (typeof initPortalHeaderNav === 'function') initPortalHeaderNav();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { void boot(); });
+  else void boot();
+})();
+</script>
+
 <div id="app"></div>
 <div id="fci-report-snapshot-host" style="position:absolute;left:-9999px;top:0;width:1px;height:1px;overflow:hidden" aria-hidden="true"></div>
+
+<!-- FCI View Instructions — floating button (visibility toggled per screen) + overlay panel -->
+<button type="button" id="fci-vi-btn" class="fci-vi-btn no-print" style="display:none" onclick="fciOpenInstructions()" aria-label="View Instructions">📖 View Instructions</button>
+<div id="fci-vi-overlay" class="fci-vi-overlay no-print" onclick="fciCloseInstructionsIfBackdrop(event)">
+  <div class="fci-vi-panel" onclick="event.stopPropagation()">
+    <button type="button" class="fci-vi-close" onclick="fciCloseInstructions()">Close ✕</button>
+    <h2>Functional Capacity Index™ — Instructions</h2>
+
+    <h3>How FCI Works</h3>
+    <p>FCI produces two outputs:</p>
+    <ul>
+      <li><strong>Functional Capacity Index (FCI):</strong> the minimum score across the four P-domains (Physical, Psychological, Psychosocial, Professional). FCI tells you where the client is functioning right now — the lowest domain score determines overall functional capacity, because stability cannot exceed the weakest area.</li>
+      <li><strong>Functional Vulnerability Indicator (FVI):</strong> a categorical output (High, Moderate, or Low) computed from financial context (income, dependents, sole earner), pain level, and psychological stress. FVI tells you what external pressure is acting on the client's recovery trajectory.</li>
+    </ul>
+    <p>FCI measures <em>where the person is functioning</em>. FVI measures <em>what pressure is acting on their recovery</em>. Both are reported separately so the attorney can read them together or apart.</p>
+
+    <h3>Scoring Guidance</h3>
+    <ul>
+      <li>Scores are whole numbers, 1&ndash;5. A score of 5 indicates the most stable functioning; a score of 1 indicates critical instability.</li>
+      <li>If more than one level appears applicable, select the lowest level that reflects the client's current condition.</li>
+      <li>Pain and Psychological Stress ratings feed into the FVI calculation. They do <strong>not</strong> change the FCI score.</li>
+      <li>Score against the clinical picture available in case records, intake notes, and attorney-client communication.</li>
+    </ul>
+
+    <h3>What to Look For</h3>
+    <ul>
+      <li>Physical (P1) or Psychological (P2) at SEVERE or CRITICAL, or Pain or Psychological Stress at CRITICAL, warrant attention to whether current clinical support and treatment access are adequate.</li>
+      <li>FCI and FVI divergence reveals meaningful patterns: high FCI with high FVI suggests stable-but-vulnerable (watch for destabilization under pressure), while low FCI with low FVI suggests functional impairment from the injury itself rather than from external pressure.</li>
+      <li>Re-run FCI to document how functional capacity changes over the life of the case. Serial assessments create a trajectory that is more valuable than a single snapshot.</li>
+    </ul>
+  </div>
+</div>
 
 <script>
 // ─────────────────────────────────────────────────────────────────────────────
@@ -410,13 +630,13 @@ const DOMAINS = [
     ]
   },
   { id:"professional", label:"Professional Wellness",
-    subtitle:"Evaluates the client's occupational functioning, work capacity, role sustainability, income disruption, financial stability, and the pressures associated with resuming or maintaining professional responsibilities.",
+    subtitle:"Evaluates the client's professional role functioning and role sustainability — whether that role is paid employment, academic progression, homemaking, caregiving, or other structured responsibilities — along with associated financial stability and the pressures of resuming or maintaining that role after injury.",
     levels:[
-      {score:5,title:"Stable / Fully Occupationally Functional",description:"The client is employed and functioning fully in their professional role, or is engaged in meaningful productive activity consistent with their pre-injury occupational status. Financial stability is maintained. Professional identity and purpose are intact. There is no current pressure to resume or modify work responsibilities due to injury-related limitations."},
-      {score:4,title:"Mild Professional Disruption",description:"The client has experienced minor occupational disruption, such as modified duty, reduced hours, or a temporary leave of absence. Financial strain is limited and manageable. The client anticipates returning to full professional functioning. Some pressure to maintain work responsibilities may exist but does not yet constitute a significant barrier to recovery."},
-      {score:3,title:"Moderate Professional Disruption",description:"The client is unable to perform their pre-injury job duties and is currently on extended leave, receiving disability benefits, or working in a significantly reduced capacity. Financial stress is present and growing. Career trajectory or professional identity is uncertain. Pressure to resume work prematurely — due to financial or role obligations — may be present and should be documented."},
-      {score:2,title:"Severe Professional Disruption",description:"The client has experienced significant occupational loss. Employment may be terminated or career trajectory substantially altered. Financial instability is creating compounding stress across other domains. The client may be experiencing pressure to return to work before being medically cleared, creating risk of re-injury or delayed recovery. Return to prior professional functioning is uncertain in the near term."},
-      {score:1,title:"Critical Professional Instability",description:"The client has complete occupational incapacity. Employment has been lost, vocational rehabilitation may be required, and financial crisis is present or imminent. Role sustainability is no longer possible in the current condition. Severe pressure to resume responsibilities — driven by financial desperation, dependent obligations, or role expectations — creates immediate risk of premature return to work or abandonment of necessary treatment. Long-term prognosis in this domain is guarded."}
+      {score:5,title:"Stable / Fully Functional in Professional Role",description:"The client is functioning fully in their pre-injury professional role. For paid workers, this means working at full capacity consistent with pre-injury occupational status. For students, this means progressing in academic or certification work without injury-related disruption. For homemakers and caregivers, this means performing household or caregiving responsibilities at pre-injury capacity. For retirees with structured roles (volunteer commitments, grandparent caregiving, community responsibilities), this means sustaining those roles at pre-injury capacity. Financial stability is maintained. Professional identity and purpose are intact. There is no current pressure to resume or modify role responsibilities due to injury-related limitations."},
+      {score:4,title:"Mild Professional Disruption",description:"The client has experienced minor disruption to their professional role. For paid workers, this may include modified duty, reduced hours, or a temporary leave of absence. For students, this may include delayed coursework, reduced course load, or temporary academic accommodations. For homemakers and caregivers, this may include reduced capacity for physically demanding household or caregiving tasks. For retirees with structured roles, this may include temporary reduction in volunteer commitments, caregiving hours, or community responsibilities. Financial strain is limited and manageable. The client anticipates returning to full role functioning. Some pressure to maintain role responsibilities may exist but does not yet constitute a significant barrier to recovery."},
+      {score:3,title:"Moderate Professional Disruption",description:"The client is unable to perform their pre-injury role at normal capacity. For paid workers, this may mean extended leave, disability benefits, or working in a significantly reduced capacity. For students, this may mean academic leave, reduced progression toward degree or certification, or significant accommodations. For homemakers and caregivers, this may mean substantial reliance on others to maintain household or caregiving responsibilities. For retirees with structured roles, this may mean significant withdrawal from volunteer activity, reduced caregiving for grandchildren or aging family members, or loss of community role engagement. Financial or role-related stress is present and growing. Career trajectory, academic progression, or family role is uncertain. Pressure to resume role responsibilities prematurely — due to financial, academic, or family obligations — may be present and should be documented."},
+      {score:2,title:"Severe Professional Disruption",description:"The client has experienced significant loss of professional role functioning. For paid workers, employment may be terminated or career trajectory substantially altered. For students, academic progression may be stalled or at serious risk of not resuming. For homemakers and caregivers, the ability to maintain household or caregiving responsibilities may be substantially compromised, requiring external support or replacement services. For retirees with structured roles, the client may be unable to continue volunteer, caregiving, or community responsibilities, representing a significant loss of purpose and role identity. Financial or role-related instability is creating compounding stress across other domains. The client may be experiencing pressure to return to role responsibilities before being medically cleared, creating risk of re-injury or delayed recovery. Return to prior role functioning is uncertain in the near term."},
+      {score:1,title:"Critical Professional Instability",description:"The client has complete incapacity to perform their pre-injury professional role. For paid workers, employment has been lost and vocational rehabilitation may be required; financial crisis is present or imminent. For students, academic progression has halted; long-term educational and career trajectory is at serious risk. For homemakers and caregivers, household or caregiving functioning has effectively collapsed, with full reliance on outside support. For retirees with structured roles, the client is unable to sustain any previously held volunteer, caregiving, or community responsibilities, with meaningful loss of purpose, identity, and role connection. Role sustainability is no longer possible in the current condition. Severe pressure to resume responsibilities — driven by financial desperation, academic deadlines, dependent obligations, or family role expectations — creates immediate risk of premature return to role or abandonment of necessary treatment. Long-term prognosis in this domain is guarded."}
     ]
   }
 ];
@@ -456,6 +676,20 @@ const FVI_COLOR = {
   Moderate:{text:"#6b4a10",bg:"#fdf5e6",border:"#e8c97a"},
   Low:{text:"#1e5c3a",bg:"#edf7f1",border:"#a8d5b8"}
 };
+
+/* FCI Step 1 tier system — uppercase labels for chips, mirrors FCI_CLASS palette.
+   TIE_ORDER uses the 4Ps sequence (P1 Physical, P2 Psychological, P3 Psychosocial,
+   P4 Professional) — same Maslow-ascending logic as HSI: P1 is most foundational.
+   Domain ids in FCI: physical, psychological, psychosocial, professional. */
+const FCI_TIE_ORDER = ["physical","psychological","psychosocial","professional"];
+const FCI_TIER = {
+  5: { label:"STABLE",     cls:"fci-tier-stable",     bg:"#1e5c3a", fg:"#fff" },
+  4: { label:"MILD",       cls:"fci-tier-mild",       bg:"#3d5c1e", fg:"#fff" },
+  3: { label:"MODERATE",   cls:"fci-tier-moderate",   bg:"#6b4a10", fg:"#fff" },
+  2: { label:"SEVERE",     cls:"fci-tier-severe",     bg:"#7a2e10", fg:"#fff" },
+  1: { label:"CRITICAL",   cls:"fci-tier-critical",   bg:"#7a1010", fg:"#fff" }
+};
+function fciTier(v){ return FCI_TIER[v] || FCI_TIER[3]; }
 
 const INCOME_RANGES = [
   {value:"",label:"Select income range"},
@@ -507,28 +741,48 @@ function computeFVI({incomeRange,hasDependents,isSoleEarner,painScore,psychScore
 }
 
 function buildInterp({fciScore,primaryDomains,fvi,painScore,psychScore}){
-  const prim=primaryDomains.join(" and ");
-  const opening="The Functional Capacity Index Analysis provides a structured snapshot of the client's current functional stability across the four domains of the 4Ps of Wellness: Physical, Psychological, Psychosocial, and Professional.";
-  const fciP={
-    5:"Based on the information entered, the client's current Functional Capacity Index indicates stable functional status, with no domain currently reflecting significant instability. At the time of analysis, the client appears able to maintain functional capacity across the assessed domains without substantial disruption to normal activity or role expectations.",
-    4:"Based on the information entered, the client's current Functional Capacity Index indicates mild disruption in functional stability, with the primary area of instability identified in the "+prim+" domain. This may suggest emerging difficulty in maintaining full stability across all areas of functioning, although the client may still retain substantial capacity in daily or occupational roles.",
-    3:"Based on the information entered, the client's current Functional Capacity Index indicates moderate disruption in functional stability, with the primary area of instability identified in the "+prim+" domain. This may suggest noticeable difficulty sustaining normal activity, role expectations, or occupational functioning during the current stage of recovery.",
-    2:"Based on the information entered, the client's current Functional Capacity Index indicates significant disruption in functional stability, with the primary area of instability identified in the "+prim+" domain. This may suggest substantial limitation in the client's ability to maintain normal activity, work responsibilities, or consistent day-to-day functioning during the current stage of recovery.",
-    1:"Based on the information entered, the client's current Functional Capacity Index indicates severe disruption in functional stability, with the primary area of instability identified in the "+prim+" domain. This may suggest profound limitation in the client's ability to sustain normal activity, occupational functioning, or other structured life responsibilities at the time of analysis."
+  // Multi-domain handling: render "areas of instability identified in the X, Y, and Z domains"
+  // when 2+ domains tie at the floor; "area of instability identified in the X domain" when 1.
+  function joinDomains(arr) {
+    if (!arr || !arr.length) return '';
+    if (arr.length === 1) return arr[0];
+    if (arr.length === 2) return arr[0] + ' and ' + arr[1];
+    return arr.slice(0, -1).join(', ') + ', and ' + arr[arr.length - 1];
+  }
+  const isMulti = (primaryDomains && primaryDomains.length > 1);
+  const primPhrase = joinDomains(primaryDomains);
+  const areaLabel = isMulti ? 'primary areas of instability identified in the ' + primPhrase + ' domains'
+                            : 'primary area of instability identified in the ' + primPhrase + ' domain';
+
+  const opening = "The Return-to-Role Interpretation provides a structured read of the client's current functional capacity across the four domains of the 4Ps of Wellness: Physical, Psychological, Psychosocial, and Professional. It describes how closely the client is functioning relative to their pre-injury baseline across role and daily-life activities.";
+
+  const fciP = {
+    5: "Based on the information entered, the client's current Functional Capacity Index indicates stable functional status, with no domain currently reflecting significant instability. At the time of analysis, the client appears able to maintain functional capacity across the assessed domains without substantial disruption to their pre-injury role or daily activities.",
+    4: "Based on the information entered, the client's current Functional Capacity Index indicates mild disruption in functional stability, with " + areaLabel + ". This pattern reflects emerging difficulty in maintaining full stability across all areas of functioning, although the client may still retain substantial capacity in their pre-injury role and daily activities — whether that role is paid employment, academic progression, homemaking, caregiving, or other structured responsibilities.",
+    3: "Based on the information entered, the client's current Functional Capacity Index indicates moderate disruption in functional stability, with " + areaLabel + ". This pattern reflects noticeable difficulty sustaining normal activity, role expectations, or daily functioning during the current stage of recovery — across work, school, homemaking, caregiving, or other structured activities.",
+    2: "Based on the information entered, the client's current Functional Capacity Index indicates significant disruption in functional stability, with " + areaLabel + ". This pattern reflects substantial limitation in the client's ability to maintain normal activity, role responsibilities, or consistent day-to-day functioning during the current stage of recovery.",
+    1: "Based on the information entered, the client's current Functional Capacity Index indicates severe disruption in functional stability, with " + areaLabel + ". This pattern reflects profound limitation in the client's ability to sustain normal activity, role functioning, or other structured life responsibilities at the time of analysis."
   };
-  const fviP={
-    Low:"Current vulnerability indicators do not suggest elevated external pressure likely to destabilize recovery trajectory at this time. Continued monitoring may still be appropriate if work status, pain levels, or psychosocial stressors change.",
-    Moderate:"Current vulnerability indicators suggest moderate external pressure that may affect recovery stability or increase the likelihood of functional strain during the course of the case. Monitoring may be beneficial if work demands, financial pressures, or symptom severity increase.",
-    High:"Current vulnerability indicators suggest elevated external pressure that may affect recovery stability or increase the likelihood of premature return to work, reinjury, or disruption to recovery trajectory. This is particularly important when role demands, financial pressures, and ongoing symptoms are present."
+
+  // FVI paragraph — when elevated symptoms are present (pain or psych ≤ 2), the symptom risk
+  // is folded into the FVI paragraph rather than rendered as a separate paragraph.
+  const showSym = (painScore !== null && painScore <= 2) || (psychScore !== null && psychScore <= 2);
+  const symFold = " When elevated pain and/or psychological stress are present alongside these pressures, the risk of reinjury or disruption to the recovery trajectory increases.";
+
+  const fviP = {
+    Low:      "Current vulnerability indicators do not reflect elevated external pressure likely to destabilize recovery trajectory at this time. Continued monitoring may still be appropriate if role demands, pain levels, or psychosocial stressors change." +
+              (showSym ? symFold : ""),
+    Moderate: "Current vulnerability indicators reflect moderate external pressure that may affect recovery stability or increase the likelihood of functional strain during the course of the case. Monitoring is appropriate if role demands, financial pressures, or symptom severity increase." +
+              (showSym ? symFold : ""),
+    High:     "Current vulnerability indicators reflect elevated external pressure that may affect recovery stability or increase the likelihood of premature return to role — most commonly driven by financial necessity, caregiving obligations, academic deadlines, or role-identity pressure." +
+              (showSym ? symFold : "")
   };
-  const showSym=(painScore!==null&&painScore<=2)||(psychScore!==null&&psychScore<=2);
-  const symP="The presence of elevated pain and/or psychological stress may further affect the client's ability to maintain consistent functional stability. When these factors occur alongside employment or financial pressures, there may be increased risk of premature return to work or disruption to recovery trajectory.";
-  const docP="Documenting these functional changes over time may help illustrate how an injury has affected a client's ability to maintain normal activity, employment, and overall stability during the course of a case.";
-  const closing="This interpretation reflects the client's status at the time the analysis was completed and should be considered within the broader context of medical evaluation, treatment progress, and ongoing case developments.";
-  const paras=[opening, fciP[fciScore]||fciP[1], fviP[fvi]||fviP["Low"]];
-  if(showSym) paras.push(symP);
-  paras.push(docP,closing);
-  return paras;
+
+  const docP = "Documenting functional capacity changes over time helps illustrate how an injury affects the client's ability to maintain normal activity, role participation, and overall functional stability throughout the course of a case. Serial FCI reassessments provide a longitudinal record of functional capacity changes and support early identification of premature return-to-role risk patterns.";
+
+  const closing = "This interpretation reflects the client's status at the time the analysis was completed and should be considered alongside medical findings, treatment progress, and ongoing case developments.";
+
+  return [opening, fciP[fciScore] || fciP[1], fviP[fvi] || fviP["Low"], docP, closing];
 }
 
 function vulnLabel(score) {
@@ -536,6 +790,335 @@ function vulnLabel(score) {
   const L = {5:'Minimal',4:'Mild',3:'Moderate',2:'Significant',1:'Severe'};
   return score + ' — ' + (L[score] || '');
 }
+
+/* ─── FCI Step 4 report helpers ─── */
+
+/** Uppercase tier chip — mirrors FCI_TIER palette */
+function fciTierChip(v) {
+  var t = fciTier(v);
+  return '<span style="display:inline-block;font-family:Georgia,\'Times New Roman\',serif;font-size:10px;font-weight:800;letter-spacing:0.08em;padding:4px 10px;border-radius:3px;text-transform:uppercase;background:' + t.bg + ';color:' + t.fg + ';white-space:nowrap">' + t.label + '</span>';
+}
+
+/** Critical Domain banner — fires when any P <= 2 */
+function fciCriticalDomainBannerHtml(scores) {
+  var crit = [];
+  DOMAINS.forEach(function(d, i) {
+    var s = scores[d.id];
+    if (s != null && s <= 2) {
+      crit.push({ pCode:'P'+(i+1), label:d.label, id:d.id, score:s });
+    }
+  });
+  if (!crit.length) return '';
+  crit.sort(function(a,b){
+    if (a.score !== b.score) return a.score - b.score;
+    return FCI_TIE_ORDER.indexOf(a.id) - FCI_TIE_ORDER.indexOf(b.id);
+  });
+  var list = crit.map(function(c){ return c.pCode + ' ' + esc(c.label) + ' (' + fciTier(c.score).label + ')'; }).join(', ');
+  return '<div style="margin:0 0 14px;padding:14px 18px;border-left:4px solid #7a1010;background:#fdf0f0;border-radius:4px">' +
+    '<div style="font-family:Georgia,serif;font-weight:800;font-size:12px;color:#7a1010;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px">⚠ Critical Domain' + (crit.length>1?'s':'') + ' Identified</div>' +
+    '<div style="font-family:Georgia,serif;font-size:13px;color:#3a1010;line-height:1.55">' + list + '</div>' +
+    '</div>';
+}
+
+/** Recommended Response Timeframe banner — fires when P1<=2 OR P2<=2 OR Pain=1 OR Psych Stress=1 */
+function fciRecommendedResponseBannerHtml(scores, pain, psych) {
+  var p1 = scores.physical, p2 = scores.psychological;
+  var p1Trigger = p1 != null && p1 <= 2;
+  var p2Trigger = p2 != null && p2 <= 2;
+  var painTrigger = pain === 1;
+  var psychTrigger = psych === 1;
+  if (!p1Trigger && !p2Trigger && !painTrigger && !psychTrigger) return '';
+  var reasons = [];
+  if (p1Trigger) reasons.push('Physical capacity (P1) at ' + fciTier(p1).label);
+  if (p2Trigger) reasons.push('Psychological capacity (P2) at ' + fciTier(p2).label);
+  if (painTrigger) reasons.push('Pain at CRITICAL');
+  if (psychTrigger) reasons.push('Psychological Stress at CRITICAL');
+  return '<div style="margin:10px 0 0;padding:14px 18px;border-left:4px solid #7a2e10;background:#fdf0ea;border-radius:4px">' +
+    '<div style="font-family:Georgia,serif;font-weight:800;font-size:12px;color:#7a2e10;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px">⚠ Recommended Response Timeframe — 24–48 Hours</div>' +
+    '<div style="font-family:Georgia,serif;font-size:13px;color:#3a2410;line-height:1.6">' +
+    esc(reasons.join(' • ')) + '. Attention should be given to whether current clinical support and treatment access are adequate given the severity indicated. Document clinical status and any referrals made.' +
+    '</div></div>';
+}
+
+/** P3/P4 follow-up banner — 3-7 days; suppressed when higher-urgency banner fires */
+function fciP34FollowupBannerHtml(scores, pain, psych) {
+  var p1Urgent = scores.physical != null && scores.physical <= 2;
+  var p2Urgent = scores.psychological != null && scores.psychological <= 2;
+  var painUrgent = pain === 1, psychUrgent = psych === 1;
+  if (p1Urgent || p2Urgent || painUrgent || psychUrgent) return '';
+  var p3 = scores.psychosocial, p4 = scores.professional;
+  var p3Trigger = p3 != null && p3 <= 2;
+  var p4Trigger = p4 != null && p4 <= 2;
+  if (!p3Trigger && !p4Trigger) return '';
+  var reasons = [];
+  if (p3Trigger) reasons.push('Psychosocial capacity (P3) at ' + fciTier(p3).label);
+  if (p4Trigger) reasons.push('Professional capacity (P4) at ' + fciTier(p4).label);
+  return '<div style="margin:10px 0 0;padding:13px 17px;border-left:4px solid #6b4a10;background:#fdf5e6;border-radius:4px">' +
+    '<div style="font-family:Georgia,serif;font-weight:700;font-size:12px;color:#6b4a10;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px">Recommended Follow-up — 3–7 Days</div>' +
+    '<div style="font-family:Georgia,serif;font-size:12.5px;color:#3a2f0f;line-height:1.6">' +
+    esc(reasons.join(' • ')) + '. Follow-up within 3–7 days is recommended to assess whether conditions are changing and whether additional support is warranted.' +
+    '</div></div>';
+}
+
+/** Recommended Next Actions by capacity tier — replaces the prior Clinical Considerations blocks.
+    Tier driven by lowest score across 4Ps + Pain + Psych Stress:
+      CRITICAL — any P=1 OR Pain=1 OR Psych Stress=1 (follow-up 24–48hr)
+      SEVERE   — lowest = 2 (follow-up 3–7 days)
+      MODERATE — lowest = 3 (follow-up 14 days)
+      MILD     — lowest = 4 (follow-up 30 days)
+      STABLE   — all = 5 (follow-up 60 days)
+    Records-and-attorney-impression voice (FCI is scored from case records, not direct client call). */
+function fciRecommendedNextActionsHtml(scores, pain, psych) {
+  var p1 = scores.physical, p2 = scores.psychological, p3 = scores.psychosocial, p4 = scores.professional;
+  var critTrigger = (p1 === 1) || (p2 === 1) || (p3 === 1) || (p4 === 1) || pain === 1 || psych === 1;
+  var all = [p1, p2, p3, p4, pain, psych].filter(function(v){ return v != null; });
+  var lowest = all.length ? Math.min.apply(null, all) : 5;
+
+  var tier;
+  if (critTrigger) tier = 'CRITICAL';
+  else if (lowest === 2) tier = 'SEVERE';
+  else if (lowest === 3) tier = 'MODERATE';
+  else if (lowest === 4) tier = 'MILD';
+  else tier = 'STABLE';
+
+  var byTier = {
+    CRITICAL: {
+      cadence: '24–48 hours',
+      intro: 'Record review reveals severe functional impairment or acute vulnerability indicators requiring immediate stabilization oversight.',
+      actions: [
+        'Initiate direct client contact within 24 hours to verify current functional status and confirm that the client is safe and actively engaged in necessary care.',
+        'Coordinate urgent communication with treating providers when records indicate severe physical instability, psychological decline, or unmanaged pain or stress.',
+        'Verify continuity of care participation by confirming upcoming appointments are scheduled and no treatment interruptions are occurring.',
+        'Review financial or caregiving pressures identified in the FVI profile to identify risk of premature return to role.',
+        'Schedule a follow-up functional review within 24–48 hours to reassess whether the client\'s capacity indicators are stabilizing.'
+      ],
+      priority: 'Confirm immediate functional safety and treatment continuity based on critical findings identified in the record.',
+      docFocus: 'Document all critical-level functional impairments identified, provider coordination actions initiated, and verified continuity of care status.'
+    },
+    SEVERE: {
+      cadence: '3–7 days',
+      intro: 'Records indicate significant functional limitation that may deteriorate without active coordination and monitoring.',
+      actions: [
+        'Review lowest-performing functional domain(s) identified in the FCI scoring to confirm the nature and persistence of impairment.',
+        'Verify treatment adherence through provider documentation review to ensure recommended care activities are progressing without delay.',
+        'Initiate client contact to clarify unresolved functional limitations or recent changes in status not captured in the record.',
+        'Monitor FVI risk indicators to determine whether external pressure may accelerate premature return to role.',
+        'Review prior FCI results for this client to identify whether current capacity reflects improvement, decline, or stable trajectory.',
+        'Schedule structured reassessment within 3–7 days to evaluate whether functional capacity is improving or declining.'
+      ],
+      priority: 'Stabilize the most impaired functional domain identified through record review before deterioration accelerates.',
+      docFocus: 'Document the specific functional limitations confirmed through records and any actions taken to maintain treatment continuity.'
+    },
+    MODERATE: {
+      cadence: '14 days',
+      intro: 'Records show moderate functional limitation with vulnerability to decline if recovery progress slows.',
+      actions: [
+        'Review recent clinical documentation trends to identify whether functional performance is improving, plateauing, or worsening.',
+        'Confirm that all scheduled care activities are progressing as expected without missed visits or unexplained delays.',
+        'Monitor for early indicators of premature return-to-role pressure, especially when financial or caregiver demands are present.',
+        'Request updated provider documentation when functional progress is unclear or inconsistently recorded.',
+        'Review prior FCI results for this client to identify whether current capacity reflects improvement, decline, or stable trajectory.',
+        'Schedule reassessment within 14 days to confirm trajectory direction and recovery progression.'
+      ],
+      priority: 'Monitor functional trajectory closely to detect early decline or premature return-to-role pressure.',
+      docFocus: 'Document observed functional trends and note whether recovery indicators suggest improvement, stagnation, or emerging risk.'
+    },
+    MILD: {
+      cadence: '30 days',
+      intro: 'Records indicate mild functional limitation with generally stable recovery performance.',
+      actions: [
+        'Confirm sustained functional participation by reviewing updated provider documentation and appointment records.',
+        'Evaluate whether external pressure indicators remain stable, particularly when financial responsibilities or dependents are present.',
+        'Verify that previously documented impairments continue to improve without regression.',
+        'Monitor for subtle early signs of premature role re-engagement, particularly when recovery progress appears rapid.',
+        'Review prior FCI results for this client to identify whether current capacity reflects improvement, decline, or stable trajectory.',
+        'Schedule routine reassessment within 30 days to maintain oversight of functional progress.'
+      ],
+      priority: 'Verify that functional gains remain consistent without premature escalation of role demands.',
+      docFocus: 'Document evidence of improving functional performance and note any external pressures that could influence recovery timing.'
+    },
+    STABLE: {
+      cadence: '60 days',
+      intro: 'Records demonstrate consistent functional capacity across domains with minimal impairment indicators.',
+      actions: [
+        'Confirm sustained full-domain functional performance through review of recent provider documentation.',
+        'Review FVI indicators to identify latent external pressure risk, even when functional capacity appears strong.',
+        'Document consistency of recovery performance across multiple reporting periods.',
+        'Monitor for role re-engagement behaviors that may occur before full recovery stabilization.',
+        'Review prior FCI results for this client to identify whether current capacity reflects improvement, decline, or stable trajectory.',
+        'Schedule routine reassessment within 60 days to maintain long-term functional oversight.'
+      ],
+      priority: 'Confirm that stable functional performance is sustained without pressure-driven role escalation.',
+      docFocus: 'Document continued functional stability and confirm alignment between recorded performance and recovery expectations.'
+    }
+  };
+
+  var g = byTier[tier];
+  var tierColor = tier === 'CRITICAL' ? '#7a1010'
+                : tier === 'SEVERE' ? '#7a2e10'
+                : tier === 'MODERATE' ? '#6b4a10'
+                : tier === 'MILD' ? '#3d5c1e'
+                : '#1e5c3a';
+  var actionItems = g.actions.map(function(a){ return '<li style="margin-bottom:6px">' + esc(a) + '</li>'; }).join('');
+
+  return '<div style="margin:10px 0 0;padding:16px 18px;background:#fdf8e8;border:2px solid #b8922a;border-left:6px solid #b8922a;border-radius:8px;box-shadow:0 1px 4px rgba(184,146,42,0.15)">' +
+    '<div style="font-family:Georgia,\'Times New Roman\',serif;font-size:11.5px;font-weight:800;color:#7a6a22;text-transform:uppercase;letter-spacing:0.13em;margin-bottom:10px;padding-bottom:7px;border-bottom:1.5px solid rgba(184,146,42,0.35);display:flex;align-items:center;gap:8px">' +
+      '<span style="display:inline-block;width:18px;height:18px;background:' + tierColor + ';color:#fff;border-radius:50%;text-align:center;line-height:18px;font-size:11px;font-weight:900">!</span>' +
+      'Recommended Next Actions — ' + tier + ' · Follow-up: ' + g.cadence +
+    '</div>' +
+    '<div style="font-family:Georgia,serif;font-size:12.5px;color:#555;line-height:1.55;margin-bottom:10px;font-style:italic">' + esc(g.intro) + '</div>' +
+    '<ul style="list-style:disc;padding:0 0 0 22px;margin:0 0 14px;font-family:Georgia,serif;font-size:13px;line-height:1.6;color:#1a1a1a">' +
+      actionItems +
+    '</ul>' +
+    '<div style="background:#fff;border:1px solid #d4c890;border-radius:6px;padding:10px 12px;margin-top:8px">' +
+      '<div style="font-family:Georgia,serif;font-size:10.5px;font-weight:800;color:#7a6a22;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">Priority Action</div>' +
+      '<div style="font-family:Georgia,serif;font-size:12.5px;color:#333;line-height:1.55">' + esc(g.priority) + '</div>' +
+    '</div>' +
+    '<div style="background:#fff;border:1px solid #d4c890;border-radius:6px;padding:10px 12px;margin-top:8px">' +
+      '<div style="font-family:Georgia,serif;font-size:10.5px;font-weight:800;color:#7a6a22;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">Documentation Focus</div>' +
+      '<div style="font-family:Georgia,serif;font-size:12.5px;color:#333;line-height:1.55">' + esc(g.docFocus) + '</div>' +
+    '</div>' +
+    '</div>';
+}
+
+/** FCI / FVI mismatch callout — two meaningful divergence patterns */
+function fciMismatchCalloutHtml(minS, fvi) {
+  // Pattern A: FCI stable (>=4) but FVI High — stable now, under serious pressure
+  // Pattern B: FCI low (<=2) but FVI Low — functional impairment from injury, not external pressure
+  var title, body;
+  if (minS >= 4 && fvi === 'High') {
+    title = 'Pattern: Stable Function Under High External Pressure';
+    body = 'The client is currently functioning at a stable level across the 4Ps, but the Functional Vulnerability Indicator is High — financial pressure, dependent obligations, or symptom severity may destabilize recovery over time. Document the specific pressures and monitor for early signs of functional deterioration.';
+  } else if (minS <= 2 && fvi === 'Low') {
+    title = 'Pattern: Functional Impairment Despite Low External Pressure';
+    body = 'The client is functionally impaired, but the Functional Vulnerability Indicator is Low — external pressures such as financial strain, dependent obligations, and heightened pain or psychological stress are not the primary drivers of functional disruption. This pattern points to the injury itself as the main source of impairment. Document the injury-specific functional limitations as the central clinical picture.';
+  } else {
+    return '';
+  }
+  return '<div style="margin:14px 0 0;padding:13px 17px;border:1px solid #b8922a;background:#fbf6e6;border-radius:4px">' +
+    '<div style="font-family:Georgia,serif;font-weight:700;font-size:11px;color:#6b4a10;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:5px">' + esc(title) + '</div>' +
+    '<div style="font-family:Georgia,serif;font-size:12.5px;color:#222;line-height:1.65">' + esc(body) + '</div></div>';
+}
+
+/** FVI reasoning transparency — explains WHY FVI landed where it did */
+function fciFviReasoningHtml(fvi, fields, pain, psych) {
+  var factors = [];
+  var dep = fields.hasDependents === 'yes';
+  var sole = fields.isSoleEarner === 'yes';
+  var depUnk = fields.hasDependents === 'prefer';
+  var soleUnk = fields.isSoleEarner === 'prefer';
+  var inc = fields.incomeRange;
+  var u30 = inc === 'under30';
+  var u50 = inc === 'under30' || inc === '30to50';
+  var incUnk = !inc || inc === 'prefer';
+  var painNum = pain || 5, psychNum = psych || 5;
+
+  if (fvi === 'High') {
+    if (u30 && dep) factors.push('income under $30,000 with dependents');
+    else if (sole && dep) factors.push('sole earner with dependents');
+    else if (u50 && dep && sole) factors.push('income under $50,000, sole earner, dependents present');
+    if (painNum <= 2) factors.push('pain at significant or severe level');
+    if (psychNum <= 2) factors.push('psychological stress at significant or severe level');
+  } else if (fvi === 'Moderate') {
+    if (u50 && !dep) factors.push('income under $50,000');
+    if (dep && !sole) factors.push('dependents present (not sole earner)');
+    if (sole && !dep) factors.push('sole earner (no dependents)');
+    if (incUnk || depUnk || soleUnk) factors.push('one or more context fields unreported');
+    if (painNum <= 3) factors.push('pain at moderate level or higher');
+    if (psychNum <= 3) factors.push('psychological stress at moderate level or higher');
+  } else {
+    factors.push('context indicators do not suggest elevated external pressure on recovery at this time');
+  }
+
+  // Dedupe and cap at 4 to keep readable
+  var seen = {}, uniq = [];
+  factors.forEach(function(f){ if (!seen[f]) { seen[f] = 1; uniq.push(f); } });
+  if (uniq.length > 4) uniq = uniq.slice(0, 4);
+  if (!uniq.length) return '';
+
+  return '<div class="fci-fvi-reasoning">' +
+    '<strong>FVI factors:</strong> ' + uniq.map(function(f){ return esc(f); }).join('; ') + '.' +
+    '</div>';
+}
+
+/** Urgent trigger check — matches the Recommended Response 24-48hr banner criteria */
+function fciHasUrgentTrigger(scores, pain, psych) {
+  var p1 = scores.physical, p2 = scores.psychological;
+  var p1Trigger = p1 != null && p1 <= 2;
+  var p2Trigger = p2 != null && p2 <= 2;
+  return p1Trigger || p2Trigger || pain === 1 || psych === 1;
+}
+
+/** Score-driven follow-up cadence panel — timespan-led headline, clinical context below */
+function fciFollowupCadencePanelHtml(scores, pain, psych) {
+  var p1 = scores.physical, p2 = scores.psychological;
+  var p3 = scores.psychosocial, p4 = scores.professional;
+
+  // Urgent triggers: any P=1 OR Pain=1 OR Psych=1
+  var critTrigger = (p1 === 1) || (p2 === 1) || (p3 === 1) || (p4 === 1) || pain === 1 || psych === 1;
+  // Severe triggers: any P=2 OR Pain=2 OR Psych=2
+  var sevTrigger = (p1 === 2) || (p2 === 2) || (p3 === 2) || (p4 === 2) || pain === 2 || psych === 2;
+
+  // Lowest score across all six (4Ps + Pain + Psych), ignoring nulls
+  var all = [p1, p2, p3, p4, pain, psych].filter(function(v){ return v != null; });
+  var lowest = all.length ? Math.min.apply(null, all) : 5;
+
+  var cadence, explainer, borderColor, bgColor;
+  if (critTrigger) {
+    cadence = '24–48 hours';
+    explainer = 'The client has reported crisis-level concern in functional capacity or vulnerability indicators. Attention should be given within 24–48 hours to whether current clinical support and treatment access are adequate. Document the contact and any referrals made.';
+    borderColor = '#7a1010'; bgColor = '#fdf0f0';
+  } else if (sevTrigger) {
+    cadence = '3–7 days';
+    explainer = 'The client has reported significant disruption in functional capacity or vulnerability indicators. Close follow-up within 3–7 days allows the attorney to assess whether conditions are changing and whether additional support is warranted.';
+    borderColor = '#7a2e10'; bgColor = '#fdf0ea';
+  } else if (lowest === 3) {
+    cadence = '14 days';
+    explainer = 'The client is reporting manageable disruption. Stability is holding but not strong. Periodic contact supports early detection of deterioration and documents the trajectory of functional capacity over time.';
+    borderColor = '#6b4a10'; bgColor = '#fdf5e6';
+  } else if (lowest === 4) {
+    cadence = '30 days';
+    explainer = 'The client is reporting stable functioning across domains. Routine contact is appropriate to confirm continued stability and capture any changes in the client\'s condition or circumstances.';
+    borderColor = '#3d5c1e'; bgColor = '#f3f7ed';
+  } else {
+    cadence = '60 days';
+    explainer = 'The client is reporting strong functioning across all domains. Light contact cadence is appropriate. Serial FCI re-runs document the trajectory of functional capacity across the life of the case.';
+    borderColor = '#1e5c3a'; bgColor = '#edf7f1';
+  }
+
+  return '<div style="margin-top:22px;padding:20px 22px;background:' + bgColor + ';border:1px solid ' + borderColor + ';border-left:4px solid ' + borderColor + ';border-radius:8px">' +
+    '<div style="font-family:Georgia,serif;font-size:11px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#6a6560;margin-bottom:10px">Recommended attorney follow-up with client</div>' +
+    '<div style="font-family:Georgia,serif;font-size:26px;font-weight:800;color:' + borderColor + ';margin-bottom:12px;letter-spacing:0.01em">' + cadence + '</div>' +
+    '<div style="font-family:Georgia,serif;font-size:13px;color:#222;line-height:1.65;margin-bottom:10px">' + esc(explainer) + '</div>' +
+    '<div style="font-family:Georgia,serif;font-size:11.5px;color:#6a6560;line-height:1.6;padding-top:10px;border-top:1px dashed rgba(0,0,0,0.12)">' +
+    'Cadence reflects the client\'s reported functional capacity and vulnerability at the time of this assessment. Adjust to specific case circumstances and client needs. Re-run FCI after any meaningful change in status, treatment, or life circumstances to document the trajectory over time.' +
+    '</div></div>';
+}
+
+/** Per-indicator rows — Pain and Psychological Stress with tier chips (parallel to HSI destabilizers) */
+function fciIndicatorRowsHtml(pain, psych) {
+  var items = [
+    { name:'Pain', score:pain },
+    { name:'Psychological Stress', score:psych }
+  ];
+  return '<div style="margin-top:22px;padding:16px 18px 4px;background:#faf8f4;border:1px solid #e8e3d8;border-radius:8px">' +
+    '<div style="font-size:11px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#0c1c34;margin-bottom:12px">Vulnerability indicators</div>' +
+    items.map(function(it) {
+      if (it.score == null) {
+        return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eef0f3;gap:10px;flex-wrap:wrap">' +
+          '<span style="font-size:13px;font-weight:600;color:#0c1c34;flex:1;min-width:180px">' + esc(it.name) + '</span>' +
+          '<span style="font-size:12px;color:#888">— not scored</span>' +
+          '</div>';
+      }
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eef0f3;gap:10px;flex-wrap:wrap">' +
+        '<span style="font-size:13px;font-weight:600;color:#0c1c34;flex:1;min-width:180px">' + esc(it.name) + '</span>' +
+        '<span style="display:inline-flex;align-items:center;gap:8px;font-size:12px;color:#444">' + esc(vulnLabel(it.score)) + ' ' + fciTierChip(it.score) + '</span>' +
+        '</div>';
+    }).join('') +
+    '<div style="font-size:11px;color:#777;padding:10px 0 4px;line-height:1.55">Vulnerability indicators feed the FVI calculation. They do not change the FCI score.</div>' +
+    '</div>';
+}
+
 function buildFciDashboardSnapshot(minS, weak, fvi, toolData) {
   const pain = toolData.vulnScores.pain;
   const psych = toolData.vulnScores.psych;
@@ -550,7 +1133,17 @@ function buildFciDashboardSnapshot(minS, weak, fvi, toolData) {
   const incomeLbl = (INCOME_RANGES.find(o => o.value === toolData.fviFields.incomeRange) || {}).label || '—';
   const depLbl = (YES_NO.find(o => o.value === toolData.fviFields.hasDependents) || {}).label || '—';
   const soleLbl = (YES_NO.find(o => o.value === toolData.fviFields.isSoleEarner) || {}).label || '—';
-  const domainRows = DOMAINS.map(function (d) {
+
+  // Sort domain rows worst-first with Maslow tie-break (P1→P4)
+  var sortedDomains = DOMAINS.slice().sort(function(a, b) {
+    var sa = toolData.scores[a.id], sb = toolData.scores[b.id];
+    if (sa == null) sa = 99;
+    if (sb == null) sb = 99;
+    if (sa !== sb) return sa - sb;
+    return FCI_TIE_ORDER.indexOf(a.id) - FCI_TIE_ORDER.indexOf(b.id);
+  });
+
+  const domainRows = sortedDomains.map(function (d) {
     const s = toolData.scores[d.id];
     if (s == null) return '';
     const cl = FCI_CLASS[s];
@@ -558,12 +1151,30 @@ function buildFciDashboardSnapshot(minS, weak, fvi, toolData) {
     const fillW = (s / 5) * 100;
     const fillBg = isW ? '#7a2e10' : '#0c1c34';
     return '<div style="margin-bottom:14px">' +
-      '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><span style="font-size:13px;font-weight:700;color:#0e1c2e">' + esc(d.label) + '</span>' +
-      '<span style="font-size:13px;font-weight:800;color:' + (isW ? '#7a2e10' : '#0c1c34') + '">' + s + '</span></div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap">' +
+      '<span style="font-size:13px;font-weight:700;color:#0e1c2e">' + esc(d.label) + '</span>' +
+      '<span style="display:inline-flex;align-items:center;gap:8px">' +
+      '<span style="font-size:13px;font-weight:800;color:' + (isW ? '#7a2e10' : '#0c1c34') + '">' + s + '</span>' +
+      fciTierChip(s) + '</span></div>' +
       '<div style="height:10px;background:#e8e3d8;border-radius:5px;overflow:hidden">' +
       '<div style="height:100%;width:' + fillW + '%;background:' + fillBg + ';border-radius:5px"></div></div>' +
       '<div style="margin-top:6px"><span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:4px;color:' + cl.text + ';background:' + cl.bg + ';border:1px solid ' + cl.border + '">' + esc(cl.label) + '</span></div></div>';
   }).join('');
+
+  // Alerts block — render in priority order: Critical Domain → Recommended Response → P3/P4 Follow-up → Mismatch → Clinical Considerations
+  const alertsHtml =
+    fciCriticalDomainBannerHtml(toolData.scores) +
+    fciRecommendedResponseBannerHtml(toolData.scores, pain, psych) +
+    fciP34FollowupBannerHtml(toolData.scores, pain, psych) +
+    fciMismatchCalloutHtml(minS, fvi) +
+    fciRecommendedNextActionsHtml(toolData.scores, pain, psych);
+  const alertsWrap = alertsHtml
+    ? '<div style="padding:0 0 14px">' + alertsHtml + '</div>'
+    : '';
+
+  // Per-indicator rows (Pain, Psych Stress) with tier chips
+  const indicatorRowsHtml = fciIndicatorRowsHtml(pain, psych);
+
   const interpHtml = paras.map(function (p) {
     return '<p style="margin:0 0 12px;font-size:13px;line-height:1.65;color:#333">' + esc(p) + '</p>';
   }).join('');
@@ -571,23 +1182,34 @@ function buildFciDashboardSnapshot(minS, weak, fvi, toolData) {
     '<div style="background:linear-gradient(135deg,#0c1c34 0%,#1a3050 100%);padding:20px 24px;color:#e8e2d4;border-bottom:3px solid #b8922a">' +
     '<div style="font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#b8922a;margin-bottom:6px">Functional Capacity Index™</div>' +
     '<h2 style="margin:0;font-size:24px;font-weight:400;letter-spacing:0.02em">Functional capacity analysis</h2>' +
-    '<div style="font-size:12px;opacity:0.88;margin-top:8px">' + esc(new Date(toolData.timestamp).toLocaleString()) + '</div></div>' +
+    '<div class="fci-report-header-identifier" style="font-size:11px;line-height:1.4;margin-top:8px;opacity:0.92;display:grid;grid-template-columns:1fr 1fr;gap:2px 18px">' +
+    '<div><strong>Case:</strong> <span id="fci-report-id-case">—</span></div>' +
+    '<div><strong>Client:</strong> <span id="fci-report-id-client">—</span></div>' +
+    '<div><strong>Date of Injury:</strong> <span id="fci-report-id-doi">—</span></div>' +
+    '<div><strong>Status:</strong> <span id="fci-report-id-status">—</span></div>' +
+    '</div>' +
+    '<div style="font-size:12px;opacity:0.88;margin-top:6px">' + esc(new Date(toolData.timestamp).toLocaleString()) + '</div></div>' +
     '<div style="padding:20px 24px;background:' + fviSt.bg + ';border-bottom:2px solid ' + fviSt.border + '">' +
     '<div style="font-size:11px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:' + fviSt.text + '">Functional vulnerability indicator</div>' +
     '<div style="font-size:26px;font-weight:800;color:' + fviSt.text + ';margin-top:6px">' + esc(fvi) + '</div>' +
-    '<div style="font-size:13px;color:#444;margin-top:8px"><strong>FCI minimum score:</strong> ' + minS + ' &nbsp;·&nbsp; <strong>Primary instability:</strong> ' + esc(weak.join(', ')) + '</div></div>' +
+    '<div style="font-size:13px;color:#444;margin-top:10px"><strong>FCI minimum score:</strong> ' + minS + ' ' + fciTierChip(minS) + '</div>' +
+    '<div style="font-size:13px;color:#444;margin-top:10px"><strong>Primary instability:</strong></div>' +
+    '<ul style="margin:6px 0 0;padding-left:22px;font-size:13px;color:#444;line-height:1.7">' +
+    weak.map(function(w){ return '<li>' + esc(w) + '</li>'; }).join('') +
+    '</ul>' +
+    '</div>' +
     '<div style="padding:22px 26px">' +
+    alertsWrap +
     '<div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#6a7a8a;margin-bottom:12px">Context indicators (FVI inputs)</div>' +
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;font-size:13px;color:#333;margin-bottom:24px">' +
     '<div><span style="color:#6a7a8a">Income range:</span> ' + esc(incomeLbl) + '</div>' +
     '<div><span style="color:#6a7a8a">Dependents:</span> ' + esc(depLbl) + '</div>' +
-    '<div><span style="color:#6a7a8a">Sole earner:</span> ' + esc(soleLbl) + '</div>' +
-    '<div><span style="color:#6a7a8a">Pain / injury:</span> ' + esc(vulnLabel(pain)) + '</div>' +
-    '<div style="grid-column:1/-1"><span style="color:#6a7a8a">Psychological stress:</span> ' + esc(vulnLabel(psych)) + '</div></div>' +
-    '<div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#0c1c34;margin-bottom:14px">4Ps wellness scores</div>' +
+    '<div style="grid-column:1/-1"><span style="color:#6a7a8a">Sole earner:</span> ' + esc(soleLbl) + '</div></div>' +
+    '<div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#0c1c34;margin-bottom:14px">4Ps wellness scores (sorted by capacity — lowest first)</div>' +
     domainRows +
+    indicatorRowsHtml +
     '<div style="margin-top:28px;padding:20px 22px;background:#faf8f4;border:1px solid #e8e3d8;border-left:3px solid #b8922a;border-radius:8px">' +
-    '<div style="font-size:11px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#0c1c34;margin-bottom:12px">Professional interpretation</div>' +
+    '<div style="font-size:11px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#0c1c34;margin-bottom:12px">Return-to-Role Interpretation</div>' +
     interpHtml + '</div>' +
     '<p style="margin:18px 0 0;font-size:11px;line-height:1.55;color:#888">Structured care management framework — not a diagnostic instrument. Interpret in clinical and legal context.</p></div></div>';
 }
@@ -604,7 +1226,263 @@ const S = {
   analysisDate:""
 };
 
-function setState(patch){ Object.assign(S,patch); render(); }
+// ── Paid portal: case_tool_drafts (FCI) ─────────────────────────────────────
+var fciDraftSaveTimer = null;
+var fciDraftDirty = false;
+var fciDraftApplying = false;
+var fciDraftAutosaveDisabled = false;
+var fciDraftLockedAfterRun = false;
+var fciHydratingFromDraft = false;
+var FCI_DRAFT_DEBOUNCE_MS = 900;
+
+function fciResolveCaseRef() {
+  return typeof window.caseClarityResolveCaseRef === 'function' ? window.caseClarityResolveCaseRef() : null;
+}
+
+async function fciResolvePaidCaseRow(client) {
+  var caseRef = fciResolveCaseRef();
+  if (!caseRef || !client) return null;
+  var gu = await client.auth.getUser();
+  var user = gu.data && gu.data.user;
+  if (gu.error || !user) return null;
+  var cq = await client
+    .from('case_cases')
+    .select('id, attorney_user_id')
+    .eq('case_ref', caseRef)
+    .eq('attorney_user_id', user.id)
+    .maybeSingle();
+  if (cq.error || !cq.data) {
+    if (cq.error) console.error('[FCI] case lookup for draft', cq.error);
+    return null;
+  }
+  return cq.data;
+}
+
+function fciDraftHasMeaningfulState(d) {
+  if (!d || d.v !== 1) return false;
+  if (d.screen && d.screen !== 'intro') return true;
+  var ctx = d.ctx || {};
+  if ((ctx.clientRef && String(ctx.clientRef).trim()) || ctx.doi || ctx.injuryType) return true;
+  var f = d.fviFields || {};
+  if (f.incomeRange || f.hasDependents || f.isSoleEarner) return true;
+  var v = d.vulnScores || {};
+  if (v.pain != null || v.psych != null) return true;
+  var sc = d.scores || {};
+  if (sc.physical != null || sc.psychological != null || sc.psychosocial != null || sc.professional != null) return true;
+  if (d.analysisDate) return true;
+  return false;
+}
+
+function fciVulnAndFviComplete() {
+  return (
+    S.fviFields.incomeRange !== '' &&
+    S.fviFields.hasDependents !== '' &&
+    S.fviFields.isSoleEarner !== '' &&
+    S.vulnScores.pain !== null &&
+    S.vulnScores.psych !== null
+  );
+}
+
+function fciStateHasAllDomainScores() {
+  return DOMAINS.every(function (d) {
+    return S.scores[d.id] != null;
+  });
+}
+
+function fciCollectDraftJson() {
+  return {
+    v: 1,
+    screen: S.screen,
+    ctx: JSON.parse(JSON.stringify(S.ctx)),
+    fviFields: JSON.parse(JSON.stringify(S.fviFields)),
+    vulnScores: JSON.parse(JSON.stringify(S.vulnScores)),
+    scores: JSON.parse(JSON.stringify(S.scores)),
+    analysisDate: S.analysisDate
+  };
+}
+
+async function saveFciDraft() {
+  if (fciDraftApplying || fciDraftAutosaveDisabled || fciDraftLockedAfterRun) return;
+  var client = window.supabaseClient;
+  if (!client) return;
+  var rowCtx = await fciResolvePaidCaseRow(client);
+  if (!rowCtx) return;
+  var draftJson = fciCollectDraftJson();
+  if (!fciDraftHasMeaningfulState(draftJson)) return;
+  var payload = {
+    case_id: rowCtx.id,
+    attorney_user_id: rowCtx.attorney_user_id,
+    tool_key: 'FCI',
+    draft_json: draftJson,
+    updated_at: new Date().toISOString()
+  };
+  var up = await client.from('case_tool_drafts').upsert(payload, {
+    onConflict: 'case_id,attorney_user_id,tool_key'
+  });
+  if (up.error) console.error('[FCI] case_tool_drafts upsert failed', up.error);
+  else {
+    console.log('[FCI] draft save ok');
+    fciDraftDirty = false;
+  }
+}
+
+function scheduleFciDraftSave() {
+  if (fciDraftApplying || fciDraftAutosaveDisabled || fciDraftLockedAfterRun || fciHydratingFromDraft) return;
+  if (!new URLSearchParams(window.location.search).get('case_ref') || !window.supabaseClient) return;
+  fciDraftDirty = true;
+  clearTimeout(fciDraftSaveTimer);
+  fciDraftSaveTimer = setTimeout(function () {
+    fciDraftSaveTimer = null;
+    void saveFciDraft();
+  }, FCI_DRAFT_DEBOUNCE_MS);
+}
+
+async function flushFciDraftSave() {
+  if (fciDraftLockedAfterRun) return;
+  clearTimeout(fciDraftSaveTimer);
+  fciDraftSaveTimer = null;
+  if (fciDraftDirty) await saveFciDraft();
+}
+
+function fciMergeDraftJsonIntoState(d) {
+  if (!fciDraftHasMeaningfulState(d)) return;
+  if (typeof d.screen === 'string') S.screen = d.screen;
+  if (d.ctx && typeof d.ctx === 'object') Object.assign(S.ctx, d.ctx);
+  if (d.fviFields && typeof d.fviFields === 'object') Object.assign(S.fviFields, d.fviFields);
+  if (d.vulnScores && typeof d.vulnScores === 'object') Object.assign(S.vulnScores, d.vulnScores);
+  if (d.scores && typeof d.scores === 'object') Object.assign(S.scores, d.scores);
+  if (typeof d.analysisDate === 'string') S.analysisDate = d.analysisDate;
+}
+
+async function loadFciDraft() {
+  if (!new URLSearchParams(window.location.search).get('case_ref')) return;
+  var client = window.supabaseClient;
+  if (!client) return;
+  fciDraftApplying = true;
+  try {
+    var rowCtx = await fciResolvePaidCaseRow(client);
+    if (!rowCtx) {
+      console.log('[FCI] draft load: none');
+      return;
+    }
+    var dr = await client
+      .from('case_tool_drafts')
+      .select('draft_json')
+      .eq('case_id', rowCtx.id)
+      .eq('tool_key', 'FCI')
+      .maybeSingle();
+    if (dr.error) {
+      console.error('[FCI] draft load failed', dr.error);
+      return;
+    }
+    var dj = dr.data && dr.data.draft_json;
+    if (!dj || !fciDraftHasMeaningfulState(dj)) {
+      console.log('[FCI] draft load: none');
+      return;
+    }
+    fciMergeDraftJsonIntoState(dj);
+    console.log('[FCI] draft loaded');
+  } finally {
+    fciDraftApplying = false;
+  }
+}
+
+async function deleteFciDraft() {
+  var client = window.supabaseClient;
+  if (!client) return false;
+  var gu = await client.auth.getUser();
+  var user = gu.data && gu.data.user;
+  if (gu.error || !user) {
+    console.error('[FCI] delete draft getUser', gu.error);
+    return false;
+  }
+  var uid = user.id;
+  var caseRef = fciResolveCaseRef();
+  if (!caseRef) return false;
+  var cq = await client
+    .from('case_cases')
+    .select('id')
+    .eq('case_ref', caseRef)
+    .eq('attorney_user_id', uid)
+    .maybeSingle();
+  if (cq.error || !cq.data) return false;
+  var del = await client
+    .from('case_tool_drafts')
+    .delete()
+    .eq('case_id', cq.data.id)
+    .eq('attorney_user_id', uid)
+    .eq('tool_key', 'FCI');
+  if (del.error) {
+    console.error('[FCI] case_tool_drafts delete failed', del.error);
+    return false;
+  }
+  console.log('[FCI] draft delete ok');
+  fciDraftDirty = false;
+  return true;
+}
+
+function fciLockDraftAutosaveForCompletion() {
+  fciDraftAutosaveDisabled = true;
+  clearTimeout(fciDraftSaveTimer);
+  fciDraftSaveTimer = null;
+  fciDraftDirty = false;
+}
+
+function fciInitPaidDraftPersistence() {
+  if (!new URLSearchParams(window.location.search).get('case_ref')) return;
+  if (window.__fciDraftEventsBound) return;
+  window.__fciDraftEventsBound = true;
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') void flushFciDraftSave();
+  });
+  window.addEventListener('pagehide', function () {
+    void flushFciDraftSave();
+  });
+}
+
+/** Rebuild report snapshot from current S without recording a paid run (draft hydration). */
+function fciRebuildSnapshotFromStateNoSave() {
+  if (!fciVulnAndFviComplete() || !fciStateHasAllDomainScores()) return;
+  var sv = DOMAINS.map(function (d) {
+    return S.scores[d.id];
+  }).filter(function (v) {
+    return v != null;
+  });
+  if (sv.length !== 4) return;
+  var minS = Math.min.apply(null, sv);
+  var weak = DOMAINS.filter(function (d) {
+    return S.scores[d.id] === minS;
+  }).map(function (d) {
+    return d.label;
+  });
+  var fvi = computeFVI({
+    incomeRange: S.fviFields.incomeRange,
+    hasDependents: S.fviFields.hasDependents,
+    isSoleEarner: S.fviFields.isSoleEarner,
+    painScore: S.vulnScores.pain,
+    psychScore: S.vulnScores.psych
+  });
+  var toolData = {
+    completed: true,
+    timestamp: new Date().toISOString(),
+    scores: JSON.parse(JSON.stringify(S.scores)),
+    vulnScores: JSON.parse(JSON.stringify(S.vulnScores)),
+    fviFields: JSON.parse(JSON.stringify(S.fviFields)),
+    fciMinScore: minS,
+    primaryInstabilityDomains: weak,
+    functionalVulnerabilityIndicator: fvi
+  };
+  var snapshotHtml = buildFciDashboardSnapshot(minS, weak, fvi, toolData);
+  window.__fciLastSnapshotHtml = snapshotHtml;
+  localStorage.setItem('tool5_data', JSON.stringify(toolData));
+  localStorage.setItem('tool5_complete', 'true');
+  localStorage.setItem('tool5_report_html', snapshotHtml);
+}
+
+function setState(patch) {
+  Object.assign(S, patch);
+  render();
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HTML BUILDERS
@@ -632,13 +1510,13 @@ function dateInput(id,val){
 }
 
 function interpBlock(paras){
-  return `<div class="interp-block print-card"><span class="section-label">Professional Interpretation</span>`+paras.map(p=>`<p class="interp-para print-body-text">${esc(p)}</p>`).join("")+`</div>`;
+  return `<div class="interp-block print-card"><span class="section-label">Return-to-Role Interpretation</span>`+paras.map(p=>`<p class="interp-para print-body-text">${esc(p)}</p>`).join("")+`</div>`;
 }
 function reassessBlock(){
   return `<div class="reassess-block print-card"><span class="section-label">Why Reassessment Matters</span><p class="interp-para print-body-text">This analysis reflects the client's condition at the time it is completed. Repeated Functional Capacity Index Analyses can help document changes in wellness, stability, and role sustainability over the life of a case.</p><span class="section-sublabel">Recommended Reassessment Points</span><ul class="reassess-list">`+["After a major treatment change","After work status changes","Before mediation or settlement","When new instability develops"].map(i=>`<li class="reassess-item"><span class="reassess-bullet print-bullet">&#9670;</span><span class="print-body-text">${esc(i)}</span></li>`).join("")+`</ul></div>`;
 }
 function disclaimerBlock(){
-  return `<div class="disclaimer-block print-card"><p class="disclaimer-text">The Functional Capacity Index is a structured care management assessment framework developed by Reconcile Care Management Services. It is not a scientific, diagnostic, or clinical instrument and does not replace medical evaluation, clinical judgment, psychological assessment, or legal analysis. Results are intended to support care management documentation and case support purposes only. All assessments should be interpreted by a qualified care management professional in the appropriate clinical and legal context.</p></div>`;
+  return `<div class="disclaimer-block print-card"><p class="disclaimer-text">Clinical care management tool for case coordination and documentation. Not a scientific instrument, predictive model, or substitute for medical or legal judgment.</p></div>`;
 }
 
 function scoreBarRow(d,s,isWeakest){
@@ -650,14 +1528,14 @@ function scoreBarRow(d,s,isWeakest){
 // SCREEN RENDERERS
 // ─────────────────────────────────────────────────────────────────────────────
 function screenIntro(){
-  return appHeader()+`<div class="container">`+progressBar("intro")+`<div class="card"><span class="eyebrow">Care Management Assessment Tool</span><h1 style="font-size:34px;font-weight:normal;color:#0c1c34;margin:0 0 6px;letter-spacing:0.01em">Functional Capacity Index</h1><p style="font-size:17px;color:#3a4a5a;margin:0 0 32px;line-height:1.6">A structured evaluation of holistic wellness across the 4Ps of Wellness</p><hr class="light" style="margin:0 0 32px"><p style="font-size:15px;line-height:1.85;color:#0e1c2e;margin:0 0 18px">The <strong>Functional Capacity Index (FCI)</strong> is a structured care management assessment tool developed by Reconcile Care Management Services. This analysis evaluates how a client's current condition across the 4Ps of Wellness may affect their ability to sustain work or continue in a professional or occupational role.</p><p style="font-size:15px;line-height:1.85;color:#0e1c2e;margin:0 0 32px">This assessment is designed to be completed thoughtfully. The value of this analysis depends on responses that reflect what is actually being experienced — not what is desired or hoped for. Estimated completion time: approximately 8–10 minutes.</p><div class="grid-4p">`+
-    [{p:"Physical",d:"Functional mobility, pain, and medical stability"},{p:"Psychological",d:"Emotional regulation, mental health, and cognitive functioning"},{p:"Psychosocial",d:"Support systems, relationships, and environmental stability"},{p:"Professional",d:"Occupational functioning, work capacity, and financial stability"}].map(x=>`<div class="fourp-card"><span class="fourp-label">${x.p} Wellness</span><span class="fourp-desc">${x.d}</span></div>`).join("")+
-    `</div><div class="callout" style="margin-bottom:32px"><span class="callout-label">Framework Notice</span><p style="font-size:13px;color:#3a4a5a;line-height:1.8;margin:0">The Functional Capacity Index is a structured care management assessment framework. It is not a scientific, diagnostic, or clinical instrument and does not replace medical evaluation, clinical judgment, or legal analysis. Results support care management documentation and case support purposes only.</p></div>
-    <div class="nav-row no-print"><button type="button" class="btn-ghost" id="intro-back">&larr; Back</button><button type="button" class="btn-primary" id="intro-next">Begin Analysis &rarr;</button></div></div></div>`;
+  return appHeader()+`<div class="container fci-intro-page">`+progressBar("intro")+`<div id="case-header-fields" class="no-print fci-intro-case-overview"></div><div class="card fci-intro-card"><span class="eyebrow">Care Management Assessment Tool</span><h1 style="font-size:34px;font-weight:normal;color:#0c1c34;margin:0 0 6px;letter-spacing:0.01em">Functional Capacity Index</h1><p style="font-size:17px;color:#3a4a5a;margin:0 0 32px;line-height:1.6">A structured evaluation of holistic wellness across the 4Ps of Wellness</p><hr class="light" style="margin:0 0 32px"><p style="font-size:15px;line-height:1.85;color:#0e1c2e;margin:0 0 18px">The <strong>Functional Capacity Index (FCI)</strong> is a structured care management assessment tool. This analysis evaluates how a client's current condition across the 4Ps of Wellness may affect their ability to sustain their pre-injury role — whether paid employment, academic progression, homemaking, caregiving, or other structured responsibilities.</p><p style="font-size:15px;line-height:1.85;color:#0e1c2e;margin:0 0 32px">This assessment is designed to be completed thoughtfully. The value of this analysis depends on responses that reflect what is actually being experienced — not what is desired or hoped for. Estimated completion time: approximately 8–10 minutes.</p><div class="grid-4p">`+
+    [{p:"Physical",d:"Functional mobility, pain, and medical stability"},{p:"Psychological",d:"Emotional regulation, mental health, and cognitive functioning"},{p:"Psychosocial",d:"Support systems, relationships, and environmental stability"},{p:"Professional",d:"Role sustainability across work, school, homemaking, caregiving, and other structured responsibilities"}].map(x=>`<div class="fourp-card"><span class="fourp-label">${x.p} Wellness</span><span class="fourp-desc">${x.d}</span></div>`).join("")+
+    `</div><div class="callout" style="margin-bottom:0"><span class="callout-label">Framework Notice</span><p style="font-size:13px;color:#3a4a5a;line-height:1.8;margin:0">The Functional Capacity Index is a structured care management assessment framework. It is not a scientific, diagnostic, or clinical instrument and does not replace medical evaluation, clinical judgment, or legal analysis. Results support care management documentation and case support purposes only.</p></div></div>
+    <div class="nav-row no-print fci-action-row"><button type="button" class="btn-ghost" id="intro-back">&larr; Back</button><button type="button" class="btn-primary" id="intro-next">Begin Analysis &rarr;</button></div></div>`;
 }
 
 function screenVulnIntro(){
-  return appHeader()+`<div class="container">`+progressBar("vuln-intro")+`<span class="eyebrow">Step 1 of 7 — Vulnerability Overview</span><h2 class="section-title">Functional Vulnerability Indicator</h2><div class="card"><p style="font-size:15px;color:#3a4a5a;line-height:1.85;margin:0 0 20px">The Functional Vulnerability Indicator identifies contextual factors that may increase pressure on a client's recovery trajectory or increase the likelihood of premature return to work before full recovery or medical clearance.</p><p style="font-size:15px;color:#3a4a5a;line-height:1.85;margin:0 0 20px">This portion of the analysis considers factors such as income level, dependent responsibilities, sole income earner status, pain related to injury, and psychological stress. These factors may increase vulnerability during recovery and may affect the client's ability to maintain stability over the life of a case.</p><p style="font-size:15px;color:#3a4a5a;line-height:1.85;margin:0 0 32px">These indicators help inform the Functional Vulnerability Indicator but <strong>do not</strong> change the Functional Capacity Index score.</p><div class="callout" style="margin-bottom:32px"><span class="callout-label">Indicators Covered</span><ul style="margin:0;padding:0;list-style:none">`+
+  return appHeader()+`<div class="container">`+progressBar("vuln-intro")+`<div id="case-header-fields" class="no-print" style="margin-bottom:24px"></div><span class="eyebrow">Step 1 of 7 — Vulnerability Overview</span><h2 class="section-title">Functional Vulnerability Indicator</h2><div class="card"><p style="font-size:15px;color:#3a4a5a;line-height:1.85;margin:0 0 20px">The Functional Vulnerability Indicator identifies contextual factors that may increase pressure on a client's recovery trajectory or increase the likelihood of premature return to work before full recovery or medical clearance.</p><p style="font-size:15px;color:#3a4a5a;line-height:1.85;margin:0 0 20px">This portion of the analysis considers factors such as income level, dependent responsibilities, sole income earner status, pain related to injury, and psychological stress. These factors may increase vulnerability during recovery and may affect the client's ability to maintain stability over the life of a case.</p><p style="font-size:15px;color:#3a4a5a;line-height:1.85;margin:0 0 32px">These indicators help inform the Functional Vulnerability Indicator but <strong>do not</strong> change the Functional Capacity Index score.</p><div class="callout" style="margin-bottom:32px"><span class="callout-label">Indicators Covered</span><ul style="margin:0;padding:0;list-style:none">`+
     ["Pre-Injury Annual Income Range","Dependent Responsibilities","Sole Income Earner Status","Pain Related to Injury","Psychological Stress (Depression / Anxiety)"].map(i=>`<li style="display:flex;align-items:baseline;gap:10px;font-size:13px;color:#3a4a5a;padding:7px 0;border-bottom:1px solid #e8e3d8"><span style="color:#b8922a;font-size:10px;flex-shrink:0">&#9670;</span>${esc(i)}</li>`).join("")+
     `</ul></div><div class="nav-row no-print"><button type="button" class="btn-ghost" id="vi-back">&larr; Back</button><button type="button" class="btn-primary" id="vi-next">Continue to Vulnerability Indicators &rarr;</button></div></div></div>`;
 }
@@ -665,7 +1543,7 @@ function screenVulnIntro(){
 function screenVuln(){
   const can=S.fviFields.incomeRange!==""&&S.fviFields.hasDependents!==""&&S.fviFields.isSoleEarner!==""&&S.vulnScores.pain!==null&&S.vulnScores.psych!==null;
   const shortL={5:"Minimal",4:"Mild",3:"Moderate",2:"Significant",1:"Severe"};
-  let html=appHeader()+`<div class="container">`+progressBar("vuln")+`<span class="eyebrow">Step 2 of 7 — Vulnerability Indicators</span><h2 class="section-title">Functional Vulnerability Indicators</h2><p class="subtitle">These indicators help identify factors that may increase vulnerability during recovery. They may influence the Functional Vulnerability Indicator but <span style="font-style:normal">do not</span> change the Functional Capacity Index score.</p><div class="card"><div style="margin-bottom:28px;padding-bottom:28px;border-bottom:1px solid #e8e3d8"><span class="vuln-section-label">Financial &amp; Household Context</span><div class="grid-3">`+
+  let html=appHeader()+`<div class="container">`+progressBar("vuln")+`<div id="case-header-fields" class="no-print" style="margin-bottom:24px"></div><span class="eyebrow">Step 2 of 7 — Vulnerability Indicators</span><h2 class="section-title">Functional Vulnerability Indicators</h2><p class="subtitle">These indicators help identify factors that may increase vulnerability during recovery. They may influence the Functional Vulnerability Indicator but <span style="font-style:normal">do not</span> change the Functional Capacity Index score.</p><div class="card"><div style="margin-bottom:28px;padding-bottom:28px;border-bottom:1px solid #e8e3d8"><span class="vuln-section-label">Financial &amp; Household Context</span><div class="grid-3">`+
     fieldWrap("Pre-Injury Annual Income Range",true,selectInput("fvi-income",S.fviFields.incomeRange,INCOME_RANGES),"Used to calculate the Functional Vulnerability Indicator.")+
     fieldWrap("Dependents",true,selectInput("fvi-dep",S.fviFields.hasDependents,YES_NO),"Does the client have financial dependents?")+
     fieldWrap("Sole Income Earner",true,selectInput("fvi-sole",S.fviFields.isSoleEarner,YES_NO),"Is the client the primary or sole household income earner?")+
@@ -690,7 +1568,7 @@ function screenDomain(idx){
   const cur=S.scores[dom.id];
   const stepNum=idx+3;
   const shortL={5:"Minimal",4:"Mild",3:"Moderate",2:"Significant",1:"Severe"};
-  let html=appHeader()+`<div class="container">`+progressBar("domain-"+idx)+`<span class="eyebrow">Step ${stepNum} of 7 — Domain Assessment</span><h2 class="section-title">${esc(dom.label)}</h2><p class="subtitle">${esc(dom.subtitle)}</p><div style="font-size:14px;color:#0e1c2e;margin-bottom:22px;padding:14px 20px;background:#faf8f4;border:1px solid #e8e3d8;border-left:3px solid #b8922a;line-height:1.7">Select the level that most accurately reflects the client's current situation in this domain. Choose the <strong>lowest level</strong> that accurately applies.</div>`;
+  let html=appHeader()+`<div class="container">`+progressBar("domain-"+idx)+`<div id="case-header-fields" class="no-print" style="margin-bottom:24px"></div><span class="eyebrow">Step ${stepNum} of 7 — Domain Assessment</span><h2 class="section-title">${esc(dom.label)}</h2><p class="subtitle">${esc(dom.subtitle)}</p><div style="font-size:14px;color:#0e1c2e;margin-bottom:22px;padding:14px 20px;background:#faf8f4;border:1px solid #e8e3d8;border-left:3px solid #b8922a;line-height:1.7">Select the level that most accurately reflects the client's current situation in this domain. Choose the <strong>lowest level</strong> that accurately applies.</div>`;
   dom.levels.slice().sort((a,b)=>b.score-a.score).forEach(lv=>{
     const active=cur===lv.score;
     html+=`<div class="level-card${active?" active":""}" data-domain="${dom.id}" data-score="${lv.score}"><div class="level-num${active?" active":""}">${lv.score}</div><div><p class="level-title${active?" active":""}">${esc(lv.title)}</p><p class="level-desc">${esc(lv.description)}</p></div></div>`;
@@ -700,9 +1578,10 @@ function screenDomain(idx){
   return html;
 }
 
-function saveTool5AndComplete(){
+async function saveTool5AndComplete(){
   const sv=DOMAINS.map(d=>S.scores[d.id]).filter(v=>v!=null);
   if(sv.length!==4) return;
+  fciLockDraftAutosaveForCompletion();
   const minS=Math.min(...sv);
   const weak=DOMAINS.filter(d=>S.scores[d.id]===minS).map(d=>d.label);
   const fvi=computeFVI({...S.fviFields,painScore:S.vulnScores.pain,psychScore:S.vulnScores.psych});
@@ -719,6 +1598,7 @@ function saveTool5AndComplete(){
   localStorage.setItem('tool5_data',JSON.stringify(toolData));
   localStorage.setItem('tool5_complete','true');
   var snapshotHtml = buildFciDashboardSnapshot(minS, weak, fvi, toolData);
+  window.__fciLastSnapshotHtml = snapshotHtml;
   var fciHost = document.getElementById('fci-report-snapshot-host');
   if (fciHost) {
     fciHost.innerHTML = snapshotHtml;
@@ -726,16 +1606,58 @@ function saveTool5AndComplete(){
   }
   localStorage.setItem('tool5_report_html', snapshotHtml);
   console.log('FCI report HTML saved, length:', localStorage.getItem('tool5_report_html') ? localStorage.getItem('tool5_report_html').length : 0);
+
+  var paidFciRef=new URLSearchParams(window.location.search).get('case_ref');
+  if(paidFciRef&&!window.__paidPortalFCIRecorded){
+    var recorded=await paidPortalRecordCaseToolRunAsync({
+      toolKey:'FCI',
+      scoreSummary:{
+        tool:'FCI',
+        fciMinScore:minS,
+        functionalVulnerabilityIndicator:fvi,
+        primaryInstabilityDomains:weak
+      },
+      resultJson:toolData
+    });
+    if(recorded===true){
+      window.__paidPortalFCIRecorded=true;
+      await deleteFciDraft();
+      fciDraftLockedAfterRun=true;
+    }else{
+      console.warn('[FCI] case_tool_runs insert failed; draft retained');
+      fciDraftAutosaveDisabled=false;
+    }
+  }
 }
 
 function screenComplete(){
-  return appHeader()+`<div class="container">`+progressBar("complete")+`<div class="card" style="text-align:center;padding:40px 28px 48px"><span class="eyebrow">Assessment complete</span><h2 class="section-title" style="margin-top:12px">Functional Capacity Index</h2><p style="font-size:15px;color:#3a4a5a;line-height:1.85;margin:16px auto 0;max-width:520px">Your responses have been saved. Detailed analysis will be available on the dashboard after all assessments are complete.</p><div class="nav-row no-print" style="justify-content:center;margin-top:36px;flex-wrap:wrap;gap:16px"><button type="button" class="btn-ghost" onclick="returnToDashboard()">&larr; Return to Dashboard</button><button type="button" class="btn-primary" onclick="goToNext()">Next Assessment &rarr;</button></div></div></div>`;
+  var paidRef=new URLSearchParams(window.location.search).get('case_ref');
+  if(paidRef){
+    return appHeader()+`<div class="container fci-paid-complete-container">`+progressBar("complete")+`<div id="case-header-fields" class="no-print" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)"></div><div id="fci-paid-report-anchor"></div><div id="fci-paid-report-block" style="margin-top:0;text-align:left"><div id="fci-paid-report-visible" style="margin-top:0;text-align:left"></div></div><div class="no-print fci-paid-report-toolbar" style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;padding:10px 0 6px;border-top:1px solid #e8e3d8;margin-top:8px"><button type="button" class="btn-primary" onclick="fciScrollToPaidReport()">View Report</button><button type="button" class="btn-primary" onclick="window.print()">Print / Save PDF</button><a id="fci-paid-return-case" class="btn-ghost" href="/case-detail.html" style="display:inline-block;text-decoration:none;padding:10px 20px;border:1.5px solid #0c1c34;border-radius:4px;color:#0c1c34;font-weight:600">Return to Case</a><button type="button" class="btn-ghost" onclick="returnToDashboard()">Dashboard</button></div></div>`;
+  }
+  return appHeader()+`<div class="container fci-paid-complete-container">`+progressBar("complete")+`<div id="case-header-fields" class="no-print" style="margin-bottom:16px"></div><div id="fci-paid-report-anchor"></div><div id="fci-paid-report-block" style="margin-top:0;text-align:left"><div id="fci-paid-report-visible" style="margin-top:0;text-align:left"></div></div><div class="no-print fci-paid-report-toolbar" style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;padding:10px 0 6px;border-top:1px solid #e8e3d8;margin-top:8px"><button type="button" class="btn-ghost" onclick="returnToDashboard()">&larr; Return to Dashboard</button><button type="button" class="btn-primary" onclick="goToNext()">Next Assessment &rarr;</button></div></div>`;
+}
+
+function fciSyncPaidReportIdentity(){
+  var src=document.getElementById('case-header-fields');
+  if(!src) return;
+  var pairs=[['case_title','fci-report-id-case'],['client_name','fci-report-id-client'],['date_of_injury','fci-report-id-doi'],['case_status','fci-report-id-status']];
+  pairs.forEach(function(pair){
+    var sEl=src.querySelector('[data-case-identity="'+pair[0]+'"]');
+    var tEl=document.getElementById(pair[1]);
+    if(sEl&&tEl) tEl.textContent=sEl.textContent;
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // RENDER + EVENT BINDING
 // ─────────────────────────────────────────────────────────────────────────────
 function render(){
+  if (S.screen === 'complete' && fciVulnAndFviComplete() && fciStateHasAllDomainScores()) {
+    if (fciHydratingFromDraft || !window.__fciLastSnapshotHtml) {
+      fciRebuildSnapshotFromStateNoSave();
+    }
+  }
   const app=document.getElementById("app");
   const sc=S.screen;
   let html="";
@@ -748,7 +1670,48 @@ function render(){
 
   app.innerHTML=html;
   bindEvents();
+  if(sc==="complete"){
+    var pr=new URLSearchParams(window.location.search).get('case_ref');
+    var host=document.getElementById('fci-paid-report-visible');
+    if(host&&window.__fciLastSnapshotHtml){ host.innerHTML=window.__fciLastSnapshotHtml; }
+    if(window.caseClarityIdentity&&window.supabaseClient){
+      void window.caseClarityIdentity.mountToolPage(window.supabaseClient).then(function(){
+        fciSyncPaidReportIdentity();
+      });
+    } else {
+      fciSyncPaidReportIdentity();
+    }
+    var a=document.getElementById('fci-paid-return-case');
+    if(a&&pr){ a.setAttribute('href','/case-detail.html?case_ref='+encodeURIComponent(pr)); }
+  }
+  if (!fciHydratingFromDraft) scheduleFciDraftSave();
+  fciUpdateInstructionsBtnVisibility();
   window.scrollTo(0,0);
+}
+
+/* View Instructions — show button on scoring screens (vuln, domain-N, complete); hide on intro screens */
+function fciUpdateInstructionsBtnVisibility(){
+  var btn = document.getElementById('fci-vi-btn');
+  if (!btn) return;
+  var sc = S.screen || '';
+  var show = sc === 'vuln' || sc.indexOf('domain-') === 0 || sc === 'complete';
+  btn.style.display = show ? 'block' : 'none';
+}
+function fciOpenInstructions(){
+  var ov = document.getElementById('fci-vi-overlay');
+  if (ov) ov.classList.add('open');
+}
+function fciCloseInstructions(){
+  var ov = document.getElementById('fci-vi-overlay');
+  if (ov) ov.classList.remove('open');
+}
+function fciCloseInstructionsIfBackdrop(e){
+  if (e && e.target && e.target.id === 'fci-vi-overlay') fciCloseInstructions();
+}
+
+function fciScrollToPaidReport(){
+  var el=document.getElementById('fci-paid-report-block')||document.getElementById('fci-paid-report-anchor');
+  if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 function bindEvents(){
@@ -792,8 +1755,10 @@ function bindEvents(){
     bind("dom-next",()=>{
       if(idx<DOMAINS.length-1) setState({screen:"domain-"+(idx+1)});
       else{
-        saveTool5AndComplete();
-        setState({screen:"complete"});
+        void (async function(){
+          await saveTool5AndComplete();
+          setState({screen:"complete"});
+        })();
       }
     });
   }
@@ -801,8 +1766,22 @@ function bindEvents(){
 
 function bind(id,fn){ const el=document.getElementById(id); if(el) el.addEventListener("click",fn); }
 
-// Initial render
-render();
+async function fciDomReady(){
+  if(window.caseClarityIdentity&&window.supabaseClient){
+    await window.caseClarityIdentity.mountToolPage(window.supabaseClient);
+  }
+  fciInitPaidDraftPersistence();
+  await loadFciDraft();
+  fciHydratingFromDraft=true;
+  render();
+  requestAnimationFrame(function(){
+    fciHydratingFromDraft=false;
+  });
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  void fciDomReady();
+});
 </script>
 <script>
 function goToNext() {
@@ -847,6 +1826,5 @@ function returnToDashboard() {
     window.location.href = 'dashboard.html';
 }
 </script>
-<script src="trial-pinned-banner.js"></script>
 </body>
 </html>
