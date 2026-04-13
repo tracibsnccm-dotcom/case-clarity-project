@@ -1633,8 +1633,6 @@
         <div class="submit-title">Assessment Complete</div>
         <p class="submit-sub">All 7 Clinical Rights have been evaluated. Open the full two-page report below, or use the dashboard / next assessment options.</p>
         <div class="csa-report-completion-actions no-print">
-          <button type="button" class="btn-primary" onclick="csaOpenReportWindow()">View Report</button>
-          <button type="button" class="btn-primary" onclick="csaPrintPaidReport()">Print / Save PDF</button>
         </div>
         <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 24px;">
           <button type="button" onclick="returnToDashboard()" class="btn-ghost-on-light">← Return to Dashboard</button>
@@ -1645,8 +1643,6 @@
         <div class="submit-title">Assessment Complete</div>
         <p class="submit-sub no-print">Your Clinical Sequencing Auditor report is ready. Open it in a new tab to review the full two-page report, or print / save as PDF from there.</p>
         <div class="csa-report-completion-actions no-print">
-          <button type="button" class="btn-primary" onclick="csaOpenReportWindow()">View Report</button>
-          <button type="button" class="btn-primary" onclick="csaPrintPaidReport()">Print / Save PDF</button>
           <button type="button" class="csa-drawer-trigger" onclick="csaOpenInstructionsDrawer()">View Instructions</button>
           <a id="csa-paid-return-case" class="btn-ghost-on-light" href="/case-detail.html">Return to Case</a>
           <button type="button" onclick="returnToDashboard()" class="btn-ghost-on-light">Dashboard</button>
@@ -2860,8 +2856,6 @@ function csaGetReportStandaloneStyles() {
 
 function csaGetReportToolbarHtml() {
   return '<div class="csa-report-toolbar" role="toolbar" aria-label="Report actions">' +
-    '<button type="button" onclick="document.getElementById(\'csa-report-page-summary\').scrollIntoView({block:\'start\',behavior:\'smooth\'})">View Report</button>' +
-    '<button type="button" onclick="window.print()">Print / Save PDF</button>' +
     '</div>';
 }
 
