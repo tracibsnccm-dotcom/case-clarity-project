@@ -2382,7 +2382,7 @@ function render() {
   updateSidebar();
   updatePill();
   const isLast = step===5;
-  document.getElementById('btnNext').textContent = isLast ? 'View Results →' : 'Continue →';
+  document.getElementById('btnNext').textContent = isLast ? 'Complete Assessment →' : 'Continue →';
 
   if      (step<=3) renderAllDomains();
   else if (step===4) renderDrivers();
