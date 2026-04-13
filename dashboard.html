@@ -1620,7 +1620,7 @@
                   
                   <h4 style="margin: 20px 0 10px;">What to Expect</h4>
                   <ul style="margin-bottom: 16px; padding-left: 20px;">
-                    <li>We recommend you complete the instruments using two types of cases: one active and one retrospective (closed) case.</li>
+                    <li>Complete all six instruments for your case to generate the full report set.</li>
                     <li>Case information will be entered once and applied across all six instruments.</li>
                     <li>Each instrument typically requires approximately 10–15 minutes to complete.</li>
                     <li>Estimated total assessment time: approximately 60–90 minutes.</li>
@@ -1660,14 +1660,14 @@
                 <!-- CASE ENTRY SECTION (side by side) -->
                 <div style="background: #fff; border: 1px solid #d6d0c4; padding: 24px; margin-bottom: 32px;">
                   <h2 style="font-size: 20px; margin-bottom: 16px;">Enter Your Case Information</h2>
-                  <p style="margin-bottom: 20px;">Provide basic information for both cases. This information will be used across all six assessment instruments — you will not be asked to re-enter it within each tool.</p>
+                  <p style="margin-bottom: 20px;">Provide basic information for your case. This information will be used across all six assessment instruments — you will not be asked to re-enter it within each tool.</p>
                   <div style="margin-bottom: 20px; padding: 12px; background: #f1f0eb; border-left: 3px solid #b8922a;">
                     <p style="font-size: 14px;"><strong>Data Storage Notice:</strong> Case information entered here is stored only during the active 7-day assessment window. All case data, instrument responses, and generated reports are automatically deleted when the assessment period expires.</p>
                   </div>
                   <div class="case-entry-two-col">
                     <div class="case-entry-panel">
                       <div class="case-entry-block">
-                        <h3 style="font-size: 17px; color: #0c1c34; margin-bottom: 18px;">Active Case</h3>
+                        <h3 style="font-size: 17px; color: #0c1c34; margin-bottom: 18px;">Case</h3>
                         <div class="case-entry-field">
                           <label for="active-name-case-id">Name / Case ID</label>
                           <input type="text" id="active-name-case-id" placeholder="" value="${acName}" autocomplete="off">
@@ -1690,34 +1690,7 @@
                           </select>
                         </div>
                       </div>
-                    </div>
-                    <div class="case-entry-panel">
-                      <div class="case-entry-block">
-                        <h3 style="font-size: 17px; color: #0c1c34; margin-bottom: 18px;">Retrospective (closed case)</h3>
-                        <div class="case-entry-field">
-                          <label for="retro-name-case-id">Name / Case ID</label>
-                          <input type="text" id="retro-name-case-id" placeholder="" value="${rcName}" autocomplete="off">
-                        </div>
-                        <div class="case-entry-field">
-                          <label for="retro-date-injury">Date of Injury / Loss</label>
-                          <input type="date" id="retro-date-injury" value="${rcDate}">
-                        </div>
-                        <div class="case-entry-field">
-                          <label for="retro-mechanism">Mechanism of Injury</label>
-                          <input type="text" id="retro-mechanism" placeholder="" value="${rcMech}" autocomplete="off">
-                        </div>
-                        <div class="case-entry-field">
-                          <label for="retro-case-type">Case Type</label>
-                          <select id="retro-case-type">
-                            <option value="">Select…</option>
-                            <option value="PI"${sel(rcType, 'PI')}>PI</option>
-                            <option value="WC"${sel(rcType, 'WC')}>WC</option>
-                            <option value="Disability"${sel(rcType, 'Disability')}>Disability</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                    </div>                  </div>
                   <button type="button" id="save-case-info" style="background: #0c1c34; color: white; border: none; padding: 10px 24px; cursor: pointer;">Save Case Information</button>
                   <span style="margin-left: 16px; font-size: 13px; color: #666;">You may edit this information from the dashboard at any time during the assessment window.</span>
                 </div>
@@ -1727,15 +1700,15 @@
             // Active Case Section
             html += `
                 <div class="case-section case-section-active">
-                    <h2 style="font-size: 20px; margin: 32px 0 16px;">Active Case — Recommended Order</h2>
+                    <h2 style="font-size: 20px; margin: 32px 0 16px;">Case — Recommended Order</h2>
                     <p style="margin-bottom: 20px; color: #4a5568; line-height: 1.6;">It is recommended that you complete in order, but you may choose any sequence. Reports will unlock for download once all assessments in this section are completed.</p>
                     <p style="margin-bottom: 24px; color: #4a5568; line-height: 1.6; padding: 16px; background: #f4f6f8; border-left: 3px solid #0c1c34;">Consider beginning with a case that has stalled or where clinical direction is unclear. This process also provides a framework for new cases, offering guidance from the outset.</p>
-                    <p style="margin-bottom: 12px; font-size: 15px; color: #0c1c34; font-weight: 600;">Start here with your Active Case</p>
+                    <p style="margin-bottom: 12px; font-size: 15px; color: #0c1c34; font-weight: 600;">Start here with your case</p>
                     <div class="collapsible-section">
                       <div class="collapsible-header" onclick="toggleSection('active-tools')">
                         <span style="display: flex; align-items: center; gap: 12px;">
                           <span class="arrow expanded" id="arrow-active">▶</span>
-                          <span>Active Case Tools (<span id="active-progress">${localN}/6</span> completed)</span>
+                          <span>Case Tools (<span id="active-progress">${localN}/6</span> completed)</span>
                         </span>
                       </div>
                       <div class="collapsible-content expanded" id="active-tools">
@@ -1756,59 +1729,18 @@
 
             html += `</div>
                     <div class="inline-reports-card">
-                      <h4 style="font-size: 15px; color: #0c1c34; margin-bottom: 12px;">Active Case Reports</h4>
-                      <p style="font-size: 14px; color: #4a5568; margin-bottom: 10px; line-height: 1.5;">Reports available when all 6 Active assessments are complete.</p>
+                      <h4 style="font-size: 15px; color: #0c1c34; margin-bottom: 12px;">Case Reports</h4>
+                      <p style="font-size: 14px; color: #4a5568; margin-bottom: 10px; line-height: 1.5;">Reports available when all 6 assessments are complete.</p>
                       <p style="font-size: 14px; color: #b8922a; margin-bottom: 8px;">Progress: <span id="active-assessment-report-progress">${localN}</span>/6</p>
                       <p id="report-active-capture" style="font-size: 12px; color: #6a7a8a; margin-bottom: 14px; line-height: 1.4;">${activePrintReady ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localN + '/6. Complete all six to unlock downloads.')}</p>
-                      <button type="button" class="btn-report" data-report-btn="active" id="btn-download-active-all" ${(localN === 6 && !trialExpired) ? '' : 'disabled'} onclick="printActiveReports()">Download All Active Reports</button>
+                      <button type="button" class="btn-report" data-report-btn="active" id="btn-download-active-all" ${(localN === 6 && !trialExpired) ? '' : 'disabled'} onclick="printActiveReports()">Download All Reports</button>
                     </div>
                       </div>
                     </div>
                 </div>`;
 
             // Retrospective Case Section
-            html += `
-                <div class="case-section case-section-retro">
-                    <h2 style="font-size: 20px; margin: 48px 0 16px;">Retrospective Case</h2>
-                    <p style="margin-bottom: 24px; color: #4a5568; line-height: 1.6; padding: 16px; background: #faf6f0; border-left: 3px solid #8b6914;">For cases that have already settled, this review may identify factors that could have influenced the outcome or settlement value.</p>
-                    <div class="collapsible-section">
-                      <div class="collapsible-header" onclick="toggleSection('retro-tools')">
-                        <span style="display: flex; align-items: center; gap: 12px;">
-                          <span class="arrow" id="arrow-retro">▶</span>
-                          <span>Retrospective Case Tools (<span id="retro-progress">${localN}/6</span> completed)</span>
-                        </span>
-                      </div>
-                      <div id="retro-preview" class="tool-preview" style="margin: 4px 0 8px 24px; font-size: 13px; color: #8a9aa8;">
-                        CCI · CSA · CAF · HSI · FCI · RRF
-                      </div>
-                      <div class="collapsible-content" id="retro-tools">
-                    <div class="tools-grid">
-            `;
-
-            const retroAssessments = (typeof session !== 'undefined' && session && session.retrospective_case && session.retrospective_case.assessments) || {};
-            TOOL_ORDER.forEach(toolKey => {
-                const tool = TOOL_INFO[toolKey];
-                const status = retroAssessments[toolKey]?.status || 'not_started';
-                const retroLocked = trialRetroLocked;
-                html += getToolCard(toolKey, tool, status, 'retrospective', {
-                    displayName: tool.name,
-                    cardClass: 'tool-card-retro',
-                    trialExpired: trialExpired,
-                    lockedBySequence: retroLocked
-                });
-            });
-
-            html += `</div>
-                    <div class="inline-reports-card">
-                      <h4 style="font-size: 15px; color: #0c1c34; margin-bottom: 12px;">Retrospective Case Reports</h4>
-                      <p style="font-size: 14px; color: #4a5568; margin-bottom: 10px; line-height: 1.5;">Reports available when all 6 Retrospective assessments are complete.</p>
-                      <p style="font-size: 14px; color: #b8922a; margin-bottom: 8px;">Progress: <span id="retro-assessment-report-progress">${localN}</span>/6</p>
-                      <p id="report-retro-capture" style="font-size: 12px; color: #6a7a8a; margin-bottom: 14px; line-height: 1.4;">${retroPrintReady ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localN + '/6. Complete all six to unlock downloads.')}</p>
-                      <button type="button" class="btn-report" data-report-btn="retro" id="btn-download-retro-all" ${(localN === 6 && !trialExpired) ? '' : 'disabled'} onclick="printRetroReports()">Download All Retro Reports</button>
-                    </div>
-                      </div>
-                    </div>
-                </div>`;
+            
 
             container.innerHTML = html;
 
@@ -1916,7 +1848,7 @@
             } else if (effectiveDone) {
                 btnLabel = 'Completed';
             } else if (opts.lockedBySequence) {
-                btnLabel = caseType === 'active' ? 'Complete previous step first' : 'Complete Active Case first';
+                btnLabel = 'Complete previous step first';
             }
 
             return `
