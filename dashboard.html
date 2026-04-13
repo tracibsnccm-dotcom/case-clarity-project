@@ -1964,6 +1964,13 @@
             window.location.href = 'login.html';
         };
 
+        // Initial render — was missing, caused blank dashboard
+        if (typeof computeTrialDaysRemaining === 'function' && computeTrialDaysRemaining() <= 0 && localStorage.getItem('trial_start_at')) {
+            showExpiredMessage();
+        } else {
+            renderDashboard();
+        }
+
         // Refresh progress every 30 seconds
         setInterval(function() {
             updateTrialReportUI();
