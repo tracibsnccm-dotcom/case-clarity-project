@@ -6,6 +6,8 @@
   <title>Recovery Risk Forecaster™ – RCMS</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="trial-pinned-banner.css" />
+  <link rel="stylesheet" href="css/case-identity.css" />
+  <link rel="stylesheet" href="css/theme.css" />
   <style>
     :root {
       --navy: #1a2744;
@@ -39,15 +41,16 @@
       min-height: 100vh;
     }
 
-    /* ── Header ── */
-    header {
+    /* ── RRF hero (section — normal document flow, no flex distribution) ── */
+    .rrf-hero {
+      display: block;
       background: var(--navy);
       color: var(--white);
       padding: 2.5rem 2rem 2rem;
       text-align: center;
       border-bottom: 4px solid var(--gold);
     }
-    header .eyebrow {
+    .rrf-hero .eyebrow {
       font-size: 0.72rem;
       letter-spacing: 0.22em;
       text-transform: uppercase;
@@ -55,22 +58,22 @@
       font-weight: 600;
       margin-bottom: 0.6rem;
     }
-    header h1 {
+    .rrf-hero h1 {
       font-family: 'Playfair Display', serif;
       font-size: clamp(1.6rem, 4vw, 2.4rem);
       font-weight: 700;
       line-height: 1.2;
       margin-bottom: 0.5rem;
     }
-    header h1 span { color: var(--gold-light); }
-    header .tagline {
+    .rrf-hero h1 span { color: var(--gold-light); }
+    .rrf-hero .tagline {
       font-size: 0.95rem;
       color: rgba(255,255,255,0.72);
       max-width: 580px;
       margin: 0 auto;
       line-height: 1.5;
     }
-    header .badge {
+    .rrf-hero .badge {
       display: inline-block;
       margin-top: 1rem;
       background: rgba(184,151,58,0.18);
@@ -473,11 +476,12 @@
 
     .hidden { display: none !important; }
 
-    /* ── Explainer page ── */
-    #explainerPage {
-      max-width: 680px;
-      margin: 3rem auto;
-      padding: 0 1.5rem 4rem;
+    /* ── Intro stack: hero → identifier → explainer → action (block flow, 860px) ── */
+    #explainerPage.rrf-page {
+      display: block;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0.65rem 1.5rem 2.25rem;
     }
     .explainer-card {
       background: var(--white);
@@ -485,7 +489,7 @@
       border-top: 4px solid var(--gold);
       border-radius: 4px;
       box-shadow: var(--shadow);
-      padding: 2.5rem 2rem;
+      padding: 2.25rem 2rem 2rem;
     }
     .explainer-card h2 {
       font-family: 'Playfair Display', serif;
@@ -524,9 +528,31 @@
     .explainer-closing {
       font-size: 0.9rem;
       color: var(--gray-600);
-      margin-top: 1.5rem;
-      padding-top: 1rem;
+      margin-top: 1.35rem;
+      padding-top: 0.85rem;
       border-top: 1px solid var(--border);
+      margin-bottom: 0;
+    }
+    .rrf-page .rrf-identifier-wrap {
+      margin: 0 0 0.65rem;
+      padding: 0;
+      max-width: none;
+    }
+    .rrf-page .rrf-identifier-wrap .case-clarity-identity-card {
+      margin-bottom: 0;
+    }
+    .rrf-page .rrf-intro-card {
+      margin: 0;
+      padding: 0;
+      display: block;
+    }
+    .rrf-page .rrf-action-row {
+      margin-top: 0.65rem;
+      padding: 0;
+      display: block;
+    }
+    .rrf-page .rrf-action-row .explainer-btn {
+      margin-top: 0;
     }
     .explainer-btn {
       display: inline-block;
@@ -601,7 +627,7 @@
 
     /* ── Print styles ── */
     @media print {
-      header, .completion-meter, .btn-outline, .calc-btn, .accordion-header,
+      header, .rrf-hero, .completion-meter, .btn-outline, .calc-btn, .accordion-header,
       #caseTypeSection, #disabilityPlaceholder, #explainerPage { display: none !important; }
       .case-reference-block { display: block !important; border: 1px solid #ccc; }
       .result-box { break-inside: avoid; }
@@ -638,24 +664,75 @@
       border-top: 1px solid var(--border);
     }
     footer strong { color: var(--gray-600); }
-  </style>
-</head>
-<body>
 
-<header>
+    @media print {
+      #rrf-paid-complete .no-print { display: none !important; }
+      #rrf-paid-complete { position: static !important; inset: auto !important; background: #fff !important; }
+      #case-header-fields,
+      #case-header-fields *,
+      #rrf-overlay-case-header-fields,
+      #rrf-overlay-case-header-fields *,
+      #rrf-paid-report-visible,
+      #rrf-paid-report-visible * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth-guard.js"></script>
+  <script src="js/portal-header-nav.js"></script>
+  <script src="js/paid-portal-tool-run.js"></script>
+  <script src="js/case-identity.js"></script>
+</head>
+<body class="with-portal-tool-header">
+
+<header class="portal-header no-print">
+  <a href="/index.html" class="portal-logo">
+    <div class="portal-logo-box"><span>C</span></div>
+    <div class="portal-logo-text">
+      <strong>C.A.S.E. Clarity</strong>
+      Reconcile Care Management Services
+    </div>
+  </a>
+  <div class="portal-header-right">
+    <a href="/case-detail.html" class="portal-nav-link" id="portal-nav-back-case">Back to Case</a>
+    <a href="/dashboard.html" class="portal-nav-link" id="portal-nav-back-dashboard">Back to Dashboard</a>
+    <span class="portal-user" id="user-email">Loading…</span>
+    <button type="button" class="btn-secondary" id="portal-nav-logout" disabled>Logout</button>
+  </div>
+</header>
+<script>
+(function () {
+  async function boot() {
+    const ok = await requireAuth();
+    if (!ok) return;
+    if (typeof initPortalHeaderNav === 'function') initPortalHeaderNav();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { void boot(); });
+  else void boot();
+})();
+</script>
+
+<section class="rrf-hero">
   <div class="eyebrow">Reconcile Care Management Services™</div>
   <h1>Recovery Risk <span>Forecaster™</span></h1>
   <p class="tagline">
     Select the case type to load the appropriate risk engine.
   </p>
   <span class="badge">Clinical Tool — Attorney &amp; RN Use</span>
-</header>
+</section>
 
 <!-- ══════════════════════════════════════════
-     EXPLAINER PAGE
+     INTRO FLOW: hero → identifier → explainer → action (single #case-header-fields)
 ═══════════════════════════════════════════ -->
-<div id="explainerPage">
-  <div class="explainer-card">
+<div id="explainerPage" class="rrf-page rrf-intro-content">
+  <section class="rrf-identifier-wrap" aria-label="Case overview">
+    <div id="case-header-fields"></div>
+  </section>
+  <section class="rrf-intro-card">
+    <div class="explainer-card">
     <h2>Before You Begin — How the Recovery Risk Forecaster™ Works</h2>
 
     <p>The Recovery Risk Forecaster™ is a forensic, evidence-based evaluation tool designed to help attorneys identify the real-world barriers that influence recovery timelines, treatment consistency, and overall case outcomes.</p>
@@ -683,7 +760,10 @@
     </div>
 
     <p class="explainer-closing">To begin the evaluation, please complete the brief access form.</p>
-    <button class="explainer-btn" onclick="startForecaster()">Continue to Access Form →</button>
+    </div>
+  </section>
+  <div class="rrf-action-row">
+    <button type="button" class="explainer-btn" onclick="startForecaster()">Continue to Access Form →</button>
   </div>
 </div>
 
@@ -1284,6 +1364,7 @@
   function startForecaster() {
     document.getElementById('explainerPage').classList.add('hidden');
     document.getElementById('forecasterMain').classList.remove('hidden');
+    scheduleRrfDraftSave();
   }
 
   /* ── Navigation ── */
@@ -1297,10 +1378,17 @@
     // Clear all stored severity values
     severityValues.pi = {};
     severityValues.wc = {};
+    rrfDraftLockedAfterRun = false;
+    rrfDraftAutosaveDisabled = false;
+    clearTimeout(rrfDraftSaveTimer);
+    rrfDraftSaveTimer = null;
+    rrfDraftDirty = false;
+    window.__paidPortalRRFRecorded = false;
     // Reset completion meters
     updateCompletionMeter('pi');
     updateCompletionMeter('wc');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    scheduleRrfDraftSave();
   }
 
   /* ── Mechanism change handler ── */
@@ -1330,6 +1418,27 @@
     wc_mechanism_section: ['wc_mechanism'],
     wc_severity_section:  []
   };
+
+  const RRF_PI_SELECT_IDS = [
+    'pi_vehicleDamaged','pi_liabilityOnly','pi_waitingOtherInsurer','pi_altTransport',
+    'pi_income','pi_dependents','pi_hourly','pi_tenure',
+    'pi_singleParent','pi_caregiving',
+    'pi_accessFriction',
+    'pi_physical','pi_psych',
+    'pi_comm','pi_follow',
+    'pi_mechanism',
+    'pi_severityDomain'
+  ];
+  const RRF_WC_SELECT_IDS = [
+    'wc_occupation','wc_industry',
+    'wc_tenure','wc_wageLoss',
+    'wc_chronic','wc_lightDuty',
+    'wc_accessFriction',
+    'wc_physical','wc_psych',
+    'wc_comm','wc_follow',
+    'wc_mechanism',
+    'wc_severityDomain'
+  ];
 
   function isSectionComplete(prefix, sectionKey, ids) {
     if (ids.length === 0) {
@@ -1371,6 +1480,7 @@
     bar.className = 'completion-bar' + (pct === 100 ? ' complete' : '');
     txt.textContent = complete + ' of ' + total + ' sections complete';
     txt.className = 'completion-text';
+    rrfGuidedAccordionSync(prefix);
   }
 
   function markMeterError(prefix) {
@@ -1382,18 +1492,66 @@
   function selectCaseType(type) {
     document.getElementById('caseTypeSection').classList.add('hidden');
     resetViews();
-    if (type === 'PI')  document.getElementById('piForm').classList.remove('hidden');
-    if (type === 'WC')  document.getElementById('wcForm').classList.remove('hidden');
+    if (type === 'PI') {
+      document.getElementById('piForm').classList.remove('hidden');
+      updateCompletionMeter('pi');
+    }
+    if (type === 'WC') {
+      document.getElementById('wcForm').classList.remove('hidden');
+      updateCompletionMeter('wc');
+    }
     if (type === 'DIS') document.getElementById('disabilityPlaceholder').classList.remove('hidden');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    scheduleRrfDraftSave();
   }
 
-  /* ── Accordion ── */
+  /* ── Accordion — exclusive sections within PI/WC form; one open at a time ── */
+  function rrfCloseAllAccordionsInForm(form) {
+    if (!form) return;
+    form.querySelectorAll('.accordion-body').forEach(function (b) { b.classList.remove('open'); });
+    form.querySelectorAll('.accordion-icon').forEach(function (i) { i.classList.remove('open'); });
+  }
+  function rrfOpenOnlySectionInForm(form, sectionKey) {
+    if (!form || !sectionKey) return;
+    rrfCloseAllAccordionsInForm(form);
+    var acc = form.querySelector('[data-section="' + sectionKey + '"]');
+    if (!acc) return;
+    var body = acc.querySelector('.accordion-body');
+    var icon = acc.querySelector('.accordion-icon');
+    if (body) body.classList.add('open');
+    if (icon) icon.classList.add('open');
+  }
+  function rrfGuidedAccordionSync(prefix) {
+    var formId = prefix === 'pi' ? 'piForm' : 'wcForm';
+    var form = document.getElementById(formId);
+    if (!form || form.classList.contains('hidden')) return;
+    var map = prefix === 'pi' ? piSectionMap : wcSectionMap;
+    var keys = Object.keys(map);
+    var target = null;
+    for (var i = 0; i < keys.length; i++) {
+      var k = keys[i];
+      if (!isSectionComplete(prefix, k, map[k])) {
+        target = k;
+        break;
+      }
+    }
+    if (target) {
+      rrfOpenOnlySectionInForm(form, target);
+    } else {
+      rrfCloseAllAccordionsInForm(form);
+    }
+  }
   function toggleAccordion(header) {
-    const body = header.nextElementSibling;
-    const icon = header.querySelector('.accordion-icon');
-    body.classList.toggle('open');
-    icon.classList.toggle('open');
+    var form = header.closest('#piForm, #wcForm');
+    if (!form) return;
+    var body = header.nextElementSibling;
+    var icon = header.querySelector('.accordion-icon');
+    var wasOpen = body.classList.contains('open');
+    rrfCloseAllAccordionsInForm(form);
+    if (!wasOpen) {
+      body.classList.add('open');
+      if (icon) icon.classList.add('open');
+    }
   }
 
   /* ══════════════════════════════════════════
@@ -1513,6 +1671,283 @@
     severityValues[prefix][domain] = value;
     updateSeverityProgress(prefix);
     updateCompletionMeter(prefix);
+    scheduleRrfDraftSave();
+  }
+
+  // ── Paid portal: case_tool_drafts (RRF) ─────────────────────────────────────
+  var rrfDraftSaveTimer = null;
+  var rrfDraftDirty = false;
+  var rrfDraftApplying = false;
+  var rrfDraftAutosaveDisabled = false;
+  var rrfDraftLockedAfterRun = false;
+  var rrfHydratingFromDraft = false;
+  var RRF_DRAFT_DEBOUNCE_MS = 900;
+
+  function rrfResolveCaseRef() {
+    return typeof window.caseClarityResolveCaseRef === 'function' ? window.caseClarityResolveCaseRef() : null;
+  }
+
+  async function rrfResolvePaidCaseRow(client) {
+    var caseRef = rrfResolveCaseRef();
+    if (!caseRef || !client) return null;
+    var gu = await client.auth.getUser();
+    var user = gu.data && gu.data.user;
+    if (gu.error || !user) return null;
+    var cq = await client
+      .from('case_cases')
+      .select('id, attorney_user_id')
+      .eq('case_ref', caseRef)
+      .eq('attorney_user_id', user.id)
+      .maybeSingle();
+    if (cq.error || !cq.data) {
+      if (cq.error) console.error('[RRF] case lookup for draft', cq.error);
+      return null;
+    }
+    return cq.data;
+  }
+
+  function rrfGetSelectedCaseType() {
+    var pi = document.getElementById('piForm');
+    var wc = document.getElementById('wcForm');
+    var dis = document.getElementById('disabilityPlaceholder');
+    if (pi && !pi.classList.contains('hidden')) return 'PI';
+    if (wc && !wc.classList.contains('hidden')) return 'WC';
+    if (dis && !dis.classList.contains('hidden')) return 'DIS';
+    return null;
+  }
+
+  function rrfDraftHasMeaningfulState(d) {
+    if (!d || d.v !== 1) return false;
+    if (!d.forecasterMainVisible) return false;
+    if (d.selectedCaseType) return true;
+    function objHasVal(o) {
+      if (!o || typeof o !== 'object') return false;
+      return Object.keys(o).some(function (k) {
+        return o[k] !== '' && o[k] != null;
+      });
+    }
+    if (objHasVal(d.piValues) || objHasVal(d.wcValues)) return true;
+    var sp = (d.severityValues && d.severityValues.pi) || {};
+    var sw = (d.severityValues && d.severityValues.wc) || {};
+    if (Object.keys(sp).length > 0 || Object.keys(sw).length > 0) return true;
+    return false;
+  }
+
+  function rrfCollectSelectMap(ids) {
+    var o = {};
+    ids.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) o[id] = el.value;
+    });
+    return o;
+  }
+
+  function rrfCollectDraftJson() {
+    var main = document.getElementById('forecasterMain');
+    return {
+      v: 1,
+      forecasterMainVisible: !!(main && !main.classList.contains('hidden')),
+      selectedCaseType: rrfGetSelectedCaseType(),
+      piValues: rrfCollectSelectMap(RRF_PI_SELECT_IDS),
+      wcValues: rrfCollectSelectMap(RRF_WC_SELECT_IDS),
+      severityValues: {
+        pi: JSON.parse(JSON.stringify(severityValues.pi)),
+        wc: JSON.parse(JSON.stringify(severityValues.wc))
+      },
+      activeSeverityDomain: {
+        pi: (document.getElementById('pi_severityDomain') || {}).value || '',
+        wc: (document.getElementById('wc_severityDomain') || {}).value || ''
+      }
+    };
+  }
+
+  async function saveRrfDraft() {
+    if (rrfDraftApplying || rrfDraftAutosaveDisabled || rrfDraftLockedAfterRun) return;
+    var client = window.supabaseClient;
+    if (!client) return;
+    var rowCtx = await rrfResolvePaidCaseRow(client);
+    if (!rowCtx) return;
+    var draftJson = rrfCollectDraftJson();
+    if (!rrfDraftHasMeaningfulState(draftJson)) return;
+    var payload = {
+      case_id: rowCtx.id,
+      attorney_user_id: rowCtx.attorney_user_id,
+      tool_key: 'RRF',
+      draft_json: draftJson,
+      updated_at: new Date().toISOString()
+    };
+    var up = await client.from('case_tool_drafts').upsert(payload, {
+      onConflict: 'case_id,attorney_user_id,tool_key'
+    });
+    if (up.error) console.error('[RRF] case_tool_drafts upsert failed', up.error);
+    else {
+      console.log('[RRF] draft save ok');
+      rrfDraftDirty = false;
+    }
+  }
+
+  function scheduleRrfDraftSave() {
+    if (rrfDraftApplying || rrfDraftAutosaveDisabled || rrfDraftLockedAfterRun || rrfHydratingFromDraft) return;
+    if (!new URLSearchParams(window.location.search).get('case_ref') || !window.supabaseClient) return;
+    rrfDraftDirty = true;
+    clearTimeout(rrfDraftSaveTimer);
+    rrfDraftSaveTimer = setTimeout(function () {
+      rrfDraftSaveTimer = null;
+      void saveRrfDraft();
+    }, RRF_DRAFT_DEBOUNCE_MS);
+  }
+
+  async function flushRrfDraftSave() {
+    if (rrfDraftLockedAfterRun) return;
+    clearTimeout(rrfDraftSaveTimer);
+    rrfDraftSaveTimer = null;
+    if (rrfDraftDirty) await saveRrfDraft();
+  }
+
+  function rrfApplySelectMap(map) {
+    if (!map || typeof map !== 'object') return;
+    Object.keys(map).forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.value = map[id];
+    });
+  }
+
+  function applyRrfDraftFromJson(d) {
+    if (!d || d.v !== 1 || !rrfDraftHasMeaningfulState(d)) return;
+    var expl = document.getElementById('explainerPage');
+    var main = document.getElementById('forecasterMain');
+    if (d.forecasterMainVisible && expl && main) {
+      expl.classList.add('hidden');
+      main.classList.remove('hidden');
+    }
+    resetViews();
+    var caseSec = document.getElementById('caseTypeSection');
+    if (d.selectedCaseType === 'PI' || d.selectedCaseType === 'WC' || d.selectedCaseType === 'DIS') {
+      caseSec.classList.add('hidden');
+    } else {
+      caseSec.classList.remove('hidden');
+    }
+    severityValues.pi = {};
+    severityValues.wc = {};
+    if (d.severityValues) {
+      if (d.severityValues.pi) Object.assign(severityValues.pi, d.severityValues.pi);
+      if (d.severityValues.wc) Object.assign(severityValues.wc, d.severityValues.wc);
+    }
+    if (d.selectedCaseType === 'PI') {
+      document.getElementById('piForm').classList.remove('hidden');
+      rrfApplySelectMap(d.piValues || {});
+      var domPi = document.getElementById('pi_severityDomain');
+      if (domPi && d.activeSeverityDomain && d.activeSeverityDomain.pi) {
+        domPi.value = d.activeSeverityDomain.pi;
+        loadSeverityDomain('pi', domPi.value);
+      } else if (domPi) {
+        loadSeverityDomain('pi', '');
+      }
+      updateCompletionMeter('pi');
+      updateSeverityProgress('pi');
+      rrfGuidedAccordionSync('pi');
+    } else if (d.selectedCaseType === 'WC') {
+      document.getElementById('wcForm').classList.remove('hidden');
+      rrfApplySelectMap(d.wcValues || {});
+      var domWc = document.getElementById('wc_severityDomain');
+      if (domWc && d.activeSeverityDomain && d.activeSeverityDomain.wc) {
+        domWc.value = d.activeSeverityDomain.wc;
+        loadSeverityDomain('wc', domWc.value);
+      } else if (domWc) {
+        loadSeverityDomain('wc', '');
+      }
+      updateCompletionMeter('wc');
+      updateSeverityProgress('wc');
+      rrfGuidedAccordionSync('wc');
+    } else if (d.selectedCaseType === 'DIS') {
+      document.getElementById('disabilityPlaceholder').classList.remove('hidden');
+    }
+  }
+
+  async function loadRrfDraft() {
+    if (!new URLSearchParams(window.location.search).get('case_ref')) return;
+    var client = window.supabaseClient;
+    if (!client) return;
+    rrfDraftApplying = true;
+    try {
+      var rowCtx = await rrfResolvePaidCaseRow(client);
+      if (!rowCtx) {
+        console.log('[RRF] draft load: none');
+        return;
+      }
+      var dr = await client
+        .from('case_tool_drafts')
+        .select('draft_json')
+        .eq('case_id', rowCtx.id)
+        .eq('tool_key', 'RRF')
+        .maybeSingle();
+      if (dr.error) {
+        console.error('[RRF] draft load failed', dr.error);
+        return;
+      }
+      var dj = dr.data && dr.data.draft_json;
+      if (!dj || !rrfDraftHasMeaningfulState(dj)) {
+        console.log('[RRF] draft load: none');
+        return;
+      }
+      applyRrfDraftFromJson(dj);
+      console.log('[RRF] draft loaded');
+    } finally {
+      rrfDraftApplying = false;
+    }
+  }
+
+  async function deleteRrfDraft() {
+    var client = window.supabaseClient;
+    if (!client) return false;
+    var gu = await client.auth.getUser();
+    var user = gu.data && gu.data.user;
+    if (gu.error || !user) {
+      console.error('[RRF] delete draft getUser', gu.error);
+      return false;
+    }
+    var uid = user.id;
+    var caseRef = rrfResolveCaseRef();
+    if (!caseRef) return false;
+    var cq = await client
+      .from('case_cases')
+      .select('id')
+      .eq('case_ref', caseRef)
+      .eq('attorney_user_id', uid)
+      .maybeSingle();
+    if (cq.error || !cq.data) return false;
+    var del = await client
+      .from('case_tool_drafts')
+      .delete()
+      .eq('case_id', cq.data.id)
+      .eq('attorney_user_id', uid)
+      .eq('tool_key', 'RRF');
+    if (del.error) {
+      console.error('[RRF] case_tool_drafts delete failed', del.error);
+      return false;
+    }
+    console.log('[RRF] draft delete ok');
+    rrfDraftDirty = false;
+    return true;
+  }
+
+  function rrfLockDraftAutosaveForCompletion() {
+    rrfDraftAutosaveDisabled = true;
+    clearTimeout(rrfDraftSaveTimer);
+    rrfDraftSaveTimer = null;
+    rrfDraftDirty = false;
+  }
+
+  function rrfInitPaidDraftPersistence() {
+    if (!new URLSearchParams(window.location.search).get('case_ref')) return;
+    if (window.__rrfDraftEventsBound) return;
+    window.__rrfDraftEventsBound = true;
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'hidden') void flushRrfDraftSave();
+    });
+    window.addEventListener('pagehide', function () {
+      void flushRrfDraftSave();
+    });
   }
 
   const domainLabels = {
@@ -1593,45 +2028,50 @@
     return valid;
   }
 
-  /* ── Risk classification ── */
+  /* ── Risk classification (5-tier) ── */
   function categorize(score) {
-    if (score < 25) return 'Low';
-    if (score < 50) return 'Moderate';
-    if (score < 75) return 'High';
+    if (score < 20) return 'Stable';
+    if (score < 40) return 'Mild';
+    if (score < 60) return 'Moderate';
+    if (score < 80) return 'Severe';
     return 'Critical';
   }
   function riskClass(level) {
-    return { Low:'low', Moderate:'moderate', High:'high', Critical:'critical' }[level];
+    return { Stable:'stable', Mild:'mild', Moderate:'moderate', Severe:'severe', Critical:'critical' }[level];
   }
 
-  /* ── C.A.R.E. tie-in ── */
+  /* ── C.A.R.E. tie-in (5-tier) ── */
   function careTieIn(level) {
-    if (level === 'Low')
+    if (level === 'Stable')
       return 'C.A.R.E. maintains proactive communication and monitors for emerging instability so small issues do not escalate.';
+    if (level === 'Mild')
+      return 'C.A.R.E. monitors low-impact friction points and confirms continued treatment participation as the case progresses.';
     if (level === 'Moderate')
       return 'C.A.R.E. stabilizes early friction points — transportation gaps, income strain, childcare conflicts, or early chronic condition changes — before they disrupt treatment.';
-    if (level === 'High')
+    if (level === 'Severe')
       return 'C.A.R.E. intervenes directly to stabilize the client\'s environment, coordinate care around real-world limitations, and prevent treatment collapse.';
     return 'C.A.R.E. provides immediate, trauma-informed stabilization for clients in crisis, preventing treatment dropout and significant case devaluation.';
   }
 
-  /* ── PI Narratives ── */
+  /* ── PI Narratives (5-tier) ── */
   function piNarrative(level) {
     const n = {
-      Low: 'This client presents with a low recovery risk profile. While barriers exist in virtually every case, the combination of factors evaluated here does not indicate a high probability of treatment disruption at this time. Continued proactive engagement is appropriate to monitor for emerging instability.',
+      Stable: 'This client presents with a stable recovery risk profile. While barriers exist in virtually every case, the combination of factors evaluated here does not indicate a high probability of treatment disruption at this time. Continued proactive engagement is appropriate to monitor for emerging instability.',
+      Mild: 'This client presents with a mild recovery risk profile. A small number of low-impact friction points are present but are not currently expected to materially extend recovery duration. Periodic monitoring is appropriate to confirm these factors remain stable as the case progresses.',
       Moderate: 'This client presents with a moderate and clinically meaningful recovery risk. One or more friction points — transportation instability, financial pressure, caregiving demands, or early behavioral signals — are present and likely to compound over time without intervention. Motor vehicle injury clients at this level frequently underestimate the cumulative weight of barriers on treatment consistency.',
-      High: 'This client presents with a high recovery risk. Multiple reinforcing barriers are simultaneously active across transportation, income, psychological stability, and behavioral follow-through. Without direct clinical intervention and barrier stabilization, treatment disruption is probable and case value is at significant risk.',
+      Severe: 'This client presents with a severe recovery risk. Multiple reinforcing barriers are simultaneously active across transportation, income, psychological stability, and behavioral follow-through. Without direct clinical intervention and barrier stabilization, treatment disruption is probable and case value is at significant risk.',
       Critical: 'This client presents with a critical recovery risk. The convergence of structural, psychological, and behavioral barriers creates a high probability of near-term treatment collapse. Immediate RN intervention, attorney coordination, and a formal care stabilization plan are clinically indicated to prevent case devaluation.'
     };
     return n[level];
   }
 
-  /* ── WC Narratives ── */
+  /* ── WC Narratives (5-tier) ── */
   function wcNarrative(level) {
     const n = {
-      Low: 'This worker presents with a low recovery risk profile. Workplace conditions, financial stability, and behavioral patterns do not indicate significant disruption risk at this time. Standard monitoring and proactive communication are sufficient.',
+      Stable: 'This worker presents with a stable recovery risk profile. Workplace conditions, financial stability, and behavioral patterns do not indicate significant disruption risk at this time. Standard monitoring and proactive communication are sufficient.',
+      Mild: 'This worker presents with a mild recovery risk profile. A small number of low-impact factors are present but are not currently expected to materially extend recovery duration. Periodic monitoring is appropriate to confirm these factors remain stable as the case progresses.',
       Moderate: 'This worker presents with a moderate recovery risk. Wage loss, employer pressure, or early behavioral signals are creating friction that, if unaddressed, can disrupt treatment consistency. Workers at this level frequently express a desire to return to work prematurely as financial and occupational pressure mounts — a pattern that reflects survival-driven decision-making, not non-compliance.',
-      High: 'This worker presents with a high recovery risk. Employer behavior, wage loss, or significant psychological instability are actively undermining treatment engagement. Workers facing retaliatory workplace environments or total wage loss are among the highest-risk populations for abrupt care disengagement. Direct clinical intervention is indicated.',
+      Severe: 'This worker presents with a severe recovery risk. Employer behavior, wage loss, or significant psychological instability are actively undermining treatment engagement. Workers facing retaliatory workplace environments or total wage loss are among the highest-risk populations for abrupt care disengagement. Direct clinical intervention is indicated.',
       Critical: 'This worker presents with a critical recovery risk. A convergence of occupational, financial, and psychosocial pressures is creating conditions where continued treatment engagement is unsustainable without immediate external stabilization. RN-led intervention, attorney coordination, and barrier removal are clinically required.'
     };
     return n[level];
@@ -1647,54 +2087,134 @@
   }
   function rrfTierStyle(level) {
     const T = {
-      Low: { bg: '#e8f5e9', border: '#66bb6a', head: '#1b5e20', pill: '#2e7d32' },
+      Stable:   { bg: '#e8f5e9', border: '#66bb6a', head: '#1b5e20', pill: '#2e7d32' },
+      Mild:     { bg: '#f1f8e9', border: '#9ccc65', head: '#33691e', pill: '#558b2f' },
       Moderate: { bg: '#fff8e1', border: '#ffca28', head: '#f57f17', pill: '#f9a825' },
-      High: { bg: '#fff3e0', border: '#ff9800', head: '#e65100', pill: '#ef6c00' },
+      Severe:   { bg: '#fff3e0', border: '#ff9800', head: '#e65100', pill: '#ef6c00' },
       Critical: { bg: '#ffebee', border: '#ef5350', head: '#b71c1c', pill: '#c62828' }
     };
     return T[level] || T.Moderate;
   }
+  /* ── Recommended Next Actions (5-tier, forecast cadence) ── */
+  function rrfRecommendedActions(level) {
+    const A = {
+      Critical: {
+        cadence: 'Every 30 days',
+        intro: 'The current Recovery Risk Forecaster indicates a significantly extended recovery duration with multiple high-impact risk factors likely to influence long-term treatment continuity and functional restoration.',
+        actions: [
+          'Develop an extended recovery planning framework that anticipates prolonged treatment engagement and potential interruptions across the life of the case.',
+          'Coordinate early communication with treating providers to confirm expected treatment sequencing and identify foreseeable barriers that could lengthen recovery duration.',
+          'Monitor high-impact risk domains closely (such as transportation instability, household disruption, or treatment access friction) to prevent cumulative delays in care participation.',
+          'Establish a structured follow-up schedule to reassess duration risk factors and confirm that case planning remains aligned with the projected recovery timeline.'
+        ],
+        priority: 'Establish a structured long-duration recovery plan that aligns case expectations with the projected extended treatment timeline.',
+        docFocus: 'Document the projected extended recovery duration, identified high-risk domains, and the initial long-term case-planning strategy.'
+      },
+      Severe: {
+        cadence: 'Every 45 days',
+        intro: 'The current Recovery Risk Forecaster indicates an extended recovery timeline influenced by multiple contributing risk factors requiring structured oversight.',
+        actions: [
+          'Review contributing risk domains to identify which factors are most likely to delay treatment progression or continuity.',
+          'Coordinate with treating providers as needed to confirm that anticipated treatment duration aligns with the observed clinical course.',
+          'Monitor external risk contributors such as employment pressures, household instability, or transportation reliability that may affect consistent care participation.',
+          'Schedule periodic duration reviews to confirm whether projected recovery timeframes remain appropriate based on ongoing case developments.'
+        ],
+        priority: 'Identify and monitor the dominant risk factors most likely to extend treatment duration.',
+        docFocus: 'Document the specific duration-risk contributors identified and the monitoring strategy established to track their progression.'
+      },
+      Moderate: {
+        cadence: 'Every 60 days',
+        intro: 'The current Recovery Risk Forecaster indicates a moderately extended recovery duration with identifiable but manageable risk contributors.',
+        actions: [
+          'Review moderate-risk domains to confirm that contributing factors remain stable and are not escalating into higher-risk patterns.',
+          'Monitor treatment continuity indicators to ensure that scheduled care activities remain consistent with the projected recovery timeframe.',
+          'Evaluate changes in environmental or behavioral factors that could shift recovery duration expectations.',
+          'Schedule routine reassessment to confirm that projected recovery duration remains consistent with observed case progress.'
+        ],
+        priority: 'Maintain active monitoring of moderate-risk contributors to prevent progression into higher-duration risk tiers.',
+        docFocus: 'Document current duration expectations and note whether moderate-risk factors remain stable or show signs of escalation.'
+      },
+      Mild: {
+        cadence: 'Every 90 days',
+        intro: 'The current Recovery Risk Forecaster indicates a slightly extended recovery duration with limited contributing risk factors.',
+        actions: [
+          'Confirm stability of low-impact risk domains through periodic review of treatment participation and environmental factors.',
+          'Monitor emerging changes that could introduce new duration risks, particularly shifts in employment, housing, or access reliability.',
+          'Maintain periodic review of treatment progression to ensure recovery milestones remain consistent with projected timelines.',
+          'Schedule routine reassessment to confirm continued alignment between projected and observed recovery duration.'
+        ],
+        priority: 'Confirm that mild-duration risk factors remain stable and do not progress into higher-impact categories.',
+        docFocus: 'Document the current projected recovery duration and confirm the continued stability of contributing risk factors.'
+      },
+      Stable: {
+        cadence: 'Every 6 months + prior to case completion',
+        intro: 'The current Recovery Risk Forecaster indicates a recovery duration with minimal contributing risk factors.',
+        actions: [
+          'Confirm consistency of treatment progression with projected recovery timelines through periodic documentation review.',
+          'Monitor for new duration-risk indicators that may emerge as the case evolves or circumstances change.',
+          'Maintain awareness of environmental and behavioral stability that supports uninterrupted recovery progression.',
+          'Re-run RRF prior to case completion to confirm that the projected duration aligns with final recovery outcomes.'
+        ],
+        priority: 'Maintain routine oversight to confirm continued alignment between projected recovery duration and observed case progression.',
+        docFocus: 'Document sustained alignment between projected recovery duration and treatment progression across the case timeline.'
+      }
+    };
+    const a = A[level] || A.Moderate;
+    const st = rrfTierStyle(level);
+    const tierLabel = level.toUpperCase();
+    const bullets = a.actions.map(function(item) {
+      return '<li style="margin-bottom:8px;line-height:1.6">' + escRrf(item) + '</li>';
+    }).join('');
+    return '<div class="rrf-rna" style="margin-top:20px;padding:18px 20px;background:#fff;border-radius:10px;border:1px solid #e6e6e6;border-left:4px solid ' + st.border + '">' +
+      '<div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:' + st.head + ';margin-bottom:8px">Recommended Next Actions — ' + escRrf(tierLabel) + ' · Re-run RRF: ' + escRrf(a.cadence) + '</div>' +
+      '<p style="margin:0 0 12px;font-size:13px;line-height:1.65;color:#333">' + escRrf(a.intro) + '</p>' +
+      '<ul style="margin:0 0 14px;padding-left:20px;font-size:13px;color:#333">' + bullets + '</ul>' +
+      '<div style="margin-top:10px;padding:10px 12px;background:#f7f9fc;border-radius:6px;border-left:3px solid ' + st.pill + '">' +
+      '<div style="font-size:10px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:#333;margin-bottom:4px">Priority Action</div>' +
+      '<p style="margin:0;font-size:13px;line-height:1.6;color:#222">' + escRrf(a.priority) + '</p></div>' +
+      '<div style="margin-top:8px;padding:10px 12px;background:#f7f9fc;border-radius:6px;border-left:3px solid #999">' +
+      '<div style="font-size:10px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:#333;margin-bottom:4px">Documentation Focus</div>' +
+      '<p style="margin:0;font-size:13px;line-height:1.6;color:#222">' + escRrf(a.docFocus) + '</p></div>' +
+      '</div>';
+  }
+
   function persistRrfReportHtml(toolData) {
     const branch = toolData.branch === 'WC' ? "Workers' Compensation" : 'Personal Injury';
     const narrative = toolData.branch === 'WC' ? wcNarrative(toolData.level) : piNarrative(toolData.level);
     const care = careTieIn(toolData.level);
     const st = rrfTierStyle(toolData.level);
-    const pct = (n, w) => (w ? Math.round((n / w) * 1000) / 10 : 0);
-    const extrPct = pct(toolData.extrinsicScore, 60);
-    const intPct = pct(toolData.intrinsicScore, 25);
-    const behPct = pct(toolData.behavioralScore, 15);
     const dm = Number(toolData.durationMult);
     const dmStr = Number.isFinite(dm) ? dm.toFixed(2) : String(toolData.durationMult);
 
     const html =
       '<div class="rrf-report rrf-dashboard-snapshot" style="font-family:system-ui,Segoe UI,sans-serif;max-width:860px;margin:0 auto;background:#fff;border:1px solid #d6d0c4;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(14,28,46,0.08)">' +
-      '<div style="background:linear-gradient(135deg,#1a2744 0%,#2d3e5f 100%);padding:20px 24px;color:#fff">' +
+      '<div class="rrf-report-header" style="background:linear-gradient(135deg,#1a2744 0%,#2d3e5f 100%);padding:20px 24px;color:#fff">' +
       '<div style="font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#90caf9;margin-bottom:6px">Recovery Risk Forecaster™</div>' +
       '<h2 style="margin:0;font-size:22px;font-weight:800">Recovery risk report</h2>' +
+      '<div class="rrf-report-meta" style="font-size:11px;margin-top:10px;line-height:1.5;opacity:0.95;display:flex;flex-wrap:wrap;gap:6px 16px">' +
+      '<span><strong>Case:</strong> <span id="rrf-report-id-case-title">—</span></span>' +
+      '<span><strong>Client:</strong> <span id="rrf-report-id-client">—</span></span>' +
+      '<span><strong>Type:</strong> <span id="rrf-report-id-case-type">—</span></span>' +
+      '<span><strong>DOI:</strong> <span id="rrf-report-id-doi">—</span></span>' +
+      '<span><strong>Status:</strong> <span id="rrf-report-id-status">—</span></span></div>' +
       '<div style="font-size:12px;opacity:0.88;margin-top:8px">' + escRrf(new Date(toolData.timestamp).toLocaleString()) + ' · ' + escRrf(branch) + '</div></div>' +
       '<div style="padding:22px 24px;background:' + st.bg + ';border-bottom:3px solid ' + st.border + '">' +
       '<div style="font-size:11px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:' + st.head + '">Composite risk level</div>' +
       '<div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:16px;margin-top:8px">' +
       '<span style="font-size:32px;font-weight:900;color:' + st.pill + '">' + escRrf(toolData.level) + '</span>' +
       '<span style="font-size:15px;font-weight:700;color:#333">Score ' + toolData.total + ' / 100</span></div>' +
-      '<p style="margin:12px 0 0;font-size:13px;color:#444;line-height:1.55"><strong>Illustrative treatment duration index:</strong> ' + toolData.predictedDays + ' days <span style="color:#777">(modifier × ' + escRrf(dmStr) + ')</span></p></div>' +
+      '<p style="margin:12px 0 0;font-size:13px;color:#444;line-height:1.55"><strong>Estimated treatment duration:</strong> ' + toolData.predictedDays + ' days</p></div>' +
       '<div style="padding:20px 24px">' +
-      '<div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#1a2744;margin-bottom:14px">Weighted score breakdown</div>' +
-      '<table style="width:100%;border-collapse:collapse;font-size:13px">' +
-      '<tr style="background:#f5f7fa"><th style="text-align:left;padding:10px 12px;border:1px solid #e0e0e0">Component</th><th style="text-align:right;padding:10px 12px;border:1px solid #e0e0e0">Points</th><th style="text-align:right;padding:10px 12px;border:1px solid #e0e0e0">% of cap</th></tr>' +
-      '<tr><td style="padding:10px 12px;border:1px solid #eee">Extrinsic / environmental drivers</td><td style="text-align:right;padding:10px 12px;border:1px solid #eee;font-weight:700">' + Number(toolData.extrinsicScore).toFixed(1) + ' / 60</td><td style="text-align:right;padding:10px 12px;border:1px solid #eee">' + extrPct + '%</td></tr>' +
-      '<tr style="background:#fafafa"><td style="padding:10px 12px;border:1px solid #eee">Intrinsic health / coping</td><td style="text-align:right;padding:10px 12px;border:1px solid #eee;font-weight:700">' + Number(toolData.intrinsicScore).toFixed(1) + ' / 25</td><td style="text-align:right;padding:10px 12px;border:1px solid #eee">' + intPct + '%</td></tr>' +
-      '<tr><td style="padding:10px 12px;border:1px solid #eee">Behavioral engagement</td><td style="text-align:right;padding:10px 12px;border:1px solid #eee;font-weight:700">' + Number(toolData.behavioralScore).toFixed(1) + ' / 15</td><td style="text-align:right;padding:10px 12px;border:1px solid #eee">' + behPct + '%</td></tr>' +
-      '<tr style="background:#e3f2fd;font-weight:800"><td style="padding:10px 12px;border:1px solid #90caf9">Composite (capped)</td><td style="text-align:right;padding:10px 12px;border:1px solid #90caf9">' + toolData.total + ' / 100</td><td style="text-align:right;padding:10px 12px;border:1px solid #90caf9">—</td></tr></table>' +
-      '<div style="margin-top:10px;font-size:12px;color:#666">Raw item sums: extrinsic ' + toolData.extrinsicRaw + ', intrinsic ' + toolData.intrinsicRaw + ', behavioral ' + toolData.behavioralRaw + '</div>' +
-      '<div style="margin-top:22px;padding:18px 20px;background:#f5f9ff;border-radius:10px;border-left:4px solid #1e88e5">' +
+      '<div style="padding:18px 20px;background:#f5f9ff;border-radius:10px;border-left:4px solid #1e88e5">' +
       '<div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#1565c0;margin-bottom:8px">C.A.R.E. coordination focus</div>' +
       '<p style="margin:0;font-size:13px;line-height:1.65;color:#333">' + escRrf(care) + '</p></div>' +
       '<div style="margin-top:20px;padding:18px 20px;background:#fafafa;border-radius:10px;border:1px solid #eee">' +
       '<div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#444;margin-bottom:10px">Clinical narrative</div>' +
       '<p style="margin:0;font-size:13px;line-height:1.7;color:#333">' + escRrf(narrative) + '</p></div>' +
-      '<p style="margin:16px 0 0;font-size:11px;line-height:1.5;color:#888">Illustrative model for care documentation — not a prognosis of legal outcomes.</p></div></div>';
+      rrfRecommendedActions(toolData.level) +
+      '<p style="margin:16px 0 0;font-size:11px;line-height:1.5;color:#888">Clinical care management tool for case coordination and documentation. Not a scientific instrument, predictive model, or substitute for medical or legal judgment.</p></div></div>';
 
+    window.__rrfLastReportHtml = html;
     var rrfHost = document.getElementById('rrf-report-snapshot-host');
     if (rrfHost) {
       rrfHost.innerHTML = html;
@@ -1705,7 +2225,7 @@
   }
 
   /* ── PI Calculation ── */
-  function calculatePI() {
+  async function calculatePI() {
     const piFields = [
       'pi_vehicleDamaged','pi_liabilityOnly','pi_waitingOtherInsurer','pi_altTransport',
       'pi_income','pi_dependents','pi_hourly','pi_tenure',
@@ -1794,11 +2314,34 @@
       );
     }
 
-    window.location.href = 'dashboard.html?complete=true';
+    var paidRrfRef = new URLSearchParams(window.location.search).get('case_ref');
+    if (paidRrfRef && !window.__paidPortalRRFRecorded) {
+      rrfLockDraftAutosaveForCompletion();
+      var recorded = await paidPortalRecordCaseToolRunAsync({
+        toolKey: 'RRF',
+        scoreSummary: {
+          tool: 'RRF',
+          branch: 'PI',
+          total: total,
+          level: level,
+          predictedDays: predicted
+        },
+        resultJson: toolData
+      });
+      if (recorded === true) {
+        window.__paidPortalRRFRecorded = true;
+        await deleteRrfDraft();
+        rrfDraftLockedAfterRun = true;
+      } else {
+        console.warn('[RRF] case_tool_runs insert failed; draft retained');
+        rrfDraftAutosaveDisabled = false;
+      }
+    }
+    rrfAfterPaidPortalComplete();
   }
 
   /* ── WC Calculation ── */
-  function calculateWC() {
+  async function calculateWC() {
     const wcFields = [
       'wc_occupation','wc_industry',
       'wc_tenure','wc_wageLoss',
@@ -1884,7 +2427,30 @@
       );
     }
 
-    window.location.href = 'dashboard.html?complete=true';
+    var paidRrfRefWc = new URLSearchParams(window.location.search).get('case_ref');
+    if (paidRrfRefWc && !window.__paidPortalRRFRecorded) {
+      rrfLockDraftAutosaveForCompletion();
+      var recordedWc = await paidPortalRecordCaseToolRunAsync({
+        toolKey: 'RRF',
+        scoreSummary: {
+          tool: 'RRF',
+          branch: 'WC',
+          total: total,
+          level: level,
+          predictedDays: predicted
+        },
+        resultJson: toolData
+      });
+      if (recordedWc === true) {
+        window.__paidPortalRRFRecorded = true;
+        await deleteRrfDraft();
+        rrfDraftLockedAfterRun = true;
+      } else {
+        console.warn('[RRF] case_tool_runs insert failed; draft retained');
+        rrfDraftAutosaveDisabled = false;
+      }
+    }
+    rrfAfterPaidPortalComplete();
   }
   /* ── Global select listener for completion meter ── */
   document.addEventListener('change', function(e) {
@@ -1892,6 +2458,23 @@
     const id = e.target.id || '';
     if (id.startsWith('pi_')) updateCompletionMeter('pi');
     if (id.startsWith('wc_')) updateCompletionMeter('wc');
+    scheduleRrfDraftSave();
+  });
+
+  async function rrfDomReady() {
+    if (window.caseClarityIdentity && window.supabaseClient) {
+      await window.caseClarityIdentity.mountToolPage(window.supabaseClient);
+    }
+    rrfInitPaidDraftPersistence();
+    await loadRrfDraft();
+    rrfHydratingFromDraft = true;
+    requestAnimationFrame(function () {
+      rrfHydratingFromDraft = false;
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    void rrfDomReady();
   });
 
 </script>
@@ -1937,8 +2520,70 @@ function goToNext() {
 function returnToDashboard() {
     window.location.href = 'dashboard.html';
 }
+
+function rrfSyncReportIdentity() {
+  var src = document.getElementById('rrf-overlay-case-header-fields');
+  if (!src) return;
+  var pairs = [
+    ['case_title', 'rrf-report-id-case-title'],
+    ['client_name', 'rrf-report-id-client'],
+    ['case_type', 'rrf-report-id-case-type'],
+    ['date_of_injury', 'rrf-report-id-doi'],
+    ['case_status', 'rrf-report-id-status']
+  ];
+  pairs.forEach(function (p) {
+    var el = src.querySelector('[data-case-identity="' + p[0] + '"]');
+    var t = document.getElementById(p[1]);
+    if (el && t) t.textContent = el.textContent;
+  });
+}
+function rrfAfterPaidPortalComplete() {
+  var paidRef = new URLSearchParams(window.location.search).get('case_ref');
+  var html = window.__rrfLastReportHtml || '';
+  if (paidRef) {
+    var overlay = document.getElementById('rrf-paid-complete');
+    var vis = document.getElementById('rrf-paid-report-visible');
+    var ret = document.getElementById('rrf-paid-return-case');
+    if (vis) vis.innerHTML = html;
+    if (ret) ret.setAttribute('href', '/case-detail.html?case_ref=' + encodeURIComponent(paidRef));
+    if (window.caseClarityIdentity && window.supabaseClient) {
+      void window.caseClarityIdentity.mount('rrf-overlay-case-header-fields', window.supabaseClient).then(function () {
+        rrfSyncReportIdentity();
+      });
+    } else {
+      rrfSyncReportIdentity();
+    }
+    if (overlay) overlay.style.display = 'block';
+    window.scrollTo(0, 0);
+  } else {
+    window.location.href = 'dashboard.html?complete=true';
+  }
+}
+function rrfScrollToPaidReport() {
+  var el = document.getElementById('rrf-paid-report-block') || document.getElementById('rrf-paid-report-anchor');
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function rrfPrintPaidReport() {
+  window.print();
+}
 </script>
+<div id="rrf-paid-complete" style="display:none;position:fixed;inset:0;z-index:5000;background:#f0ede6;overflow:auto;padding:24px 16px 48px;font-family:system-ui,Segoe UI,sans-serif">
+  <div style="max-width:920px;margin:0 auto">
+    <h2 class="no-print" style="color:#1a2744;font-size:1.35rem;font-weight:700;margin:0 0 10px">Assessment complete</h2>
+    <p class="no-print" style="color:#444;line-height:1.6;margin:0 0 20px;font-size:14px">Your recovery risk report is ready below. You may print or save a PDF, then return to this case or the dashboard.</p>
+    <div class="no-print" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;align-items:center">
+      <button type="button" style="padding:10px 18px;border-radius:6px;border:none;background:#1a2744;color:#fff;font-weight:600;cursor:pointer" onclick="rrfScrollToPaidReport()">View Report</button>
+      <button type="button" style="padding:10px 18px;border-radius:6px;border:none;background:#1a2744;color:#fff;font-weight:600;cursor:pointer" onclick="rrfPrintPaidReport()">Print / Save PDF</button>
+      <a id="rrf-paid-return-case" href="/case-detail.html" style="display:inline-block;padding:10px 18px;border-radius:6px;border:2px solid #1a2744;color:#1a2744;font-weight:600;text-decoration:none">Return to Case</a>
+      <button type="button" style="padding:10px 18px;border-radius:6px;border:2px solid #1a2744;background:transparent;color:#1a2744;font-weight:600;cursor:pointer" onclick="returnToDashboard()">Dashboard</button>
+    </div>
+    <div id="rrf-paid-report-block">
+    <div id="rrf-paid-report-anchor"></div>
+    <div id="rrf-overlay-case-header-fields" class="no-print" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)"></div>
+    <div id="rrf-paid-report-visible"></div>
+    </div>
+  </div>
+</div>
 <div id="rrf-report-snapshot-host" style="position:absolute;left:-9999px;top:0;width:1px;height:1px;overflow:hidden" aria-hidden="true"></div>
-<script src="trial-pinned-banner.js"></script>
 </body>
 </html>
