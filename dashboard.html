@@ -371,23 +371,27 @@
             font-family: inherit;
         }
         .case-entry-two-col {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
+            display: block;
             margin-bottom: 20px;
-        }
-        @media (max-width: 900px) {
-            .case-entry-two-col { grid-template-columns: 1fr; }
         }
         .case-entry-panel {
             border: 1px solid #d6d0c4;
-            padding: 20px 22px;
+            padding: 24px 28px;
             background: #faf8f4;
         }
         .case-entry-panel .case-entry-block {
             border: none;
             margin: 0;
             padding: 0;
+        }
+        .case-entry-fields-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px 28px;
+            margin-top: 4px;
+        }
+        @media (max-width: 700px) {
+            .case-entry-fields-grid { grid-template-columns: 1fr; }
         }
         .inline-reports-card {
             margin-top: 24px;
@@ -1668,6 +1672,7 @@
                     <div class="case-entry-panel">
                       <div class="case-entry-block">
                         <h3 style="font-size: 17px; color: #0c1c34; margin-bottom: 18px;">Case</h3>
+                        <div class="case-entry-fields-grid">
                         <div class="case-entry-field">
                           <label for="active-name-case-id">Name / Case ID</label>
                           <input type="text" id="active-name-case-id" placeholder="" value="${acName}" autocomplete="off">
@@ -1687,7 +1692,8 @@
                             <option value="PI"${sel(acType, 'PI')}>PI</option>
                             <option value="WC"${sel(acType, 'WC')}>WC</option>
                             <option value="Disability"${sel(acType, 'Disability')}>Disability</option>
-                          </select>
+                          </select>                        </div>
+
                         </div>
                       </div>
                     </div>                  </div>
@@ -1735,6 +1741,17 @@
                       <p id="report-active-capture" style="font-size: 12px; color: #6a7a8a; margin-bottom: 14px; line-height: 1.4;">${activePrintReady ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localN + '/6. Complete all six to unlock downloads.')}</p>
                       <button type="button" class="btn-report" data-report-btn="active" id="btn-download-active-all" ${(localN === 6 && !trialExpired) ? '' : 'disabled'} onclick="printActiveReports()">Download All Reports</button>
                     </div>
+                    ${(localN === 6 && !trialExpired) ? `
+                    <div class="purchase-cta-card" style="margin-top:24px;padding:28px 32px;background:linear-gradient(135deg,#0c1c34 0%,#162d4a 100%);border:1px solid #b09837;border-radius:6px;color:#ffffff;text-align:center;">
+                      <p style="margin:0 0 10px;font-family:Georgia,'Times New Roman',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#b09837;">Continue Beyond Your Trial</p>
+                      <h3 style="margin:0 0 14px;font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:normal;color:#ffffff;line-height:1.35;">Ready to make C.A.S.E. Clarity part of your practice?</h3>
+                      <p style="margin:0 0 22px;font-family:Georgia,'Times New Roman',serif;font-size:14px;color:#c4ced8;line-height:1.6;max-width:560px;margin-left:auto;margin-right:auto;">Purchase a single report to keep what you\'ve created, or subscribe to run unlimited assessments on every case you handle.</p>
+                      <div style="display:inline-flex;gap:14px;flex-wrap:wrap;justify-content:center;">
+                        <a href="https://case-clarity-trial-active-purchase-l9vc0ylpl.vercel.app" target="_blank" rel="noopener" style="display:inline-block;padding:13px 32px;background:#b09837;color:#0c1c34;font-family:Georgia,\'Times New Roman\',serif;font-size:14px;letter-spacing:1px;text-decoration:none;font-weight:600;border-radius:4px;">View Purchase Options</a>
+                      </div>
+                      <p style="margin:18px 0 0;font-family:Georgia,\'Times New Roman\',serif;font-size:11px;color:#8899aa;letter-spacing:1px;">No commitment required. Review plans at your own pace.</p>
+                    </div>
+                    ` : ''}
                       </div>
                     </div>
                 </div>`;
@@ -1882,11 +1899,14 @@
 
         function showExpiredMessage() {
             document.getElementById('dashboard-content').innerHTML = `
-                <div class="expired-message">
-                    <h2>Access Expired</h2>
-                    <p>Your 7-day trial has ended.</p>
-                    <p><a href="pricing.html" style="color:#1a2e3f;text-decoration:underline;font-weight:bold;">Purchase a subscription to continue</a></p>
-                    <button onclick="handleLogout()" class="btn-primary" style="margin-top: 20px;">Return to Login</button>
+                <div class="expired-message" style="max-width:640px;margin:60px auto;padding:44px 48px;background:#ffffff;border:1px solid #d6d0c4;border-top:4px solid #b09837;text-align:center;">
+                    <p style="margin:0 0 12px;font-family:Georgia,'Times New Roman',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#b09837;">Trial Concluded</p>
+                    <h2 style="margin:0 0 16px;font-family:Georgia,'Times New Roman',serif;font-size:26px;font-weight:normal;color:#0c1c34;">Your 7-day trial has ended</h2>
+                    <p style="margin:0 0 28px;font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#4a5568;line-height:1.7;">Continue using the C.A.S.E. Clarity System on every case you handle. Review available subscription options to keep your access open.</p>
+                    <a href="https://clarity-post-trial-pricing-qnsof4i2l-tracis-projects-26fd65a2.vercel.app" target="_blank" rel="noopener" style="display:inline-block;padding:13px 32px;background:#0c1c34;color:#ffffff;font-family:Georgia,'Times New Roman',serif;font-size:14px;letter-spacing:1px;text-decoration:none;font-weight:600;border-radius:4px;border:1.5px solid #b09837;">View Subscription Plans</a>
+                    <div style="margin-top:24px;padding-top:20px;border-top:1px solid #e8e3d8;">
+                      <button onclick="handleLogout()" style="background:transparent;border:1px solid #c4ced8;color:#4a5568;padding:9px 22px;font-family:Georgia,'Times New Roman',serif;font-size:13px;cursor:pointer;border-radius:3px;">Return to Login</button>
+                    </div>
                 </div>
             `;
         }
