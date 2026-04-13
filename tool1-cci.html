@@ -1304,9 +1304,33 @@ function buildCciReportPremiumHtml(ad,toolData,level,cmg,identityRow){
   for(var i=1;i<=5;i++){
     meterSegs+='<div class="rpt-meter-seg'+(i<=level?' rpt-meter-on':'')+'"></div>';
   }
-  var guid=(cmg.guidance||[]).map(function(g){
-    return '<li>'+escSnap(g)+'</li>';
+  var nextActionsItems=(cmg.guidance||[]).map(function(g){
+    return '<li style="display:flex;align-items:flex-start;gap:10px;font-size:14px;color:#1a1a1a;line-height:1.65;margin-bottom:8px;font-weight:500"><span style="width:7px;height:7px;border-radius:50%;background:#b09837;flex-shrink:0;margin-top:8px;border:1.5px solid #8a7728"></span><span>'+escSnap(g)+'</span></li>';
   }).join('');
+  var nurseCarveOut='';
+  if(level===1||level===2){
+    nurseCarveOut=
+      '<div style="margin-top:1rem;padding:0.95rem 1.1rem;background:#fffbea;border:1.5px solid #b09837;border-left:5px solid #b09837;border-radius:6px">'+
+      '<div style="font-size:11px;font-weight:800;color:#7a6a22;text-transform:uppercase;letter-spacing:0.13em;margin-bottom:0.5rem;display:flex;align-items:center;gap:7px"><span style="display:inline-block;width:8px;height:8px;background:#b09837;border-radius:50%"></span>Nurse Care Manager</div>'+
+      '<p style="margin:0;font-size:13.5px;color:#1a1a1a;line-height:1.65;font-weight:500">Consider engagement of a <strong style="color:#7a6a22">nurse care manager</strong> if the client is comatose, in intensive care, anticipated to be bedridden for 21 days or longer, or is a candidate for long-term rehabilitation, as assistance with community resources and services may be required.</p>'+
+      '</div>';
+  }
+  var soCountForCarve=0;
+  try{
+    if(toolData&&Array.isArray(toolData.soSelections)){
+      soCountForCarve=toolData.soSelections.length;
+    } else {
+      soCountForCarve=document.querySelectorAll('#assessment input[type=checkbox][data-p="so"]:checked').length;
+    }
+  }catch(e){soCountForCarve=0;}
+  var p3CarveOut='';
+  if(soCountForCarve>=3){
+    p3CarveOut=
+      '<div style="margin-top:0.85rem;padding:0.95rem 1.1rem;background:#fffbea;border:1.5px solid #b09837;border-left:5px solid #b09837;border-radius:6px">'+
+      '<div style="font-size:11px;font-weight:800;color:#7a6a22;text-transform:uppercase;letter-spacing:0.13em;margin-bottom:0.5rem;display:flex;align-items:center;gap:7px"><span style="display:inline-block;width:8px;height:8px;background:#b09837;border-radius:50%"></span>Care Coordination Considerations</div>'+
+      '<p style="margin:0;font-size:13.5px;color:#1a1a1a;line-height:1.65;font-weight:500">If <strong style="color:#7a6a22">three or more Psychosocial (P3) factors</strong> are identified, consider engagement of a <strong style="color:#7a6a22">nurse care manager or social worker</strong> for community support and services to address barriers affecting recovery, treatment adherence, or access to services.</p>'+
+      '</div>';
+  }
   var arClass=ad.coord&&ad.coord.authRisk==='HIGH'?'risk-high':(ad.coord&&ad.coord.authRisk==='MODERATE'?'risk-mod':'risk-low');
   return '<div class="report-wrap cci-premium-report" id="cci-premium-report-root">'+
     '<div class="rpt-header">'+
@@ -1326,6 +1350,12 @@ function buildCciReportPremiumHtml(ad,toolData,level,cmg,identityRow){
     '<span class="rpt-banner-interval-label">Recommended review interval</span>'+
     '<span class="rpt-banner-interval-badge">'+escSnap(ad.interval)+'</span></div></div>'+
     '<div style="padding:0 1.5rem 1.25rem;background:#fff">'+
+    '<div style="background:#fdf8e8;border:2px solid #b09837;border-left:6px solid #b09837;border-radius:8px;padding:1.1rem 1.35rem;margin-bottom:1.25rem;box-shadow:0 1px 4px rgba(176,152,55,0.15)">'+
+    '<div style="font-size:11.5px;font-weight:800;color:#7a6a22;text-transform:uppercase;letter-spacing:0.13em;margin-bottom:0.65rem;padding-bottom:0.5rem;border-bottom:1.5px solid rgba(176,152,55,0.35);display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:18px;height:18px;background:#b09837;color:#fff;border-radius:50%;text-align:center;line-height:18px;font-size:11px;font-weight:900">!</span>Recommended next actions</div>'+
+    '<ul style="list-style:none;padding:0;margin:0">'+nextActionsItems+'</ul>'+
+    nurseCarveOut+
+    p3CarveOut+
+    '</div>'+
     '<div class="r-cards">'+driversCol('Injury drivers',d.injury)+driversCol('Functional drivers',d.functional)+driversCol('Coordination drivers',d.coordination)+'</div>'+
     '<div class="coord-grid" style="margin-top:1rem">'+
     '<div class="coord-stat"><div class="coord-stat-label">Referral pattern</div><div class="coord-stat-value">'+escSnap(ad.coord&&ad.coord.ref)+'</div></div>'+
@@ -1333,10 +1363,36 @@ function buildCciReportPremiumHtml(ad,toolData,level,cmg,identityRow){
     '<div class="coord-stat"><div class="coord-stat-label">Authorization risk</div><div class="coord-stat-value '+arClass+'">'+escSnap(ad.coord&&ad.coord.authRisk)+'</div></div>'+
     '<div class="coord-stat"><div class="coord-stat-label">Specialty count factor</div><div class="coord-stat-value">'+escSnap(ad.coord&&ad.coord.specCount!=null?String(ad.coord.specCount):'—')+'</div></div></div>'+
     '<div class="priority-box" style="margin-top:1rem"><div class="priority-box-label">Priority action</div><p style="margin:0;font-size:13px;color:#333;line-height:1.6">'+escSnap(ad.priorityAction)+'</p></div>'+
-    '<div class="priority-box"><div class="priority-box-label">Documentation focus</div><p style="margin:0;font-size:13px;color:#333;line-height:1.6">'+escSnap(ad.docFocus)+'</p></div>'+
-    '<div class="cmg-sub-label">Monitoring guidance</div>'+
-    '<ul class="cmg-list">'+guid+'</ul></div>'+
-    '<div class="rpt-scope"><div class="rpt-scope-label">Assessment scope</div><p>This Case Complexity Index™ report reflects documented selections at the time of calculation. Interpret alongside medical records and case developments.</p></div></div>';
+    '<div class="priority-box"><div class="priority-box-label">Documentation focus</div><p style="margin:0;font-size:13px;color:#333;line-height:1.6">'+escSnap(ad.docFocus)+'</p></div></div>'+
+    '<div class="rpt-section">'+
+    '<div class="rpt-section-head" onclick="cciToggleRptSection(this)">'+
+    '<span class="rpt-section-label">Follow-up &amp; re-run guidance</span>'+
+    '<span class="rpt-section-chev">▼</span></div>'+
+    '<div class="rpt-section-body">'+
+    '<p style="font-size:12.5px;color:#444;line-height:1.65;margin-bottom:0.85rem">The level-based review interval shown above provides the baseline monitoring cadence for this case. The triggers below indicate circumstances that may justify an off-cycle re-run before the next routine review point.</p>'+
+    '<div class="r-list-box">'+
+    '<div class="r-list-box-label" style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#7a6a22;margin-bottom:0.5rem">Re-run this assessment when</div>'+
+    '<ul class="r-plain-list" style="list-style:none;padding:0;margin:0;font-size:12.5px;line-height:1.65;color:#1a1a1a">'+
+    '<li style="margin-bottom:5px;padding-left:14px;position:relative"><span style="position:absolute;left:0;top:8px;width:5px;height:5px;background:#b09837;border-radius:50%"></span>Additional medical records are received that document new injuries, complications, or catastrophic indicators</li>'+
+    '<li style="margin-bottom:5px;padding-left:14px;position:relative"><span style="position:absolute;left:0;top:8px;width:5px;height:5px;background:#b09837;border-radius:50%"></span>A new specialty physician is added or the referral chain expands</li>'+
+    '<li style="margin-bottom:5px;padding-left:14px;position:relative"><span style="position:absolute;left:0;top:8px;width:5px;height:5px;background:#b09837;border-radius:50%"></span>Functional status changes meaningfully across any of the 4Ps domains</li>'+
+    '<li style="margin-bottom:5px;padding-left:14px;position:relative"><span style="position:absolute;left:0;top:8px;width:5px;height:5px;background:#b09837;border-radius:50%"></span>Pre-existing conditions are newly disclosed, clarified, or identified in the record</li>'+
+    '<li style="margin-bottom:5px;padding-left:14px;position:relative"><span style="position:absolute;left:0;top:8px;width:5px;height:5px;background:#b09837;border-radius:50%"></span>Treatment is denied, delayed, interrupted, or materially altered by the payer</li>'+
+    '<li style="margin-bottom:5px;padding-left:14px;position:relative"><span style="position:absolute;left:0;top:8px;width:5px;height:5px;background:#b09837;border-radius:50%"></span>The case transitions between acute, rehabilitative, and long-term management phases</li>'+
+    '<li style="margin-bottom:0;padding-left:14px;position:relative"><span style="position:absolute;left:0;top:8px;width:5px;height:5px;background:#b09837;border-radius:50%"></span>A new catastrophic event occurs, including re-hospitalization, surgical complication, or new neurologic finding</li>'+
+    '</ul></div></div></div>'+
+    '<div class="rpt-scope"><div class="rpt-scope-label">Assessment scope</div><p>This Case Complexity Index™ report reflects documented selections at the time of calculation. Interpret alongside medical records and case developments.</p></div>'+
+    '<p style="margin:16px 0 0;padding:0 1.5rem 1.5rem;font-size:11px;line-height:1.5;color:#888">Clinical care management tool for case coordination and documentation. Not a scientific instrument, predictive model, or substitute for medical or legal judgment.</p></div>';
+}
+
+function cciToggleRptSection(headEl){
+  if(!headEl) return;
+  var body=headEl.nextElementSibling;
+  var chev=headEl.querySelector('.rpt-section-chev');
+  if(!body) return;
+  var willOpen=!body.classList.contains('open');
+  body.classList.toggle('open',willOpen);
+  if(chev) chev.classList.toggle('open',willOpen);
 }
 
 // ── Calculate ─────────────────────────────────────────
