@@ -289,96 +289,106 @@ body.cci-paid-mode .cci-tool-page-overview{display:none!important}
 /* Reset button */
 .reset-btn{display:block;width:100%;padding:0.8rem;margin-top:1rem;background:#fff;border:1.5px solid #b09837;color:#b09837;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Segoe UI',Arial,sans-serif;transition:background 0.15s}
 .reset-btn:hover{background:#fdf8e8}
+
+/* ── INSTRUCTIONS DRAWER ────────────────────────────── */
+.cci-drawer-trigger{
+  font-family:'Segoe UI',Arial,sans-serif;
+  font-size:12px;font-weight:600;letter-spacing:0.06em;
+  padding:7px 14px;
+  background:#fff;color:#b09837;
+  border:1.5px solid #b09837;border-radius:4px;
+  cursor:pointer;transition:background .15s;
+  white-space:nowrap;
+}
+.cci-drawer-trigger:hover{background:#fdf8e8}
+.cci-drawer-header-row{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:1rem;flex-wrap:wrap;margin-bottom:1rem;
+}
+.cci-drawer-header-row .page-header{padding-bottom:0;margin-bottom:0;flex:1;min-width:0}
+.cci-drawer-trigger-wrap{flex-shrink:0;padding-top:4px}
+
+/* Report-view trigger row */
+.cci-drawer-report-trigger-row{
+  display:flex;justify-content:flex-end;
+  padding:0.65rem 1.5rem 0;background:#fff;
+}
+
+/* Backdrop */
+.cci-drawer-backdrop{
+  position:fixed;inset:0;background:rgba(10,22,40,0.45);
+  opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s;
+  z-index:9998;
+}
+.cci-drawer-backdrop.open{opacity:1;visibility:visible}
+
+/* Drawer panel */
+.cci-drawer{
+  position:fixed;top:0;right:0;height:100vh;width:420px;max-width:100vw;
+  background:#eceae3;
+  box-shadow:-4px 0 24px rgba(10,22,40,0.18);
+  transform:translateX(100%);transition:transform .28s ease;
+  z-index:9999;display:flex;flex-direction:column;
+  font-family:Georgia,'Times New Roman',serif;
+}
+.cci-drawer.open{transform:translateX(0)}
+
+/* Drawer header */
+.cci-drawer-head{
+  background:#0a1628;padding:1.1rem 1.25rem;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:0.75rem;
+  flex-shrink:0;
+}
+.cci-drawer-head-text{flex:1;min-width:0}
+.cci-drawer-tag{
+  font-size:9px;letter-spacing:2px;color:#e8c97a;
+  text-transform:uppercase;font-family:Arial,sans-serif;
+  margin-bottom:6px;
+}
+.cci-drawer-title{
+  font-size:15px;font-weight:400;color:#fff;
+  line-height:1.35;font-family:Georgia,'Times New Roman',serif;
+}
+.cci-drawer-close{
+  background:transparent;border:none;color:rgba(255,255,255,0.7);
+  cursor:pointer;font-size:22px;line-height:1;padding:2px 6px;
+  flex-shrink:0;transition:color .15s;
+}
+.cci-drawer-close:hover{color:#e8c97a}
+
+/* Drawer body — scrollable */
+.cci-drawer-body{
+  flex:1;overflow-y:auto;
+  background:#faf8f3;
+}
+.cci-drawer-body-inner{padding:0}
+
+/* Cloned accordion styling — inherits from .byb-acc but scoped */
+.cci-drawer-body .byb-acc-toolbar{
+  padding:8px 1.1rem 10px;
+}
+.cci-drawer-body .byb-acc-hd{padding:0.95rem 1.1rem}
+.cci-drawer-body .byb-acc-body{padding:1.1rem 1.1rem 1.2rem}
+
+/* Mobile: full-width drawer */
+@media(max-width:900px){
+  .cci-drawer{width:100vw}
+}
+
+/* Print: hide drawer entirely */
+@media print{
+  .cci-drawer,.cci-drawer-backdrop,.cci-drawer-trigger,
+  .cci-drawer-report-trigger-row{display:none!important}
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-client.js"></script>
 <script src="js/auth-guard.js"></script>
 <script src="js/portal-header-nav.js"></script>
+<script src="js/paid-portal-tool-run.js"></script>
 <script>
 (function (w) {
-  w.paidPortalRecordCaseToolRunAsync = async function (opts) {
-    var toolKey = opts.toolKey;
-    var scoreSummary = opts.scoreSummary;
-    var resultJson = opts.resultJson;
-    try {
-      var params = new URLSearchParams(window.location.search);
-      var caseRef = params.get('case_ref');
-      if (!caseRef || !w.supabaseClient) return;
-      var client = w.supabaseClient;
-      var sessRes = await client.auth.getSession();
-      var session = sessRes.data.session;
-      if (!session) return;
-      var cq = await client
-        .from('case_cases')
-        .select('id, attorney_user_id')
-        .eq('case_ref', caseRef)
-        .eq('attorney_user_id', session.user.id)
-        .maybeSingle();
-      if (cq.error || !cq.data) {
-        if (cq.error) console.error('[paid-portal] case lookup', cq.error);
-        return;
-      }
-      var caseId = cq.data.id;
-      var attorneyUserId = cq.data.attorney_user_id;
-      var runNumber = 1;
-      var rpc = await client.rpc('get_next_tool_run_number', {
-        case_id: caseId,
-        tool_key: toolKey
-      });
-      if (rpc.error) {
-        console.warn('[paid-portal] get_next_tool_run_number RPC, using fallback', rpc.error);
-        var mx = await client
-          .from('case_tool_runs')
-          .select('run_number')
-          .eq('case_id', caseId)
-          .eq('tool_key', toolKey)
-          .order('run_number', { ascending: false })
-          .limit(1)
-          .maybeSingle();
-        if (mx.error) {
-          console.error('[paid-portal] run_number fallback failed', mx.error);
-          return;
-        }
-        runNumber = (mx.data && mx.data.run_number != null ? Number(mx.data.run_number) : 0) + 1;
-      } else {
-        var d = rpc.data;
-        runNumber = typeof d === 'number' ? d : (d != null ? parseInt(String(d), 10) : NaN);
-        if (!Number.isFinite(runNumber) || runNumber < 1) runNumber = 1;
-      }
-      var upd = await client
-        .from('case_tool_runs')
-        .update({ is_latest: false })
-        .eq('case_id', caseId)
-        .eq('tool_key', toolKey)
-        .eq('is_latest', true);
-      if (upd.error) console.warn('[paid-portal] is_latest update', upd.error);
-      var ins = await client.from('case_tool_runs').insert({
-        case_id: caseId,
-        attorney_user_id: attorneyUserId,
-        tool_key: toolKey,
-        run_number: runNumber,
-        is_latest: true,
-        completion_status: 'completed',
-        score_summary: scoreSummary,
-        result_json: resultJson
-      });
-      if (ins.error) {
-        console.error('[paid-portal] case_tool_runs insert', ins.error);
-      } else {
-        var delDraft = await client
-          .from('case_tool_drafts')
-          .delete()
-          .eq('case_id', caseId)
-          .eq('attorney_user_id', attorneyUserId)
-          .eq('tool_key', toolKey);
-        if (delDraft.error) {
-          console.warn('[paid-portal] case_tool_drafts delete after run', delDraft.error);
-        }
-      }
-    } catch (err) {
-      console.error('[paid-portal] recordCaseToolRun', err);
-    }
-  };
+  w.cciEffectivePaidCaseRef = w.caseClarityResolveCaseRef;
 })(window);
 </script>
 <script src="js/case-identity.js"></script>
@@ -402,11 +412,13 @@ body.cci-paid-mode .cci-tool-page-overview{display:none!important}
 </header>
 <script>
 (function () {
-  function boot() {
+  async function boot() {
+    const ok = (function(){ if (!localStorage.getItem('user_logged_in')) { window.location.href='login.html'; return false; } return true; })();
+    if (!ok) return;
     if (typeof initPortalHeaderNav === 'function') initPortalHeaderNav();
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { void boot(); });
+  else void boot();
 })();
 </script>
 
@@ -488,6 +500,26 @@ body.cci-paid-mode .cci-tool-page-overview{display:none!important}
       </div>
     </div>
 
+    <div class="byb-acc">
+      <button type="button" class="byb-acc-hd" id="cci-byb-acc-hd-4" aria-expanded="false" onclick="cciToggleBybAcc(4)">
+        <span class="byb-acc-title">Follow-up &amp; re-run guidance</span>
+        <svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="byb-acc-body" id="cci-byb-acc-bd-4">
+        <p>The level-based review interval provides the baseline monitoring cadence for this tool. The triggers below indicate circumstances that may justify an off-cycle re-run before the next routine review point.</p>
+        <p style="margin-top:.75rem"><strong style="color:var(--nv)">Re-run this assessment when:</strong></p>
+        <ul class="byb-points">
+          <li>Additional medical records are received that document new injuries, complications, or catastrophic indicators</li>
+          <li>A new specialty physician is added or the referral chain expands</li>
+          <li>Functional status changes meaningfully across any of the 4Ps domains</li>
+          <li>Pre-existing conditions are newly disclosed, clarified, or identified in the record</li>
+          <li>Treatment is denied, delayed, interrupted, or materially altered by the payer</li>
+          <li>The case transitions between acute, rehabilitative, and long-term management phases</li>
+          <li>A new catastrophic event occurs, including re-hospitalization, surgical complication, or new neurologic finding</li>
+        </ul>
+      </div>
+    </div>
+
     <div class="cta-sec">
       <button class="cta-btn" onclick="startAssessment()">Start Case Complexity Assessment</button>
       <div class="cta-note">Five steps · ~5–10 minutes</div>
@@ -502,10 +534,15 @@ body.cci-paid-mode .cci-tool-page-overview{display:none!important}
 <div id="assessment">
 <div class="wrap">
 
-<div class="page-header">
-  <h1>Case Complexity Index™</h1>
-  <div class="company">Reconcile Care Management Services</div>
-  <div class="disclaimer"><strong>Important:</strong> This assessment should be completed thoughtfully and accurately. The Case Complexity Level generated is only as reliable as the information entered.</div>
+<div class="cci-drawer-header-row no-print">
+  <div class="page-header">
+    <h1>Case Complexity Index™</h1>
+    <div class="company">Reconcile Care Management Services</div>
+    <div class="disclaimer"><strong>Important:</strong> This assessment should be completed thoughtfully and accurately. The Case Complexity Level generated is only as reliable as the information entered.</div>
+  </div>
+  <div class="cci-drawer-trigger-wrap">
+    <button type="button" class="cci-drawer-trigger" onclick="cciOpenInstructionsDrawer()">View Instructions — Case Complexity Index</button>
+  </div>
 </div>
 
 <!-- STEP 1 -->
@@ -841,6 +878,9 @@ body.cci-paid-mode .cci-tool-page-overview{display:none!important}
       <button type="button" onclick="returnToDashboard()" class="btn-ghost">Dashboard</button>
     </div>
     <div id="cci-paid-report-block" style="width:100%;max-width:920px;margin:0 auto">
+    <div class="cci-drawer-report-trigger-row no-print">
+      <button type="button" class="cci-drawer-trigger" onclick="cciOpenInstructionsDrawer()">View Instructions — Case Complexity Index</button>
+    </div>
     <div id="cci-paid-report-visible" class="complexity-report report-view results-display" style="position:relative;left:auto;top:auto;width:100%;max-width:920px;margin:0 auto;pointer-events:auto"></div>
     </div>
   </div>
@@ -853,7 +893,7 @@ body.cci-paid-mode .cci-tool-page-overview{display:none!important}
 const caseType = new URLSearchParams(window.location.search).get('caseType') || 'active';
 
 // ── Before You Begin accordions (mirrors CAF) ─────────
-var CCI_BYB_ACC_COUNT=4;
+var CCI_BYB_ACC_COUNT=5;
 function cciToggleBybAcc(i){
   var hd=document.getElementById('cci-byb-acc-hd-'+i);
   var bd=document.getElementById('cci-byb-acc-bd-'+i);
@@ -891,6 +931,7 @@ function cciSetStepOpenExclusive(stepId){
     if(body) body.classList.toggle('open',on);
     if(chev) chev.classList.toggle('open',on);
   });
+  cciScheduleDraftSave();
 }
 function toggleStep(id){
   var body=document.getElementById('body-'+id);
@@ -900,6 +941,7 @@ function toggleStep(id){
   if(isOpen){
     body.classList.remove('open');
     chev.classList.remove('open');
+    cciScheduleDraftSave();
   } else {
     cciSetStepOpenExclusive(id);
   }
@@ -918,306 +960,6 @@ function cciMaybeAdvanceFromStep1(){
   }
 }
 
-// ── Paid portal: draft autosave (case_tool_drafts, CCI only) ──
-var cciDraftSaveTimer = null;
-var cciDraftHydrateLock = false;
-var cciDraftListenersAttached = false;
-/** Must match js/portal-header-nav.js — used when CCI is opened without ?case_ref= */
-var CCI_LAST_CASE_REF_KEY = 'caseClarityLastCaseRef';
-
-function cciResolvePaidCaseRef() {
-  try {
-    var p = new URLSearchParams(window.location.search);
-    var ref = p.get('case_ref');
-    if (ref != null && String(ref).trim() !== '') return String(ref).trim();
-    if (window.localStorage) {
-      var last = window.localStorage.getItem(CCI_LAST_CASE_REF_KEY);
-      if (last != null && String(last).trim() !== '') return String(last).trim();
-    }
-  } catch (e) {}
-  return '';
-}
-
-function cciParseDraftJson(raw) {
-  if (raw == null || raw === '') return null;
-  if (typeof raw === 'object' && raw !== null && !Array.isArray(raw)) return raw;
-  if (typeof raw === 'string') {
-    try {
-      var o = JSON.parse(raw);
-      return typeof o === 'object' && o !== null && !Array.isArray(o) ? o : null;
-    } catch (e) {
-      return null;
-    }
-  }
-  return null;
-}
-
-function cciDraftJsonHasAnswers(d) {
-  if (!d || typeof d !== 'object') return false;
-  if (d.primaryRegion || d.specificInjury) return true;
-  var groups = ['cat', 'rec', 'ph', 'ps', 'so', 'pr', 'spec', 'rehab', 'align'];
-  for (var i = 0; i < groups.length; i++) {
-    var g = d[groups[i]];
-    if (Array.isArray(g) && g.length) return true;
-  }
-  if (d.referral && String(d.referral) !== '0') return true;
-  if (d.duration && String(d.duration) !== '0') return true;
-  if (d.otherCatText && String(d.otherCatText).trim()) return true;
-  return false;
-}
-
-function cciClearAssessmentInputsOnly() {
-  document.querySelectorAll('#assessment input[type=checkbox]').forEach(function (c) {
-    c.checked = false;
-    var item = c.closest('.cb-item');
-    if (item) item.classList.remove('selected');
-  });
-  var pr = document.getElementById('primary-region');
-  var si = document.getElementById('specific-injury');
-  if (pr) pr.value = '';
-  if (si) {
-    si.innerHTML = '<option value="">— Select primary injury region first —</option>';
-  }
-  var ref = document.getElementById('referral');
-  var dur = document.getElementById('duration');
-  var ot = document.getElementById('other-cat-text');
-  if (ref) ref.value = '0';
-  if (dur) dur.value = '0';
-  if (ot) ot.value = '';
-}
-
-function cciApplyCheckboxList(cssSel, values) {
-  if (!Array.isArray(values)) values = [];
-  var set = {};
-  for (var i = 0; i < values.length; i++) set[values[i]] = true;
-  document.querySelectorAll(cssSel).forEach(function (inp) {
-    inp.checked = !!set[inp.value];
-    var item = inp.closest('.cb-item');
-    if (item) item.classList.toggle('selected', inp.checked);
-  });
-}
-
-function cciApplyDraftJson(d) {
-  cciDraftHydrateLock = true;
-  try {
-    cciClearAssessmentInputsOnly();
-    var prEl = document.getElementById('primary-region');
-    var pr = d.primaryRegion || '';
-    if (prEl) prEl.value = pr;
-    updateSpecific();
-    var si = d.specificInjury || '';
-    var specSel = document.getElementById('specific-injury');
-    if (specSel && si) {
-      var found = false;
-      for (var oi = 0; oi < specSel.options.length; oi++) {
-        if (specSel.options[oi].value === si) {
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
-        var opt = document.createElement('option');
-        opt.value = opt.textContent = si;
-        specSel.appendChild(opt);
-      }
-      specSel.value = si;
-    }
-    cciApplyCheckboxList('#assessment input[type=checkbox][data-g="cat"]', d.cat);
-    cciApplyCheckboxList('#assessment input[type=checkbox][data-g="rec"]', d.rec);
-    cciApplyCheckboxList('#assessment input[type=checkbox][data-p="ph"]', d.ph);
-    cciApplyCheckboxList('#assessment input[type=checkbox][data-p="ps"]', d.ps);
-    cciApplyCheckboxList('#assessment input[type=checkbox][data-p="so"]', d.so);
-    cciApplyCheckboxList('#assessment input[type=checkbox][data-p="pr"]', d.pr);
-    cciApplyCheckboxList('#assessment input[type=checkbox][data-g="spec"]', d.spec);
-    cciApplyCheckboxList('#assessment input[type=checkbox][data-g="rehab"]', d.rehab);
-    cciApplyCheckboxList('#assessment input[type=checkbox][data-g="align"]', d.align);
-    if (d.referral != null) {
-      var rEl = document.getElementById('referral');
-      if (rEl) rEl.value = String(d.referral);
-    }
-    if (d.duration != null) {
-      var dEl = document.getElementById('duration');
-      if (dEl) dEl.value = String(d.duration);
-    }
-    if (d.otherCatText != null) {
-      var tEl = document.getElementById('other-cat-text');
-      if (tEl) tEl.value = String(d.otherCatText);
-    }
-    cciPrevStep1Complete = cciStep1IsComplete();
-    var ex = document.getElementById('explainer');
-    var as = document.getElementById('assessment');
-    if (ex) ex.style.display = 'none';
-    if (as) as.style.display = 'block';
-    cciSetStepOpenExclusive('step1');
-  } finally {
-    requestAnimationFrame(function () {
-      cciDraftHydrateLock = false;
-    });
-  }
-}
-
-function cciCollectDraftJson() {
-  function checkedVals(sel) {
-    return Array.prototype.map
-      .call(document.querySelectorAll(sel), function (inp) {
-        return inp.value;
-      })
-      .filter(Boolean);
-  }
-  return {
-    v: 1,
-    primaryRegion: document.getElementById('primary-region')
-      ? document.getElementById('primary-region').value
-      : '',
-    specificInjury: document.getElementById('specific-injury')
-      ? document.getElementById('specific-injury').value
-      : '',
-    cat: checkedVals('#assessment input[type=checkbox][data-g="cat"]:checked'),
-    rec: checkedVals('#assessment input[type=checkbox][data-g="rec"]:checked'),
-    ph: checkedVals('#assessment input[type=checkbox][data-p="ph"]:checked'),
-    ps: checkedVals('#assessment input[type=checkbox][data-p="ps"]:checked'),
-    so: checkedVals('#assessment input[type=checkbox][data-p="so"]:checked'),
-    pr: checkedVals('#assessment input[type=checkbox][data-p="pr"]:checked'),
-    spec: checkedVals('#assessment input[type=checkbox][data-g="spec"]:checked'),
-    rehab: checkedVals('#assessment input[type=checkbox][data-g="rehab"]:checked'),
-    align: checkedVals('#assessment input[type=checkbox][data-g="align"]:checked'),
-    referral: document.getElementById('referral') ? document.getElementById('referral').value : '0',
-    duration: document.getElementById('duration') ? document.getElementById('duration').value : '0',
-    otherCatText: document.getElementById('other-cat-text')
-      ? document.getElementById('other-cat-text').value
-      : ''
-  };
-}
-
-async function cciSaveDraftNow() {
-  var ctx = window.cciPaidDraftContext;
-  if (!ctx || !ctx.active || !window.supabaseClient) return;
-  if (cciDraftHydrateLock) return;
-  var client = window.supabaseClient;
-  var sessRes = await client.auth.getSession();
-  var session = sessRes.data && sessRes.data.session;
-  if (!session || session.user.id !== ctx.attorneyUserId) return;
-  var payload = cciCollectDraftJson();
-  var up = await client.from('case_tool_drafts').upsert(
-    {
-      case_id: ctx.caseId,
-      attorney_user_id: ctx.attorneyUserId,
-      tool_key: ctx.toolKey,
-      draft_json: payload,
-      updated_at: new Date().toISOString()
-    },
-    { onConflict: 'case_id,attorney_user_id,tool_key' }
-  );
-  if (up.error) console.warn('[paid-portal] case_tool_drafts upsert', up.error);
-}
-
-function cciScheduleDraftSave() {
-  var ctx = window.cciPaidDraftContext;
-  if (!ctx || !ctx.active) return;
-  if (cciDraftHydrateLock) return;
-  clearTimeout(cciDraftSaveTimer);
-  cciDraftSaveTimer = setTimeout(function () {
-    void cciSaveDraftNow();
-  }, 400);
-}
-
-async function cciFlushPendingDraftSave() {
-  clearTimeout(cciDraftSaveTimer);
-  cciDraftSaveTimer = null;
-  await cciSaveDraftNow();
-}
-window.cciFlushPendingDraftSave = cciFlushPendingDraftSave;
-
-function cciWireDraftUnloadFlush() {
-  if (cciWireDraftUnloadFlush._done) return;
-  cciWireDraftUnloadFlush._done = true;
-  window.addEventListener('pagehide', function () {
-    clearTimeout(cciDraftSaveTimer);
-    cciDraftSaveTimer = null;
-    void cciSaveDraftNow();
-  });
-  document.addEventListener('visibilitychange', function () {
-    if (document.visibilityState === 'hidden') {
-      clearTimeout(cciDraftSaveTimer);
-      cciDraftSaveTimer = null;
-      void cciSaveDraftNow();
-    }
-  });
-}
-
-function cciWirePaidDraftExitHooks() {
-  var dash = document.getElementById('portal-nav-back-dashboard');
-  if (dash && !dash.getAttribute('data-cci-draft-exit')) {
-    dash.setAttribute('data-cci-draft-exit', '1');
-    dash.addEventListener('click', function (e) {
-      var ctx = window.cciPaidDraftContext;
-      if (!ctx || !ctx.active) return;
-      e.preventDefault();
-      var href = dash.getAttribute('href') || 'dashboard.html';
-      void cciFlushPendingDraftSave().finally(function () {
-        window.location.href = href;
-      });
-    });
-  }
-}
-
-function cciAttachDraftAutosave() {
-  if (cciDraftListenersAttached) return;
-  var assessment = document.getElementById('assessment');
-  if (!assessment) return;
-  cciDraftListenersAttached = true;
-  assessment.addEventListener('change', cciScheduleDraftSave, true);
-  assessment.addEventListener('input', cciScheduleDraftSave, true);
-}
-
-async function cciPaidDraftBootstrap() {
-  var caseRef = cciResolvePaidCaseRef();
-  if (!caseRef || !window.supabaseClient) {
-    window.cciPaidDraftContext = { active: false };
-    return;
-  }
-  var client = window.supabaseClient;
-  var sessRes = await client.auth.getSession();
-  var session = sessRes.data && sessRes.data.session;
-  if (!session) {
-    window.cciPaidDraftContext = { active: false };
-    return;
-  }
-  var cq = await client
-    .from('case_cases')
-    .select('id, attorney_user_id')
-    .eq('case_ref', caseRef)
-    .eq('attorney_user_id', session.user.id)
-    .maybeSingle();
-  if (cq.error || !cq.data) {
-    if (cq.error) console.warn('[paid-portal] draft case lookup', cq.error);
-    window.cciPaidDraftContext = { active: false };
-    return;
-  }
-  window.cciPaidDraftContext = {
-    active: true,
-    caseId: cq.data.id,
-    attorneyUserId: cq.data.attorney_user_id,
-    toolKey: 'CCI'
-  };
-  var dr = await client
-    .from('case_tool_drafts')
-    .select('draft_json')
-    .eq('case_id', cq.data.id)
-    .eq('attorney_user_id', session.user.id)
-    .eq('tool_key', 'CCI')
-    .maybeSingle();
-  if (dr.error) console.warn('[paid-portal] draft load', dr.error);
-  var raw = dr.data && dr.data.draft_json;
-  var d = cciParseDraftJson(raw);
-  if (d && cciDraftJsonHasAnswers(d)) {
-    cciApplyDraftJson(d);
-  }
-  cciAttachDraftAutosave();
-  cciWireDraftUnloadFlush();
-  cciWirePaidDraftExitHooks();
-}
-
 // ── Start assessment ──────────────────────────────────
 function startAssessment(){
   document.getElementById('explainer').style.display='none';
@@ -1225,9 +967,304 @@ function startAssessment(){
   cciPrevStep1Complete=cciStep1IsComplete();
   cciSetStepOpenExclusive('step1');
   window.scrollTo({top:0,behavior:'smooth'});
-  if (window.cciPaidDraftContext && window.cciPaidDraftContext.active) {
+}
+
+// ── Paid portal: case_tool_drafts (CCI only, scoped by case_ref) ──
+var cciDraftSaveTimer=null;
+var cciDraftDirty=false;
+var cciDraftApplying=false;
+var cciDraftAutosaveDisabled=false;
+/** After a successful run + draft delete, block any autosave (prevents immediate re-upsert). */
+var cciDraftLockedAfterRun=false;
+var CCI_DRAFT_DEBOUNCE_MS=900;
+
+function cciClearDraftSaveSchedule(){
+  clearTimeout(cciDraftSaveTimer);
+  cciDraftSaveTimer=null;
+  cciDraftDirty=false;
+}
+
+function cciLockDraftAutosaveForCompletion(){
+  cciDraftAutosaveDisabled=true;
+  cciClearDraftSaveSchedule();
+}
+
+function cciReadOpenStepId(){
+  var order=['step1','step2','step3','step4','step5'];
+  for(var i=0;i<order.length;i++){
+    var b=document.getElementById('body-'+order[i]);
+    if(b&&b.classList.contains('open')) return order[i];
+  }
+  return 'step1';
+}
+
+function cciDraftHasMeaningfulState(d){
+  if(!d||d.v!==1) return false;
+  if(d.primaryRegion) return true;
+  if(d.specificInjury) return true;
+  if(d.otherCatText && String(d.otherCatText).trim()) return true;
+  if(d.referral!=null && String(d.referral)!=='0') return true;
+  if(d.duration!=null && String(d.duration)!=='0') return true;
+  var lists=['cat','rec','spec','rehab','align','ph','ps','so','pr'];
+  for(var i=0;i<lists.length;i++){
+    var a=d[lists[i]];
+    if(a&&a.length) return true;
+  }
+  return false;
+}
+
+function cciCollectDraftJson(){
+  var root=document.getElementById('assessment');
+  if(!root) return null;
+  var pr=document.getElementById('primary-region');
+  var sp=document.getElementById('specific-injury');
+  var refEl=document.getElementById('referral');
+  var durEl=document.getElementById('duration');
+  var ot=document.getElementById('other-cat-text');
+  var data={
+    v:1,
+    openStep:cciReadOpenStepId(),
+    primaryRegion:pr?pr.value||'':'',
+    specificInjury:sp?sp.value||'':'',
+    referral:refEl?refEl.value||'0':'0',
+    duration:durEl?durEl.value||'0':'0',
+    otherCatText:ot?ot.value||'':'',
+    cat:[],rec:[],spec:[],rehab:[],align:[],ph:[],ps:[],so:[],pr:[]
+  };
+  function pushChecked(attr,val,key){
+    root.querySelectorAll('input[type=checkbox]['+attr+'="'+val+'"]:checked').forEach(function(cb){
+      data[key].push(cb.value);
+    });
+  }
+  pushChecked('data-g','cat','cat');
+  pushChecked('data-g','rec','rec');
+  pushChecked('data-g','spec','spec');
+  pushChecked('data-g','rehab','rehab');
+  pushChecked('data-g','align','align');
+  pushChecked('data-p','ph','ph');
+  pushChecked('data-p','ps','ps');
+  pushChecked('data-p','so','so');
+  pushChecked('data-p','pr','pr');
+  return data;
+}
+
+function cciApplyDraftJson(d){
+  if(!d||d.v!==1) return;
+  document.querySelectorAll('#assessment input[type=checkbox]').forEach(function(cb){
+    cb.checked=false;
+    var item=cb.closest('.cb-item');
+    if(item) item.classList.remove('selected');
+  });
+  var pr=document.getElementById('primary-region');
+  if(pr&&d.primaryRegion!=null) pr.value=d.primaryRegion;
+  updateSpecific();
+  var sp=document.getElementById('specific-injury');
+  if(sp&&d.specificInjury!=null&&d.specificInjury!==''){
+    sp.value=d.specificInjury;
+    if(sp.value!==d.specificInjury){
+      var opt=document.createElement('option');
+      opt.value=d.specificInjury;
+      opt.textContent=d.specificInjury;
+      sp.appendChild(opt);
+      sp.value=d.specificInjury;
+    }
+  }
+  var refEl=document.getElementById('referral');
+  var durEl=document.getElementById('duration');
+  if(refEl&&d.referral!=null) refEl.value=String(d.referral);
+  if(durEl&&d.duration!=null) durEl.value=String(d.duration);
+  var ot=document.getElementById('other-cat-text');
+  if(ot&&d.otherCatText!=null) ot.value=d.otherCatText;
+  function applyList(attr,val,key){
+    var list=d[key];
+    if(!list||!list.length) return;
+    var set={};
+    list.forEach(function(x){ set[x]=true; });
+    document.querySelectorAll('#assessment input[type=checkbox]['+attr+'="'+val+'"]').forEach(function(cb){
+      if(set[cb.value]){
+        cb.checked=true;
+        var item=cb.closest('.cb-item');
+        if(item) item.classList.add('selected');
+      }
+    });
+  }
+  applyList('data-g','cat','cat');
+  applyList('data-g','rec','rec');
+  applyList('data-g','spec','spec');
+  applyList('data-g','rehab','rehab');
+  applyList('data-g','align','align');
+  applyList('data-p','ph','ph');
+  applyList('data-p','ps','ps');
+  applyList('data-p','so','so');
+  applyList('data-p','pr','pr');
+  if(d.openStep&&['step1','step2','step3','step4','step5'].indexOf(d.openStep)>=0)
+    cciSetStepOpenExclusive(d.openStep);
+}
+
+function cciScheduleDraftSave(){
+  if(cciDraftApplying||cciDraftAutosaveDisabled||cciDraftLockedAfterRun) return;
+  var p=new URLSearchParams(window.location.search);
+  if(!p.get('case_ref')||!window.supabaseClient) return;
+  cciDraftDirty=true;
+  clearTimeout(cciDraftSaveTimer);
+  cciDraftSaveTimer=setTimeout(function(){
+    cciDraftSaveTimer=null;
+    void cciPersistDraftNow();
+  },CCI_DRAFT_DEBOUNCE_MS);
+}
+
+async function cciResolvePaidCaseRow(client){
+  var caseRef=typeof window.cciEffectivePaidCaseRef==='function'?window.cciEffectivePaidCaseRef():null;
+  if(!caseRef||!client) return null;
+  var gu=await client.auth.getUser();
+  var user=gu.data&&gu.data.user;
+  if(gu.error||!user) return null;
+  var cq=await client
+    .from('case_cases')
+    .select('id, attorney_user_id')
+    .eq('case_ref',caseRef)
+    .eq('attorney_user_id',user.id)
+    .maybeSingle();
+  if(cq.error||!cq.data){
+    if(cq.error) console.error('[CCI] case lookup for draft',cq.error);
+    return null;
+  }
+  return cq.data;
+}
+
+async function cciPersistDraftNow(){
+  if(cciDraftApplying||cciDraftAutosaveDisabled||cciDraftLockedAfterRun) return;
+  var client=window.supabaseClient;
+  if(!client) return;
+  var rowCtx=await cciResolvePaidCaseRow(client);
+  if(!rowCtx) return;
+  var draftJson=cciCollectDraftJson();
+  if(!cciDraftHasMeaningfulState(draftJson)) return;
+  var payload={
+    case_id:rowCtx.id,
+    attorney_user_id:rowCtx.attorney_user_id,
+    tool_key:'CCI',
+    draft_json:draftJson,
+    updated_at:new Date().toISOString()
+  };
+  var up=await client.from('case_tool_drafts').upsert(payload,{onConflict:'case_id,attorney_user_id,tool_key'});
+  if(up.error) console.error('[CCI] case_tool_drafts upsert',up.error);
+  else cciDraftDirty=false;
+}
+
+async function cciFlushDraftSave(){
+  if(cciDraftLockedAfterRun) return;
+  clearTimeout(cciDraftSaveTimer);
+  cciDraftSaveTimer=null;
+  if(cciDraftDirty) await cciPersistDraftNow();
+}
+
+async function cciDeletePaidDraftAsync(){
+  var client=window.supabaseClient;
+  if(!client) return false;
+  var gu=await client.auth.getUser();
+  var user=gu.data&&gu.data.user;
+  if(gu.error||!user){
+    console.error('[CCI] case_tool_drafts delete getUser',gu.error);
+    return false;
+  }
+  var uid=user.id;
+  var caseRef=typeof window.cciEffectivePaidCaseRef==='function'?window.cciEffectivePaidCaseRef():null;
+  if(!caseRef) return false;
+  var cq=await client
+    .from('case_cases')
+    .select('id')
+    .eq('case_ref',caseRef)
+    .eq('attorney_user_id',uid)
+    .maybeSingle();
+  if(cq.error||!cq.data){
+    if(cq.error) console.error('[CCI] case lookup for draft delete',cq.error);
+    return false;
+  }
+  var caseId=cq.data.id;
+  var del=await client
+    .from('case_tool_drafts')
+    .delete()
+    .eq('case_id',caseId)
+    .eq('attorney_user_id',uid)
+    .eq('tool_key','CCI');
+  if(del.error){
+    console.error('[CCI] case_tool_drafts delete failed',del.error);
+    return false;
+  }
+  cciDraftDirty=false;
+  return true;
+}
+
+async function cciHydrateDraftIfAny(){
+  var client=window.supabaseClient;
+  if(!client) return;
+  var caseRef=new URLSearchParams(window.location.search).get('case_ref');
+  if(!caseRef) return;
+  var rowCtx=await cciResolvePaidCaseRow(client);
+  if(!rowCtx) return;
+  var dr=await client
+    .from('case_tool_drafts')
+    .select('draft_json')
+    .eq('case_id',rowCtx.id)
+    .eq('tool_key','CCI')
+    .maybeSingle();
+  if(dr.error){
+    console.error('[CCI] case_tool_drafts select',dr.error);
+    return;
+  }
+  var dj=dr.data&&dr.data.draft_json;
+  if(!cciDraftHasMeaningfulState(dj)) return;
+  cciDraftApplying=true;
+  try{
+    document.getElementById('explainer').style.display='none';
+    document.getElementById('assessment').style.display='block';
+    cciApplyDraftJson(dj);
+    cciPrevStep1Complete=cciStep1IsComplete();
+    window.scrollTo({top:0,behavior:'smooth'});
+  } finally{
+    cciDraftApplying=false;
+  }
+}
+
+function cciInitPaidDraftPersistence(){
+  var p=new URLSearchParams(window.location.search);
+  if(!p.get('case_ref')) return;
+  if(!document.getElementById('assessment')) return;
+  if(window.__cciDraftEventsBound) return;
+  window.__cciDraftEventsBound=true;
+
+  function isDraftInteractionTarget(t){
+    if(!t||!t.matches) return false;
+    if(t.matches('input[type="checkbox"]')||t.matches('input[type="text"]')||t.matches('select')) return true;
+    if(t.closest&&t.closest('label.cb-item')) return true;
+    return false;
+  }
+
+  function onAssessmentDraftEvent(ev){
+    if(cciDraftApplying) return;
+    var t=ev.target;
+    if(!t||!t.closest||!t.closest('#assessment')) return;
     cciScheduleDraftSave();
   }
+
+  document.addEventListener('change',onAssessmentDraftEvent,true);
+  document.addEventListener('input',onAssessmentDraftEvent,true);
+
+  document.addEventListener('click',function(ev){
+    if(cciDraftApplying) return;
+    var t=ev.target;
+    if(!t||!t.closest||!t.closest('#assessment')) return;
+    if(t.closest&&t.closest('.step-head')) return;
+    if(!isDraftInteractionTarget(t)) return;
+    requestAnimationFrame(function(){ cciScheduleDraftSave(); });
+  },true);
+
+  document.addEventListener('visibilitychange',function(){
+    if(document.visibilityState==='hidden') void cciFlushDraftSave();
+  });
+  window.addEventListener('pagehide',function(){ void cciFlushDraftSave(); });
+  void cciHydrateDraftIfAny();
 }
 
 // ── Dependent dropdowns ───────────────────────────────
@@ -1385,20 +1422,9 @@ function buildCciReportPremiumHtml(ad,toolData,level,cmg,identityRow){
     '<p style="margin:16px 0 0;padding:0 1.5rem 1.5rem;font-size:11px;line-height:1.5;color:#888">Clinical care management tool for case coordination and documentation. Not a scientific instrument, predictive model, or substitute for medical or legal judgment.</p></div>';
 }
 
-function cciToggleRptSection(headEl){
-  if(!headEl) return;
-  var body=headEl.nextElementSibling;
-  var chev=headEl.querySelector('.rpt-section-chev');
-  if(!body) return;
-  var willOpen=!body.classList.contains('open');
-  body.classList.toggle('open',willOpen);
-  if(chev) chev.classList.toggle('open',willOpen);
-}
-
 // ── Calculate ─────────────────────────────────────────
-function calculate(){
-  clearTimeout(cciDraftSaveTimer);
-  cciDraftSaveTimer = null;
+async function calculate(){
+  cciLockDraftAutosaveForCompletion();
   // DOMAIN 1
   const catAll=checked('data-g','cat');
   const catTriggers=catAll.filter(c=>c.dataset.cat==='1');
@@ -1509,11 +1535,11 @@ function calculate(){
   const durLabels={0:'—',1:'Short-term',2:'Moderate course',3:'Extended rehab',4:'Long-term management',5:'Lifelong coordination'};
   const authRisk=alignCount>=3?'HIGH':alignCount>=1?'MODERATE':'LOW';
   const cmgData={
-    1:{interval:'Every 2–7 days',guidance:['Intensive case monitoring recommended','Frequent review of treatment sequencing and provider coordination','Monitor closely for treatment delays, authorization issues, and referral barriers','Early intervention may be required if recovery progression stalls'],priority:'Confirm all specialists have received records and are aligned on the treatment plan. Identify any pending authorizations and escalate immediately.',docFocus:'Establish baseline documentation for all catastrophic indicators. Document all provider communications, authorization requests, and treatment milestones from the outset.'},
-    2:{interval:'Weekly',guidance:['Monitor provider coordination and treatment progression','Watch for emerging access barriers or referral delays','Track treatment milestones closely to prevent disruption of recovery progress'],priority:'Verify all active referrals are scheduled and confirm no authorization barriers are pending with the insurer.',docFocus:'Document all specialist referrals, treatment responses, and any payer communications. Note any deviations from the expected treatment pathway.'},
-    3:{interval:'Every 10–14 days',guidance:['Periodic monitoring of treatment progression','Evaluate for emerging system barriers or coordination issues','Escalate monitoring frequency if recovery progress slows'],priority:'Confirm treatment milestones are on track and identify any emerging coordination issues before the next scheduled review.',docFocus:'Maintain running documentation of treatment progression and functional status. Note any changes in provider involvement or payer activity.'},
-    4:{interval:'Every 21–30 days',guidance:['Standard monitoring of treatment progression','Reassess complexity if treatment delays occur','Increase monitoring if new providers become involved or complications develop'],priority:'Confirm current treatment is progressing and that no new providers or complications have been introduced since the last review.',docFocus:'Keep standard treatment documentation current. Flag any new providers, complications, or payer activity for the next review cycle.'},
-    5:{interval:'Every 21–30 days',guidance:['Standard monitoring of treatment progression','Reassess complexity if treatment delays occur','Increase monitoring if new providers become involved or complications develop'],priority:'Confirm current treatment is progressing and that no new providers or complications have been introduced since the last review.',docFocus:'Keep standard treatment documentation current. Flag any new providers, complications, or payer activity for the next review cycle.'}
+    1:{interval:'Every 2–7 days',guidance:['Conduct an immediate review of provider sequencing and authority alignment','Confirm diagnostic clarity and specialty engagement','Identify structural gaps requiring corrective action','Review documentation for consistency and defensibility','Reassess within the recommended interval to monitor stabilization progress'],priority:'Confirm all specialists have received records and are aligned on the treatment plan. Identify any pending authorizations and escalate immediately.',docFocus:'Establish baseline documentation for all catastrophic indicators. Document all provider communications, authorization requests, and treatment milestones from the outset.'},
+    2:{interval:'Weekly',guidance:['Conduct an immediate review of provider sequencing and authority alignment','Confirm diagnostic clarity and specialty engagement','Identify structural gaps requiring corrective action','Review documentation for consistency and defensibility','Reassess within the recommended interval to monitor stabilization progress'],priority:'Verify all active referrals are scheduled and confirm no authorization barriers are pending with the insurer.',docFocus:'Document all specialist referrals, treatment responses, and any payer communications. Note any deviations from the expected treatment pathway.'},
+    3:{interval:'Every 10–14 days',guidance:['Review provider coordination and sequencing alignment','Confirm specialist involvement matches clinical presentation','Identify missing diagnostics or delayed referrals','Evaluate documentation for structural gaps or inconsistencies','Reassess at the recommended interval to maintain structural defensibility'],priority:'Confirm treatment milestones are on track and identify any emerging coordination issues before the next scheduled review.',docFocus:'Maintain running documentation of treatment progression and functional status. Note any changes in provider involvement or payer activity.'},
+    4:{interval:'Every 21–30 days',guidance:['Review coordination among treating providers','Confirm diagnostic progression matches the reported injury profile','Monitor referral sequencing and specialty involvement','Identify early indicators of increasing case complexity','Reassess at the recommended interval to monitor structural changes'],priority:'Confirm current treatment is progressing and that no new providers or complications have been introduced since the last review.',docFocus:'Keep standard treatment documentation current. Flag any new providers, complications, or payer activity for the next review cycle.'},
+    5:{interval:'Every 21–30 days',guidance:['Maintain current treatment monitoring','Confirm documentation remains consistent across providers','Monitor for introduction of additional providers or diagnoses','Reassess at the recommended interval to confirm continued stability'],priority:'Confirm current treatment is progressing and that no new providers or complications have been introduced since the last review.',docFocus:'Keep standard treatment documentation current. Flag any new providers, complications, or payer activity for the next review cycle.'}
   };
   const cmg=cmgData[level];
   const assessmentData={
@@ -1543,6 +1569,7 @@ function calculate(){
     rehabSelections:rehabAll.map(c=>c.value),
     alignmentSelections:alignAll.map(c=>c.value),
     preExistingSelections:phPreExisting.map(c=>c.value),
+    soSelections:soAll.map(c=>c.value),
     referralDepth:refVal,
     treatmentDuration:durVal,
     psAffected,
@@ -1553,7 +1580,7 @@ function calculate(){
 
   document.getElementById('assessment').style.display='none';
 
-  void cciFinalizeReportAndUI(assessmentData,toolData,level,cmg,levelNames,composite);
+  await cciFinalizeReportAndUI(assessmentData,toolData,level,cmg,levelNames,composite);
 }
 
 async function cciFinalizeReportAndUI(assessmentData,toolData,level,cmg,levelNames,composite){
@@ -1605,14 +1632,7 @@ async function cciFinalizeReportAndUI(assessmentData,toolData,level,cmg,levelNam
 
   window.scrollTo({top:0,behavior:'smooth'});
 
-  if(window.opener&&!window.opener.closed){
-    window.opener.postMessage({type:'INSTRUMENT_COMPLETE',instrument:'CCI',caseType},'*');
-  }
-  if(typeof window.markAssessmentComplete==='function'){
-    window.markAssessmentComplete(assessmentData);
-  }
-
-  void paidPortalRecordCaseToolRunAsync({
+  var recorded = await paidPortalRecordCaseToolRunAsync({
     toolKey: 'CCI',
     scoreSummary: {
       tool: 'CCI',
@@ -1623,6 +1643,33 @@ async function cciFinalizeReportAndUI(assessmentData,toolData,level,cmg,levelNam
     },
     resultJson: toolData
   });
+  if (recorded === true) {
+    var delOk = await cciDeletePaidDraftAsync();
+    if (delOk) cciDraftLockedAfterRun = true;
+  } else {
+    cciDraftAutosaveDisabled = false;
+  }
+
+  if(window.opener&&!window.opener.closed){
+    window.opener.postMessage({type:'INSTRUMENT_COMPLETE',instrument:'CCI',caseType},'*');
+  }
+  try{
+    if(typeof window.markAssessmentComplete==='function'){
+      window.markAssessmentComplete(assessmentData);
+    }
+  }catch(markErr){
+    console.warn('[CCI] markAssessmentComplete',markErr);
+  }
+}
+
+function cciToggleRptSection(headEl){
+  if(!headEl) return;
+  var body=headEl.nextElementSibling;
+  var chev=headEl.querySelector('.rpt-section-chev');
+  if(!body) return;
+  var willOpen=!body.classList.contains('open');
+  body.classList.toggle('open',willOpen);
+  if(chev) chev.classList.toggle('open',willOpen);
 }
 
 function cciScrollToPaidReport(){
@@ -1637,8 +1684,102 @@ function cciPrintPaidReport(){
   window.print();
 }
 
+// ── Instructions drawer (Option X: clone at runtime, no drift) ──
+var cciDrawerHydrated=false;
+
+function cciHydrateDrawerContent(){
+  if(cciDrawerHydrated) return;
+  var src=document.querySelector('#explainer .exp-body');
+  var dest=document.getElementById('cci-drawer-body-inner');
+  if(!src||!dest) return;
+  // Clone the explainer body (toolbar + 5 accordions + CTA section)
+  var clone=src.cloneNode(true);
+  // Remove the CTA section — drawer is reference-only
+  var cta=clone.querySelector('.cta-sec');
+  if(cta) cta.parentNode.removeChild(cta);
+  // Rewrite IDs to avoid conflicts with the originals on the explainer page
+  clone.querySelectorAll('[id]').forEach(function(el){
+    el.id='cci-drawer-clone-'+el.id;
+  });
+  // Strip original onclick handlers (they reference the original IDs / counts)
+  // and rebind to a drawer-scoped accordion toggle
+  clone.querySelectorAll('.byb-acc-hd').forEach(function(hd,idx){
+    hd.removeAttribute('onclick');
+    hd.setAttribute('data-cci-drawer-acc-idx',String(idx));
+    hd.addEventListener('click',function(){
+      cciDrawerToggleAcc(hd);
+    });
+    // Default all collapsed inside the drawer
+    hd.classList.remove('open');
+    hd.setAttribute('aria-expanded','false');
+  });
+  clone.querySelectorAll('.byb-acc-body').forEach(function(bd){
+    bd.classList.remove('open');
+  });
+  // Rebind the toolbar Expand/Collapse All buttons to drawer-scoped versions
+  clone.querySelectorAll('.byb-acc-bulk').forEach(function(btn){
+    var label=(btn.textContent||'').trim().toLowerCase();
+    btn.removeAttribute('onclick');
+    if(label.indexOf('expand')>=0){
+      btn.addEventListener('click',function(){ cciDrawerSetAllAcc(true); });
+    } else if(label.indexOf('collapse')>=0){
+      btn.addEventListener('click',function(){ cciDrawerSetAllAcc(false); });
+    }
+  });
+  dest.appendChild(clone);
+  cciDrawerHydrated=true;
+}
+
+function cciDrawerToggleAcc(hd){
+  if(!hd) return;
+  var bd=hd.nextElementSibling;
+  if(!bd) return;
+  var willOpen=!bd.classList.contains('open');
+  hd.classList.toggle('open',willOpen);
+  bd.classList.toggle('open',willOpen);
+  hd.setAttribute('aria-expanded',willOpen?'true':'false');
+}
+
+function cciDrawerSetAllAcc(open){
+  var dest=document.getElementById('cci-drawer-body-inner');
+  if(!dest) return;
+  dest.querySelectorAll('.byb-acc-hd').forEach(function(hd){
+    hd.classList.toggle('open',open);
+    hd.setAttribute('aria-expanded',open?'true':'false');
+  });
+  dest.querySelectorAll('.byb-acc-body').forEach(function(bd){
+    bd.classList.toggle('open',open);
+  });
+}
+
+function cciOpenInstructionsDrawer(){
+  cciHydrateDrawerContent();
+  var d=document.getElementById('cci-drawer');
+  var b=document.getElementById('cci-drawer-backdrop');
+  if(d){ d.classList.add('open'); d.setAttribute('aria-hidden','false'); }
+  if(b){ b.classList.add('open'); b.setAttribute('aria-hidden','false'); }
+  document.body.style.overflow='hidden';
+}
+
+function cciCloseInstructionsDrawer(){
+  var d=document.getElementById('cci-drawer');
+  var b=document.getElementById('cci-drawer-backdrop');
+  if(d){ d.classList.remove('open'); d.setAttribute('aria-hidden','true'); }
+  if(b){ b.classList.remove('open'); b.setAttribute('aria-hidden','true'); }
+  document.body.style.overflow='';
+}
+
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){
+    var d=document.getElementById('cci-drawer');
+    if(d&&d.classList.contains('open')) cciCloseInstructionsDrawer();
+  }
+});
+
 // ── Reset ─────────────────────────────────────────────
 function resetAll(){
+  cciDraftAutosaveDisabled=false;
+  cciDraftLockedAfterRun=false;
   document.querySelectorAll('input[type=checkbox]').forEach(c=>{c.checked=false;c.closest('.cb-item').classList.remove('selected');});
   document.getElementById('primary-region').value='';
   document.getElementById('specific-injury').innerHTML='<option value="">— Select primary injury region first —</option>';
@@ -1652,6 +1793,7 @@ function resetAll(){
   document.getElementById('paid-complete').style.display='none';
   var paidRep=document.getElementById('cci-paid-report-visible');
   if(paidRep){paidRep.innerHTML='';}
+  void cciDeletePaidDraftAsync();
   if(window.caseClarityIdentity&&window.supabaseClient){
     void window.caseClarityIdentity.mountToolPage(window.supabaseClient);
   }
@@ -1701,24 +1843,30 @@ function goToNext() {
     }
 }
 
-async function returnToDashboard() {
-    if (typeof window.cciFlushPendingDraftSave === 'function') {
-        await window.cciFlushPendingDraftSave();
-    }
+function returnToDashboard() {
     window.location.href = 'dashboard.html';
 }
 </script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  var p = Promise.resolve();
   if (window.caseClarityIdentity && window.supabaseClient) {
-    p = Promise.resolve(window.caseClarityIdentity.mountToolPage(window.supabaseClient));
+    void window.caseClarityIdentity.mountToolPage(window.supabaseClient);
   }
-  void p.then(function () {
-    void cciPaidDraftBootstrap();
-  });
+  cciInitPaidDraftPersistence();
 });
 </script>
-<script src="trial-pinned-banner.js"></script>
+<div class="cci-drawer-backdrop" id="cci-drawer-backdrop" onclick="cciCloseInstructionsDrawer()" aria-hidden="true"></div>
+<aside class="cci-drawer" id="cci-drawer" role="dialog" aria-modal="true" aria-labelledby="cci-drawer-title-text" aria-hidden="true">
+  <div class="cci-drawer-head">
+    <div class="cci-drawer-head-text">
+      <div class="cci-drawer-tag">Reconcile Care Management Services</div>
+      <div class="cci-drawer-title" id="cci-drawer-title-text">Before You Begin — Case Complexity Index™</div>
+    </div>
+    <button type="button" class="cci-drawer-close" onclick="cciCloseInstructionsDrawer()" aria-label="Close instructions">✕</button>
+  </div>
+  <div class="cci-drawer-body">
+    <div class="cci-drawer-body-inner" id="cci-drawer-body-inner"></div>
+  </div>
+</aside>
 </body>
 </html>
