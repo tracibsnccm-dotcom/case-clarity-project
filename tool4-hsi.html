@@ -2749,6 +2749,14 @@ function pickDestab(idx, val, btn) {
   btn.classList.add('sel');
   document.getElementById('dd'+idx).classList.add('answered');
   scheduleHsiDraftSave();
+  // Auto-advance to completion screen once all destabilizers are rated
+  var allDone = true;
+  for (var i = 0; i < DESTABILIZERS.length; i++) {
+    if (A[5][i] === undefined) { allDone = false; break; }
+  }
+  if (allDone) {
+    setTimeout(function(){ void buildResults(); }, 350);
+  }
 }
 
 /* ─────────────────────────────────────────────────────────
