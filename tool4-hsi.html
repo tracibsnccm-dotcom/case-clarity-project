@@ -7,7 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Jost:wght@300;400;500;600;700&family=Source+Code+Pro:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="trial-pinned-banner.css">
+<link rel="stylesheet" href="css/case-identity.css">
+<link rel="stylesheet" href="css/theme.css">
 <style>
 /* ═══════════════════════════════════════════════════
    TOKENS
@@ -18,11 +19,15 @@
   --gold-pale:  #faf7ee;
   --gold-dim:   rgba(176,152,55,0.10);
   --gold-ring:  rgba(176,152,55,0.30);
+  --hsi-navy:   #0e1c2e;
+  --hsi-navy-mid: #152238;
+  --hsi-navy-deep: #0a1628;
   --ink:        #111111;
   --ink-mid:    #3a3a3a;
   --ink-soft:   #666666;
   --white:      #ffffff;
   --surface:    #f8f8f6;
+  --page-tint:  #f3f1ec;
   --border:     #e4e4e2;
   --border-md:  #d0d0ce;
   --shadow-xs:  0 1px 3px rgba(0,0,0,0.05);
@@ -40,12 +45,13 @@
 html{scroll-behavior:smooth}
 body{
   font-family:var(--fb);
-  background:var(--white);
+  background:var(--page-tint);
   color:var(--ink);
   min-height:100vh;
   -webkit-font-smoothing:antialiased;
   line-height:1.6;
 }
+body.tool-hsi{background:linear-gradient(180deg,#ebe8e1 0%,var(--page-tint) 28%,#f7f6f3 100%)}
 button{cursor:pointer;font-family:var(--fb)}
 canvas{display:block}
 
@@ -146,22 +152,149 @@ canvas{display:block}
 /* ═══════════════════════════════════════════════════
    ── INTRO SCREEN ──
 ═══════════════════════════════════════════════════ */
-#sc-intro{background:var(--white)}
-.intro-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  flex:1;
+#sc-intro{background:transparent}
+.intro-flow{
+  display:flex;flex-direction:column;flex:1;
+  padding:0 12px;
+  box-sizing:border-box;
 }
-.intro-l{
-  padding:88px 72px 88px 80px;
-  border-right:1px solid var(--border);
-  display:flex;flex-direction:column;justify-content:center;
+.intro-hero{
+  padding:0;
+  max-width:100%;margin:0;
+  width:100%;
 }
-.intro-r{
-  background:var(--surface);
-  padding:88px 80px 88px 72px;
-  display:flex;flex-direction:column;justify-content:center;
+/* Navy title band: title, subtitle, intro copy + gold accent under block (compact) */
+.intro-hero-navy{
+  background:linear-gradient(165deg,var(--hsi-navy-deep) 0%,var(--hsi-navy) 42%,var(--hsi-navy-mid) 100%);
+  padding:32px 24px 22px;
+  border-bottom:3px solid var(--gold);
+  box-shadow:0 8px 28px rgba(10,22,40,0.1);
 }
+.intro-hero-navy .eyebrow{color:#e8c97a;margin-bottom:8px}
+.intro-hero-navy .hero-h{
+  font-weight:700;color:#fff;
+  font-size:clamp(2.35rem,5.2vw,2.95rem);
+  line-height:0.92;
+  letter-spacing:-0.02em;
+  text-shadow:0 1px 2px rgba(0,0,0,0.2);
+}
+.intro-hero-navy .hero-sub{color:rgba(255,255,255,0.92);font-weight:500;margin-bottom:14px}
+.intro-hero-navy .rule{background:linear-gradient(90deg,var(--gold),var(--gold-lt));height:3px;margin:12px 0 14px}
+.intro-hero-navy .hero-body{
+  max-width:none;
+  margin-bottom:0;
+}
+.intro-hero-navy .hero-body p{
+  color:rgba(255,255,255,0.9);
+  font-weight:400;
+  line-height:1.65;
+}
+.intro-hero-navy .hero-body p + p{margin-top:0.65rem}
+.intro-hero-navy .hero-body p{font-size:14px;line-height:1.6}
+.intro-hero-navy-inner{
+  max-width:720px;margin:0 auto;
+}
+/* Start Assessment — footer inside .intro-acc-wrap (below accordions) */
+.hsi-intro-cta{
+  margin-top:0;
+  padding:1.35rem 1.25rem 1.45rem;
+  border-top:1px solid rgba(176,152,55,0.2);
+  background:linear-gradient(180deg,#f4f1ea 0%,#ebe6dc 100%);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  gap:0.5rem;
+}
+.hsi-intro-cta-btn{
+  width:100%;
+  max-width:300px;
+  height:44px;
+  font-size:11px;
+  letter-spacing:0.12em;
+  padding:0 24px;
+}
+.hsi-intro-cta .hsi-intro-cta-meta{
+  margin:0.15rem 0 0;
+  font-size:10px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+}
+.hsi-intro-cta .hsi-intro-cta-note{
+  margin:0;
+  max-width:440px;
+  font-size:12px;
+  line-height:1.6;
+  color:#777;
+  font-style:italic;
+}
+#hsi-identity-slot-intro .hsi-tool-page-overview,
+#hsi-identity-slot-global .hsi-tool-page-overview{
+  max-width:920px;margin:0 auto;padding:0.45rem 0 0.65rem;
+  background:transparent;
+  border-bottom:none;
+}
+.hsi-identity-slot-global{
+  max-width:920px;margin:0 auto;
+  padding:0 1.5rem;
+}
+/* Anchor card to shared case-identity look (navy head + gold already in case-identity.css) */
+.hsi-tool-page-overview .case-clarity-identity-card{
+  box-shadow:0 4px 24px rgba(10,22,40,0.08),0 1px 0 rgba(255,255,255,0.85) inset;
+}
+.fsm-section-heading{
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);
+  font-family:var(--fb);font-weight:700;margin-bottom:10px;
+}
+/* Accordion + Start CTA — align with .case-clarity-identity-card (12px radius, gold edge, warm gradient) */
+.intro-acc-wrap{
+  max-width:920px;margin:0.35rem auto 2.5rem;padding:0;
+  width:100%;
+  border:1px solid rgba(176,152,55,0.34);
+  border-radius:12px;
+  overflow:hidden;
+  background:linear-gradient(165deg,#fdfcfa 0%,#f7f4ed 42%,#f0ebe3 100%);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 10px 36px rgba(10,22,40,0.07),
+    0 2px 10px rgba(10,22,40,0.04);
+}
+.intro-acc-wrap .byb-acc{border-bottom:1px solid var(--border)}
+.intro-acc-wrap .byb-acc:nth-last-child(2){border-bottom:none}
+.intro-acc-wrap .byb-acc-hd{
+  width:100%;text-align:left;padding:1.05rem 1.35rem 1.05rem 1.25rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:linear-gradient(100deg,var(--hsi-navy-deep) 0%,var(--hsi-navy) 55%,var(--hsi-navy-mid) 100%);
+  border:none;border-left:4px solid var(--gold);
+  font:inherit;transition:background .18s ease,filter .18s ease;
+}
+.intro-acc-wrap .byb-acc-hd:hover{filter:brightness(1.08)}
+.intro-acc-wrap .byb-acc-hd.open{
+  background:linear-gradient(100deg,#0a1422 0%,var(--hsi-navy-deep) 100%);
+  border-left-color:var(--gold-lt);
+}
+.intro-acc-wrap .byb-acc-title{
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#fff;
+  font-family:var(--fb);font-weight:600;
+}
+.intro-acc-wrap .byb-acc-hd.open .byb-acc-title{color:#fff}
+.intro-acc-wrap .byb-acc-cv{
+  width:14px;height:14px;color:var(--gold-lt);transition:transform .25s,color .15s;flex-shrink:0;
+}
+.intro-acc-wrap .byb-acc-hd.open .byb-acc-cv{transform:rotate(180deg);color:var(--gold)}
+.intro-acc-wrap .byb-acc-body{display:none;padding:1.1rem 1.5rem 1.25rem;background:#fafaf8}
+.intro-acc-wrap .byb-acc:nth-child(even) .byb-acc-body{background:#f5f4f0}
+.intro-acc-wrap .byb-acc-body.open{display:block}
+.hsi-fourps-summary{
+  margin:0 0 20px;padding:16px 18px;
+  background:linear-gradient(180deg,#f8f7f4 0%,#f2f0eb 100%);
+  border:1px solid var(--border);border-radius:var(--r);
+  font-size:13px;color:var(--ink-soft);line-height:1.7;
+}
+.hsi-fourps-summary strong{color:var(--ink);font-weight:700}
+.hsi-fourps-summary .row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-bottom:10px}
+.hsi-fourps-summary .row:last-child{margin-bottom:0}
 .hero-h{
   font-family:var(--fd);
   font-size:62px;font-weight:600;
@@ -179,7 +312,6 @@ canvas{display:block}
   color:var(--ink-soft);max-width:420px;margin-bottom:44px;
 }
 .hero-body p+p{margin-top:14px}
-.hero-cta{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
 .hero-time{
   font-size:11px;font-weight:500;
   letter-spacing:0.12em;text-transform:uppercase;
@@ -235,7 +367,7 @@ canvas{display:block}
   letter-spacing:0.2em;text-transform:uppercase;
   color:var(--gold);margin-bottom:12px;
 }
-#cvMini{display:block;width:100%;min-height:140px;height:140px;max-width:100%}
+#cvMini,#cvAssessFsm{display:block;width:100%;min-height:140px;height:140px;max-width:100%}
 .slab-preview-caption{
   font-size:12px;line-height:1.65;
   color:#999;text-align:center;
@@ -243,25 +375,119 @@ canvas{display:block}
   max-width:320px;margin-left:auto;margin-right:auto;
 }
 
+/* Foundation Stability Model — intro/assess use collapsible .byb-acc */
+.fsm-intro-wrap,.intro-acc-wrap .slab-preview{margin-top:0}
+.fsm-section-heading{
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);
+  font-family:var(--fb);font-weight:700;margin-bottom:10px;
+}
+.hsi-fsm-assess-acc canvas#cvAssessFsm{display:block;width:100%;min-height:140px;height:140px;max-width:100%}
+.fsm-explain-list{
+  margin:12px 0 0;padding-left:1.25rem;
+  font-size:13px;color:var(--ink-soft);line-height:1.65;
+  text-align:left;font-style:normal;font-family:var(--fb);
+}
+.fsm-explain-list li{margin:0 0 .55rem}
+.fsm-explain-list li:last-child{margin-bottom:0}
+
+/* ── CAF-aligned accordions (same structure & behavior as tool3-caf .byb-acc) ── */
+.byb-acc{border-bottom:1px solid var(--border)}
+.byb-acc:last-child{border-bottom:none}
+.byb-acc-hd{
+  width:100%;text-align:left;padding:1.05rem 1.5rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:var(--white);border:none;font:inherit;transition:background .15s;
+}
+.byb-acc-hd:hover{background:var(--gold-pale)}
+.byb-acc:nth-child(even) .byb-acc-hd:not(.open){background:var(--surface)}
+.byb-acc:nth-child(even) .byb-acc-hd:not(.open):hover{background:#f0efe9}
+.byb-acc-hd.open{background:var(--ink)}
+.byb-acc-title{
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);
+  font-family:var(--fb);
+}
+.byb-acc-hd.open .byb-acc-title{color:var(--gold-lt)}
+.byb-acc-cv{
+  width:14px;height:14px;color:var(--ink-mid);transition:transform .25s,color .15s;flex-shrink:0;
+}
+.byb-acc-hd.open .byb-acc-cv{transform:rotate(180deg);color:var(--gold)}
+.byb-acc-body{display:none;padding:1.35rem 1.5rem;background:var(--white)}
+.byb-acc:nth-child(even) .byb-acc-body{background:var(--surface)}
+.byb-acc-body.open{display:block}
+.byb-acc-body>p{
+  font-size:14px;color:var(--ink-soft);font-family:var(--fb);
+  line-height:1.75;margin-bottom:.875rem;
+}
+.byb-acc-body>p:last-child{margin-bottom:0}
+.intro-r .byb-acc{
+  border:1px solid var(--border);border-radius:var(--r);
+  margin-top:8px;overflow:hidden;
+}
+.intro-r .byb-acc .byb-acc-body{background:var(--white)}
+.hsi-assess-acc-wrap .byb-acc{
+  border:1px solid rgba(10,22,40,0.1);border-radius:var(--r);
+  margin-bottom:12px;overflow:hidden;
+  box-shadow:0 2px 12px rgba(10,22,40,0.04);
+}
+.hsi-assess-acc-wrap .byb-acc:last-child{margin-bottom:0}
+/* Assess accordions (FSM, Social Drivers, Destabilizers): navy headers, light bodies */
+.hsi-assess-acc-wrap .byb-acc .byb-acc-hd{
+  background:linear-gradient(100deg,var(--hsi-navy-deep) 0%,var(--hsi-navy) 55%,var(--hsi-navy-mid) 100%);
+  border-left:4px solid var(--gold);
+}
+.hsi-assess-acc-wrap .byb-acc .byb-acc-hd:hover{filter:brightness(1.08)}
+.hsi-assess-acc-wrap .byb-acc:nth-child(even) .byb-acc-hd:not(.open),
+.hsi-assess-acc-wrap .byb-acc:nth-child(even) .byb-acc-hd:not(.open):hover{
+  background:linear-gradient(100deg,var(--hsi-navy-deep) 0%,var(--hsi-navy) 55%,var(--hsi-navy-mid) 100%);
+}
+.hsi-assess-acc-wrap .byb-acc:nth-child(even) .byb-acc-hd:not(.open):hover{filter:brightness(1.08)}
+.hsi-assess-acc-wrap .byb-acc .byb-acc-hd.open{
+  background:linear-gradient(100deg,#0a1422 0%,var(--hsi-navy-deep) 100%);
+  border-left-color:var(--gold-lt);
+}
+.hsi-assess-acc-wrap .byb-acc .byb-acc-title{color:#fff;font-weight:600}
+.hsi-assess-acc-wrap .byb-acc .byb-acc-hd.open .byb-acc-title{color:#fff}
+.hsi-assess-acc-wrap .byb-acc .byb-acc-cv{color:var(--gold-lt)}
+.hsi-assess-acc-wrap .byb-acc .byb-acc-body{background:#fafaf8}
+.hsi-assess-acc-wrap .byb-acc:nth-child(even) .byb-acc-body{background:#f5f4f0}
+.slab-preview--in-acc{
+  background:transparent;border:none;box-shadow:none;
+  padding:0;margin:0;
+}
+.slab-preview--in-acc:hover{transform:none;filter:none}
+
 /* ═══════════════════════════════════════════════════
-   ── ASSESSMENT SCREEN ──
+   ── ASSESSMENT SCREEN (CAF-style centered working column) ──
 ═══════════════════════════════════════════════════ */
-#sc-assess{background:var(--white)}
+#sc-assess{background:transparent}
+.hsi-assess-work{
+  flex:1;
+  width:100%;
+  max-width:1320px;
+  margin:0 auto;
+  padding:0 20px 40px;
+  box-sizing:border-box;
+  min-height:0;
+}
 .assess-layout{
   display:grid;
-  grid-template-columns:264px 1fr;
+  grid-template-columns:232px minmax(0,1fr);
+  gap:0 32px;
+  align-items:start;
   flex:1;
 }
 
 /* Sidebar */
 .sidebar{
   background:var(--surface);
-  border-right:1px solid var(--border);
-  padding:44px 28px;
-  position:sticky;top:60px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:36px 22px;
+  position:sticky;top:72px;
   align-self:start;
-  max-height:calc(100vh - 60px);
+  max-height:calc(100vh - 72px);
   overflow-y:auto;
+  box-shadow:0 1px 0 rgba(255,255,255,0.85) inset;
 }
 .sb-heading{
   font-size:9px;font-weight:700;
@@ -285,8 +511,33 @@ canvas{display:block}
 .sb-step.active .sb-pip{background:var(--gold)}
 .sb-step.done .sb-pip{background:#ccc}
 
-/* Main */
-.assess-main{padding:56px 68px 80px;max-width:740px}
+/* Main: fluid cell; inner column matches CAF .page width (~860px) */
+.assess-main{
+  padding:32px 0 48px;
+  min-width:0;
+  width:100%;
+  background:transparent;
+  border:none;
+  box-shadow:none;
+}
+.hsi-assess-main-inner{
+  max-width:860px;
+  width:100%;
+  margin:0;
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  min-height:0;
+}
+#hsi-identity-slot-assess{
+  width:100%;
+  margin:0 0 1.25rem;
+}
+#hsi-identity-slot-assess .hsi-tool-page-overview{
+  max-width:none;
+  margin:0;
+  padding:0 0 0.5rem;
+}
 
 /* Domain header */
 .d-header{margin-bottom:40px}
@@ -344,7 +595,7 @@ canvas{display:block}
 .q-text{
   font-family:var(--fd);font-size:20px;font-weight:500;
   color:var(--ink);line-height:1.45;
-  margin-bottom:30px;max-width:580px;
+  margin-bottom:30px;max-width:100%;
 }
 
 /* Stage options */
@@ -471,19 +722,27 @@ canvas{display:block}
   content:'•';color:var(--gold);flex-shrink:0;font-weight:700;
 }
 
-/* Nav */
+/* Nav — anchored to main column width */
 .assess-nav{
   display:flex;justify-content:space-between;align-items:center;
-  padding-top:28px;border-top:1px solid var(--border);
-  margin-top:8px;
+  gap:16px;
+  flex-wrap:wrap;
+  padding-top:24px;
+  margin-top:12px;
+  border-top:1px solid rgba(10,22,40,0.1);
+  width:100%;
+  max-width:100%;
 }
 
 /* ═══════════════════════════════════════════════════
    SOCIAL DRIVERS (reuses assess layout)
 ═══════════════════════════════════════════════════ */
 .drivers-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:14px;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:16px;
   margin-bottom:36px;
+  width:100%;
 }
 .driver-card{
   background:var(--white);border:1.5px solid var(--border);
@@ -852,19 +1111,24 @@ canvas{display:block}
    RESPONSIVE
 ═══════════════════════════════════════════════════ */
 @media(max-width:1080px){
-  .intro-grid{grid-template-columns:1fr}
-  .intro-l{border-right:none;border-bottom:1px solid var(--border);padding:56px 48px}
-  .intro-r{padding:56px 48px}
-  .hero-h{font-size:48px}
-  .assess-layout{grid-template-columns:1fr}
-  .sidebar{display:none}
-  .assess-main{padding:40px 36px 64px;max-width:100%}
+  .intro-hero-navy{padding:28px 22px 20px}
+  .intro-hero-navy .hero-h{font-size:clamp(2rem,4.5vw,2.65rem)}
+  .hsi-assess-work{padding:0 16px 32px}
+  .assess-layout{grid-template-columns:1fr;gap:0}
+  .sidebar{
+    position:relative;top:auto;max-height:none;
+    margin-bottom:20px;
+  }
+  .assess-main{padding:24px 0 40px}
+  .hsi-assess-main-inner{max-width:100%}
   .plans-grid{grid-template-columns:1fr 1fr}
 }
 @media(max-width:660px){
   .nav{padding:0 20px}
-  .intro-l,.intro-r{padding:40px 20px}
-  .hero-h{font-size:38px}
+  .intro-flow{padding:0 10px}
+  .intro-hero-navy{padding:24px 18px 18px}
+  .hsi-intro-cta{padding-left:1rem;padding-right:1rem}
+  .intro-hero-navy .hero-h{font-size:clamp(1.75rem,7vw,2.35rem)}
   .assess-main{padding:28px 18px 56px}
   .results-wrap,.upgrade-wrap{padding:36px 18px 56px}
   .score-row{grid-template-columns:1fr}
@@ -874,39 +1138,121 @@ canvas{display:block}
   .slab-card{padding:24px 16px}
   .destab-card-r,.interp-card{padding:24px 18px}
 }
-  /* ── Collapsible domain sections ── */
+  /* ── Collapsible domain sections (4P) — navy headers, gold accent ── */
   .domain-section {
-    border: 1.5px solid var(--border);
+    border: 1px solid rgba(10, 22, 40, 0.12);
     border-radius: var(--r);
     margin-bottom: 16px;
     overflow: hidden;
+    box-shadow: 0 2px 12px rgba(10, 22, 40, 0.05);
   }
   .domain-section-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 20px;
+    padding: 16px 18px 16px 16px;
     cursor: pointer;
-    background: var(--white);
+    background: linear-gradient(100deg, var(--hsi-navy-deep) 0%, var(--hsi-navy) 55%, var(--hsi-navy-mid) 100%);
+    border-left: 4px solid var(--gold);
     user-select: none;
+    transition: filter 0.18s ease;
   }
-  .domain-section-header:hover { background: var(--gold-pale); }
-  .domain-section-header.open { border-bottom: 1.5px solid var(--border); }
+  .domain-section-header:hover { filter: brightness(1.06); }
+  .domain-section-header.open { border-bottom: 1px solid rgba(255, 255, 255, 0.12); }
   .domain-section-title {
-    font-family: var(--font-display);
+    font-family: var(--fd);
     font-size: 17px;
     font-weight: 600;
-    color: var(--black);
+    color: #fff;
   }
   .domain-section-badge {
-    font-family: var(--font-ui);
+    font-family: var(--fb);
     font-size: 10px;
     font-weight: 600;
     letter-spacing: 0.15em;
     text-transform: uppercase;
-    color: var(--gray-mid);
+    color: #e8c97a;
   }
   .domain-section-status {
+    font-family: var(--fb);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .domain-section-status.complete {
+    background: rgba(46, 125, 50, 0.35);
+    color: #c8f0c9;
+  }
+  .domain-section-arrow {
+    font-size: 12px;
+    color: var(--gold-lt);
+    transition: transform 0.2s;
+  }
+  .domain-section-arrow.open { transform: rotate(180deg); }
+  .domain-section-body {
+    display: none;
+    padding: 20px;
+    background: #f7f6f3;
+  }
+  .domain-section-body.open { display: block; }
+
+  /* Level 2: one collapsible block per question inside each 4P domain */
+  .hsi-q-acc {
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    margin-bottom: 12px;
+    overflow: hidden;
+    background: var(--white);
+  }
+  .hsi-q-acc:last-child { margin-bottom: 0; }
+  .hsi-q-acc-hd {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px 12px 12px;
+    cursor: pointer;
+    border: none;
+    border-left: 3px solid rgba(176, 152, 55, 0.55);
+    background: #fdfcfa;
+    text-align: left;
+    font: inherit;
+    box-sizing: border-box;
+  }
+  .hsi-q-acc-hd:hover { background: var(--gold-pale); }
+  .hsi-q-acc-hd.open {
+    border-bottom: 1px solid var(--border);
+    border-left-color: var(--gold);
+    background: #faf8f3;
+  }
+  .hsi-q-acc-hd-text { min-width: 0; flex: 1; }
+  .hsi-q-acc-hd-num {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gray-mid);
+    margin-bottom: 4px;
+  }
+  .hsi-q-acc-hd-title {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--black);
+    line-height: 1.35;
+  }
+  .hsi-q-acc-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .hsi-q-acc-status {
     font-family: var(--font-ui);
     font-size: 11px;
     font-weight: 600;
@@ -915,26 +1261,194 @@ canvas{display:block}
     background: var(--surf-line);
     color: var(--gray-mid);
   }
-  .domain-section-status.complete {
+  .hsi-q-acc-status.answered {
     background: #e6f4ea;
     color: #1a6e2e;
   }
-  .domain-section-arrow {
+  .hsi-q-acc-arrow {
     font-size: 12px;
     color: var(--gray-mid);
     transition: transform 0.2s;
   }
-  .domain-section-arrow.open { transform: rotate(180deg); }
-  .domain-section-body {
+  .hsi-q-acc-body {
     display: none;
-    padding: 20px;
+    padding: 0 16px 16px;
     background: var(--surface);
   }
-  .domain-section-body.open { display: block; }
+  .hsi-q-acc-body.open { display: block; }
+  .hsi-q-acc-body .q-text {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    margin-top: 4px;
+    margin-bottom: 14px;
+  }
+
+  @media print {
+    .no-print { display: none !important; }
+    #sc-assess, #sc-intro { display: none !important; }
+    #sc-results { display: block !important; }
+    #sc-results .screen { display: block !important; }
+    #case-header-fields,
+    #case-header-fields *,
+    #hsi-paid-report-visible,
+    #hsi-paid-report-visible * {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+  }
+
+/* ═══════════════════════════════════════════════════
+   HSI ENHANCEMENTS — Tier chips, banners, panels
+═══════════════════════════════════════════════════ */
+
+/* Tier chips — color mirrors hsiTier(), text uppercase */
+.hsi-tier-chip{
+  display:inline-block;font-family:var(--fb);font-size:10px;font-weight:800;
+  letter-spacing:0.08em;padding:4px 10px;border-radius:4px;text-transform:uppercase;
+  vertical-align:middle;white-space:nowrap;
+}
+.hsi-tier-strong     { background:#1e5c3a; color:#fff; }
+.hsi-tier-stable     { background:#4a6741; color:#fff; }
+.hsi-tier-struggling { background:#a8852b; color:#fff; }
+.hsi-tier-unstable   { background:#c45c1a; color:#fff; }
+.hsi-tier-critical   { background:#8b1e1e; color:#fff; }
+
+/* Critical Domain banner — fires when any P ≤ 2 */
+.hsi-cd-banner{
+  margin:0 22px 16px;padding:14px 18px;border-left:4px solid #8b1e1e;
+  background:#fdf4f4;border-radius:4px;
+}
+.hsi-cd-banner-title{
+  font-family:var(--fb);font-weight:800;font-size:13px;color:#8b1e1e;
+  letter-spacing:0.04em;text-transform:uppercase;margin-bottom:6px;
+}
+.hsi-cd-banner-body{
+  font-family:var(--fb);font-size:13px;color:#3a2020;line-height:1.55;
+}
+
+/* Recommended Response Timeframe banner — intrinsic-crisis triggers */
+.hsi-rr-banner{
+  margin:14px 22px 0;padding:14px 18px;border-left:4px solid #c45c1a;
+  background:#fff6ee;border-radius:4px;
+}
+.hsi-rr-title{
+  font-family:var(--fb);font-weight:800;font-size:13px;color:#8a3e10;
+  letter-spacing:0.04em;text-transform:uppercase;margin-bottom:6px;
+}
+.hsi-rr-body{ font-family:var(--fb);font-size:13px;color:#3a2410;line-height:1.55; }
+
+/* SDOH Attorney-Action flag — lighter weight than rr-banner */
+.hsi-sdoh-flag{
+  margin:10px 22px 0;padding:12px 16px;border-left:3px solid #a8852b;
+  background:#fbf6e6;border-radius:4px;
+}
+.hsi-sdoh-title{
+  font-family:var(--fb);font-weight:700;font-size:12px;color:#6a5418;
+  letter-spacing:0.04em;text-transform:uppercase;margin-bottom:5px;
+}
+.hsi-sdoh-body{ font-family:var(--fb);font-size:12.5px;color:#3a2f0f;line-height:1.55; }
+
+/* Clinical-Legal Consideration blocks — per P when P ≤ 2 */
+.hsi-cl-block{
+  margin:10px 22px 0;padding:13px 17px;border-left:3px solid #0e1c2e;
+  background:#f3f1ec;border-radius:4px;
+}
+.hsi-cl-title{
+  font-family:var(--fb);font-weight:700;font-size:12px;color:#0e1c2e;
+  letter-spacing:0.04em;text-transform:uppercase;margin-bottom:5px;
+}
+.hsi-cl-body{ font-family:var(--fb);font-size:12.5px;color:#222;line-height:1.6; }
+
+/* Intrinsic/Extrinsic mismatch callout */
+.hsi-mm-callout{
+  margin:14px 22px 0;padding:13px 17px;border:1px solid #b09837;
+  background:#faf7ee;border-radius:4px;
+}
+.hsi-mm-title{
+  font-family:var(--fb);font-weight:700;font-size:12px;color:#6a5418;
+  letter-spacing:0.04em;text-transform:uppercase;margin-bottom:5px;
+}
+.hsi-mm-body{ font-family:var(--fb);font-size:12.5px;color:#222;line-height:1.6; }
+
+/* View Instructions overlay button + panel */
+.hsi-vi-btn{
+  position:fixed;top:110px;right:18px;z-index:40;
+  padding:9px 14px;font-family:var(--fb);font-size:12px;font-weight:600;
+  background:#0e1c2e;color:#fff;border:1px solid #b09837;border-radius:4px;
+  cursor:pointer;box-shadow:var(--shadow-sm);
+}
+.hsi-vi-btn:hover{ background:#152238; }
+.hsi-vi-overlay{
+  display:none;position:fixed;inset:0;z-index:60;background:rgba(14,28,46,0.55);
+  align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto;
+}
+.hsi-vi-overlay.open{ display:flex; }
+.hsi-vi-panel{
+  background:#fff;max-width:720px;width:100%;border-radius:6px;
+  box-shadow:var(--shadow-md);padding:28px 32px;font-family:var(--fb);
+}
+.hsi-vi-panel h2{
+  font-family:var(--fd);font-size:24px;font-weight:600;color:#0e1c2e;
+  margin-bottom:6px;
+}
+.hsi-vi-panel h3{
+  font-family:var(--fb);font-size:13px;font-weight:700;color:#0e1c2e;
+  letter-spacing:0.04em;text-transform:uppercase;margin:18px 0 8px;
+}
+.hsi-vi-panel p, .hsi-vi-panel li{
+  font-size:13.5px;color:#222;line-height:1.65;
+}
+.hsi-vi-panel ul{ padding-left:20px;margin-bottom:10px; }
+.hsi-vi-panel li{ margin-bottom:5px; }
+.hsi-vi-close{
+  float:right;background:transparent;border:1px solid #d0d0ce;border-radius:3px;
+  padding:4px 10px;font-size:12px;cursor:pointer;color:#555;
+}
+.hsi-vi-close:hover{ background:#f3f1ec; }
+
+/* Print hygiene */
+@media print{
+  .hsi-vi-btn, .hsi-vi-overlay{ display:none !important; }
+}
 
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/auth-guard.js"></script>
+<script src="js/portal-header-nav.js"></script>
+<script src="js/paid-portal-tool-run.js"></script>
+<script src="js/case-identity.js"></script>
 </head>
-<body>
+<body class="with-portal-tool-header tool-hsi">
+
+<header class="portal-header no-print">
+  <a href="/index.html" class="portal-logo">
+    <div class="portal-logo-box"><span>C</span></div>
+    <div class="portal-logo-text">
+      <strong>C.A.S.E. Clarity</strong>
+      Reconcile Care Management Services
+    </div>
+  </a>
+  <div class="portal-header-right">
+    <a href="/case-detail.html" class="portal-nav-link" id="portal-nav-back-case">Back to Case</a>
+    <a href="/dashboard.html" class="portal-nav-link" id="portal-nav-back-dashboard">Back to Dashboard</a>
+    <span class="portal-user" id="user-email">Loading…</span>
+    <button type="button" class="btn-secondary" id="portal-nav-logout" disabled>Logout</button>
+  </div>
+</header>
+<script>
+(function () {
+  async function boot() {
+    const ok = await requireAuth();
+    if (!ok) return;
+    if (typeof initPortalHeaderNav === 'function') initPortalHeaderNav();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { void boot(); });
+  else void boot();
+})();
+</script>
+<div id="hsi-identity-slot-global" class="hsi-identity-slot-global" style="display:none" aria-hidden="true"></div>
 
 <!-- ══════════════════════════════════════════
      INTRO
@@ -944,48 +1458,103 @@ canvas{display:block}
     <div class="nav-brand">Holistic Stability Index<span class="g">™</span></div>
     <div class="nav-pill">Clinical Assessment</div>
   </nav>
-  <div class="intro-grid">
-    <div class="intro-l">
-      <div class="eyebrow">Personal Injury &amp; Workers' Compensation</div>
-      <h1 class="hero-h">Holistic<br>Stability<br>Index<sup>™</sup></h1>
-      <p class="hero-sub">Powered by the 4Ps of Wellness</p>
-      <div class="rule"></div>
-      <div class="hero-body">
-        <p>Recovery outcomes are influenced by more than medical treatment alone. Internal stability and environmental pressures interact to either support or destabilize recovery.</p>
-        <p>The Holistic Stability Index™ evaluates these structural forces to help identify hidden pressures affecting recovery progress and case outcomes.</p>
+  <div class="intro-flow">
+    <div class="intro-hero">
+      <div class="intro-hero-navy">
+        <div class="intro-hero-navy-inner">
+          <div class="eyebrow">Personal Injury &amp; Workers' Compensation</div>
+          <h1 class="hero-h">Holistic<br>Stability<br>Index<sup>™</sup></h1>
+          <p class="hero-sub">Powered by the 4Ps of Wellness</p>
+          <div class="rule"></div>
+          <div class="hero-body">
+            <p>Recovery outcomes are influenced by more than medical treatment alone. Internal stability and environmental pressures interact to either support or destabilize recovery.</p>
+            <p>The Holistic Stability Index™ evaluates these structural forces to help identify hidden pressures affecting recovery progress and case outcomes.</p>
+          </div>
+        </div>
       </div>
-      <div class="hero-cta">
-        <button type="button" class="btn btn-dark" onclick="window.startAssessment()">Start Assessment →</button>
-        <p class="hero-time">⏱ Estimated time: 3–5 minutes</p>
-        <p class="hero-note">Medical records are not required. Please answer based on the most accurate and current information available.</p>
+      <div id="hsi-identity-slot-intro">
+        <div id="hsi-identity-mount" class="hsi-tool-page-overview">
+          <div id="case-header-fields"></div>
+        </div>
       </div>
     </div>
-    <div class="intro-r">
-      <div class="r-section">
-        <div class="r-title">What This Evaluates</div>
-        <ul class="r-list">
-          <li><span class="dot"></span>Physical wellness and injury-related functional capacity</li>
-          <li><span class="dot"></span>Psychological stability and behavioral health impact</li>
-          <li><span class="dot"></span>Psychosocial barriers and environmental pressures</li>
-          <li><span class="dot"></span>Professional role stability and vocational outlook</li>
-          <li><span class="dot"></span>Social drivers of health affecting recovery</li>
-        </ul>
-        <p class="r-time-note">Estimated completion time: 3–5 minutes</p>
+    <div class="intro-acc-wrap">
+      <div class="byb-acc">
+        <button type="button" class="byb-acc-hd" id="hsi-intro-acc-hd-2" aria-expanded="false" onclick="hsiToggleIntroAcc(2)">
+          <span class="byb-acc-title">How to Conduct This Assessment</span>
+          <svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="byb-acc-body" id="hsi-intro-acc-bd-2">
+          <p style="margin-bottom:12px;line-height:1.65;">The Holistic Stability Index™ is most meaningful when scored from direct client input. Best practice is a structured phone call with the client, walking through each item together.</p>
+          <ol style="padding-left:20px;margin:0;line-height:1.7;">
+            <li style="margin-bottom:10px;"><strong>Clinical accuracy.</strong> Self-report on psychological, psychosocial, and destabilizer items reflects what the client is actually experiencing &mdash; not what the case file happens to document.</li>
+            <li style="margin-bottom:10px;"><strong>Evidentiary record.</strong> A dated, structured client-reported assessment becomes a contemporaneous record of pain, functional limitation, emotional impact, and treatment burden. That record has independent value in negotiations, mediation, and demand packages, and a series of HSI runs over the life of a case creates a trajectory that is difficult to dispute.</li>
+            <li><strong>Documentation defensibility.</strong> Record the date of the client interaction and document that responses were obtained directly from the client whenever possible. Direct client-reported responses strengthen the evidentiary value of this assessment.</li>
+          </ol>
+        </div>
       </div>
-      <div class="r-section">
-        <div class="r-title">What You Will Receive</div>
-        <ul class="r-list">
-          <li><span class="dot"></span>Holistic Stability Index™ score</li>
-          <li><span class="dot"></span>Foundation Stability Model™ visualization</li>
-          <li><span class="dot"></span>Primary vulnerability domain identification</li>
-          <li><span class="dot"></span>Clinical Destabilizer Profile (Pain, Depression, Anxiety indicators)</li>
-        </ul>
+      <div class="byb-acc">
+        <button type="button" class="byb-acc-hd" id="hsi-intro-acc-hd-0" aria-expanded="false" onclick="hsiToggleIntroAcc(0)">
+          <span class="byb-acc-title">What This Evaluates</span>
+          <svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="byb-acc-body" id="hsi-intro-acc-bd-0">
+          <div style="margin:8px 0 6px;font-weight:700;font-size:13px;color:var(--ink,#111);letter-spacing:0.02em">Intrinsic stability (4Ps of Wellness)</div>
+          <ul class="r-list">
+            <li><span class="dot"></span><strong>P1 Physical</strong> — injury-related functional capacity and medical stability</li>
+            <li><span class="dot"></span><strong>P2 Psychological</strong> — emotional stability and behavioral-health impact on function</li>
+            <li><span class="dot"></span><strong>P3 Psychosocial</strong> — support environment, relationships, and daily recovery logistics</li>
+            <li><span class="dot"></span><strong>P4 Professional</strong> — capacity to maintain pre-injury role (paid employment, student, homemaker, caregiver, or other structured responsibilities)</li>
+          </ul>
+          <div style="margin:14px 0 6px;font-weight:700;font-size:13px;color:var(--ink,#111);letter-spacing:0.02em">Extrinsic pressures (Social Drivers of Health)</div>
+          <ul class="r-list">
+            <li><span class="dot"></span>Housing, food, transportation, insurance, and six other environmental conditions affecting recovery</li>
+          </ul>
+          <div style="margin:14px 0 6px;font-weight:700;font-size:13px;color:var(--ink,#111);letter-spacing:0.02em">Clinical Destabilizers</div>
+          <ul class="r-list">
+            <li><span class="dot"></span>Pain, Depression, and Anxiety as contextual modifiers that color how intrinsic and extrinsic scores should be read</li>
+          </ul>
+          <p class="r-time-note">Estimated completion time: 3–5 minutes</p>
+        </div>
       </div>
-      <div class="slab-preview">
-        <div class="slab-preview-divider"></div>
-        <div class="slab-preview-lbl">Foundation Stability Model™ Preview</div>
-        <canvas id="cvMini"></canvas>
-        <p class="slab-preview-caption">The model visualizes how intrinsic stability and external pressures interact to influence recovery outcomes.</p>
+      <div class="byb-acc">
+        <button type="button" class="byb-acc-hd" id="hsi-intro-acc-hd-1" aria-expanded="false" onclick="hsiToggleIntroAcc(1)">
+          <span class="byb-acc-title">What You Will Receive</span>
+          <svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="byb-acc-body" id="hsi-intro-acc-bd-1">
+          <ul class="r-list">
+            <li><span class="dot"></span>Holistic Stability Index™ intrinsic score and tier</li>
+            <li><span class="dot"></span>Extrinsic score from Social Drivers of Health</li>
+            <li><span class="dot"></span>Foundation Stability Model™ visualization</li>
+            <li><span class="dot"></span>4Ps domain breakdown sorted by stability (lowest first) with tier chips</li>
+            <li><span class="dot"></span>Clinical Destabilizer profile with individual tier chips for Pain, Depression, and Anxiety</li>
+            <li><span class="dot"></span>Critical Domain identification when any domain scores at UNSTABLE or CRITICAL</li>
+            <li><span class="dot"></span>Recommended Response Timeframe guidance (24–48 hours or 3–7 days) based on which domains are affected</li>
+            <li><span class="dot"></span>Intrinsic / Extrinsic pattern analysis when scores diverge meaningfully</li>
+            <li><span class="dot"></span>Recommended Next Actions by stability tier, with Priority Action and Documentation Focus guidance calibrated to the follow-up cadence (24–48 hours through 60 days)</li>
+            <li><span class="dot"></span>Environmental barrier flag when Social Drivers of Health indicate systemic pressures</li>
+          </ul>
+        </div>
+      </div>
+      <div class="byb-acc">
+        <button type="button" class="byb-acc-hd" id="hsi-fsm-intro-hd" aria-expanded="false" onclick="hsiToggleFsmIntro()">
+          <span class="byb-acc-title">Foundation Stability Model™</span>
+          <svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="byb-acc-body" id="hsi-fsm-intro-bd">
+          <div class="slab-preview slab-preview--in-acc">
+            <div class="slab-preview-divider"></div>
+            <div class="slab-preview-lbl">Foundation Stability Model™ Preview</div>
+            <canvas id="cvMini"></canvas>
+            <div id="fsm-intro-explain"></div>
+          </div>
+        </div>
+      </div>
+      <div class="hsi-intro-cta">
+        <button type="button" class="btn btn-dark hsi-intro-cta-btn" onclick="window.startAssessment()">Start Assessment →</button>
+        <p class="hero-time hsi-intro-cta-meta">⏱ Estimated time: 3–5 minutes</p>
+        <p class="hero-note hsi-intro-cta-note">Medical records are not required. Please answer based on the most accurate and current information available.</p>
       </div>
     </div>
   </div>
@@ -999,18 +1568,24 @@ canvas{display:block}
     <div class="nav-brand">Holistic Stability Index<span class="g">™</span></div>
     <div class="nav-pill" id="assessPill">P1 of 4</div>
   </nav>
-  <div class="assess-layout">
-    <aside class="sidebar">
-      <div class="sb-heading">Assessment Progress</div>
-      <div id="sbSteps"></div>
-    </aside>
-    <main class="assess-main">
-      <div id="assessContent"></div>
-      <div class="assess-nav">
-        <button class="btn btn-outline" onclick="navBack()">← Back</button>
-        <button class="btn btn-dark" id="btnNext" onclick="navNext()">Continue →</button>
-      </div>
-    </main>
+  <button type="button" class="hsi-vi-btn no-print" onclick="hsiOpenInstructions()" aria-label="View Instructions">📖 View Instructions</button>
+  <div class="hsi-assess-work">
+    <div class="assess-layout">
+      <aside class="sidebar">
+        <div class="sb-heading">Assessment Progress</div>
+        <div id="sbSteps"></div>
+      </aside>
+      <main class="assess-main">
+        <div class="hsi-assess-main-inner">
+          <div id="hsi-identity-slot-assess" class="hsi-identity-slot-assess"></div>
+          <div id="assessContent"></div>
+          <div class="assess-nav">
+            <button class="btn btn-outline" onclick="navBack()">← Back</button>
+            <button class="btn btn-dark" id="btnNext" onclick="navNext()">Continue →</button>
+          </div>
+        </div>
+      </main>
+    </div>
   </div>
 </div>
 
@@ -1022,17 +1597,62 @@ canvas{display:block}
     <div class="nav-brand">Holistic Stability Index<span class="g">™</span></div>
     <div class="nav-pill">Complete</div>
   </nav>
-  <div class="results-wrap" style="max-width:640px;margin:0 auto;padding:48px 24px 80px;text-align:center">
+  <div id="hsi-results-trial" class="results-wrap" style="max-width:640px;margin:0 auto;padding:48px 24px 80px;text-align:center">
     <div class="eyebrow">Assessment complete</div>
     <h1 class="results-title" style="margin:12px 0 16px">Holistic Stability Index™</h1>
-    <p class="results-sub" style="margin:0 auto;max-width:520px;line-height:1.65;color:var(--muted,#555)">Your responses have been saved. A detailed stability report will be available on the dashboard after all six assessments are finished.</p>
+    <p class="results-sub" style="margin:0 auto;max-width:520px;line-height:1.65;color:var(--muted,#555)">Your responses have been recorded. Review the stability summary below.</p>
     <div class="no-print" style="display:flex;gap:16px;justify-content:center;margin-top:40px;flex-wrap:wrap">
       <button type="button" onclick="returnToDashboard()" class="btn-ghost">← Return to Dashboard</button>
       <button type="button" onclick="goToNext()" class="btn-primary">Continue to Next Assessment →</button>
     </div>
   </div>
+  <div id="hsi-results-paid" class="results-wrap" style="display:none;max-width:920px;margin:0 auto;padding:48px 24px 80px;text-align:center">
+    <div class="eyebrow">Assessment complete</div>
+    <h1 class="results-title" style="margin:12px 0 16px">Holistic Stability Index™</h1>
+    <p class="results-sub no-print" style="margin:0 auto;max-width:560px;line-height:1.65;color:var(--muted,#555)">Your stability report is ready below. You may print or save a PDF, then return to this case or the dashboard.</p>
+    <div class="no-print" style="display:flex;gap:12px;justify-content:center;margin-top:32px;flex-wrap:wrap;align-items:center">
+      <button type="button" class="btn-primary" onclick="hsiScrollToPaidReport()">View Report</button>
+      <button type="button" class="btn-primary" onclick="hsiPrintPaidReport()">Print / Save PDF</button>
+      <a id="hsi-paid-return-case" class="btn-ghost" href="/case-detail.html" style="display:inline-block;text-decoration:none;padding:10px 20px;border-radius:4px;font-weight:600">Return to Case</a>
+      <button type="button" onclick="returnToDashboard()" class="btn-ghost">Dashboard</button>
+    </div>
+    <div id="hsi-paid-report-anchor"></div>
+    <div id="hsi-paid-report-block" style="max-width:920px;margin:0 auto;text-align:left">
+    <div id="hsi-paid-report-visible" style="margin-top:0;text-align:left"></div>
+    </div>
+  </div>
 </div>
 <div id="hsi-report-snapshot" aria-hidden="true" style="position:absolute;left:-9999px;top:0;width:920px;pointer-events:none"></div>
+
+<!-- View Instructions overlay — standing reference during assessment -->
+<div id="hsi-vi-overlay" class="hsi-vi-overlay no-print" onclick="hsiCloseInstructionsIfBackdrop(event)">
+  <div class="hsi-vi-panel" onclick="event.stopPropagation()">
+    <button type="button" class="hsi-vi-close" onclick="hsiCloseInstructions()">Close ✕</button>
+    <h2>Holistic Stability Index™ — Instructions</h2>
+
+    <h3>The Three-Axis Model</h3>
+    <p>HSI measures stability across three axes:</p>
+    <ul>
+      <li><strong>Intrinsic (4Ps of Wellness):</strong> the person's own state across Maslow's hierarchy &mdash; Physical (P1), Psychological (P2), Psychosocial (P3), Professional (P4). The intrinsic score is the lowest P-domain score, because stability cannot exceed the weakest tier.</li>
+      <li><strong>Extrinsic (Social Drivers of Health):</strong> environmental conditions acting on the person &mdash; housing, food, transportation, insurance, and six others. Scored as the average across the nine drivers.</li>
+      <li><strong>Destabilizers (Pain, Depression, Anxiety):</strong> contextual modifiers that color how intrinsic and extrinsic scores should be read. Destabilizers do not change intrinsic or extrinsic scores.</li>
+    </ul>
+
+    <h3>Scoring Guidance</h3>
+    <ul>
+      <li>Scores are whole numbers, 1&ndash;5. A score of 5 indicates the strongest stability; a score of 1 indicates critical instability.</li>
+      <li>If more than one stage appears applicable, select the lowest stage that reflects the individual's current condition. The lowest domain score determines intrinsic stability.</li>
+      <li>Conduct the assessment through direct client contact when possible. Record the date of the client interaction and note that responses were obtained directly from the client. Attorney inference from case records is acceptable when client contact is unavailable, but the source of responses should always be noted.</li>
+    </ul>
+
+    <h3>What to Look For</h3>
+    <ul>
+      <li>Psychological (P2) scores at 1 or 2, or any Destabilizer at 1, warrant a welfare check or clinical referral within 24&ndash;48 hours.</li>
+      <li>Divergence between intrinsic and extrinsic scores (a gap of 2 or more points) signals meaningful clinical-legal patterns worth flagging in case strategy.</li>
+      <li>Re-run HSI at intervals appropriate to case acuity. The Recommended Next Actions block in each report shows the follow-up cadence for the current tier.</li>
+    </ul>
+  </div>
+</div>
 
 
 <!-- ══════════════════════════════════════════
@@ -1043,6 +1663,17 @@ canvas{display:block}
 
 // Read case type from portal launch URL (?caseType=active|closed)
 const caseType = new URLSearchParams(window.location.search).get('caseType') || 'active';
+
+function getFsmExplainBulletsHtml() {
+  return '<ul class="fsm-explain-list">' +
+    '<li>The model visualizes how intrinsic stability and external pressures interact to influence recovery outcomes.</li>' +
+    '<li>The left pillar reflects stability (lowest score across all four (4) of the 4Ps of Wellness).</li>' +
+    '<li>The right pillar reflects extrinsic pressures (average rating across the nine (9) social drivers of health).</li>' +
+    '<li>The gold leading edge marks the stress line between them—where internal functional limits meet environmental load.</li>' +
+    '<li>Higher pillars indicate stronger stability on that dimension.</li>' +
+    '<li>Level foundations are not necessarily an indication of health and progress, especially if the leveling occurs at lower levels of the slab.</li>' +
+    '</ul>';
+}
 
 /* ─────────────────────────────────────────────────────────
    DATA — PI/WC Aligned 4Ps Stages (exact text, no changes)
@@ -1312,6 +1943,21 @@ const DESTABILIZERS = ['Pain','Depression','Anxiety'];
 const SCORE_LABELS  = {5:'Strong',4:'Stable',3:'Struggling',2:'Unstable',1:'Critical'};
 const DOMAIN_DESCS  = {P1:'physical wellness',P2:'psychological wellness',P3:'psychosocial wellness',P4:'professional wellness'};
 
+/* HSI tier system — mirrors SCORE_LABELS; used for chips, banners, sort order.
+   TIE_ORDER reflects Maslow ascending: P1 (physiological) is most foundational,
+   P4 (self-actualization / professional) is highest tier. When multiple P-domains
+   tie at the intrinsic floor, the lower-tier (more foundational) domain is the
+   determining domain because its break undermines everything above it. */
+const HSI_TIE_ORDER = ['P1','P2','P3','P4'];
+const HSI_TIER = {
+  5: { label:'STRONG',     cls:'hsi-tier-strong',      bg:'#1e5c3a', fg:'#fff' },
+  4: { label:'STABLE',     cls:'hsi-tier-stable',      bg:'#4a6741', fg:'#fff' },
+  3: { label:'STRUGGLING', cls:'hsi-tier-struggling',  bg:'#a8852b', fg:'#fff' },
+  2: { label:'UNSTABLE',   cls:'hsi-tier-unstable',    bg:'#c45c1a', fg:'#fff' },
+  1: { label:'CRITICAL',   cls:'hsi-tier-critical',    bg:'#8b1e1e', fg:'#fff' }
+};
+function hsiTier(v){ return HSI_TIER[v] || HSI_TIER[3]; }
+
 /* ─────────────────────────────────────────────────────────
    STATE
    Steps 0–3: P domains (each has 5 questions, one per view)
@@ -1320,16 +1966,306 @@ const DOMAIN_DESCS  = {P1:'physical wellness',P2:'psychological wellness',P3:'ps
 ───────────────────────────────────────────────────────── */
 let step = 0;   // 0–5
 let currentQuestionIndex = 0;   // 0–4 within a P domain (resets when advancing to a new domain section)
+let hsiOpenDomain = 0;
+/** Per 4P domain: index of the one open question accordion, or -1 if none */
+let hsiOpenQiPerDomain = [-1, -1, -1, -1];
+/** Assess screen: Foundation Stability Model accordion */
+let hsiFsmAssessOpen = false;
 
 // answers[stepIdx][qi] = value
 const A = {0:{},1:{},2:{},3:{},4:{},5:{}};
 
+// ── Paid portal: case_tool_drafts (HSI) ─────────────────────────────────────
+var hsiDraftSaveTimer = null;
+var hsiDraftDirty = false;
+var hsiDraftApplying = false;
+var hsiDraftAutosaveDisabled = false;
+var hsiDraftLockedAfterRun = false;
+var hsiHydratingFromDraft = false;
+var HSI_DRAFT_DEBOUNCE_MS = 900;
+
+function hsiResolveCaseRef() {
+  return typeof window.caseClarityResolveCaseRef === 'function' ? window.caseClarityResolveCaseRef() : null;
+}
+
+async function hsiResolvePaidCaseRow(client) {
+  var caseRef = hsiResolveCaseRef();
+  if (!caseRef || !client) return null;
+  var gu = await client.auth.getUser();
+  var user = gu.data && gu.data.user;
+  if (gu.error || !user) return null;
+  var cq = await client
+    .from('case_cases')
+    .select('id, attorney_user_id')
+    .eq('case_ref', caseRef)
+    .eq('attorney_user_id', user.id)
+    .maybeSingle();
+  if (cq.error || !cq.data) {
+    if (cq.error) console.error('[HSI] case lookup for draft', cq.error);
+    return null;
+  }
+  return cq.data;
+}
+
+function hsiDraftHasMeaningfulState(d) {
+  if (!d || d.v !== 1) return false;
+  var ans = d.answers;
+  if (ans && typeof ans === 'object') {
+    for (var si = 0; si <= 5; si++) {
+      var block = ans[si] !== undefined ? ans[si] : ans[String(si)];
+      if (block && typeof block === 'object' && Object.keys(block).length > 0) return true;
+    }
+  }
+  if (d.drivers && typeof d.drivers === 'object' && Object.keys(d.drivers).length > 0) return true;
+  if (d.destabilizers && typeof d.destabilizers === 'object' && Object.keys(d.destabilizers).length > 0) return true;
+  return false;
+}
+
+function hsiDraftIsFullyAnswered() {
+  for (var di = 0; di < 4; di++) {
+    var dom = DOMAINS[di];
+    for (var qi = 0; qi < dom.questions.length; qi++) {
+      if (A[di][qi] === undefined) return false;
+    }
+  }
+  for (var i = 0; i < SOCIAL_DRIVERS.length; i++) {
+    if (A[4][i] === undefined) return false;
+  }
+  for (var j = 0; j < DESTABILIZERS.length; j++) {
+    if (A[5][j] === undefined) return false;
+  }
+  return true;
+}
+
+function hsiStateHasMeaningfulProgressNow() {
+  return hsiDraftHasMeaningfulState({ v: 1, answers: A, drivers: A[4], destabilizers: A[5] });
+}
+
+function hsiCollectDraftJson() {
+  return {
+    v: 1,
+    step: step,
+    currentQuestionIndex: currentQuestionIndex,
+    hsiOpenDomain: hsiOpenDomain,
+    hsiOpenQiPerDomain: hsiOpenQiPerDomain.slice(),
+    hsiFsmAssessOpen: hsiFsmAssessOpen,
+    answers: JSON.parse(JSON.stringify(A)),
+    drivers: JSON.parse(JSON.stringify(A[4])),
+    destabilizers: JSON.parse(JSON.stringify(A[5]))
+  };
+}
+
+async function saveHsiDraft() {
+  if (hsiDraftApplying || hsiDraftAutosaveDisabled || hsiDraftLockedAfterRun) return;
+  var client = window.supabaseClient;
+  if (!client) return;
+  var rowCtx = await hsiResolvePaidCaseRow(client);
+  if (!rowCtx) return;
+  var draftJson = hsiCollectDraftJson();
+  if (!hsiDraftHasMeaningfulState(draftJson)) return;
+  var payload = {
+    case_id: rowCtx.id,
+    attorney_user_id: rowCtx.attorney_user_id,
+    tool_key: 'HSI',
+    draft_json: draftJson,
+    updated_at: new Date().toISOString()
+  };
+  var up = await client.from('case_tool_drafts').upsert(payload, {
+    onConflict: 'case_id,attorney_user_id,tool_key'
+  });
+  if (up.error) console.error('[HSI] case_tool_drafts upsert failed', up.error);
+  else {
+    console.log('[HSI] draft save ok');
+    hsiDraftDirty = false;
+  }
+}
+
+function scheduleHsiDraftSave() {
+  if (hsiDraftApplying || hsiDraftAutosaveDisabled || hsiDraftLockedAfterRun || hsiHydratingFromDraft) return;
+  if (!new URLSearchParams(window.location.search).get('case_ref') || !window.supabaseClient) return;
+  hsiDraftDirty = true;
+  clearTimeout(hsiDraftSaveTimer);
+  hsiDraftSaveTimer = setTimeout(function () {
+    hsiDraftSaveTimer = null;
+    void saveHsiDraft();
+  }, HSI_DRAFT_DEBOUNCE_MS);
+}
+
+async function flushHsiDraftSave() {
+  if (hsiDraftLockedAfterRun) return;
+  clearTimeout(hsiDraftSaveTimer);
+  hsiDraftSaveTimer = null;
+  if (hsiDraftDirty) await saveHsiDraft();
+}
+
+function hsiMergeDraftJsonIntoState(d) {
+  if (!hsiDraftHasMeaningfulState(d)) return;
+  for (var si = 0; si <= 5; si++) {
+    A[si] = {};
+  }
+  var ans = d.answers;
+  if (ans && typeof ans === 'object') {
+    for (var s = 0; s <= 5; s++) {
+      var block = ans[s] !== undefined ? ans[s] : ans[String(s)];
+      if (!block || typeof block !== 'object') continue;
+      Object.keys(block).forEach(function (k) {
+        var idx = parseInt(k, 10);
+        var v = block[k];
+        if (!Number.isFinite(idx)) return;
+        var n = typeof v === 'number' ? v : parseInt(String(v), 10);
+        if (!Number.isFinite(n)) return;
+        A[s][idx] = n;
+      });
+    }
+  }
+  function mergeIdxMap(src, targetStep) {
+    if (!src || typeof src !== 'object') return;
+    Object.keys(src).forEach(function (k) {
+      var idx = parseInt(k, 10);
+      var v = src[k];
+      if (!Number.isFinite(idx)) return;
+      var n = typeof v === 'number' ? v : parseInt(String(v), 10);
+      if (!Number.isFinite(n)) return;
+      A[targetStep][idx] = n;
+    });
+  }
+  mergeIdxMap(d.drivers, 4);
+  mergeIdxMap(d.destabilizers, 5);
+  if (typeof d.step === 'number' && d.step >= 0 && d.step <= 5) step = d.step;
+  if (typeof d.currentQuestionIndex === 'number' && d.currentQuestionIndex >= 0 && d.currentQuestionIndex <= 4) {
+    currentQuestionIndex = d.currentQuestionIndex;
+  }
+  if (typeof d.hsiOpenDomain === 'number') hsiOpenDomain = d.hsiOpenDomain;
+  if (Array.isArray(d.hsiOpenQiPerDomain) && d.hsiOpenQiPerDomain.length === 4) {
+    for (var i = 0; i < 4; i++) {
+      hsiOpenQiPerDomain[i] =
+        typeof d.hsiOpenQiPerDomain[i] === 'number' ? d.hsiOpenQiPerDomain[i] : -1;
+    }
+  }
+  if (typeof d.hsiFsmAssessOpen === 'boolean') hsiFsmAssessOpen = d.hsiFsmAssessOpen;
+  if (hsiDraftIsFullyAnswered()) {
+    step = 5;
+    currentQuestionIndex = 0;
+  }
+}
+
+async function loadHsiDraft() {
+  if (!new URLSearchParams(window.location.search).get('case_ref')) return;
+  var client = window.supabaseClient;
+  if (!client) return;
+  hsiDraftApplying = true;
+  try {
+    var rowCtx = await hsiResolvePaidCaseRow(client);
+    if (!rowCtx) {
+      console.log('[HSI] draft load: none');
+      return;
+    }
+    var dr = await client
+      .from('case_tool_drafts')
+      .select('draft_json')
+      .eq('case_id', rowCtx.id)
+      .eq('tool_key', 'HSI')
+      .maybeSingle();
+    if (dr.error) {
+      console.error('[HSI] draft load failed', dr.error);
+      return;
+    }
+    var dj = dr.data && dr.data.draft_json;
+    if (!dj || !hsiDraftHasMeaningfulState(dj)) {
+      console.log('[HSI] draft load: none');
+      return;
+    }
+    hsiMergeDraftJsonIntoState(dj);
+    console.log('[HSI] draft loaded');
+  } finally {
+    hsiDraftApplying = false;
+  }
+}
+
+async function deleteHsiDraft() {
+  var client = window.supabaseClient;
+  if (!client) return false;
+  var gu = await client.auth.getUser();
+  var user = gu.data && gu.data.user;
+  if (gu.error || !user) {
+    console.error('[HSI] delete draft getUser', gu.error);
+    return false;
+  }
+  var uid = user.id;
+  var caseRef = hsiResolveCaseRef();
+  if (!caseRef) return false;
+  var cq = await client
+    .from('case_cases')
+    .select('id')
+    .eq('case_ref', caseRef)
+    .eq('attorney_user_id', uid)
+    .maybeSingle();
+  if (cq.error || !cq.data) return false;
+  var del = await client
+    .from('case_tool_drafts')
+    .delete()
+    .eq('case_id', cq.data.id)
+    .eq('attorney_user_id', uid)
+    .eq('tool_key', 'HSI');
+  if (del.error) {
+    console.error('[HSI] case_tool_drafts delete failed', del.error);
+    return false;
+  }
+  console.log('[HSI] draft delete ok');
+  hsiDraftDirty = false;
+  return true;
+}
+
+function hsiLockDraftAutosaveForCompletion() {
+  hsiDraftAutosaveDisabled = true;
+  clearTimeout(hsiDraftSaveTimer);
+  hsiDraftSaveTimer = null;
+  hsiDraftDirty = false;
+}
+
+function hsiInitPaidDraftPersistence() {
+  if (!new URLSearchParams(window.location.search).get('case_ref')) return;
+  if (window.__hsiDraftEventsBound) return;
+  window.__hsiDraftEventsBound = true;
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') void flushHsiDraftSave();
+  });
+  window.addEventListener('pagehide', function () {
+    void flushHsiDraftSave();
+  });
+}
+
 /* ─────────────────────────────────────────────────────────
    SCREEN MANAGEMENT
 ───────────────────────────────────────────────────────── */
+/** Single #hsi-identity-mount (contains #case-header-fields) moves between intro / assess / results. */
+function hsiPlaceIdentityMount() {
+  var mount = document.getElementById('hsi-identity-mount');
+  if (!mount) return;
+  var intro = document.getElementById('hsi-identity-slot-intro');
+  var assess = document.getElementById('hsi-identity-slot-assess');
+  var global = document.getElementById('hsi-identity-slot-global');
+  var active = document.querySelector('.screen.active');
+  var sid = active ? active.id : '';
+  if (sid === 'sc-intro' && intro) {
+    intro.appendChild(mount);
+  } else if (sid === 'sc-assess' && assess) {
+    assess.appendChild(mount);
+  } else if (sid === 'sc-results' && global) {
+    global.appendChild(mount);
+  }
+}
+
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  hsiPlaceIdentityMount();
+  var g = document.getElementById('hsi-identity-slot-global');
+  if (g) {
+    var showGlobal = id === 'sc-results';
+    g.style.display = showGlobal ? '' : 'none';
+    g.setAttribute('aria-hidden', showGlobal ? 'false' : 'true');
+  }
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -1337,7 +2273,18 @@ function showScreen(id) {
    START
 ───────────────────────────────────────────────────────── */
 function startAssessment() {
-  step=0; currentQuestionIndex=0;
+  for (var si = 0; si <= 5; si++) {
+    A[si] = {};
+  }
+  step=0; currentQuestionIndex=0; hsiOpenDomain=0;
+  hsiOpenQiPerDomain = [-1, -1, -1, -1];
+  hsiFsmAssessOpen = false;
+  hsiDraftLockedAfterRun = false;
+  hsiDraftAutosaveDisabled = false;
+  clearTimeout(hsiDraftSaveTimer);
+  hsiDraftSaveTimer = null;
+  hsiDraftDirty = false;
+  window.__paidPortalHSIRecorded = false;
   showScreen('sc-assess');
   render();
   requestAnimationFrame(function(){
@@ -1356,13 +2303,9 @@ function navNext() {
       const unanswered = DOMAINS[di].questions.findIndex((_, qi) => A[di][qi] === undefined);
       if (unanswered !== -1) {
         toast(`Please answer all questions for ${DOMAINS[di].title} before continuing.`);
-        // Auto-open that domain section
-        const body  = document.getElementById(`dom-body-${di}`);
-        const arrow = document.getElementById(`dom-arrow-${di}`);
-        if (body && !body.classList.contains('open')) {
-          body.classList.add('open');
-          if (arrow) arrow.style.transform = 'rotate(180deg)';
-        }
+        hsiOpenDomain = di;
+        hsiOpenQiPerDomain[di] = unanswered;
+        renderAllDomains();
         return;
       }
     }
@@ -1370,16 +2313,25 @@ function navNext() {
     currentQuestionIndex = 0;
   } else if (step===4) {
     for (let i=0;i<SOCIAL_DRIVERS.length;i++) {
-      if (A[4][i]===undefined) { toast('Please rate all Social Drivers before continuing.'); return; }
+      if (A[4][i]===undefined) {
+        toast('Please rate all Social Drivers before continuing.');
+        hsiEnsureBybAccOpen('sd');
+        return;
+      }
     }
     step++;
   } else if (step===5) {
     for (let i=0;i<DESTABILIZERS.length;i++) {
-      if (A[5][i]===undefined) { toast('Please rate all Clinical Destabilizers before continuing.'); return; }
+      if (A[5][i]===undefined) {
+        toast('Please rate all Clinical Destabilizers before continuing.');
+        hsiEnsureBybAccOpen('cd');
+        return;
+      }
     }
-    buildResults(); return;
+    void buildResults(); return;
   }
   render();
+  scheduleHsiDraftSave();
   window.scrollTo({top:0});
 }
 
@@ -1389,6 +2341,7 @@ function navBack() {
   else if (step===4) { step = 0; } // back to all domains
   else if (step===5) { step = 4; }
   render();
+  scheduleHsiDraftSave();
   window.scrollTo({top:0});
 }
 
@@ -1401,6 +2354,27 @@ function toast(msg) {
   el.textContent=msg;
   document.body.appendChild(el);
   setTimeout(()=>el.remove(),2800);
+}
+
+/** Same toggle logic as CAF cafToggleBybAcc (independent panels). */
+function hsiToggleBybAcc(key) {
+  const hd = document.getElementById('byb-acc-hd-' + key);
+  const bd = document.getElementById('byb-acc-bd-' + key);
+  if (!hd || !bd) return;
+  const willOpen = !bd.classList.contains('open');
+  hd.classList.toggle('open', willOpen);
+  bd.classList.toggle('open', willOpen);
+  hd.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+}
+
+function hsiEnsureBybAccOpen(key) {
+  const pbd = document.getElementById('byb-acc-bd-' + key);
+  const phd = document.getElementById('byb-acc-hd-' + key);
+  if (pbd && phd && !pbd.classList.contains('open')) {
+    pbd.classList.add('open');
+    phd.classList.add('open');
+    phd.setAttribute('aria-expanded', 'true');
+  }
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -1444,10 +2418,20 @@ function advanceToNextDomain(nextDi) {
   requestAnimationFrame(function () {
     const sec = document.getElementById('dom-section-' + nextDi);
     if (!sec) return;
-    const firstQ = sec.querySelector('.q-view');
-    const el = firstQ || sec;
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
+}
+
+function computeFourPsSnapshot() {
+  const ds = DOMAINS.map(function (_, di) {
+    const vals = Object.values(A[di]);
+    if (vals.length < DOMAINS[di].questions.length) return null;
+    return Math.min.apply(null, vals);
+  });
+  if (ds.some(function (x) { return x === null; })) return null;
+  const minD = Math.min.apply(null, ds);
+  const pIdx = ds.findIndex(function (s) { return s === minD; });
+  return { intrinsic: minD, pIdx: pIdx, domain: DOMAINS[pIdx], badge: DOMAINS[pIdx].badge };
 }
 
 function renderAllDomains() {
@@ -1455,10 +2439,12 @@ function renderAllDomains() {
     const stg = STAGES[dom.key];
     const allAnswered = dom.questions.every((_, qi) => A[di][qi] !== undefined);
     const anyAnswered = dom.questions.some((_, qi) => A[di][qi] !== undefined);
-    const isOpen = false; // start collapsed; users expand; pickDomainStage opens next when one domain completes
+    const isOpen = di === hsiOpenDomain;
 
+    const openQi = hsiOpenQiPerDomain[di];
     const questionsHtml = dom.questions.map((q, qi) => {
       const saved = A[di][qi];
+      const isQOpen = openQi === qi;
       const optsHtml = stg.map(s => {
         const buls = s.bullets.map(b => `<li>${b}</li>`).join('');
         return `
@@ -1475,24 +2461,34 @@ function renderAllDomains() {
       }).join('');
 
       return `
-      <div class="q-view" style="margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid var(--surf-line);">
-        <div class="q-num">Question ${qi + 1} of ${dom.questions.length}</div>
-        <div class="q-title">${q.title}</div>
-        <div class="q-text">${q.text}</div>
-        <div class="stage-opts" id="domOpts-${di}-${qi}">${optsHtml}</div>
+      <div class="hsi-q-acc" id="hsi-q-wrap-${di}-${qi}">
+        <button type="button" class="hsi-q-acc-hd${isQOpen ? ' open' : ''}" id="hsi-q-hd-${di}-${qi}" aria-expanded="${isQOpen ? 'true' : 'false'}" onclick="toggleHsiQuestion(${di},${qi})">
+          <div class="hsi-q-acc-hd-text">
+            <div class="hsi-q-acc-hd-num">Question ${qi + 1} of ${dom.questions.length}</div>
+            <div class="hsi-q-acc-hd-title">${q.title}</div>
+          </div>
+          <div class="hsi-q-acc-meta">
+            <span class="hsi-q-acc-status${saved !== undefined ? ' answered' : ''}">${saved !== undefined ? 'Answered' : 'Not answered'}</span>
+            <span class="hsi-q-acc-arrow" id="hsi-q-arrow-${di}-${qi}" style="${isQOpen ? 'transform:rotate(180deg)' : ''}">▾</span>
+          </div>
+        </button>
+        <div class="hsi-q-acc-body${isQOpen ? ' open' : ''}" id="hsi-q-body-${di}-${qi}">
+          <div class="q-text">${q.text}</div>
+          <div class="stage-opts" id="domOpts-${di}-${qi}">${optsHtml}</div>
+        </div>
       </div>`;
     }).join('');
 
     return `
     <div class="domain-section" id="dom-section-${di}">
-      <div class="domain-section-header${isOpen ? '' : '' }" onclick="toggleDomainSection(${di})">
+      <div class="domain-section-header${isOpen ? ' open' : ''}" onclick="toggleDomainSection(${di})">
         <div>
           <div class="domain-section-badge">${dom.badge}</div>
           <div class="domain-section-title">${dom.title}</div>
         </div>
         <div style="display:flex;align-items:center;gap:12px;">
           <div class="domain-section-status${allAnswered ? ' complete' : ''}">${allAnswered ? 'Complete' : anyAnswered ? 'In Progress' : 'Not Started'}</div>
-          <span class="domain-section-arrow${isOpen ? '' : ''}" id="dom-arrow-${di}">▾</span>
+          <span class="domain-section-arrow${isOpen ? ' open' : ''}" id="dom-arrow-${di}" style="${isOpen ? 'transform:rotate(180deg)' : ''}">▾</span>
         </div>
       </div>
       <div class="domain-section-body${isOpen ? ' open' : ''}" id="dom-body-${di}">
@@ -1502,54 +2498,125 @@ function renderAllDomains() {
     </div>`;
   }).join('');
 
+  const fourPsSnap = computeFourPsSnapshot();
+  const snapHtml = fourPsSnap
+    ? '<div class="hsi-fourps-summary">' +
+      '<div class="row"><strong>Intrinsic (4Ps floor):</strong> ' + hsiScorePill(fourPsSnap.intrinsic) + '</div>' +
+      '<div class="row"><strong>Determining domain:</strong> ' + fourPsSnap.badge + ' ' + hsiScorePill(fourPsSnap.intrinsic) + '</div>' +
+      '</div>'
+    : '';
+
+  const fsmAssessHdOpen = hsiFsmAssessOpen ? ' open' : '';
+  const fsmAssessBdOpen = hsiFsmAssessOpen ? ' open' : '';
+  const fsmAssessAria = hsiFsmAssessOpen ? 'true' : 'false';
+  const fsmAssessBlock =
+    '<div class="byb-acc hsi-fsm-assess-acc">' +
+    '<button type="button" class="byb-acc-hd' + fsmAssessHdOpen + '" id="hsi-fsm-assess-hd" aria-expanded="' + fsmAssessAria + '" onclick="toggleHsiFsmAssess()">' +
+    '<span class="byb-acc-title">Foundation Stability Model™</span>' +
+    '<svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+    '</button>' +
+    '<div class="byb-acc-body' + fsmAssessBdOpen + '" id="hsi-fsm-assess-bd">' +
+    '<canvas id="cvAssessFsm"></canvas>' +
+    getFsmExplainBulletsHtml() +
+    '</div></div>';
+
   document.getElementById('assessContent').innerHTML = `
     <div class="d-header" style="margin-bottom:24px;">
       <div class="d-badge">4Ps of Wellness Assessment</div>
       <div class="d-title">Rate each domain below</div>
-      <div style="font-size:13px;color:var(--gray-mid);margin-top:4px;">Expand each section, answer all questions, then click Continue.</div>
+      <div style="font-size:13px;color:var(--gray-mid);margin-top:4px;">Open one 4P domain at a time. Inside each domain, expand one question at a time; after you select a score, that question collapses automatically.</div>
     </div>
-    ${sectionsHtml}`;
+    ${snapHtml}
+    <div class="hsi-assess-acc-wrap">
+      ${fsmAssessBlock}
+      ${sectionsHtml}
+    </div>`;
+  requestAnimationFrame(function () {
+    requestAnimationFrame(drawMiniSlab);
+  });
 }
 
 function toggleDomainSection(di) {
-  const body  = document.getElementById(`dom-body-${di}`);
+  const body = document.getElementById(`dom-body-${di}`);
   const arrow = document.getElementById(`dom-arrow-${di}`);
+  const hdr = document.querySelector('#dom-section-' + di + ' .domain-section-header');
   if (!body) return;
-  const isOpen = body.classList.contains('open');
-  body.classList.toggle('open', !isOpen);
-  if (arrow) arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
+  if (body.classList.contains('open')) {
+    body.classList.remove('open');
+    if (arrow) {
+      arrow.style.transform = '';
+      arrow.classList.remove('open');
+    }
+    if (hdr) hdr.classList.remove('open');
+    hsiOpenQiPerDomain[di] = -1;
+    hsiOpenDomain = -1;
+    scheduleHsiDraftSave();
+    return;
+  }
+  DOMAINS.forEach((_, j) => {
+    const b = document.getElementById(`dom-body-${j}`);
+    const a = document.getElementById(`dom-arrow-${j}`);
+    const h = document.querySelector('#dom-section-' + j + ' .domain-section-header');
+    if (b) b.classList.toggle('open', j === di);
+    if (a) {
+      a.style.transform = j === di ? 'rotate(180deg)' : '';
+      a.classList.toggle('open', j === di);
+    }
+    if (h) h.classList.toggle('open', j === di);
+    if (j !== di) hsiOpenQiPerDomain[j] = -1;
+  });
+  hsiOpenDomain = di;
+  scheduleHsiDraftSave();
+}
+
+/**
+ * Level 2: only one question open at a time within a domain (reduces scroll wall).
+ */
+function toggleHsiQuestion(di, qi) {
+  const dom = DOMAINS[di];
+  if (!dom) return;
+  const body = document.getElementById('hsi-q-body-' + di + '-' + qi);
+  if (!body) return;
+  const isCurrentlyOpen = body.classList.contains('open');
+  const willOpen = !isCurrentlyOpen;
+  dom.questions.forEach(function (_, j) {
+    const b = document.getElementById('hsi-q-body-' + di + '-' + j);
+    const h = document.getElementById('hsi-q-hd-' + di + '-' + j);
+    const ar = document.getElementById('hsi-q-arrow-' + di + '-' + j);
+    const open = willOpen && j === qi;
+    if (b) b.classList.toggle('open', open);
+    if (h) {
+      h.classList.toggle('open', open);
+      h.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    if (ar) ar.style.transform = open ? 'rotate(180deg)' : '';
+  });
+  hsiOpenQiPerDomain[di] = willOpen ? qi : -1;
+  scheduleHsiDraftSave();
 }
 
 function pickDomainStage(val, el, di, qi) {
   currentQuestionIndex = qi;
   A[di][qi] = val;
+  hsiOpenQiPerDomain[di] = -1;
   const opts = document.getElementById(`domOpts-${di}-${qi}`);
   if (opts) opts.querySelectorAll('.stage-opt').forEach(o => o.classList.remove('sel'));
   const opt = el.closest('.stage-opt') || el;
   opt.classList.add('sel');
-  // Update section status
   const dom = DOMAINS[di];
   const allAnswered = dom.questions.every((_, q) => A[di][q] !== undefined);
-  const anyAnswered = dom.questions.some((_, q) => A[di][q] !== undefined);
-  const statusEl = document.querySelector(`#dom-section-${di} .domain-section-status`);
-  if (statusEl) {
-    statusEl.textContent = allAnswered ? 'Complete' : anyAnswered ? 'In Progress' : 'Not Started';
-    statusEl.className = 'domain-section-status' + (allAnswered ? ' complete' : '');
-    if (allAnswered) {
-      // Auto-collapse completed section and open next if available
-      const body = document.getElementById(`dom-body-${di}`);
-      const arrow = document.getElementById(`dom-arrow-${di}`);
-      if (body) body.classList.remove('open');
-      if (arrow) arrow.style.transform = '';
-      if (di < DOMAINS.length - 1) {
-        const nextBody  = document.getElementById(`dom-body-${di + 1}`);
-        const nextArrow = document.getElementById(`dom-arrow-${di + 1}`);
-        if (nextBody) nextBody.classList.add('open');
-        if (nextArrow) nextArrow.style.transform = 'rotate(180deg)';
-        advanceToNextDomain(di + 1);
-      }
+  if (allAnswered) {
+    if (di < DOMAINS.length - 1) {
+      hsiOpenDomain = di + 1;
+    } else {
+      hsiOpenDomain = -1;
     }
   }
+  renderAllDomains();
+  if (allAnswered && di < DOMAINS.length - 1) {
+    advanceToNextDomain(di + 1);
+  }
+  scheduleHsiDraftSave();
 }
 
 function pickStageGrouped(val, el, qi) {
@@ -1597,22 +2664,33 @@ function renderDrivers() {
     </div>`;
   }).join('');
 
+  const accChevron = '<svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   document.getElementById('assessContent').innerHTML = `
-    <div class="d-header">
-      <div class="d-badge">Social Drivers of Health</div>
-      <div class="d-title">Social Drivers</div>
-      <div class="d-progress">
-        <span>Rate all 9 factors</span>
-        <div class="d-pbar"><div class="d-pfill" style="width:${getDriverPct()}%"></div></div>
-        <span>Final Step</span>
+    <div class="hsi-assess-acc-wrap">
+      <div class="byb-acc">
+        <button type="button" class="byb-acc-hd" id="byb-acc-hd-sd" aria-expanded="false" onclick="hsiToggleBybAcc('sd')">
+          <span class="byb-acc-title">Social Drivers of Health</span>
+          ${accChevron}
+        </button>
+        <div class="byb-acc-body" id="byb-acc-bd-sd">
+          <div class="d-header">
+            <div class="d-badge">Social Drivers of Health</div>
+            <div class="d-title">Social Drivers</div>
+            <div class="d-progress">
+              <span>Rate all 9 factors</span>
+              <div class="d-pbar"><div class="d-pfill" style="width:${getDriverPct()}%"></div></div>
+              <span>Final Step</span>
+            </div>
+          </div>
+          <div class="safeguard">Rate each Social Driver on the same 1–5 scale. Select the lower rating if uncertain.</div>
+          <div class="drivers-grid">${cards}</div>
+        </div>
       </div>
-    </div>
-    <div class="safeguard">Rate each Social Driver on the same 1–5 scale. Select the lower rating if uncertain.</div>
-    <div class="drivers-grid">${cards}</div>`;
+    </div>`;
 }
 
 function getDriverPct() {
-  return Math.round(Object.keys(A[4]).length / SOCIAL_DRIVERS.length * 100);
+  return Math.floor(Object.keys(A[4]).length / SOCIAL_DRIVERS.length * 100);
 }
 
 function pickDriver(idx, val, btn) {
@@ -1623,6 +2701,7 @@ function pickDriver(idx, val, btn) {
   card.classList.add('answered');
   const fill = document.querySelector('.d-pfill');
   if (fill) fill.style.width = getDriverPct()+'%';
+  scheduleHsiDraftSave();
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -1641,18 +2720,29 @@ function renderDestab() {
     </div>`;
   }).join('');
 
+  const accChevron = '<svg class="byb-acc-cv" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   document.getElementById('assessContent').innerHTML = `
-    <div class="d-header">
-      <div class="d-badge">Clinical Destabilizers</div>
-      <div class="d-title">Clinical Destabilizers</div>
-      <div class="d-progress">
-        <span>Rate all 3 factors</span>
-        <div class="d-pbar"><div class="d-pfill" style="width:100%"></div></div>
-        <span>Step 6 of 6</span>
+    <div class="hsi-assess-acc-wrap">
+      <div class="byb-acc">
+        <button type="button" class="byb-acc-hd" id="byb-acc-hd-cd" aria-expanded="false" onclick="hsiToggleBybAcc('cd')">
+          <span class="byb-acc-title">Clinical Destabilizers</span>
+          ${accChevron}
+        </button>
+        <div class="byb-acc-body" id="byb-acc-bd-cd">
+          <div class="d-header">
+            <div class="d-badge">Clinical Destabilizers</div>
+            <div class="d-title">Clinical Destabilizers</div>
+            <div class="d-progress">
+              <span>Rate all 3 factors</span>
+              <div class="d-pbar"><div class="d-pfill" style="width:100%"></div></div>
+              <span>Step 6 of 6</span>
+            </div>
+          </div>
+          <div class="safeguard">These ratings are stand-alone contextual factors and do not affect the Intrinsic or Extrinsic scores. They are included in the final report to identify additional pressures on recovery.</div>
+          <div class="destab-cards">${cards}</div>
+        </div>
       </div>
-    </div>
-    <div class="safeguard">These ratings are stand-alone contextual factors and do not affect the Intrinsic or Extrinsic scores. They are included in the final report to identify additional pressures on recovery.</div>
-    <div class="destab-cards">${cards}</div>`;
+    </div>`;
 }
 
 function pickDestab(idx, val, btn) {
@@ -1660,6 +2750,7 @@ function pickDestab(idx, val, btn) {
   document.getElementById('dd'+idx).querySelectorAll('.driver-btn').forEach(b=>b.classList.remove('sel'));
   btn.classList.add('sel');
   document.getElementById('dd'+idx).classList.add('answered');
+  scheduleHsiDraftSave();
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -1681,17 +2772,408 @@ function score() {
   const extr   = Math.floor(sdVals.reduce((a,b)=>a+b,0) / sdVals.length);
 
   const destab = DESTABILIZERS.map((_,i)=>A[5][i]??3);
+  const destabAvg = Math.floor(destab.reduce((a,b)=>a+b,0) / destab.length);
 
-  return { ds, intrinsic:minD, pCode:`P${pIdx+1}`, extrinsic:extr, destab };
+  return { ds, intrinsic:minD, pCode:`P${pIdx+1}`, extrinsic:extr, destab, destabAvg };
 }
 
 function escHsi(s) {
   return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
+
+function hsiToggleIntroAcc(idx) {
+  var hd = document.getElementById('hsi-intro-acc-hd-' + idx);
+  var bd = document.getElementById('hsi-intro-acc-bd-' + idx);
+  if (!hd || !bd) return;
+  var willOpen = !bd.classList.contains('open');
+  hd.classList.toggle('open', willOpen);
+  bd.classList.toggle('open', willOpen);
+  hd.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+}
+
+/* View Instructions overlay — standing reference during assessment */
+function hsiOpenInstructions() {
+  var ov = document.getElementById('hsi-vi-overlay');
+  if (ov) ov.classList.add('open');
+}
+function hsiCloseInstructions() {
+  var ov = document.getElementById('hsi-vi-overlay');
+  if (ov) ov.classList.remove('open');
+}
+function hsiCloseInstructionsIfBackdrop(e) {
+  if (e && e.target && e.target.id === 'hsi-vi-overlay') hsiCloseInstructions();
+}
+
+function hsiToggleFsmIntro() {
+  var hd = document.getElementById('hsi-fsm-intro-hd');
+  var bd = document.getElementById('hsi-fsm-intro-bd');
+  if (!hd || !bd) return;
+  var willOpen = !bd.classList.contains('open');
+  hd.classList.toggle('open', willOpen);
+  bd.classList.toggle('open', willOpen);
+  hd.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+  if (willOpen) {
+    requestAnimationFrame(function () {
+      requestAnimationFrame(drawMiniSlab);
+    });
+  }
+}
+
+function toggleHsiFsmAssess() {
+  hsiFsmAssessOpen = !hsiFsmAssessOpen;
+  var hd = document.getElementById('hsi-fsm-assess-hd');
+  var bd = document.getElementById('hsi-fsm-assess-bd');
+  if (hd && bd) {
+    hd.classList.toggle('open', hsiFsmAssessOpen);
+    bd.classList.toggle('open', hsiFsmAssessOpen);
+    hd.setAttribute('aria-expanded', hsiFsmAssessOpen ? 'true' : 'false');
+  }
+  if (hsiFsmAssessOpen) {
+    requestAnimationFrame(function () {
+      requestAnimationFrame(drawMiniSlab);
+    });
+  }
+  scheduleHsiDraftSave();
+}
+
+/** Report snapshot: locale string for generated-at line */
+function hsiFormatDateReport(ts) {
+  var d = ts ? new Date(ts) : new Date();
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+}
+
+/**
+ * Prefer live Case overview in #case-header-fields (data-case-identity), same labels as case-identity.js.
+ */
+function hsiReadCasePayloadForReport() {
+  var out = {
+    case_title: '',
+    client_name: '',
+    case_type: '',
+    case_ref: '',
+    date_of_injury: '',
+    client_identifier: '',
+    case_status: '',
+    created_at: ''
+  };
+  var root = document.getElementById('case-header-fields');
+  if (root) {
+    root.querySelectorAll('[data-case-identity]').forEach(function (span) {
+      var key = span.getAttribute('data-case-identity');
+      if (!key || !Object.prototype.hasOwnProperty.call(out, key)) return;
+      var t = (span.textContent || '').trim();
+      if (t && t !== '—') out[key] = t;
+    });
+  }
+  return out;
+}
+
+function hsiBuildReportHeaderIdentifierHtml(payload) {
+  var rows = [];
+  function push(label, key) {
+    var v = payload[key];
+    if (v == null) return;
+    var s = String(v).trim();
+    if (s === '' || s === '—') return;
+    rows.push({ label: label, val: escHsi(s) });
+  }
+  push('Case title', 'case_title');
+  push('Client name', 'client_name');
+  push('Case type', 'case_type');
+  push('System identifier', 'case_ref');
+  push('Date of injury / loss', 'date_of_injury');
+  push('Client identifier', 'client_identifier');
+  push('Status', 'case_status');
+  push('Creation date', 'created_at');
+  if (!rows.length) return '';
+  var cells = rows.map(function (r) {
+    return (
+      '<div style="min-width:0">' +
+      '<div style="font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;opacity:0.75;margin-bottom:3px">' +
+      r.label +
+      '</div>' +
+      '<div style="font-size:13px;font-weight:600;line-height:1.35;word-break:break-word">' +
+      r.val +
+      '</div></div>'
+    );
+  }).join('');
+  return (
+    '<div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.2);display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px 20px">' +
+    cells +
+    '</div>'
+  );
+}
 function hsiValStyle(v) {
   const map = { 5:{bg:'#1e5c3a',fg:'#fff'}, 4:{bg:'#4a6741',fg:'#fff'}, 3:{bg:'#a8852b',fg:'#fff'}, 2:{bg:'#c45c1a',fg:'#fff'}, 1:{bg:'#8b1e1e',fg:'#fff'} };
   return map[v] || map[3];
 }
+
+/* ─── HSI Step 3 report helpers ─── */
+
+/** Inline tier chip — mirrors SCORE_LABELS, colors mirror hsiValStyle */
+function hsiTierChip(v) {
+  var t = hsiTier(v);
+  return '<span style="display:inline-block;font-family:\'Jost\',Helvetica,sans-serif;font-size:10px;font-weight:800;letter-spacing:0.08em;padding:4px 10px;border-radius:4px;text-transform:uppercase;background:' + t.bg + ';color:' + t.fg + ';white-space:nowrap">' + t.label + '</span>';
+}
+
+/** Critical Domain banner — fires when any P ≤ 2 */
+function hsiCriticalDomainBannerHtml(ds) {
+  var crit = [];
+  ds.forEach(function(v, i) {
+    if (v <= 2) crit.push({ p:'P'+(i+1), title:DOMAINS[i].title, v:v });
+  });
+  if (!crit.length) return '';
+  crit.sort(function(a,b){
+    if (a.v !== b.v) return a.v - b.v;
+    return HSI_TIE_ORDER.indexOf(a.p) - HSI_TIE_ORDER.indexOf(b.p);
+  });
+  var list = crit.map(function(c){ return c.p + ' ' + escHsi(c.title) + ' (' + hsiTier(c.v).label + ')'; }).join(', ');
+  return '<div style="margin:14px 22px 0;padding:14px 18px;border-left:4px solid #8b1e1e;background:#fdf4f4;border-radius:4px">' +
+    '<div style="font-family:\'Jost\',sans-serif;font-weight:800;font-size:12px;color:#8b1e1e;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px">⚠ Critical Domain' + (crit.length>1?'s':'') + ' Identified</div>' +
+    '<div style="font-family:\'Jost\',sans-serif;font-size:13px;color:#3a2020;line-height:1.55">' + list + '</div>' +
+    '</div>';
+}
+
+/** Recommended Response Timeframe banner — fires when P1 ≤ 2 OR P2 ≤ 2 OR any Destabilizer = 1 */
+function hsiRecommendedResponseBannerHtml(ds, destab) {
+  var p1Trigger = ds[0] <= 2;
+  var p2Trigger = ds[1] <= 2;
+  var destabTriggerIdx = destab.findIndex(function(v){ return v === 1; });
+  if (!p1Trigger && !p2Trigger && destabTriggerIdx < 0) return '';
+  var reasons = [];
+  if (p1Trigger) reasons.push('Physical stability (P1) at ' + hsiTier(ds[0]).label);
+  if (p2Trigger) reasons.push('Psychological stability (P2) at ' + hsiTier(ds[1]).label);
+  if (destabTriggerIdx >= 0) {
+    destab.forEach(function(v,i){ if (v === 1) reasons.push(DESTABILIZERS[i] + ' destabilizer at CRITICAL'); });
+  }
+  return '<div style="margin:10px 22px 0;padding:14px 18px;border-left:4px solid #c45c1a;background:#fff6ee;border-radius:4px">' +
+    '<div style="font-family:\'Jost\',sans-serif;font-weight:800;font-size:12px;color:#8a3e10;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px">⚠ Recommended Response Timeframe — 24–48 Hours</div>' +
+    '<div style="font-family:\'Jost\',sans-serif;font-size:13px;color:#3a2410;line-height:1.6">' +
+    escHsi(reasons.join(' • ')) + '. Best practice: attorney-initiated welfare check or clinical referral within 24–48 hours. Document the contact and any referrals made.' +
+    '</div></div>';
+}
+
+/** P3/P4 follow-up banner — fires when P3 ≤ 2 or P4 ≤ 2, and no higher-urgency trigger above is active */
+function hsiP34FollowupBannerHtml(ds, destab) {
+  var p1Urgent = ds[0] <= 2;
+  var p2Urgent = ds[1] <= 2;
+  var destabUrgent = destab.some(function(v){ return v === 1; });
+  if (p1Urgent || p2Urgent || destabUrgent) return ''; // suppressed — higher-urgency banner already fires
+  var p3Trigger = ds[2] <= 2;
+  var p4Trigger = ds[3] <= 2;
+  if (!p3Trigger && !p4Trigger) return '';
+  var reasons = [];
+  if (p3Trigger) reasons.push('Psychosocial stability (P3) at ' + hsiTier(ds[2]).label);
+  if (p4Trigger) reasons.push('Professional capacity (P4) at ' + hsiTier(ds[3]).label);
+  return '<div style="margin:10px 22px 0;padding:13px 17px;border-left:4px solid #a8852b;background:#fbf6e6;border-radius:4px">' +
+    '<div style="font-family:\'Jost\',sans-serif;font-weight:700;font-size:12px;color:#6a5418;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px">Recommended Follow-up — 3–7 Days</div>' +
+    '<div style="font-family:\'Jost\',sans-serif;font-size:12.5px;color:#3a2f0f;line-height:1.6">' +
+    escHsi(reasons.join(' • ')) + '. Best practice: attorney contact with the client within 3–7 days to assess whether conditions are changing and whether intervention is warranted.' +
+    '</div></div>';
+}
+
+/** SDOH Attorney-Action flag — lighter weight; fires when extrinsic ≤ 2 */
+function hsiSdohFlagHtml(extrinsic) {
+  if (extrinsic > 2) return '';
+  return '<div style="margin:10px 22px 0;padding:12px 16px;border-left:3px solid #a8852b;background:#fbf6e6;border-radius:4px">' +
+    '<div style="font-family:\'Jost\',sans-serif;font-weight:700;font-size:11px;color:#6a5418;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:5px">Environmental Barriers Flagged</div>' +
+    '<div style="font-family:\'Jost\',sans-serif;font-size:12.5px;color:#3a2f0f;line-height:1.6">' +
+    'Social Drivers of Health average at ' + hsiTier(extrinsic).label + '. Attorney action recommended for documentation of barriers to care and to address environmental pressures that may affect recovery trajectory.' +
+    '</div></div>';
+}
+
+/** Intrinsic/Extrinsic mismatch callout — fires when |intrinsic − extrinsic| ≥ 2 */
+function hsiMismatchCalloutHtml(intrinsic, extrinsic) {
+  var diff = Math.abs(intrinsic - extrinsic);
+  if (diff < 2) return '';
+  var title, body;
+  if (intrinsic < extrinsic) {
+    title = 'Pattern: Instability Despite Supportive Environment';
+    body = 'The person is showing internal (4Ps) instability while their external conditions (SDOH) remain relatively supportive. This pattern suggests clinical acuity that warrants attention independent of environmental factors. Document the specific internal patterns and consider whether current care adequately addresses them.';
+  } else {
+    title = 'Pattern: Internal Resilience Under External Pressure';
+    body = 'The person is maintaining internal (4Ps) stability despite external (SDOH) pressures. This pattern reflects current coping, but sustained environmental pressure predicts potential destabilization over time. Document the specific external pressures and track whether internal stability holds as the case progresses.';
+  }
+  return '<div style="margin:14px 22px 0;padding:13px 17px;border:1px solid #b09837;background:#faf7ee;border-radius:4px">' +
+    '<div style="font-family:\'Jost\',sans-serif;font-weight:700;font-size:11px;color:#6a5418;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:5px">' + escHsi(title) + '</div>' +
+    '<div style="font-family:\'Jost\',sans-serif;font-size:12.5px;color:#222;line-height:1.6">' + escHsi(body) + '</div></div>';
+}
+
+/** Recommended Next Actions by stability tier — replaces the prior Clinical Considerations blocks.
+    Tier driven by lowest score across 4Ps and destabilizers:
+      CRITICAL   — any P=1 OR any destabilizer=1 (follow-up 24–48hr)
+      UNSTABLE   — lowest score = 2 (follow-up 3–7 days)
+      STRUGGLING — lowest score = 3 (follow-up 14 days)
+      STABLE     — lowest score = 4 (follow-up 30 days)
+      STRONG     — all scores = 5 (follow-up 60 days)
+    Tier computation mirrors hsiFollowupCadencePanelHtml so both pieces stay in sync. */
+function hsiRecommendedNextActionsHtml(ds, destab) {
+  var p1Crit = ds[0] === 1, p2Crit = ds[1] === 1, p3Crit = ds[2] === 1, p4Crit = ds[3] === 1;
+  var pAnyCrit = p1Crit || p2Crit || p3Crit || p4Crit;
+  var destabAnyCrit = destab.some(function(v){ return v === 1; });
+  var all = ds.concat(destab).filter(function(v){ return v != null; });
+  var lowest = all.length ? Math.min.apply(null, all) : 5;
+
+  var tier;
+  if (pAnyCrit || destabAnyCrit) tier = 'CRITICAL';
+  else if (lowest === 2) tier = 'UNSTABLE';
+  else if (lowest === 3) tier = 'STRUGGLING';
+  else if (lowest === 4) tier = 'STABLE';
+  else tier = 'STRONG';
+
+  var byTier = {
+    CRITICAL: {
+      cadence: '24–48 hours',
+      intro: 'Client has reported at least one crisis-level instability. The attorney has just heard direct client-report evidence of immediate destabilization risk.',
+      actions: [
+        'Initiate direct follow-up contact within 24 hours to confirm the client\'s immediate safety status and clarify any urgent concerns reported during the call.',
+        'Coordinate urgent outreach to the treating provider or appropriate clinical contact when the client reports severe physical instability, psychological distress, or destabilizer-level symptoms.',
+        'Verify continuity of care access by confirming the client has scheduled or attended the next medically necessary appointment and is not experiencing barriers that could delay stabilization.',
+        'Engage available support systems (family, caregiver, or primary support contacts where appropriate) when the client reports functional collapse or isolation affecting daily safety or recovery.',
+        'Schedule a follow-up stability check within 24–48 hours to reassess whether the reported crisis indicators are improving, worsening, or unchanged.'
+      ],
+      priority: 'Confirm the client\'s immediate safety and care continuity within 24 hours based on what the client directly reported.',
+      docFocus: 'Document the specific crisis-level conditions reported by the client, all coordination steps initiated, and the immediate response timeline.'
+    },
+    UNSTABLE: {
+      cadence: '3–7 days',
+      intro: 'Client reports meaningful instability indicating functional disruption that may deteriorate without intervention.',
+      actions: [
+        'Review the lowest-scoring domains identified during the client call and clarify the functional impact those conditions are having on daily life and treatment participation.',
+        'Confirm that all active treatment plans are proceeding as scheduled and that no missed visits, delayed care, or unresolved concerns were reported.',
+        'Coordinate provider communication when instability affects treatment adherence, particularly when physical or psychological symptoms are interfering with progress.',
+        'Monitor destabilizer indicators (pain, depression, anxiety) and verify whether symptom escalation is limiting recovery participation.',
+        'Review prior HSI results for this client to identify whether current stability reflects improvement, decline, or stable trajectory.',
+        'Schedule a structured follow-up check within 3–7 days to reassess stability movement and verify that corrective actions are taking effect.'
+      ],
+      priority: 'Stabilize the lowest-performing functional domain identified during the client call before further deterioration occurs.',
+      docFocus: 'Document the specific instability factors reported by the client and all actions taken to maintain treatment continuity and functional participation.'
+    },
+    STRUGGLING: {
+      cadence: '14 days',
+      intro: 'Client reports moderate instability with early signs of strain that could worsen if left unmonitored.',
+      actions: [
+        'Review domain-level concerns reported during the call to identify patterns that may gradually erode recovery stability.',
+        'Confirm ongoing participation in recommended care activities and verify that the client is maintaining scheduled appointments and responsibilities.',
+        'Reinforce continuity planning by confirming that necessary supports (transportation, communication access, appointment scheduling) remain functional.',
+        'Monitor destabilizer patterns to identify early symptom escalation that could shift stability downward.',
+        'Review prior HSI results for this client to identify whether current stability reflects improvement, decline, or stable trajectory.',
+        'Schedule a structured re-check within 14 days to evaluate whether the client\'s stability trajectory is improving or declining.'
+      ],
+      priority: 'Monitor early strain signals and reinforce stability supports before moderate instability becomes functional disruption.',
+      docFocus: 'Document reported strain indicators and note whether the client\'s trajectory appears stable, improving, or declining compared to prior HSI runs.'
+    },
+    STABLE: {
+      cadence: '30 days',
+      intro: 'Client reports overall stability with functional capacity holding across domains.',
+      actions: [
+        'Confirm that all recovery routines and treatment activities remain consistent with the client\'s reported stability level.',
+        'Review recent changes in life structure or responsibilities to identify any emerging factors that could destabilize otherwise stable conditions.',
+        'Verify that previously identified concerns remain resolved and have not re-emerged since prior assessments.',
+        'Document ongoing functional participation across domains, reinforcing that stability is currently maintained.',
+        'Review prior HSI results for this client to identify whether current stability reflects improvement, decline, or stable trajectory.',
+        'Schedule the next routine HSI reassessment within 30 days to maintain trajectory awareness.'
+      ],
+      priority: 'Verify that reported stability is being sustained across daily function and treatment participation.',
+      docFocus: 'Document confirmation of continued stability and note any minor fluctuations that could signal emerging risk.'
+    },
+    STRONG: {
+      cadence: '60 days',
+      intro: 'Client reports full-domain strength with stable functional capacity and minimal destabilizer impact.',
+      actions: [
+        'Confirm sustained full-domain stability by reviewing whether the client continues to function without disruption across all wellness dimensions.',
+        'Reinforce maintenance behaviors that support ongoing recovery consistency and structured daily function.',
+        'Review any recent life changes to ensure that new demands or responsibilities are not introducing hidden risk.',
+        'Document evidence of continued functional strength across all domains reported during the client call.',
+        'Review prior HSI results for this client to identify whether current stability reflects improvement, decline, or stable trajectory.',
+        'Schedule the next routine HSI reassessment within 60 days to maintain long-term trajectory tracking.'
+      ],
+      priority: 'Document sustained strength and maintain routine monitoring to preserve long-term functional stability.',
+      docFocus: 'Document full-domain stability and confirm that the client trajectory reflects sustained recovery strength across time.'
+    }
+  };
+
+  var g = byTier[tier];
+  var tierColor = tier === 'CRITICAL' ? '#8b1e1e'
+                : tier === 'UNSTABLE' ? '#c45c1a'
+                : tier === 'STRUGGLING' ? '#a8852b'
+                : tier === 'STABLE' ? '#4a6741'
+                : '#1e5c3a';
+  var actionItems = g.actions.map(function(a){ return '<li style="margin-bottom:6px;padding-left:4px">' + escHsi(a) + '</li>'; }).join('');
+
+  return '<div style="margin:14px 22px 0;padding:16px 18px;background:#fdf8e8;border:2px solid #b09837;border-left:6px solid #b09837;border-radius:8px;box-shadow:0 1px 4px rgba(176,152,55,0.15)">' +
+    '<div style="font-family:\'Jost\',sans-serif;font-size:11.5px;font-weight:800;color:#7a6a22;text-transform:uppercase;letter-spacing:0.13em;margin-bottom:10px;padding-bottom:7px;border-bottom:1.5px solid rgba(176,152,55,0.35);display:flex;align-items:center;gap:8px">' +
+      '<span style="display:inline-block;width:18px;height:18px;background:' + tierColor + ';color:#fff;border-radius:50%;text-align:center;line-height:18px;font-size:11px;font-weight:900">!</span>' +
+      'Recommended Next Actions — ' + tier + ' · Follow-up: ' + g.cadence +
+    '</div>' +
+    '<div style="font-family:\'Jost\',sans-serif;font-size:12.5px;color:#555;line-height:1.55;margin-bottom:10px;font-style:italic">' + escHsi(g.intro) + '</div>' +
+    '<ul style="list-style:none;padding:0 0 0 18px;margin:0 0 14px;font-family:\'Jost\',sans-serif;font-size:13px;line-height:1.6;color:#1a1a1a">' +
+      actionItems +
+    '</ul>' +
+    '<div style="background:#fff;border:1px solid #d4c890;border-radius:6px;padding:10px 12px;margin-top:8px">' +
+      '<div style="font-family:\'Jost\',sans-serif;font-size:10.5px;font-weight:800;color:#7a6a22;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">Priority Action</div>' +
+      '<div style="font-family:\'Jost\',sans-serif;font-size:12.5px;color:#333;line-height:1.55">' + escHsi(g.priority) + '</div>' +
+    '</div>' +
+    '<div style="background:#fff;border:1px solid #d4c890;border-radius:6px;padding:10px 12px;margin-top:8px">' +
+      '<div style="font-family:\'Jost\',sans-serif;font-size:10.5px;font-weight:800;color:#7a6a22;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">Documentation Focus</div>' +
+      '<div style="font-family:\'Jost\',sans-serif;font-size:12.5px;color:#333;line-height:1.55">' + escHsi(g.docFocus) + '</div>' +
+    '</div>' +
+    '</div>';
+}
+
+/** Score-driven follow-up cadence panel — renders at bottom of report */
+function hsiFollowupCadencePanelHtml(ds, destab) {
+  // Determine tier: P1/P2 ≤ 2 OR any Destabilizer = 1 → CRITICAL cadence
+  var p1Urgent = ds[0] <= 2;
+  var p2Urgent = ds[1] <= 2;
+  var destabUrgent = destab.some(function(v){ return v === 1; });
+  var p34Unstable = (ds[2] <= 2) || (ds[3] <= 2);
+  var allScores = ds.concat(destab);
+  var lowest = Math.min.apply(null, allScores);
+
+  var tierLabel, cadence, explainer;
+  if (p1Urgent || p2Urgent || destabUrgent) {
+    tierLabel = 'CRITICAL';
+    cadence = '24–48 hours';
+    explainer = 'The client has reported crisis-level concern in a domain that can deteriorate quickly. Physical (P1), Psychological (P2), and Destabilizer crises warrant immediate welfare check or clinical referral.';
+  } else if (p34Unstable) {
+    tierLabel = 'UNSTABLE';
+    cadence = '3–7 days';
+    explainer = 'The client has reported significant strain in psychosocial or professional wellness. Close follow-up allows the attorney to assess whether conditions are changing and whether intervention is warranted.';
+  } else if (lowest === 3) {
+    tierLabel = 'STRUGGLING';
+    cadence = '14 days';
+    explainer = 'The client is reporting manageable strain. Stability is holding but not strong. Periodic contact supports early detection of deterioration.';
+  } else if (lowest === 4) {
+    tierLabel = 'STABLE';
+    cadence = '30 days';
+    explainer = 'The client is reporting stable functioning across domains. Routine contact is appropriate.';
+  } else {
+    tierLabel = 'STRONG';
+    cadence = '60 days';
+    explainer = 'The client is reporting strong functioning across all domains. Light contact cadence is appropriate.';
+  }
+
+  var tierColor = tierLabel === 'CRITICAL' ? '#8b1e1e'
+                : tierLabel === 'UNSTABLE' ? '#c45c1a'
+                : tierLabel === 'STRUGGLING' ? '#a8852b'
+                : tierLabel === 'STABLE' ? '#4a6741'
+                : '#1e5c3a';
+
+  return '<div style="padding:18px 22px 22px;border-top:1px solid #e6e2da;background:#f8f7f2">' +
+    '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#6a6560;margin-bottom:12px">Follow-up & Re-run Cadence</div>' +
+    '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px">' +
+    '<span style="font-family:\'Jost\',sans-serif;font-size:11px;font-weight:800;letter-spacing:0.08em;padding:5px 12px;border-radius:4px;text-transform:uppercase;background:' + tierColor + ';color:#fff">' + tierLabel + '</span>' +
+    '<span style="font-family:\'Jost\',sans-serif;font-size:15px;font-weight:700;color:#0e1c2e">Recommended attorney follow-up with client: ' + cadence + '</span>' +
+    '</div>' +
+    '<div style="font-family:\'Jost\',sans-serif;font-size:12.5px;color:#333;line-height:1.65;margin-bottom:10px">' + escHsi(explainer) + '</div>' +
+    '<div style="font-family:\'Jost\',sans-serif;font-size:11.5px;color:#6a6560;line-height:1.6;padding-top:10px;border-top:1px dashed #d6d0c4">' +
+    'Cadence reflects the client\'s self-reported stability at the time of this assessment. Adjust to specific case circumstances and client needs. Re-run HSI after any meaningful change in status, treatment, or life circumstances to document the trajectory over time.' +
+    '</div>' +
+    '</div>';
+}
+
 function hsiScorePill(v) {
   const st = hsiValStyle(v);
   return '<span style="display:inline-block;font-size:11px;font-weight:800;padding:5px 11px;border-radius:6px;background:' + st.bg + ';color:' + st.fg + '">' + v + ' — ' + escHsi(SCORE_LABELS[v]) + '</span>';
@@ -1704,45 +3186,98 @@ function buildHsiReportSnapshotHtml(toolData) {
     extrinsic: toolData.extrinsic,
     destab: toolData.destab
   };
-  const Ans = toolData.answers || {};
-  const domRows = DOMAINS.map((d, i) => {
-    const v = scored.ds[i];
-    const isPri = scored.pCode === d.code;
-    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid #eef0f3;background:' + (isPri ? '#fff9e6' : '#fafbfc') + '">' +
-      '<div style="font-size:13px;font-weight:' + (isPri ? '800' : '600') + ';color:#0e1c2e">' + escHsi(d.title) + (isPri ? ' <span style="font-size:10px;color:#b8922a">(priority)</span>' : '') + '</div>' +
-      '<div>' + hsiScorePill(v) + '</div></div>';
-  }).join('');
-  const sdRows = SOCIAL_DRIVERS.map((name, i) => {
-    const v = Ans[4] && Ans[4][i];
-    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-bottom:1px solid #eee"><span style="font-size:12px;color:#333">' + escHsi(name) + '</span>' + hsiScorePill(v) + '</div>';
-  }).join('');
-  const destRows = DESTABILIZERS.map((name, i) => {
-    const v = scored.destab[i];
-    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-bottom:1px solid #eee"><span style="font-size:12px;color:#333">' + escHsi(name) + '</span>' + hsiScorePill(v) + '</div>';
-  }).join('');
+  const destabAvg = toolData.destabAvg != null
+    ? toolData.destabAvg
+    : Math.floor(scored.destab.reduce(function (a, b) { return a + b; }, 0) / scored.destab.length);
+  const pIdx = Math.max(0, Math.min(3, parseInt(String(scored.pCode).replace(/\D/g, ''), 10) - 1));
+  const domDetermining = DOMAINS[pIdx];
   const slabHtml = buildHsiFoundationSlabSnapshotBlock(scored.intrinsic, scored.extrinsic);
+
+  // Sort 4Ps worst-first with Maslow tie-break (P1 first when scores tie)
+  var fourPsRows = DOMAINS.map(function(d, i) {
+    return { pCode:'P'+(i+1), badge:d.badge, score:scored.ds[i] };
+  }).sort(function(a, b) {
+    if (a.score !== b.score) return a.score - b.score;
+    return HSI_TIE_ORDER.indexOf(a.pCode) - HSI_TIE_ORDER.indexOf(b.pCode);
+  });
+
+  const topSummary =
+    '<div style="padding:18px 22px;background:#fafbfc;border-bottom:1px solid #e6e2da">' +
+    '<div style="font-size:13px;color:#333;margin:10px 0;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px">' +
+    '<span style="color:#555"><strong style="color:#0e1c2e">Intrinsic (4Ps floor):</strong> ' + hsiScorePill(scored.intrinsic) + ' ' + hsiTierChip(scored.intrinsic) + '</span></div>' +
+    '<div style="font-size:13px;color:#333;margin:10px 0;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px">' +
+    '<span style="color:#555"><strong style="color:#0e1c2e">Extrinsic (Social Drivers avg):</strong> ' + hsiScorePill(scored.extrinsic) + ' ' + hsiTierChip(scored.extrinsic) + '</span></div>' +
+    '<div style="font-size:13px;color:#333;margin:10px 0;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px">' +
+    '<span style="color:#555"><strong style="color:#0e1c2e">Clinical Destabilizers avg:</strong> ' + hsiScorePill(destabAvg) + ' ' + hsiTierChip(destabAvg) + '</span></div>' +
+    '<div style="font-size:13px;color:#333;margin:10px 0;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px">' +
+    '<span style="color:#555"><strong style="color:#0e1c2e">Determining domain:</strong> ' + escHsi(domDetermining.badge) + ' ' + hsiScorePill(scored.intrinsic) + '</span></div>' +
+    '</div>';
+
+  // Alerts and patterns — render in priority order: Critical Domain → Recommended Response (24-48hr) → P3/P4 Follow-up (3-7 day) → SDOH flag → Mismatch → Recommended Next Actions
+  const alertsHtml =
+    hsiCriticalDomainBannerHtml(scored.ds) +
+    hsiRecommendedResponseBannerHtml(scored.ds, scored.destab) +
+    hsiP34FollowupBannerHtml(scored.ds, scored.destab) +
+    hsiSdohFlagHtml(scored.extrinsic) +
+    hsiMismatchCalloutHtml(scored.intrinsic, scored.extrinsic) +
+    hsiRecommendedNextActionsHtml(scored.ds, scored.destab);
+  const alertsWrap = alertsHtml
+    ? '<div style="padding:4px 0 14px;background:#fafbfc;border-bottom:1px solid #e6e2da">' + alertsHtml + '</div>'
+    : '';
+
+  // 4Ps list — sorted worst-first with tier chip on every row
+  const bottomFourPs =
+    '<div style="padding:16px 22px 22px;border-top:1px solid #e6e2da;background:#fff">' +
+    '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#6a6560;margin-bottom:12px">4Ps domain scores (sorted by stability — lowest first)</div>' +
+    fourPsRows.map(function (r) {
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid #eef0f3;gap:10px;flex-wrap:wrap">' +
+        '<span style="font-size:13px;font-weight:600;color:#0e1c2e;flex:1;min-width:200px">' + escHsi(r.badge) + '</span>' +
+        '<span style="display:inline-flex;align-items:center;gap:8px">' + hsiScorePill(r.score) + ' ' + hsiTierChip(r.score) + '</span>' +
+        '</div>';
+    }).join('') +
+    '</div>';
+
+  // Destabilizer rows — each with its own tier chip (single destabilizer at 1 is louder than the avg)
+  const destabRows =
+    '<div style="padding:16px 22px 22px;border-top:1px solid #e6e2da;background:#faf9f5">' +
+    '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#6a6560;margin-bottom:12px">Clinical Destabilizers</div>' +
+    DESTABILIZERS.map(function(name, i) {
+      var v = scored.destab[i];
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid #eef0f3;gap:10px;flex-wrap:wrap">' +
+        '<span style="font-size:13px;font-weight:600;color:#0e1c2e;flex:1;min-width:200px">' + escHsi(name) + '</span>' +
+        '<span style="display:inline-flex;align-items:center;gap:8px">' + hsiScorePill(v) + ' ' + hsiTierChip(v) + '</span>' +
+        '</div>';
+    }).join('') +
+    '</div>';
+
+  var casePayload = hsiReadCasePayloadForReport();
+  var idHtml = hsiBuildReportHeaderIdentifierHtml(casePayload);
+  var tsLine = hsiFormatDateReport(toolData.timestamp);
 
   return '<div style="font-family:system-ui,Segoe UI,sans-serif;max-width:880px;margin:0 auto;background:#fff;border:1px solid #d6d0c4;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(14,28,46,0.08)">' +
     '<div style="background:linear-gradient(135deg,#0e1c2e 0%,#1a3050 100%);padding:20px 24px;color:#fff">' +
     '<div style="font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#e8c547;margin-bottom:6px">Holistic Stability Index™</div>' +
     '<h2 style="margin:0;font-size:22px;font-weight:800;letter-spacing:-0.02em">Stability assessment report</h2>' +
-    '<div style="font-size:12px;opacity:0.85;margin-top:8px">' + escHsi(new Date(toolData.timestamp).toLocaleString()) + ' · Case: ' + escHsi(toolData.caseType || '') + '</div></div>' +
-    '<div style="padding:20px 24px;background:#f8f6f1;border-bottom:1px solid #e0dcd4">' +
-    '<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center">' +
-    '<div style="font-size:13px;color:#444"><strong style="color:#0e1c2e">Intrinsic (4Ps floor):</strong> ' + hsiScorePill(scored.intrinsic) + '</div>' +
-    '<div style="font-size:13px;color:#444"><strong style="color:#0e1c2e">Determining domain:</strong> ' + escHsi(scored.pCode) + ' — ' + escHsi(DOMAIN_DESCS[scored.pCode] || '') + '</div></div>' +
-    '<div style="margin-top:12px;font-size:13px;color:#444"><strong style="color:#0e1c2e">Extrinsic (social drivers avg):</strong> ' + hsiScorePill(scored.extrinsic) + '</div></div>' +
+    (tsLine
+      ? '<div style="font-size:12px;opacity:0.9;margin-top:10px;line-height:1.45">' + escHsi(tsLine) + '</div>'
+      : '') +
+    idHtml +
+    '</div>' +
+    topSummary +
+    alertsWrap +
     slabHtml +
-    '<div style="padding:16px 22px 8px"><div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#b8922a;margin-bottom:8px">Domain scores (lowest per domain)</div>' + domRows + '</div>' +
-    '<div style="padding:8px 22px 8px"><div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#6a7a8a;margin-bottom:8px">Social drivers (9)</div>' + sdRows + '</div>' +
-    '<div style="padding:8px 22px 20px"><div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#8b1e1e;margin-bottom:8px">Clinical destabilizers</div>' + destRows + '</div>' +
-    '<div style="padding:12px 18px;background:#f4f2ec;font-size:11px;color:#666;line-height:1.55;border-top:1px solid #e0dcd4">Dashboard capture. Destabilizers are contextual and do not change intrinsic or extrinsic scores.</div></div>';
+    bottomFourPs +
+    destabRows +
+    '<div style="padding:12px 18px;background:#f4f2ec;font-size:11px;color:#666;line-height:1.55;border-top:1px solid #e0dcd4">Destabilizers are contextual and do not change intrinsic or extrinsic scores.</div>' +
+    '<p style="margin:0;padding:14px 22px 18px;font-size:11px;line-height:1.5;color:#888;background:#fff;border-top:1px solid #e0dcd4">Clinical care management tool for case coordination and documentation. Not a scientific instrument, predictive model, or substitute for medical or legal judgment.</p>' +
+    '</div>';
 }
 
 /* ─────────────────────────────────────────────────────────
    BUILD RESULTS
 ───────────────────────────────────────────────────────── */
-function buildResults() {
+async function buildResults() {
+  hsiLockDraftAutosaveForCompletion();
   const scored = score();
   const toolData = {
     completed: true,
@@ -1756,6 +3291,19 @@ function buildResults() {
 
   showScreen('sc-results');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  var paidHsiRef = new URLSearchParams(window.location.search).get('case_ref');
+  var hsiTrial = document.getElementById('hsi-results-trial');
+  var hsiPaid = document.getElementById('hsi-results-paid');
+  var hsiRet = document.getElementById('hsi-paid-return-case');
+  if (paidHsiRef) {
+    if (hsiTrial) hsiTrial.style.display = 'none';
+    if (hsiPaid) hsiPaid.style.display = 'block';
+    if (hsiRet) hsiRet.setAttribute('href', '/case-detail.html?case_ref=' + encodeURIComponent(paidHsiRef));
+  } else {
+    if (hsiTrial) hsiTrial.style.display = 'block';
+    if (hsiPaid) hsiPaid.style.display = 'none';
+  }
 
   if (typeof window.markAssessmentComplete === 'function') {
     window.markAssessmentComplete({
@@ -1774,8 +3322,33 @@ function buildResults() {
     snapEl.className = 'hsi-output stability-report report-container';
     localStorage.setItem('tool4_report_html', snapEl.outerHTML);
     console.log('HSI report HTML saved, length:', localStorage.getItem('tool4_report_html') ? localStorage.getItem('tool4_report_html').length : 0);
+    if (paidHsiRef) {
+      var hsiPaidVis = document.getElementById('hsi-paid-report-visible');
+      if (hsiPaidVis) hsiPaidVis.innerHTML = snapEl.innerHTML;
+    }
   } else {
     console.warn('HSI: hsi-report-snapshot host missing; report HTML not saved.');
+  }
+
+  if (paidHsiRef && !window.__paidPortalHSIRecorded) {
+    var recorded = await paidPortalRecordCaseToolRunAsync({
+      toolKey: 'HSI',
+      scoreSummary: {
+        tool: 'HSI',
+        intrinsic: scored.intrinsic,
+        extrinsic: scored.extrinsic,
+        pCode: scored.pCode
+      },
+      resultJson: toolData
+    });
+    if (recorded === true) {
+      window.__paidPortalHSIRecorded = true;
+      await deleteHsiDraft();
+      hsiDraftLockedAfterRun = true;
+    } else {
+      console.warn('[HSI] case_tool_runs insert failed; draft retained');
+      hsiDraftAutosaveDisabled = false;
+    }
   }
 }
 
@@ -1798,7 +3371,8 @@ function drawSlab(canvasEl, intrinsic, extrinsic, opts={}) {
   ctx.clearRect(0,0,W,H);
 
   const GOLD = '#b09837';
-  const sW   = mini ? 0 : 68;
+  /* Wide side margin so left scale labels (e.g. “Struggling”) stay on-canvas and clear of the numeric ticks */
+  const sW   = mini ? 0 : 100;
   const padT = mini ? 10 : 36;
   const padB = mini ? 22 : 54;
   const bodyW= W - sW*2 - (mini?36:0);
@@ -1952,9 +3526,11 @@ function drawSlab(canvasEl, intrinsic, extrinsic, opts={}) {
     ctx.font='600 11px Jost,sans-serif';
     for(let i=0;i<5;i++){
       const v=i+1, frac=liftFrac(v), y=floor-frac*maxH;
+      ctx.textAlign='left';
+      ctx.fillStyle=scaleColors[i];
+      ctx.fillText(sl[i],10,y+4);
       ctx.textAlign='right';
       ctx.fillStyle='#777';ctx.fillText(v,lx-12,y+4);
-      ctx.fillStyle=scaleColors[i];ctx.fillText(sl[i],lx-26,y+4);
       ctx.strokeStyle='rgba(0,0,0,0.18)';ctx.lineWidth=1.5;
       ctx.beginPath();ctx.moveTo(lx-9,y);ctx.lineTo(lx-3,y);ctx.stroke();
       ctx.textAlign='left';
@@ -2033,7 +3609,7 @@ function drawSlab(canvasEl, intrinsic, extrinsic, opts={}) {
 function renderFoundationSlabToDataUrl(intrinsic, extrinsic) {
   const host = document.getElementById('hsi-report-snapshot') || document.body;
   const cv = document.createElement('canvas');
-  cv.style.cssText = 'width:700px;height:380px;display:block';
+  cv.style.cssText = 'width:720px;height:380px;display:block';
   host.appendChild(cv);
   try {
     drawSlab(cv, intrinsic, extrinsic, {});
@@ -2048,18 +3624,18 @@ function buildHsiFoundationSlabSnapshotBlock(intrinsic, extrinsic) {
     const url = renderFoundationSlabToDataUrl(intrinsic, extrinsic);
     return '<div class="hsi-foundation-slab-block" style="margin:16px 22px 0;padding:20px 22px 24px;background:linear-gradient(180deg,#f4f3f0 0%,#eceae5 100%);border:1px solid #d6d0c4;border-radius:10px;text-align:center">' +
       '<div style="font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#6a6560;margin-bottom:10px">Foundation Stability Model™</div>' +
-      '<img src="' + url + '" alt="Foundation Stability Model" width="700" height="380" style="max-width:100%;height:auto;display:block;margin:0 auto;border-radius:8px;box-shadow:0 4px 18px rgba(14,28,46,0.12)" />' +
-      '<p style="margin:16px 0 0;font-size:12px;color:#555;line-height:1.65;max-width:640px;margin-left:auto;margin-right:auto;text-align:left">The model visualizes how intrinsic stability and external pressures interact to influence recovery outcomes. The left pillar reflects <strong>intrinsic</strong> stability (lowest score across the four 4Ps wellness domains). The right pillar reflects <strong>extrinsic</strong> pressures (average rating across nine social drivers of health). The gold leading edge marks the stress line between them—where internal functional limits meet environmental load. Higher pillars indicate stronger stability on that dimension.</p>' +
-      '<p style="margin:10px 0 0;font-size:11px;color:#777;line-height:1.5;text-align:center;font-style:italic">Same Foundation Stability Model™ rendering as the in-tool preview (full canvas engine).</p></div>';
+      '<img src="' + url + '" alt="Foundation Stability Model" width="720" height="380" style="max-width:100%;height:auto;display:block;margin:0 auto;border-radius:8px;box-shadow:0 4px 18px rgba(14,28,46,0.12)" />' +
+      getFsmExplainBulletsHtml().replace(/class="fsm-explain-list"/g, 'class="fsm-explain-list" style="margin:16px auto 0;max-width:640px;padding-left:1.25rem;font-size:12px;color:#555;line-height:1.65;text-align:left"') +
+      '</div>';
   } catch (e) {
     return '';
   }
 }
 
 function drawMiniSlab(){
-  const cv=document.getElementById('cvMini');
-  if(!cv) return;
-  drawSlab(cv,3,5,{mini:true});
+  document.querySelectorAll('#cvMini, #cvAssessFsm').forEach(function(cv){
+    drawSlab(cv,3,5,{mini:true});
+  });
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -2076,12 +3652,47 @@ window.addEventListener('resize',()=>{
    INIT
 ───────────────────────────────────────────────────────── */
 window.addEventListener('load',()=>{
+  const introExplain = document.getElementById('fsm-intro-explain');
+  if (introExplain) introExplain.innerHTML = getFsmExplainBulletsHtml();
   function kick(){
     drawMiniSlab();
   }
   requestAnimationFrame(()=>requestAnimationFrame(kick));
   setTimeout(kick, 80);
   setTimeout(kick, 400);
+});
+
+function hsiScrollToPaidReport(){
+  var el=document.getElementById('hsi-paid-report-block')||document.getElementById('hsi-paid-report-anchor');
+  if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function hsiPrintPaidReport(){
+  window.print();
+}
+
+async function hsiDomReady() {
+  if (window.caseClarityIdentity && window.supabaseClient) {
+    await window.caseClarityIdentity.mountToolPage(window.supabaseClient);
+  }
+  hsiInitPaidDraftPersistence();
+  await loadHsiDraft();
+  if (hsiStateHasMeaningfulProgressNow()) {
+    hsiHydratingFromDraft = true;
+    showScreen('sc-assess');
+    render();
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        drawMiniSlab();
+        hsiHydratingFromDraft = false;
+      });
+    });
+  } else {
+    hsiHydratingFromDraft = false;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  void hsiDomReady();
 });
 
 </script>
@@ -2128,6 +3739,5 @@ function returnToDashboard() {
     window.location.href = 'dashboard.html';
 }
 </script>
-<script src="trial-pinned-banner.js"></script>
 </body>
 </html>
