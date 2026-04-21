@@ -43,5 +43,12 @@ CREATE POLICY "trial_users_update_progress"
     ON trial_users FOR UPDATE
     USING (true);
 
-COMMENT ON TABLE trial_users IS 'Trial signups: CCP#/PIN auth, tool completion JSONB, status lifecycle';
+COMMENT ON TABLE trial_users IS 'Trial signups: internal CCP/PIN + magic-link auth, tool completion JSONB, status lifecycle';
 COMMENT ON COLUMN trial_users.completed_tools IS 'e.g. {"CCI":{"completed":true,"completed_at":"..."}, ...}';
+
+-- Optional columns (see supabase/migrations/20260421120000_trial_portal_tracking.sql):
+--   portal_access_count INTEGER NOT NULL DEFAULT 0
+--   last_portal_login TIMESTAMPTZ
+--
+-- SECURITY NOTE: committed RLS policies above allow broad anon read/write on trial_users.
+-- Tighten for production (e.g. Edge Functions + service role, or auth.uid()-scoped policies).

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signing you in — Case Clarity</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Georgia, 'Times New Roman', serif;
+            background: #fff;
+            color: #0e1c2e;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .card {
+            max-width: 440px;
+            text-align: center;
+            border: 1px solid #d6d0c4;
+            border-top: 3px solid #b8922a;
+            padding: 40px 32px;
+        }
+        h1 { font-size: 20px; font-weight: normal; color: #0c1c34; margin-bottom: 12px; }
+        p { font-size: 14px; color: #3a4a5a; line-height: 1.6; }
+        a { color: #b8922a; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+</head>
+<body>
+    <div class="card" id="panel">
+        <h1>Signing you in…</h1>
+        <p id="msg">Completing secure sign-in. You will be redirected to the trial portal.</p>
+        <p id="err" style="display:none;margin-top:16px;color:#a93226;"></p>
+        <p style="margin-top:20px;font-size:12px;"><a href="trial-signup.html">Back to trial signup</a></p>
+    </div>
+    <script>
+        (function () {
+            var client = window.supabaseClient;
+            var errEl = document.getElementById('err');
+            var msgEl = document.getElementById('msg');
+
+            function fail(text) {
+                document.getElementById('panel').querySelector('h1').textContent = 'Sign-in could not be completed';
+                msgEl.style.display = 'none';
+                errEl.style.display = 'block';
+                errEl.textContent = text;
+            }
+
+            function goDashboard() {
+                window.location.replace('dashboard.html');
+            }
+
+            if (!client || !client.auth) {
+                fail('Portal configuration error. Please try again from the trial signup page.');
+                return;
+            }
+
+            var done = false;
+            function tryRedirect() {
+                if (done) return;
+                client.auth.getSession().then(function (res) {
+                    if (res.data && res.data.session) {
+                        done = true;
+                        goDashboard();
+                    }
+                });
+            }
+
+            client.auth.onAuthStateChange(function (event, session) {
+                if (event === 'SIGNED_IN' && session) {
+                    done = true;
+                    goDashboard();
+                }
+                if (event === 'TOKEN_REFRESHED' && session) {
+                    tryRedirect();
+                }
+            });
+
+            setTimeout(function () {
+                tryRedirect();
+            }, 50);
+
+            setTimeout(function () {
+                client.auth.getSession().then(function (res) {
+                    if (res.data && res.data.session) {
+                        goDashboard();
+                        return;
+                    }
+                    if (!done) {
+                        fail('This sign-in link is invalid or has expired. Return to the trial page and request a new access link.');
+                    }
+                });
+            }, 4000);
+        })();
+    </script>
+</body>
+</html>

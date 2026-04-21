@@ -1,11 +1,15 @@
 /*
- * C.A.S.E. Clarity Paid Portal — session helpers (Supabase Auth)
+ * C.A.S.E. Clarity — session helpers (Supabase Auth)
  */
 
-async function requireAuth() {
+/**
+ * @param {{ redirectUrl?: string }} [options]
+ */
+async function requireAuth(options) {
+  const redirectUrl = (options && options.redirectUrl) || 'login.html';
   const client = window.supabaseClient;
   if (!client) {
-    window.location.href = '/login.html';
+    window.location.href = redirectUrl;
     return false;
   }
   const {
@@ -13,7 +17,7 @@ async function requireAuth() {
     error,
   } = await client.auth.getSession();
   if (error || !session) {
-    window.location.href = '/login.html';
+    window.location.href = redirectUrl;
     return false;
   }
   return true;
@@ -27,16 +31,20 @@ async function redirectIfLoggedIn() {
     error,
   } = await client.auth.getSession();
   if (error || !session) return false;
-  window.location.href = '/dashboard.html';
+  window.location.href = 'dashboard.html';
   return true;
 }
 
-async function logoutUser() {
+/**
+ * @param {{ redirectUrl?: string }} [options]
+ */
+async function logoutUser(options) {
+  const redirectUrl = (options && options.redirectUrl) || 'login.html';
   const client = window.supabaseClient;
   if (client) {
     await client.auth.signOut();
   }
-  window.location.href = '/login.html';
+  window.location.href = redirectUrl;
 }
 
 function attachLogoutHandler(buttonSelector) {

@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Case Clarity Project - Trial Signup</title>
+    <title>Case Clarity — Start Your Free Trial</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Georgia', 'Times New Roman', serif;
-            background: #f6f3ed;
+            background: #fff;
             color: #0e1c2e;
             min-height: 100vh;
             display: flex;
@@ -23,7 +24,7 @@
             border-top: 3px solid #1a2e3f;
             padding: 48px 40px;
             width: 100%;
-            max-width: 600px;
+            max-width: 560px;
             box-shadow: 0 2px 12px rgba(12,28,52,0.06);
         }
         .brand {
@@ -37,17 +38,23 @@
             font-size: 28px;
             font-weight: normal;
             color: #1a2e3f;
-            margin: 0 0 8px;
+            margin: 0 0 12px;
             letter-spacing: 0.02em;
         }
         .subtitle {
             font-size: 15px;
             color: #3a4a5a;
-            margin: 0 0 32px;
+            margin: 0 0 10px;
             line-height: 1.7;
         }
+        .support-line {
+            font-size: 13px;
+            color: #5a6a7a;
+            margin: 0 0 28px;
+            line-height: 1.6;
+        }
         .form-group {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
         .field-label {
             font-size: 11px;
@@ -57,13 +64,7 @@
             display: block;
             margin-bottom: 6px;
         }
-        .field-label .optional {
-            color: #9aabb8;
-            font-weight: normal;
-            text-transform: none;
-            letter-spacing: 0;
-        }
-        .field-input {
+        .field-input, .field-select {
             width: 100%;
             padding: 12px 14px;
             border: 1px solid #d6d0c4;
@@ -73,9 +74,16 @@
             font-family: 'Georgia', 'Times New Roman', serif;
             outline: none;
         }
-        .field-input:focus {
+        .field-input:focus, .field-select:focus {
             border-color: #b09837;
         }
+        .field-error {
+            color: #a93226;
+            font-size: 12px;
+            margin-top: 6px;
+            display: none;
+        }
+        .field-error.visible { display: block; }
         .btn-primary {
             width: 100%;
             background: #1a2e3f;
@@ -89,252 +97,442 @@
             font-family: 'Georgia', 'Times New Roman', serif;
             margin-top: 8px;
         }
-        .btn-primary:hover {
-            background: #2a3e4f;
-        }
+        .btn-primary:hover { background: #2a3e4f; }
         .btn-primary:disabled {
             background: #9aabb8;
             cursor: not-allowed;
         }
-        .error-message {
-            color: #c0392b;
+        .btn-secondary {
+            background: transparent;
+            color: #1a2e3f;
+            border: 1px solid #d6d0c4;
+            padding: 10px 20px;
             font-size: 12px;
-            margin-top: 10px;
-            padding: 10px;
+            cursor: pointer;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            margin-top: 12px;
+        }
+        .btn-secondary:hover { border-color: #b09837; color: #b09837; }
+        .error-message {
+            color: #a93226;
+            font-size: 13px;
+            margin-top: 14px;
+            padding: 12px;
             background: #fdf1f0;
             border: 1px solid #f5c6cb;
             display: none;
         }
-        .success-message {
-            color: #27ae60;
-            font-size: 14px;
-            margin-top: 20px;
-            padding: 16px;
-            background: #e8f8f0;
-            border: 1px solid #a8e6c3;
+        .success-panel {
             display: none;
+            text-align: left;
         }
+        .success-panel h2 {
+            font-size: 22px;
+            font-weight: normal;
+            color: #1a2e3f;
+            margin-bottom: 16px;
+        }
+        .success-panel p { font-size: 14px; color: #3a4a5a; line-height: 1.7; margin-bottom: 12px; }
+        .success-actions { margin-top: 20px; }
         .info {
             font-size: 11px;
             color: #9aabb8;
-            margin-top: 20px;
-            text-align: center;
+            margin-top: 24px;
             line-height: 1.6;
         }
+        .secondary-section {
+            margin-top: 40px;
+            padding-top: 28px;
+            border-top: 1px solid #e8e4dc;
+        }
+        .secondary-section h3 {
+            font-size: 13px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #6a7a8a;
+            margin-bottom: 8px;
+        }
+        .secondary-section p { font-size: 13px; color: #5a6a7a; margin-bottom: 12px; line-height: 1.6; }
+        .secondary-section a { color: #b09837; }
     </style>
 </head>
 <body>
     <div class="signup-container">
         <div class="brand">Reconcile Care Management Services</div>
-        <h1>Case Clarity Project</h1>
-        <p class="subtitle">Start your 7-day free trial. Complete all six assessment instruments and generate comprehensive reports.</p>
-        
-        <form id="signup-form" onsubmit="event.preventDefault(); window.handleSignup && window.handleSignup()">
-            <div class="form-group">
-                <label class="field-label" for="full-name">FULL NAME *</label>
-                <input type="text" id="full-name" class="field-input" required autocomplete="name">
+
+        <div id="form-panel">
+            <h1>Start Your Free 7-Day Trial</h1>
+            <p class="subtitle">Run your first case in 5–15 minutes and identify gaps affecting recovery time, treatment coordination, and case stability.</p>
+            <p class="support-line">No credit card required. Access is available to professionals using a business email address.</p>
+
+            <form id="signup-form" onsubmit="event.preventDefault(); window.handleTrialSignup && window.handleTrialSignup()">
+                <div class="form-group">
+                    <label class="field-label" for="first-name">First name *</label>
+                    <input type="text" id="first-name" class="field-input" required autocomplete="given-name" maxlength="120">
+                    <div id="err-first-name" class="field-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="field-label" for="email">Business email *</label>
+                    <input type="email" id="email" class="field-input" required autocomplete="email">
+                    <div id="err-email" class="field-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="field-label" for="role">Role *</label>
+                    <select id="role" class="field-select" required>
+                        <option value="">Select…</option>
+                        <option value="Attorney">Attorney</option>
+                        <option value="Partner">Partner</option>
+                        <option value="Paralegal">Paralegal</option>
+                        <option value="Case Manager">Case Manager</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <div id="err-role" class="field-error"></div>
+                </div>
+
+                <button type="submit" class="btn-primary" id="submit-btn">Start Free Trial</button>
+            </form>
+
+            <div id="error-message" class="error-message"></div>
+
+            <p class="info">We will send a secure access link to your business email. Your internal trial record may include identifiers used for continuity with existing systems; you sign in with the email link, not a separate portal code.</p>
+
+            <div class="secondary-section">
+                <h3>Existing trial users</h3>
+                <p>If you previously received a CCP# and PIN, you can still use that path while we transition accounts.</p>
+                <p><a href="login.html">Sign in with CCP# and PIN</a></p>
             </div>
-            
-            <div class="form-group">
-                <label class="field-label" for="title">TITLE *</label>
-                <input type="text" id="title" class="field-input" required placeholder="e.g., Attorney, Partner" autocomplete="organization-title">
+        </div>
+
+        <div id="success-panel" class="success-panel">
+            <h2>Check Your Email</h2>
+            <p>We just sent your secure trial access link to <strong id="success-email"></strong>. Use that link to enter the Case Clarity trial portal.</p>
+            <p>If you do not see it within a minute, check spam or promotions, then try again.</p>
+            <div class="success-actions">
+                <button type="button" class="btn-primary" id="resend-btn">Resend link</button>
+                <button type="button" class="btn-secondary" id="different-email-btn">Use a different email</button>
             </div>
-            
-            <div class="form-group">
-                <label class="field-label" for="email">EMAIL *</label>
-                <input type="email" id="email" class="field-input" required autocomplete="email">
-            </div>
-            
-            <div class="form-group">
-                <label class="field-label" for="law-firm">LAW FIRM NAME *</label>
-                <input type="text" id="law-firm" class="field-input" required autocomplete="organization">
-            </div>
-            
-            <div class="form-group">
-                <label class="field-label" for="phone">PHONE <span class="optional">(optional)</span></label>
-                <input type="tel" id="phone" class="field-input" autocomplete="tel">
-            </div>
-            
-            <button type="submit" class="btn-primary" id="submit-btn">START FREE TRIAL</button>
-        </form>
-        
-        <div id="error-message" class="error-message"></div>
-        <div id="success-message" class="success-message"></div>
-        
-        <p class="info">By submitting, you agree to receive your trial access credentials via email. Your 7-day trial begins when you first log in.</p>
+        </div>
     </div>
 
     <script>
-        (function() {
-            /* ═══════════════════════════════════════════════════════════════════
-             * CONFIGURATION — update after deploy (see also login.html, dashboard.html)
-             * • Supabase: Project Settings → API → URL + anon public key
-             * • GHL:      Workflows → Inbound Webhook → copy URL into GHL_WEBHOOK_URL below
-             *   Workflow should email CCP#/PIN and may mirror lead data; signup already
-             *   writes the row to Supabase — GHL is for CRM + email automation.
-             * ═══════════════════════════════════════════════════════════════════ */
-            const SUPABASE_URL = 'https://zmjxyspizdqhrtdcgkwk.supabase.co';
-            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptanh5c3BpemRxaHJ0ZGNna3drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MjQ1NDcsImV4cCI6MjA4NTE4NDU0N30.szuVr87xdq1aqYpaM6p390f48ozj4CENU4ksg8vumhM';
+        (function () {
+            var supabaseClient = window.supabaseClient;
 
-            const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            var GHL_WEBHOOK_URL = 'https://services.leadconnectorhq.com/hooks/YOUR_WEBHOOK_ID';
+            var GHL_WEBHOOK_READY = GHL_WEBHOOK_URL && !/YOUR_WEBHOOK/i.test(GHL_WEBHOOK_URL);
 
-            /** GoHighLevel inbound webhook URL — replace YOUR_WEBHOOK_ID (or full path) when ready */
-            const GHL_WEBHOOK_URL = 'https://services.leadconnectorhq.com/hooks/YOUR_WEBHOOK_ID';
-            const GHL_WEBHOOK_READY = GHL_WEBHOOK_URL && !/YOUR_WEBHOOK/i.test(GHL_WEBHOOK_URL);
-            
+            var BLOCKED = new Set([
+                'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com', 'aol.com',
+                'me.com', 'live.com', 'msn.com', 'proton.me', 'protonmail.com'
+            ]);
+
+            var lastSubmittedEmail = '';
+
             function generateCCP() {
-                const num = Math.floor(Math.random() * 900000) + 100000; // 100000-999999
+                var num = Math.floor(Math.random() * 900000) + 100000;
                 return 'CCP-' + num.toString().padStart(6, '0');
             }
-            
+
             function generatePIN() {
-                return Math.floor(Math.random() * 900000) + 100000; // 6-digit number
+                return String(Math.floor(Math.random() * 900000) + 100000);
             }
-            
-            window.handleSignup = async function() {
-                const fullName = document.getElementById('full-name').value.trim();
-                const title = document.getElementById('title').value.trim();
-                const email = document.getElementById('email').value.trim().toLowerCase();
-                const lawFirm = document.getElementById('law-firm').value.trim();
-                const phone = document.getElementById('phone').value.trim();
-                const errorEl = document.getElementById('error-message');
-                const successEl = document.getElementById('success-message');
-                const submitBtn = document.getElementById('submit-btn');
-                
-                // Clear messages
-                errorEl.style.display = 'none';
-                successEl.style.display = 'none';
-                
-                // Validate
-                if (!fullName || !title || !email || !lawFirm) {
-                    showError('Please fill in all required fields');
-                    return;
-                }
-                
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                    showError('Please enter a valid email address');
-                    return;
-                }
-                
-                // Disable button
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'PROCESSING...';
-                
-                try {
-                    const pin = generatePIN().toString();
-                    const trialStartAt = new Date().toISOString();
 
-                    // Check if email already exists
-                    const { data: existing } = await supabaseClient
-                        .from('trial_users')
-                        .select('id')
-                        .eq('email', email)
-                        .single();
-
-                    if (existing) {
-                        showError('An account with this email already exists. Please use the login page.');
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = 'START FREE TRIAL';
-                        return;
+            function clearFieldErrors() {
+                ['err-first-name', 'err-email', 'err-role'].forEach(function (id) {
+                    var el = document.getElementById(id);
+                    if (el) {
+                        el.textContent = '';
+                        el.classList.remove('visible');
                     }
+                });
+            }
 
-                    var user = null;
-                    var ccp = null;
-                    for (var attempt = 0; attempt < 8; attempt++) {
-                        ccp = generateCCP();
-                        var ins = await supabaseClient
-                            .from('trial_users')
-                            .insert({
-                                full_name: fullName,
-                                title: title,
-                                email: email,
-                                law_firm: lawFirm,
-                                phone: phone || null,
-                                ccp: ccp,
-                                pin: pin,
-                                trial_start_at: trialStartAt,
-                                status: 'trial_active',
-                                completed_tools: {}
-                            })
-                            .select()
-                            .single();
-                        if (!ins.error) {
-                            user = ins.data;
-                            break;
-                        }
-                        var dupMsg = ((ins.error.message || '') + ' ' + (ins.error.details || '')).toLowerCase();
-                        if (ins.error.code === '23505' && (dupMsg.indexOf('ccp') !== -1 || dupMsg.indexOf('trial_users_ccp') !== -1)) {
-                            continue;
-                        }
-                        if (ins.error.code === '23505') {
-                            showError('An account with this email already exists. Please use the login page.');
-                            submitBtn.disabled = false;
-                            submitBtn.textContent = 'START FREE TRIAL';
-                            return;
-                        }
-                        console.error('Supabase error:', ins.error);
-                        showError('Registration failed. Please try again.');
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = 'START FREE TRIAL';
-                        return;
-                    }
-                    if (!user) {
-                        showError('Registration failed (could not assign a unique CCP#). Please try again.');
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = 'START FREE TRIAL';
-                        return;
-                    }
+            function showFieldError(fieldId, message) {
+                var el = document.getElementById(fieldId);
+                if (!el) return;
+                el.textContent = message;
+                el.classList.add('visible');
+            }
 
-                    /* GHL: optional POST after Supabase insert — configure GHL_WEBHOOK_URL above */
-                    if (GHL_WEBHOOK_READY) {
-                        try {
-                            await fetch(GHL_WEBHOOK_URL, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    full_name: fullName,
-                                    title: title,
-                                    email: email,
-                                    law_firm: lawFirm,
-                                    phone: phone,
-                                    ccp: ccp,
-                                    pin: pin,
-                                    trial_start_at: trialStartAt
-                                })
-                            });
-                        } catch (ghlError) {
-                            console.warn('GHL webhook failed (non-critical):', ghlError);
-                        }
-                    } else {
-                        console.info('GHL webhook skipped: set GHL_WEBHOOK_URL when your inbound webhook is ready.');
-                    }
-
-                    /* Optional: Supabase Edge Function for email — uncomment and deploy function
-                     * await supabaseClient.functions.invoke('send-trial-email', {
-                     *   body: { email: email, ccp: ccp, pin: pin }
-                     * });
-                     */
-
-                    document.getElementById('signup-form').style.display = 'none';
-                    successEl.innerHTML =
-                        '<strong>Success!</strong><br><br>Check your email for login credentials.<br><br>' +
-                        '<a href="login.html" style="color:#1a2e3f;text-decoration:underline;">Go to Login</a>';
-                    successEl.style.display = 'block';
-                    
-                } catch (err) {
-                    console.error('Signup error:', err);
-                    showError('An error occurred. Please try again.');
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'START FREE TRIAL';
-                }
-            };
-            
-            function showError(message) {
-                const errorEl = document.getElementById('error-message');
+            function showFormError(message) {
+                var errorEl = document.getElementById('error-message');
                 errorEl.textContent = message;
                 errorEl.style.display = 'block';
             }
+
+            function showFormErrorHtml(html) {
+                var errorEl = document.getElementById('error-message');
+                errorEl.innerHTML = html;
+                errorEl.style.display = 'block';
+            }
+
+            function hideFormError() {
+                var errorEl = document.getElementById('error-message');
+                errorEl.style.display = 'none';
+                errorEl.textContent = '';
+                errorEl.innerHTML = '';
+            }
+
+            function isPersonalDomain(email) {
+                var m = String(email).trim().toLowerCase().match(/@([^@]+)$/);
+                if (!m) return true;
+                return BLOCKED.has(m[1]);
+            }
+
+            function trialDaysElapsed(trialStartIso) {
+                var trialStart = new Date(trialStartIso);
+                var now = new Date();
+                return Math.floor((now - trialStart) / (1000 * 60 * 60 * 24));
+            }
+
+            async function sendMagicLink(email) {
+                var redirectTo = window.caseClarityGetAuthCallbackUrl
+                    ? window.caseClarityGetAuthCallbackUrl()
+                    : new URL('auth-callback.html', window.location.href).href;
+                return supabaseClient.auth.signInWithOtp({
+                    email: email,
+                    options: {
+                        emailRedirectTo: redirectTo,
+                        shouldCreateUser: true,
+                    },
+                });
+            }
+
+            async function postGHL(payload) {
+                if (!GHL_WEBHOOK_READY) {
+                    console.info('GHL webhook skipped: configure GHL_WEBHOOK_URL in trial-signup.html when ready.');
+                    return;
+                }
+                try {
+                    await fetch(GHL_WEBHOOK_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload),
+                    });
+                } catch (e) {
+                    console.warn('GHL webhook failed (non-critical):', e);
+                }
+            }
+
+            function showSuccess(email) {
+                document.getElementById('form-panel').style.display = 'none';
+                document.getElementById('success-panel').style.display = 'block';
+                document.getElementById('success-email').textContent = email;
+                lastSubmittedEmail = email;
+            }
+
+            function resetToForm() {
+                document.getElementById('success-panel').style.display = 'none';
+                document.getElementById('form-panel').style.display = 'block';
+                hideFormError();
+            }
+
+            window.handleTrialSignup = async function () {
+                if (!supabaseClient) {
+                    showFormError('Configuration error. Please refresh and try again.');
+                    return;
+                }
+
+                var firstName = document.getElementById('first-name').value.trim();
+                var email = document.getElementById('email').value.trim().toLowerCase();
+                var role = document.getElementById('role').value.trim();
+                var submitBtn = document.getElementById('submit-btn');
+
+                clearFieldErrors();
+                hideFormError();
+
+                if (!firstName) {
+                    showFieldError('err-first-name', 'First name is required.');
+                    return;
+                }
+                if (!email) {
+                    showFieldError('err-email', 'Business email is required.');
+                    return;
+                }
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                    showFieldError('err-email', 'Enter a valid email address.');
+                    return;
+                }
+                if (isPersonalDomain(email)) {
+                    showFieldError('err-email', 'Please use your business email address to request trial access.');
+                    return;
+                }
+                if (!role) {
+                    showFieldError('err-role', 'Please select your role.');
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Sending Access Link…';
+
+                try {
+                        var existing = await supabaseClient
+                            .from('trial_users')
+                            .select('*')
+                            .eq('email', email)
+                            .maybeSingle();
+
+                        if (existing.data) {
+                            var row = existing.data;
+                            var days = trialDaysElapsed(row.trial_start_at);
+                            var expired =
+                                row.status === 'trial_expired' ||
+                                (row.status === 'trial_active' && days >= 7);
+
+                            if (expired) {
+                                if (row.status === 'trial_active' && days >= 7) {
+                                    await supabaseClient
+                                        .from('trial_users')
+                                        .update({ status: 'trial_expired' })
+                                        .eq('id', row.id);
+                                }
+                                showFormErrorHtml(
+                                    'This trial has ended. <a href="pricing.html" style="color:#1a2e3f;font-weight:600;">View plans</a> to continue using Case Clarity.'
+                                );
+                                submitBtn.disabled = false;
+                                submitBtn.textContent = 'Start Free Trial';
+                                return;
+                            }
+
+                            var otpRes = await sendMagicLink(email);
+                            if (otpRes.error) {
+                                console.error(otpRes.error);
+                                showFormError(otpRes.error.message || 'Could not send access link. Try again shortly.');
+                                submitBtn.disabled = false;
+                                submitBtn.textContent = 'Start Free Trial';
+                                return;
+                            }
+
+                            await supabaseClient
+                                .from('trial_users')
+                                .update({ full_name: firstName, title: role })
+                                .eq('id', row.id);
+
+                            showSuccess(email);
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Start Free Trial';
+                            return;
+                        }
+
+                        var pin = generatePIN();
+                        var trialStartAt = new Date().toISOString();
+                        var user = null;
+                        var ccp = null;
+
+                        for (var attempt = 0; attempt < 8; attempt++) {
+                            ccp = generateCCP();
+                            var ins = await supabaseClient
+                                .from('trial_users')
+                                .insert({
+                                    full_name: firstName,
+                                    title: role,
+                                    email: email,
+                                    law_firm: '—',
+                                    phone: null,
+                                    ccp: ccp,
+                                    pin: pin,
+                                    trial_start_at: trialStartAt,
+                                    status: 'trial_active',
+                                    completed_tools: {},
+                                })
+                                .select()
+                                .single();
+
+                            if (!ins.error) {
+                                user = ins.data;
+                                break;
+                            }
+                            var dupMsg = ((ins.error.message || '') + ' ' + (ins.error.details || '')).toLowerCase();
+                            if (ins.error.code === '23505' && dupMsg.indexOf('ccp') !== -1) {
+                                continue;
+                            }
+                            if (ins.error.code === '23505') {
+                                showFormError('Could not complete signup. If you already have a trial, use Resend link after submitting your email again.');
+                                submitBtn.disabled = false;
+                                submitBtn.textContent = 'Start Free Trial';
+                                return;
+                            }
+                            console.error('Supabase error:', ins.error);
+                            showFormError('Registration failed. Please try again.');
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Start Free Trial';
+                            return;
+                        }
+
+                        if (!user) {
+                            showFormError('Registration failed (could not assign a unique record). Please try again.');
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Start Free Trial';
+                            return;
+                        }
+
+                        await postGHL({
+                            event: 'trial_signup',
+                            access_delivery: 'magic_link',
+                            full_name: firstName,
+                            title: role,
+                            email: email,
+                            law_firm: '—',
+                            phone: null,
+                            ccp: ccp,
+                            pin: pin,
+                            trial_start_at: trialStartAt,
+                            note:
+                                'Portal access is via secure email link (Supabase Auth). CCP/PIN retained for internal continuity only.',
+                        });
+
+                    var otpResult = await sendMagicLink(email);
+                    if (otpResult.error) {
+                        console.error(otpResult.error);
+                        showFormError(otpResult.error.message || 'Could not send access link. Try again shortly.');
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Start Free Trial';
+                        return;
+                    }
+
+                    showSuccess(email);
+                } catch (err) {
+                    console.error('Signup error:', err);
+                    showFormError('An error occurred. Please try again.');
+                }
+
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Start Free Trial';
+            };
+
+            document.getElementById('resend-btn').addEventListener('click', function () {
+                var btn = document.getElementById('resend-btn');
+                btn.disabled = true;
+                btn.textContent = 'Sending…';
+                var em = lastSubmittedEmail;
+                sendMagicLink(em)
+                    .then(function (res) {
+                        if (res.error) {
+                            alert(res.error.message || 'Could not resend. Try again.');
+                        } else {
+                            alert('Another access link has been sent to ' + em + '.');
+                        }
+                    })
+                    .finally(function () {
+                        btn.disabled = false;
+                        btn.textContent = 'Resend link';
+                    });
+            });
+
+            document.getElementById('different-email-btn').addEventListener('click', function () {
+                resetToForm();
+                document.getElementById('email').value = '';
+                document.getElementById('email').focus();
+            });
         })();
+    </script>
+    <script src="js/auth-guard.js"></script>
+    <script>
+        if (typeof redirectIfLoggedIn === 'function') {
+            redirectIfLoggedIn();
+        }
     </script>
 </body>
 </html>

@@ -685,12 +685,6 @@
     </style>
 </head>
 <body>
-    <script>
-    // Protect dashboard - redirect to login if not logged in
-    if (!localStorage.getItem('user_logged_in')) {
-        window.location.href = 'login.html';
-    }
-    </script>
     <header class="app-header">
         <div class="app-header-left">
             <span class="app-header-brand">Reconcile Care Management Services</span>
@@ -703,7 +697,7 @@
         </div>
         <div class="app-header-actions">
             <span class="app-header-right" id="assessment-id-display"></span>
-            <button type="button" class="btn-logout" onclick="localStorage.removeItem('user_logged_in'); window.location.href='login.html';">Logout</button>
+            <button type="button" class="btn-logout" id="btn-dashboard-logout">Logout</button>
         </div>
     </header>
 
@@ -713,22 +707,11 @@
 
     <script src="trial-pinned-banner.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/auth-guard.js"></script>
     <script>
         (function () {
-        // Protect dashboard — redirect to login if not authenticated
-        const ccp = localStorage.getItem('ccp');
-        const email = localStorage.getItem('email');
-        const userId = localStorage.getItem('user_id');
-
-        if (!ccp || !email || !userId) {
-            window.location.href = 'login.html';
-            return;
-        }
-
-        /* CONFIG: Supabase — same keys as trial-signup.html / login.html; table: trial_users */
-        const SUPABASE_URL = 'https://zmjxyspizdqhrtdcgkwk.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptanh5c3BpemRxaHJ0ZGNna3drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MjQ1NDcsImV4cCI6MjA4NTE4NDU0N30.szuVr87xdq1aqYpaM6p390f48ozj4CENU4ksg8vumhM';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = window.supabaseClient;
 
         // ===== REPORT STORAGE (No Database Required) =====
         try {
@@ -1492,7 +1475,12 @@
             window._beforeYouBeginCountdownInterval = setInterval(updateRealCountdown, 3600000);
         }
 
-        try { var _aidEl = document.getElementById('assessment-id-display'); if (_aidEl) _aidEl.textContent = (typeof assessmentId !== 'undefined' ? assessmentId : (localStorage.getItem('ccp') || '')); } catch(e) {}
+        try {
+            var _aidEl = document.getElementById('assessment-id-display');
+            if (_aidEl) {
+                _aidEl.textContent = localStorage.getItem('ccp') || '';
+            }
+        } catch (e) {}
 
         window.toggleSection = function (sectionId) {
             var content = document.getElementById(sectionId);
@@ -1526,7 +1514,7 @@
             try {
                 const userId = localStorage.getItem('user_id');
                 if (!userId) {
-                    window.location.href = 'login.html';
+                    window.location.href = 'trial-signup.html?next=' + encodeURIComponent('dashboard.html');
                     return;
                 }
 
@@ -1537,7 +1525,7 @@
                     .single();
 
                 if (error || !user) {
-                    window.location.href = 'login.html';
+                    window.location.href = 'trial-signup.html?next=' + encodeURIComponent('dashboard.html');
                     return;
                 }
 
@@ -1563,7 +1551,7 @@
                     return;
                 }
 
-                // Update UI
+                renderDashboard();
                 updateTrialReportUI();
                 updateReportUI();
 
@@ -1572,7 +1560,104 @@
             }
         }
 
-        checkTrialStatus();
+        async function bootstrapDashboardAccess() {
+            try {
+                const {
+                    data: { session: authSession },
+                } = await supabaseClient.auth.getSession();
+
+                if (authSession && authSession.user && authSession.user.email) {
+                    const email = authSession.user.email.trim().toLowerCase();
+                    const { data: trialUser, error } = await supabaseClient
+                        .from('trial_users')
+                        .select('*')
+                        .eq('email', email)
+                        .maybeSingle();
+                    if (error) {
+                        console.error(error);
+                    }
+                    if (!trialUser) {
+                        document.getElementById('dashboard-content').innerHTML =
+                            '<div class="timer-card" style="display:block;"><p style="font-size:15px;line-height:1.6;color:#3a4a5a;">No trial enrollment matches this sign-in. Start at the <a href="trial-signup.html" style="color:#b8922a;">trial signup page</a>, or sign out and use legacy CCP access from <a href="login.html" style="color:#b8922a;">login</a>.</p></div>';
+                        return false;
+                    }
+                    syncTrialLocalStorage(trialUser);
+                    document.getElementById('assessment-id-display').textContent = trialUser.ccp || '';
+                    await bumpPortalVisit(trialUser);
+                    return true;
+                }
+
+                if (
+                    localStorage.getItem('user_logged_in') === 'true' &&
+                    localStorage.getItem('user_id')
+                ) {
+                    const userId = localStorage.getItem('user_id');
+                    const { data: trialUser, error } = await supabaseClient
+                        .from('trial_users')
+                        .select('*')
+                        .eq('id', userId)
+                        .maybeSingle();
+                    if (error || !trialUser) {
+                        window.location.replace('trial-signup.html?next=' + encodeURIComponent('dashboard.html'));
+                        return false;
+                    }
+                    syncTrialLocalStorage(trialUser);
+                    document.getElementById('assessment-id-display').textContent = trialUser.ccp || '';
+                    await bumpPortalVisit(trialUser);
+                    return true;
+                }
+
+                window.location.replace('trial-signup.html?next=' + encodeURIComponent('dashboard.html'));
+                return false;
+            } catch (e) {
+                console.error(e);
+                window.location.replace('trial-signup.html?next=' + encodeURIComponent('dashboard.html'));
+                return false;
+            }
+        }
+
+        function syncTrialLocalStorage(trialUser) {
+            if (!trialUser) return;
+            localStorage.setItem('ccp', trialUser.ccp || '');
+            localStorage.setItem('email', trialUser.email || '');
+            localStorage.setItem('trial_start_at', trialUser.trial_start_at || '');
+            localStorage.setItem('status', trialUser.status || '');
+            localStorage.setItem('user_id', trialUser.id || '');
+            localStorage.setItem('user_logged_in', 'true');
+        }
+
+        async function bumpPortalVisit(trialUser) {
+            const { error } = await supabaseClient
+                .from('trial_users')
+                .update({
+                    portal_access_count: (trialUser.portal_access_count ?? 0) + 1,
+                    last_portal_login: new Date().toISOString(),
+                })
+                .eq('id', trialUser.id);
+            if (error) {
+                console.warn('Portal visit counters not updated (apply supabase migration if needed):', error.message);
+            }
+        }
+
+        document.getElementById('btn-dashboard-logout').addEventListener('click', async function () {
+            try {
+                await supabaseClient.auth.signOut();
+            } catch (e) {
+                /* ignore */
+            }
+            try {
+                localStorage.clear();
+            } catch (e2) {
+                /* ignore */
+            }
+            window.location.href = 'trial-signup.html';
+        });
+
+        (async function initDashboard() {
+            const ok = await bootstrapDashboardAccess();
+            if (!ok) return;
+            await checkTrialStatus();
+        })();
 
         function escapeAttr(s) {
             if (!s) return '';
@@ -1581,6 +1666,12 @@
 
         function renderDashboard() {
             const container = document.getElementById('dashboard-content');
+
+            /* Assessment status from local tool completion only (not persisted session shape) */
+            const session = {
+                active_case: { assessments: {} },
+                retrospective_case: { assessments: {} },
+            };
 
             if (!localStorage.getItem('trial_start_at')) {
                 localStorage.setItem('trial_start_at', new Date().toISOString());
@@ -1903,17 +1994,26 @@
                     <p style="margin:0 0 12px;font-family:Georgia,'Times New Roman',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#b09837;">Trial Concluded</p>
                     <h2 style="margin:0 0 16px;font-family:Georgia,'Times New Roman',serif;font-size:26px;font-weight:normal;color:#0c1c34;">Your 7-day trial has ended</h2>
                     <p style="margin:0 0 28px;font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#4a5568;line-height:1.7;">Continue using the C.A.S.E. Clarity System on every case you handle. Review available subscription options to keep your access open.</p>
-                    <a href="https://clarity-post-trial-pricing-qnsof4i2l-tracis-projects-26fd65a2.vercel.app" target="_blank" rel="noopener" style="display:inline-block;padding:13px 32px;background:#0c1c34;color:#ffffff;font-family:Georgia,'Times New Roman',serif;font-size:14px;letter-spacing:1px;text-decoration:none;font-weight:600;border-radius:4px;border:1.5px solid #b09837;">View Subscription Plans</a>
+                    <a href="pricing.html" style="display:inline-block;padding:13px 32px;background:#0c1c34;color:#ffffff;font-family:Georgia,'Times New Roman',serif;font-size:14px;letter-spacing:1px;text-decoration:none;font-weight:600;border-radius:4px;border:1.5px solid #b09837;">View Subscription Plans</a>
                     <div style="margin-top:24px;padding-top:20px;border-top:1px solid #e8e3d8;">
-                      <button onclick="handleLogout()" style="background:transparent;border:1px solid #c4ced8;color:#4a5568;padding:9px 22px;font-family:Georgia,'Times New Roman',serif;font-size:13px;cursor:pointer;border-radius:3px;">Return to Login</button>
+                      <button onclick="handleLogout()" style="background:transparent;border:1px solid #c4ced8;color:#4a5568;padding:9px 22px;font-family:Georgia,'Times New Roman',serif;font-size:13px;cursor:pointer;border-radius:3px;">Return to trial access</button>
                     </div>
                 </div>
             `;
         }
 
-        window.handleLogout = function() {
-            localStorage.clear();
-            window.location.href = 'login.html';
+        window.handleLogout = async function () {
+            try {
+                await supabaseClient.auth.signOut();
+            } catch (e) {
+                /* ignore */
+            }
+            try {
+                localStorage.clear();
+            } catch (e2) {
+                /* ignore */
+            }
+            window.location.href = 'trial-signup.html';
         };
 
         // Initial render — was missing, caused blank dashboard
