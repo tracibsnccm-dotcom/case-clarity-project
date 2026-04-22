@@ -230,15 +230,6 @@
 
             var lastSubmittedEmail = '';
 
-            function generateCCP() {
-                var num = Math.floor(Math.random() * 900000) + 100000;
-                return 'CCP-' + num.toString().padStart(6, '0');
-            }
-
-            function generatePIN() {
-                return String(Math.floor(Math.random() * 900000) + 100000);
-            }
-
             function clearFieldErrors() {
                 ['err-first-name', 'err-email', 'err-role'].forEach(function (id) {
                     var el = document.getElementById(id);
@@ -281,10 +272,29 @@
                 return BLOCKED.has(m[1]);
             }
 
-            function trialDaysElapsed(trialStartIso) {
-                var trialStart = new Date(trialStartIso);
-                var now = new Date();
-                return Math.floor((now - trialStart) / (1000 * 60 * 60 * 24));
+            async function runTrialSignupRequest(firstName, email, role) {
+                var base = window.CASE_CLARITY_SUPABASE_URL;
+                var key = window.CASE_CLARITY_SUPABASE_ANON_KEY;
+                if (!base || !key) {
+                    return { ok: false, clientConfigError: true };
+                }
+                var root = String(base).replace(/\/$/, '');
+                var res = await fetch(root + '/functions/v1/trial-signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: 'Bearer ' + key,
+                        apikey: key,
+                    },
+                    body: JSON.stringify({ first_name: firstName, email: email, title: role }),
+                });
+                var payload = {};
+                try {
+                    payload = await res.json();
+                } catch (e) {
+                    return { ok: false, parseError: true, status: res.status };
+                }
+                return { ok: res.ok, status: res.status, payload: payload };
             }
 
             async function sendMagicLink(email) {
@@ -368,131 +378,64 @@
                 submitBtn.textContent = 'Sending Access Link…';
 
                 try {
-                        var existing = await supabaseClient
-                            .from('trial_users')
-                            .select('*')
-                            .eq('email', email)
-                            .maybeSingle();
-
-                        if (existing.data) {
-                            var row = existing.data;
-                            var days = trialDaysElapsed(row.trial_start_at);
-                            var expired =
-                                row.status === 'trial_expired' ||
-                                (row.status === 'trial_active' && days >= 7);
-
-                            if (expired) {
-                                if (row.status === 'trial_active' && days >= 7) {
-                                    await supabaseClient
-                                        .from('trial_users')
-                                        .update({ status: 'trial_expired' })
-                                        .eq('id', row.id);
-                                }
+                        var signupRes = await runTrialSignupRequest(firstName, email, role);
+                        if (signupRes.clientConfigError) {
+                            showFormError('Configuration error. Please refresh and try again.');
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Start Free Trial';
+                            return;
+                        }
+                        if (!signupRes.ok) {
+                            var p = signupRes.payload || {};
+                            if (signupRes.status === 403 && p.error === 'trial_expired') {
                                 showFormErrorHtml(
                                     'This trial has ended. <a href="pricing.html" style="color:#1a2e3f;font-weight:600;">View plans</a> to continue using Case Clarity.'
                                 );
-                                submitBtn.disabled = false;
-                                submitBtn.textContent = 'Start Free Trial';
-                                return;
+                            } else if (signupRes.status === 404) {
+                                showFormError(
+                                    'Trial signup service is not available yet. Deploy the trial-signup Edge Function and retry.',
+                                );
+                            } else {
+                                showFormError(
+                                    typeof p.error === 'string'
+                                        ? p.error
+                                        : 'Registration failed. Please try again.',
+                                );
                             }
-
-                            var otpRes = await sendMagicLink(email);
-                            if (otpRes.error) {
-                                console.error(otpRes.error);
-                                showFormError(otpRes.error.message || 'Could not send access link. Try again shortly.');
-                                submitBtn.disabled = false;
-                                submitBtn.textContent = 'Start Free Trial';
-                                return;
-                            }
-
-                            await supabaseClient
-                                .from('trial_users')
-                                .update({ full_name: firstName, title: role })
-                                .eq('id', row.id);
-
-                            showSuccess(email);
                             submitBtn.disabled = false;
                             submitBtn.textContent = 'Start Free Trial';
                             return;
                         }
 
-                        var pin = generatePIN();
-                        var trialStartAt = new Date().toISOString();
-                        var user = null;
-                        var ccp = null;
+                        var payload = signupRes.payload || {};
+                        if (payload.action === 'created' && payload.user) {
+                            var u = payload.user;
+                            await postGHL({
+                                event: 'trial_signup',
+                                access_delivery: 'magic_link',
+                                full_name: firstName,
+                                title: role,
+                                email: email,
+                                law_firm: u.law_firm || '—',
+                                phone: u.phone || null,
+                                ccp: u.ccp,
+                                pin: u.pin,
+                                trial_start_at: u.trial_start_at,
+                                note:
+                                    'Portal access is via secure email link (Supabase Auth). CCP/PIN retained for internal continuity only.',
+                            });
+                        }
 
-                        for (var attempt = 0; attempt < 8; attempt++) {
-                            ccp = generateCCP();
-                            var ins = await supabaseClient
-                                .from('trial_users')
-                                .insert({
-                                    full_name: firstName,
-                                    title: role,
-                                    email: email,
-                                    law_firm: '—',
-                                    phone: null,
-                                    ccp: ccp,
-                                    pin: pin,
-                                    trial_start_at: trialStartAt,
-                                    status: 'trial_active',
-                                    completed_tools: {},
-                                })
-                                .select()
-                                .single();
-
-                            if (!ins.error) {
-                                user = ins.data;
-                                break;
-                            }
-                            var dupMsg = ((ins.error.message || '') + ' ' + (ins.error.details || '')).toLowerCase();
-                            if (ins.error.code === '23505' && dupMsg.indexOf('ccp') !== -1) {
-                                continue;
-                            }
-                            if (ins.error.code === '23505') {
-                                showFormError('Could not complete signup. If you already have a trial, use Resend link after submitting your email again.');
-                                submitBtn.disabled = false;
-                                submitBtn.textContent = 'Start Free Trial';
-                                return;
-                            }
-                            console.error('Supabase error:', ins.error);
-                            showFormError('Registration failed. Please try again.');
+                        var otpResult = await sendMagicLink(email);
+                        if (otpResult.error) {
+                            console.error(otpResult.error);
+                            showFormError(otpResult.error.message || 'Could not send access link. Try again shortly.');
                             submitBtn.disabled = false;
                             submitBtn.textContent = 'Start Free Trial';
                             return;
                         }
 
-                        if (!user) {
-                            showFormError('Registration failed (could not assign a unique record). Please try again.');
-                            submitBtn.disabled = false;
-                            submitBtn.textContent = 'Start Free Trial';
-                            return;
-                        }
-
-                        await postGHL({
-                            event: 'trial_signup',
-                            access_delivery: 'magic_link',
-                            full_name: firstName,
-                            title: role,
-                            email: email,
-                            law_firm: '—',
-                            phone: null,
-                            ccp: ccp,
-                            pin: pin,
-                            trial_start_at: trialStartAt,
-                            note:
-                                'Portal access is via secure email link (Supabase Auth). CCP/PIN retained for internal continuity only.',
-                        });
-
-                    var otpResult = await sendMagicLink(email);
-                    if (otpResult.error) {
-                        console.error(otpResult.error);
-                        showFormError(otpResult.error.message || 'Could not send access link. Try again shortly.');
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = 'Start Free Trial';
-                        return;
-                    }
-
-                    showSuccess(email);
+                        showSuccess(email);
                 } catch (err) {
                     console.error('Signup error:', err);
                     showFormError('An error occurred. Please try again.');

@@ -1,40 +1,15 @@
--- ═══════════════════════════════════════════════════════════════════════════
--- Case Clarity — trial_users (run in Supabase SQL Editor)
--- Prefer applying versioned migrations under supabase/migrations/ in order.
--- Latest security: 20260421120000_trial_portal_tracking.sql, 20260422130000_trial_users_rls.sql
--- ═══════════════════════════════════════════════════════════════════════════
+-- Tighten trial_users RLS: auth-scoped direct access; anon table access removed.
+-- Legacy CCP + dashboard path uses SECURITY DEFINER RPCs (id + ccp from browser after PIN login).
+-- New / returning magic-link signup uses Edge Function trial-signup (service role).
 
-CREATE TABLE IF NOT EXISTS trial_users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    full_name TEXT NOT NULL,
-    title TEXT NOT NULL,
-    email TEXT NOT NULL,
-    law_firm TEXT NOT NULL,
-    phone TEXT,
-    ccp TEXT NOT NULL,
-    pin TEXT NOT NULL,
-    trial_start_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    status TEXT NOT NULL DEFAULT 'trial_active',
-    completed_tools JSONB NOT NULL DEFAULT '{}'::jsonb,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    auth_user_id UUID REFERENCES auth.users (id) ON DELETE SET NULL,
-    portal_access_count INTEGER NOT NULL DEFAULT 0,
-    last_portal_login TIMESTAMPTZ,
-    CONSTRAINT trial_users_email_unique UNIQUE (email),
-    CONSTRAINT trial_users_ccp_unique UNIQUE (ccp)
-);
-
-CREATE INDEX IF NOT EXISTS idx_trial_users_ccp ON trial_users(ccp);
-CREATE INDEX IF NOT EXISTS idx_trial_users_email ON trial_users(email);
-CREATE INDEX IF NOT EXISTS idx_trial_users_status ON trial_users(status);
+ALTER TABLE trial_users
+  ADD COLUMN IF NOT EXISTS auth_user_id UUID REFERENCES auth.users (id) ON DELETE SET NULL;
 
 CREATE UNIQUE INDEX IF NOT EXISTS trial_users_auth_user_id_uidx
   ON trial_users (auth_user_id)
   WHERE auth_user_id IS NOT NULL;
 
-ALTER TABLE trial_users ENABLE ROW LEVEL SECURITY;
-
--- Align with supabase/migrations/20260422130000_trial_users_rls.sql (safe to re-run)
+-- Normalized email from the caller JWT (magic link / session).
 CREATE OR REPLACE FUNCTION public.trial_current_jwt_email ()
   RETURNS text
   LANGUAGE sql
@@ -45,6 +20,7 @@ CREATE OR REPLACE FUNCTION public.trial_current_jwt_email ()
 
 $$;
 
+-- CCP + PIN login (replaces anon SELECT ... WHERE ccp AND pin).
 CREATE OR REPLACE FUNCTION public.trial_ccp_login (p_ccp text, p_pin text)
   RETURNS SETOF trial_users
   LANGUAGE sql
@@ -67,6 +43,7 @@ GRANT EXECUTE ON FUNCTION public.trial_ccp_login (text, text) TO anon;
 
 GRANT EXECUTE ON FUNCTION public.trial_ccp_login (text, text) TO authenticated;
 
+-- Legacy dashboard: row fetch when browser holds id + ccp (after CCP/PIN login).
 CREATE OR REPLACE FUNCTION public.trial_legacy_get (p_id uuid, p_ccp text)
   RETURNS SETOF trial_users
   LANGUAGE sql
@@ -89,6 +66,7 @@ GRANT EXECUTE ON FUNCTION public.trial_legacy_get (uuid, text) TO anon;
 
 GRANT EXECUTE ON FUNCTION public.trial_legacy_get (uuid, text) TO authenticated;
 
+-- Legacy dashboard: bounded updates (completed_tools, status, portal counters).
 CREATE OR REPLACE FUNCTION public.trial_legacy_update (
   p_id uuid,
   p_ccp text,
@@ -156,6 +134,7 @@ GRANT EXECUTE ON FUNCTION public.trial_legacy_update (uuid, text, jsonb, text, b
 
 GRANT EXECUTE ON FUNCTION public.trial_legacy_update (uuid, text, jsonb, text, boolean) TO authenticated;
 
+-- Replace open policies
 DROP POLICY IF EXISTS "trial_users_select_login" ON trial_users;
 
 DROP POLICY IF EXISTS "trial_users_insert_signup" ON trial_users;
@@ -166,6 +145,7 @@ DROP POLICY IF EXISTS trial_users_select_own ON trial_users;
 
 DROP POLICY IF EXISTS trial_users_update_own ON trial_users;
 
+-- Authenticated magic-link users: own row by linked uid or matching signup email until linked.
 CREATE POLICY trial_users_select_own ON trial_users FOR SELECT TO authenticated
   USING ((auth_user_id = auth.uid())
     OR (auth_user_id IS NULL
@@ -182,9 +162,12 @@ CREATE POLICY trial_users_update_own ON trial_users FOR UPDATE TO authenticated
     AND length(trial_current_jwt_email()) > 0
     AND lower(trim(email)) = trial_current_jwt_email());
 
-COMMENT ON TABLE trial_users IS 'Trial signups: magic-link auth + optional CCP/PIN legacy path; tool completion JSONB; status lifecycle';
-COMMENT ON COLUMN trial_users.completed_tools IS 'e.g. {"CCI":{"completed":true,"completed_at":"..."}, ...}';
-COMMENT ON COLUMN trial_users.auth_user_id IS 'Supabase Auth user id; linked on first magic-link dashboard visit.';
+-- No INSERT/DELETE for anon/authenticated on table (signup via Edge Function + service role).
+
+COMMENT ON COLUMN trial_users.auth_user_id IS 'Supabase Auth user id; set on first dashboard session to tighten row ownership.';
+
 COMMENT ON FUNCTION public.trial_ccp_login (text, text) IS 'CCP/PIN portal login; replaces broad anon SELECT.';
+
 COMMENT ON FUNCTION public.trial_legacy_get (uuid, text) IS 'Legacy dashboard read when session is not Supabase Auth; requires id+ccp pair.';
+
 COMMENT ON FUNCTION public.trial_legacy_update (uuid, text, jsonb, text, boolean) IS 'Legacy dashboard writes; requires id+ccp pair; whitelisted columns only.';

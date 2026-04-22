@@ -190,15 +190,14 @@
                 }
 
                 try {
-                    var res = await supabaseClient
-                        .from('trial_users')
-                        .select('*')
-                        .eq('ccp', ccp)
-                        .eq('pin', pin)
-                        .maybeSingle();
+                    var res = await supabaseClient.rpc('trial_ccp_login', {
+                        p_ccp: ccp,
+                        p_pin: pin,
+                    });
 
-                    var user = res.data;
                     var err = res.error;
+                    var rows = res.data;
+                    var user = rows && rows[0] ? rows[0] : null;
 
                     if (err || !user) {
                         showError('Invalid CCP# or PIN');

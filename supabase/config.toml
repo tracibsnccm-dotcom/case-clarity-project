@@ -1,0 +1,8 @@
+# Supabase local / deploy configuration (minimal).
+# https://supabase.com/docs/guides/cli/config
+
+project_id = "zmjxyspizdqhrtdcgkwk"
+
+# Public trial signup calls this function with the anon key only (no user JWT).
+[functions.trial-signup]
+verify_jwt = false
