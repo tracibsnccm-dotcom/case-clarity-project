@@ -41,6 +41,50 @@ function trialDaysElapsed(trialStartIso: string): number {
   return Math.floor((now - trialStart) / (1000 * 60 * 60 * 24))
 }
 
+/** GHL Inbound Webhook (Supabase Edge Function secret: GHL_TRIAL_WEBHOOK_URL). Fires on new trial row only. */
+async function sendGhlTrialWelcomeWebhook(inserted: Record<string, unknown>): Promise<void> {
+  const url =
+    (Deno.env.get('GHL_TRIAL_WEBHOOK_URL') || Deno.env.get('GHL_WEBHOOK_URL') || '').trim()
+  if (!url || /YOUR_WEBHOOK/i.test(url)) {
+    console.info('trial-signup: GHL welcome webhook skipped (set GHL_TRIAL_WEBHOOK_URL in Edge Function secrets)')
+    return
+  }
+  const payload = {
+    event: 'trial_signup',
+    welcome_email_type: 'trial_welcome',
+    access_delivery: 'magic_link',
+    full_name: inserted.full_name,
+    title: inserted.title,
+    email: inserted.email,
+    law_firm: inserted.law_firm ?? '—',
+    phone: inserted.phone ?? null,
+    ccp: inserted.ccp,
+    pin: inserted.pin,
+    trial_start_at: inserted.trial_start_at,
+    trial_user_id: inserted.id,
+    note:
+      'Portal access is via secure email link (Supabase Auth). CCP/PIN retained for internal continuity only.',
+  }
+  const ac = new AbortController()
+  const t = setTimeout(() => ac.abort(), 15_000)
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: ac.signal,
+    })
+    if (!res.ok) {
+      const text = await res.text()
+      console.warn('trial-signup: GHL webhook non-OK', res.status, text.slice(0, 500))
+    }
+  } catch (e) {
+    console.warn('trial-signup: GHL webhook request failed:', e)
+  } finally {
+    clearTimeout(t)
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -207,6 +251,8 @@ serve(async (req) => {
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     )
   }
+
+  await sendGhlTrialWelcomeWebhook(inserted)
 
   return new Response(
     JSON.stringify({

@@ -4,5 +4,6 @@
 project_id = "zmjxyspizdqhrtdcgkwk"
 
 # Public trial signup calls this function with the anon key only (no user JWT).
+# Set secret GHL_TRIAL_WEBHOOK_URL (GHL Inbound Webhook URL) for welcome-email automation.
 [functions.trial-signup]
 verify_jwt = false
