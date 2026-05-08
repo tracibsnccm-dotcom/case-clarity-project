@@ -1,0 +1,12 @@
+{
+  "name": "case-clarity-project",
+  "version": "1.0.0",
+  "description": "Case Clarity Project - Static HTML Website",
+  "private": true,
+  "scripts": {
+    "install": "echo 'Dependencies installed'"
+  },
+  "dependencies": {
+    "@vercel/analytics": "^1.3.1"
+  }
+}
