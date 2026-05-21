@@ -42,6 +42,7 @@
             var client = window.supabaseClient;
             var errEl = document.getElementById('err');
             var msgEl = document.getElementById('msg');
+            var done = false;
 
             function fail(text) {
                 document.getElementById('panel').querySelector('h1').textContent = 'Sign-in could not be completed';
@@ -51,6 +52,8 @@
             }
 
             function goDashboard() {
+                if (done) return;
+                done = true;
                 window.location.replace('dashboard.html');
             }
 
@@ -59,42 +62,36 @@
                 return;
             }
 
-            var done = false;
-            function tryRedirect() {
-                if (done) return;
-                client.auth.getSession().then(function (res) {
-                    if (res.data && res.data.session) {
-                        done = true;
+            // Sign out any stale session first so the new magic-link session
+            // is the one used on the dashboard — not a leftover from another login.
+            client.auth.signOut({ scope: 'local' }).then(function () {
+
+                // Listen for the SIGNED_IN event triggered by detectSessionInUrl
+                // processing the implicit-flow tokens in the URL hash.
+                client.auth.onAuthStateChange(function (event, session) {
+                    if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session) {
                         goDashboard();
                     }
                 });
-            }
 
-            client.auth.onAuthStateChange(function (event, session) {
-                if (event === 'SIGNED_IN' && session) {
-                    done = true;
-                    goDashboard();
-                }
-                if (event === 'TOKEN_REFRESHED' && session) {
-                    tryRedirect();
-                }
-            });
-
-            setTimeout(function () {
-                tryRedirect();
-            }, 50);
-
-            setTimeout(function () {
-                client.auth.getSession().then(function (res) {
-                    if (res.data && res.data.session) {
-                        goDashboard();
-                        return;
+                // Fallback: if the event already fired before our listener attached
+                setTimeout(function () {
+                    if (!done) {
+                        client.auth.getUser().then(function (res) {
+                            if (res.data && res.data.user) {
+                                goDashboard();
+                            }
+                        });
                     }
+                }, 1500);
+
+                // Final timeout: show error if nothing worked
+                setTimeout(function () {
                     if (!done) {
                         fail('This sign-in link is invalid or has expired. Return to the trial page and request a new access link.');
                     }
-                });
-            }, 4000);
+                }, 8000);
+            });
         })();
     </script>
 </body>
