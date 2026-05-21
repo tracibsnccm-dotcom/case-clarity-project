@@ -1619,73 +1619,62 @@
 
         async function bootstrapDashboardAccess() {
             try {
-                const {
-                    data: { session: authSession },
-                } = await supabaseClient.auth.getSession();
+                // Use getUser() — makes a live server call to verify the session,
+                // so we always get the correct authenticated user, not stale localStorage data.
+                const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
 
-                if (authSession && authSession.user && authSession.user.email) {
-                    const email = authSession.user.email.trim().toLowerCase();
-                    const { data: trialUser, error } = await supabaseClient
+                if (!user || !user.email) {
+                    // Not authenticated — send to login to request a new magic link
+                    window.location.replace('login.html');
+                    return false;
+                }
+
+                const email = user.email.trim().toLowerCase();
+
+                // Look up their trial record by email
+                const { data: trialUser, error } = await supabaseClient
+                    .from('trial_users')
+                    .select('*')
+                    .eq('email', email)
+                    .maybeSingle();
+
+                if (error) {
+                    console.error('Trial lookup error:', error);
+                }
+
+                if (!trialUser) {
+                    document.getElementById('dashboard-content').innerHTML =
+                        '<div class="timer-card" style="display:block;">' +
+                        '<p style="font-size:15px;line-height:1.6;color:#3a4a5a;">' +
+                        'No trial enrollment found for <strong>' + email + '</strong>. ' +
+                        'Please <a href="trial-signup.html" style="color:#b8922a;">start a free trial</a> ' +
+                        'or <a href="login.html" style="color:#b8922a;">request a new access link</a>.' +
+                        '</p></div>';
+                    return false;
+                }
+
+                // Link auth_user_id for tighter row ownership on future logins
+                if (!trialUser.auth_user_id && user.id) {
+                    const { error: linkErr } = await supabaseClient
                         .from('trial_users')
-                        .select('*')
-                        .eq('email', email)
-                        .maybeSingle();
-                    if (error) {
-                        console.error(error);
+                        .update({ auth_user_id: user.id })
+                        .eq('id', trialUser.id)
+                        .is('auth_user_id', null);
+                    if (linkErr) {
+                        console.warn('auth_user_id link:', linkErr.message);
+                    } else {
+                        trialUser.auth_user_id = user.id;
                     }
-                    if (!trialUser) {
-                        document.getElementById('dashboard-content').innerHTML =
-                            '<div class="timer-card" style="display:block;"><p style="font-size:15px;line-height:1.6;color:#3a4a5a;">No trial enrollment found for <strong>' + email + '</strong>. Start at the <a href="trial-signup.html" style="color:#b8922a;">trial signup page</a>, or sign out and use legacy CCP access from <a href="login.html" style="color:#b8922a;">login</a>.</p></div>';
-                        return false;
-                    }
-                    if (!trialUser.auth_user_id && authSession.user.id) {
-                        const { error: linkErr } = await supabaseClient
-                            .from('trial_users')
-                            .update({ auth_user_id: authSession.user.id })
-                            .eq('id', trialUser.id)
-                            .is('auth_user_id', null);
-                        if (linkErr) {
-                            console.warn('auth_user_id link:', linkErr.message);
-                        } else {
-                            trialUser.auth_user_id = authSession.user.id;
-                        }
-                    }
-                    syncTrialLocalStorage(trialUser);
-                    document.getElementById('assessment-id-display').textContent = trialUser.ccp || '';
-                    await bumpPortalVisit(trialUser);
-                    return true;
                 }
 
-                if (
-                    localStorage.getItem('user_logged_in') === 'true' &&
-                    localStorage.getItem('user_id')
-                ) {
-                    const userId = localStorage.getItem('user_id');
-                    const ccp = localStorage.getItem('ccp');
-                    if (!ccp) {
-                        window.location.replace('trial-signup.html?next=' + encodeURIComponent('dashboard.html'));
-                        return false;
-                    }
-                    const { data: legacyRows, error } = await supabaseClient.rpc('trial_legacy_get', {
-                        p_id: userId,
-                        p_ccp: ccp,
-                    });
-                    const trialUser = legacyRows && legacyRows[0] ? legacyRows[0] : null;
-                    if (error || !trialUser) {
-                        window.location.replace('trial-signup.html?next=' + encodeURIComponent('dashboard.html'));
-                        return false;
-                    }
-                    syncTrialLocalStorage(trialUser);
-                    document.getElementById('assessment-id-display').textContent = trialUser.ccp || '';
-                    await bumpPortalVisit(trialUser);
-                    return true;
-                }
+                syncTrialLocalStorage(trialUser);
+                document.getElementById('assessment-id-display').textContent = trialUser.ccp || '';
+                await bumpPortalVisit(trialUser);
+                return true;
 
-                window.location.replace('trial-signup.html?next=' + encodeURIComponent('dashboard.html'));
-                return false;
             } catch (e) {
-                console.error(e);
-                window.location.replace('trial-signup.html?next=' + encodeURIComponent('dashboard.html'));
+                console.error('bootstrapDashboardAccess error:', e);
+                window.location.replace('login.html');
                 return false;
             }
         }
