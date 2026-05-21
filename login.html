@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Case Clarity Project — Portal Access</title>
+    <title>Return to Your Trial — Case Clarity</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-client.js"></script>
     <style>
@@ -17,7 +17,7 @@
             min-height: 100vh;
             padding: 20px;
         }
-        .login-card {
+        .card {
             background: #fff;
             border: 1px solid #d6d0c4;
             border-top: 3px solid #0c1c34;
@@ -33,59 +33,8 @@
             color: #b8922a;
             margin-bottom: 20px;
         }
-        h1 {
-            font-size: 26px;
-            font-weight: normal;
-            color: #0c1c34;
-            margin: 0 0 8px;
-            letter-spacing: 0.02em;
-        }
-        .subtitle {
-            font-size: 15px;
-            color: #3a4a5a;
-            margin: 0 0 24px;
-            line-height: 1.7;
-        }
-        .primary-cta {
-            display: block;
-            width: 100%;
-            text-align: center;
-            background: #0c1c34;
-            color: #e8e2d4;
-            padding: 14px 24px;
-            font-size: 11px;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            text-decoration: none;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            border: none;
-            cursor: pointer;
-            margin-bottom: 12px;
-        }
-        .primary-cta:hover { background: #1a2c44; color: #fff; }
-        .note {
-            font-size: 13px;
-            color: #5a6a7a;
-            line-height: 1.6;
-            margin-bottom: 32px;
-        }
-        .secondary-section {
-            padding-top: 28px;
-            border-top: 1px solid #e8e4dc;
-        }
-        .secondary-section h2 {
-            font-size: 13px;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: #6a7a8a;
-            margin-bottom: 12px;
-        }
-        .secondary-section .hint {
-            font-size: 13px;
-            color: #5a6a7a;
-            margin-bottom: 20px;
-            line-height: 1.6;
-        }
+        h1 { font-size: 26px; font-weight: normal; color: #0c1c34; margin: 0 0 12px; }
+        .subtitle { font-size: 15px; color: #3a4a5a; margin: 0 0 28px; line-height: 1.7; }
         .field-label {
             font-size: 11px;
             letter-spacing: 0.14em;
@@ -119,128 +68,91 @@
             margin-top: 20px;
         }
         .btn-primary:hover { background: #1a2c44; }
-        .error-message {
-            color: #c0392b;
-            font-size: 12px;
-            margin-top: 10px;
-            padding: 10px;
+        .btn-primary:disabled { background: #9aabb8; cursor: not-allowed; }
+        .error-msg {
+            color: #a93226;
+            font-size: 13px;
+            margin-top: 12px;
+            padding: 10px 12px;
             background: #fdf1f0;
             border: 1px solid #f5c6cb;
             display: none;
         }
-        .info {
-            font-size: 11px;
-            color: #9aabb8;
-            margin-top: 20px;
-            text-align: center;
+        .success-panel {
+            display: none;
         }
+        .success-panel h2 { font-size: 22px; font-weight: normal; color: #0c1c34; margin-bottom: 16px; }
+        .success-panel p { font-size: 14px; color: #3a4a5a; line-height: 1.7; margin-bottom: 12px; }
+        .divider { margin: 32px 0; border: none; border-top: 1px solid #e8e4dc; }
+        .new-trial-link { font-size: 13px; color: #5a6a7a; text-align: center; }
+        .new-trial-link a { color: #b8922a; }
     </style>
 </head>
 <body>
-    <div class="login-card">
+    <div class="card">
         <div class="brand">Reconcile Care Management Services</div>
-        <h1>Case Clarity Trial Portal</h1>
-        <p class="subtitle">New trial access is delivered by a secure email link sent to your business address.</p>
-        <a class="primary-cta" href="trial-signup.html">Start free trial — email access link</a>
-        <p class="note">Use the same business email you will use for your trial. After you submit the form, open the link in your inbox to enter the portal.</p>
 
-        <div class="secondary-section">
-            <h2>Existing trial users (CCP# and PIN)</h2>
-            <p class="hint">If you already have a CCP# and PIN from a prior message, you can still sign in here while your trial is active.</p>
+        <div id="form-panel">
+            <h1>Return to Your Trial</h1>
+            <p class="subtitle">Enter the business email you used to sign up and we will send you a new secure access link.</p>
 
-            <form id="login-form" onsubmit="event.preventDefault(); window.handleLogin && window.handleLogin()">
-                <div class="field-label">CCP#</div>
-                <input type="text" id="ccp" class="field-input" placeholder="CCP-123456" autocomplete="off">
-
-                <div class="field-label" style="margin-top:16px;">PIN</div>
-                <input type="password" id="pin" class="field-input" placeholder="6-digit PIN" maxlength="6" autocomplete="off">
-
-                <button type="submit" class="btn-primary">Access assessment portal</button>
+            <form id="link-form" onsubmit="event.preventDefault(); handleRequestLink()">
+                <label class="field-label" for="email">Business email</label>
+                <input type="email" id="email" class="field-input" required autocomplete="email" placeholder="you@lawfirm.com">
+                <button type="submit" id="submit-btn" class="btn-primary">Send Access Link</button>
             </form>
 
-            <div id="error-message" class="error-message"></div>
-            <div id="expired-message" class="error-message" style="display:none;background:#fff3cd;border-color:#ffc107;color:#856404;"></div>
+            <div id="error-msg" class="error-msg"></div>
+
+            <hr class="divider">
+            <p class="new-trial-link">New to Case Clarity? <a href="trial-signup.html">Start your free 7-day trial</a></p>
+        </div>
+
+        <div id="success-panel" class="success-panel">
+            <h2>Check Your Email</h2>
+            <p>A new secure access link has been sent to <strong id="success-email"></strong>.</p>
+            <p>Open that link to return to your trial portal. If you do not see it within a minute, check your spam folder.</p>
+            <hr class="divider">
+            <p class="new-trial-link"><a href="trial-signup.html">Back to trial signup</a></p>
         </div>
     </div>
 
     <script>
-        (function () {
-            var supabaseClient = window.supabaseClient;
+        async function handleRequestLink() {
+            var email = document.getElementById('email').value.trim().toLowerCase();
+            var btn = document.getElementById('submit-btn');
+            var errEl = document.getElementById('error-msg');
 
-            window.handleLogin = async function () {
-                var ccp = document.getElementById('ccp').value.trim();
-                var pin = document.getElementById('pin').value.trim();
-                var errorEl = document.getElementById('error-message');
-                var expiredEl = document.getElementById('expired-message');
+            errEl.style.display = 'none';
+            btn.disabled = true;
+            btn.textContent = 'Sending…';
 
-                errorEl.style.display = 'none';
-                expiredEl.style.display = 'none';
-
-                if (!ccp || !pin) {
-                    showError('Please enter both CCP# and PIN');
-                    return;
-                }
-                if (!ccp.startsWith('CCP-')) {
-                    showError('CCP# must start with CCP-');
-                    return;
-                }
-                if (pin.length !== 6 || !/^\d+$/.test(pin)) {
-                    showError('PIN must be a 6-digit number');
-                    return;
-                }
-
-                try {
-                    var res = await supabaseClient.rpc('trial_ccp_login', {
-                        p_ccp: ccp,
-                        p_pin: pin,
-                    });
-
-                    var err = res.error;
-                    var rows = res.data;
-                    var user = rows && rows[0] ? rows[0] : null;
-
-                    if (err || !user) {
-                        showError('Invalid CCP# or PIN');
-                        return;
+            try {
+                var redirectTo = new URL('auth-callback.html', window.location.href).href;
+                var result = await window.supabaseClient.auth.signInWithOtp({
+                    email: email,
+                    options: {
+                        emailRedirectTo: redirectTo,
+                        shouldCreateUser: false,
                     }
+                });
 
-                    if (user.status !== 'trial_active') {
-                        showError('Your trial account is not active. Contact support.');
-                        return;
-                    }
-
-                    var trialStart = new Date(user.trial_start_at);
-                    var now = new Date();
-                    var daysElapsed = Math.floor((now - trialStart) / (1000 * 60 * 60 * 24));
-
-                    if (daysElapsed >= 7) {
-                        expiredEl.innerHTML =
-                            'Your trial has ended. Purchase to continue. ' +
-                            '<a href="pricing.html" style="color:#1a2e3f;font-weight:bold;text-decoration:underline;">View plans</a>';
-                        expiredEl.style.display = 'block';
-                        return;
-                    }
-
-                    localStorage.setItem('ccp', ccp);
-                    localStorage.setItem('email', user.email);
-                    localStorage.setItem('trial_start_at', user.trial_start_at);
-                    localStorage.setItem('status', user.status);
-                    localStorage.setItem('user_logged_in', 'true');
-                    localStorage.setItem('user_id', user.id);
-
-                    window.location.href = 'dashboard.html';
-                } catch (e) {
-                    showError('Login failed. Please try again.');
-                    console.error(e);
+                if (result.error) {
+                    errEl.textContent = result.error.message || 'Could not send link. Please try again.';
+                    errEl.style.display = 'block';
+                } else {
+                    document.getElementById('success-email').textContent = email;
+                    document.getElementById('form-panel').style.display = 'none';
+                    document.getElementById('success-panel').style.display = 'block';
                 }
-            };
-
-            function showError(message) {
-                var errorEl = document.getElementById('error-message');
-                errorEl.textContent = message;
-                errorEl.style.display = 'block';
+            } catch (e) {
+                errEl.textContent = 'An error occurred. Please try again.';
+                errEl.style.display = 'block';
             }
-        })();
+
+            btn.disabled = false;
+            btn.textContent = 'Send Access Link';
+        }
     </script>
 </body>
 </html>
