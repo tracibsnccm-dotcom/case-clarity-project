@@ -1635,7 +1635,7 @@
                     }
                     if (!trialUser) {
                         document.getElementById('dashboard-content').innerHTML =
-                            '<div class="timer-card" style="display:block;"><p style="font-size:15px;line-height:1.6;color:#3a4a5a;">No trial enrollment matches this sign-in. Start at the <a href="trial-signup.html" style="color:#b8922a;">trial signup page</a>, or sign out and use legacy CCP access from <a href="login.html" style="color:#b8922a;">login</a>.</p></div>';
+                            '<div class="timer-card" style="display:block;"><p style="font-size:15px;line-height:1.6;color:#3a4a5a;">No trial enrollment found for <strong>' + email + '</strong>. Start at the <a href="trial-signup.html" style="color:#b8922a;">trial signup page</a>, or sign out and use legacy CCP access from <a href="login.html" style="color:#b8922a;">login</a>.</p></div>';
                         return false;
                     }
                     if (!trialUser.auth_user_id && authSession.user.id) {
@@ -2122,3 +2122,4 @@
     </script>
 </body>
 </html>
+
