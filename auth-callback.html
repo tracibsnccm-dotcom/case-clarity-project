@@ -6,23 +6,8 @@
     <title>Signing you in — Case Clarity</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: Georgia, 'Times New Roman', serif;
-            background: #fff;
-            color: #0e1c2e;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-        }
-        .card {
-            max-width: 440px;
-            text-align: center;
-            border: 1px solid #d6d0c4;
-            border-top: 3px solid #b8922a;
-            padding: 40px 32px;
-        }
+        body { font-family: Georgia, serif; background: #fff; color: #0e1c2e; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+        .card { max-width: 440px; text-align: center; border: 1px solid #d6d0c4; border-top: 3px solid #b8922a; padding: 40px 32px; }
         h1 { font-size: 20px; font-weight: normal; color: #0c1c34; margin-bottom: 12px; }
         p { font-size: 14px; color: #3a4a5a; line-height: 1.6; }
         a { color: #b8922a; }
@@ -40,15 +25,14 @@
     <script>
         (function () {
             var client = window.supabaseClient;
-            var errEl = document.getElementById('err');
-            var msgEl = document.getElementById('msg');
             var done = false;
 
             function fail(text) {
                 document.getElementById('panel').querySelector('h1').textContent = 'Sign-in could not be completed';
-                msgEl.style.display = 'none';
-                errEl.style.display = 'block';
-                errEl.textContent = text;
+                document.getElementById('msg').style.display = 'none';
+                var err = document.getElementById('err');
+                err.style.display = 'block';
+                err.textContent = text;
             }
 
             function goDashboard() {
@@ -62,36 +46,34 @@
                 return;
             }
 
-            // Sign out any stale session first so the new magic-link session
-            // is the one used on the dashboard — not a leftover from another login.
-            client.auth.signOut({ scope: 'local' }).then(function () {
+            // onAuthStateChange fires immediately with the current session state.
+            // detectSessionInUrl (in supabase-client.js) processes the magic link tokens
+            // from the URL hash when the client is created, so SIGNED_IN fires here.
+            client.auth.onAuthStateChange(function (event, session) {
+                if (event === 'SIGNED_IN' && session) {
+                    goDashboard();
+                }
+                if (event === 'TOKEN_REFRESHED' && session) {
+                    goDashboard();
+                }
+            });
 
-                // Listen for the SIGNED_IN event triggered by detectSessionInUrl
-                // processing the implicit-flow tokens in the URL hash.
-                client.auth.onAuthStateChange(function (event, session) {
-                    if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session) {
+            // Fallback: getUser() in case the event already fired before the listener attached
+            setTimeout(function () {
+                if (done) return;
+                client.auth.getUser().then(function (res) {
+                    if (res.data && res.data.user) {
                         goDashboard();
                     }
                 });
+            }, 1000);
 
-                // Fallback: if the event already fired before our listener attached
-                setTimeout(function () {
-                    if (!done) {
-                        client.auth.getUser().then(function (res) {
-                            if (res.data && res.data.user) {
-                                goDashboard();
-                            }
-                        });
-                    }
-                }, 1500);
-
-                // Final timeout: show error if nothing worked
-                setTimeout(function () {
-                    if (!done) {
-                        fail('This sign-in link is invalid or has expired. Return to the trial page and request a new access link.');
-                    }
-                }, 8000);
-            });
+            // Final fallback: show error if nothing worked after 10 seconds
+            setTimeout(function () {
+                if (!done) {
+                    fail('This sign-in link is invalid or has expired. Return to the trial page and request a new access link.');
+                }
+            }, 10000);
         })();
     </script>
 </body>
