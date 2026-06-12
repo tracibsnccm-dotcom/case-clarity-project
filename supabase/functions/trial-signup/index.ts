@@ -28,42 +28,107 @@ function trialDaysElapsed(trialStartIso: string): number {
   return Math.floor((now - trialStart) / (1000 * 60 * 60 * 24))
 }
 
-async function sendGhlTrialWelcomeWebhook(inserted: Record<string, unknown>): Promise<void> {
-  const url = (Deno.env.get('GHL_TRIAL_WEBHOOK_URL') || Deno.env.get('GHL_WEBHOOK_URL') || '').trim()
-  if (!url || /YOUR_WEBHOOK/i.test(url)) {
-    console.info('trial-signup: GHL welcome webhook skipped (set GHL_TRIAL_WEBHOOK_URL in Edge Function secrets)')
-    return
-  }
-  const payload = {
-    event: 'trial_signup',
-    welcome_email_type: 'trial_welcome',
-    access_delivery: 'magic_link',
-    full_name: inserted.full_name,
-    title: inserted.title,
-    email: inserted.email,
-    law_firm: inserted.law_firm ?? '\u2014',
-    phone: inserted.phone ?? null,
-    ccp: inserted.ccp,
-    trial_start_at: inserted.trial_start_at,
-    trial_user_id: inserted.id,
-  }
+// ── Brevo integration (GHL retired) ─────────────────────────────────────────
+// Required secrets: BREVO_API_KEY, BREVO_SENDER_EMAIL
+// Optional secrets: BREVO_SENDER_NAME (default "Case Clarity"),
+//                   BREVO_TRIAL_TEMPLATE_ID (use a Brevo template instead of inline HTML),
+//                   BREVO_TRIAL_LIST_ID (also add the contact to this Brevo list)
+
+async function brevoPost(path: string, payload: Record<string, unknown>, apiKey: string): Promise<Response | null> {
   const ac = new AbortController()
   const t = setTimeout(() => ac.abort(), 15_000)
   try {
-    const res = await fetch(url, {
+    return await fetch('https://api.brevo.com/v3' + path, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'api-key': apiKey, 'accept': 'application/json' },
       body: JSON.stringify(payload),
       signal: ac.signal,
     })
-    if (!res.ok) {
-      const text = await res.text()
-      console.warn('trial-signup: GHL webhook non-OK', res.status, text.slice(0, 500))
-    }
   } catch (e) {
-    console.warn('trial-signup: GHL webhook request failed:', e)
+    console.warn('trial-signup: Brevo request failed:', path, e)
+    return null
   } finally {
     clearTimeout(t)
+  }
+}
+
+function welcomeHtml(firstName: string, ccp: string): string {
+  return `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#f4f5f7;font-family:Arial,Helvetica,sans-serif">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f5f7;padding:24px 0">
+    <tr><td align="center">
+      <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden">
+        <tr><td style="background:#0d1f3c;padding:22px 32px">
+          <span style="color:#ffffff;font-size:18px;font-weight:bold;letter-spacing:.04em">CASE CLARITY</span>
+        </td></tr>
+        <tr><td style="padding:30px 32px 8px">
+          <p style="font-size:16px;color:#1a1a1a;margin:0 0 14px">Hi ${firstName},</p>
+          <p style="font-size:15px;color:#333;line-height:1.55;margin:0 0 14px">Your <strong>7-day Case Clarity trial is active.</strong></p>
+          <p style="font-size:15px;color:#333;line-height:1.55;margin:0 0 14px">A separate email with your <strong>secure sign-in link</strong> is on its way — click it and you're in. No password, no PIN. Any time you return, request a fresh link from the sign-in page.</p>
+          <p style="font-size:15px;color:#333;line-height:1.55;margin:0 0 14px">Your case continuity code is <strong>${ccp}</strong>. Keep it handy if you contact support.</p>
+          <p style="font-size:15px;color:#333;line-height:1.55;margin:0 0 22px">Over the next 7 days, run a real matter through the platform — that's the fastest way to see what it does for your case timelines and medical record review.</p>
+          <p style="font-size:15px;color:#333;line-height:1.55;margin:0 0 6px">Questions? Just reply to this email.</p>
+          <p style="font-size:15px;color:#333;margin:0 0 28px">— The Case Clarity Team</p>
+        </td></tr>
+        <tr><td style="background:#f0f1f3;padding:16px 32px">
+          <p style="font-size:12px;color:#777;margin:0">Case Clarity · Reconcile CARE Medical-Legal Systems</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`
+}
+
+async function sendBrevoTrialWelcome(inserted: Record<string, unknown>): Promise<void> {
+  const apiKey = (Deno.env.get('BREVO_API_KEY') || '').trim()
+  const senderEmail = (Deno.env.get('BREVO_SENDER_EMAIL') || '').trim()
+  if (!apiKey || !senderEmail) {
+    console.warn('trial-signup: Brevo welcome skipped — set BREVO_API_KEY and BREVO_SENDER_EMAIL in Edge Function secrets')
+    return
+  }
+  const senderName = (Deno.env.get('BREVO_SENDER_NAME') || 'Case Clarity').trim()
+  const templateId = parseInt(Deno.env.get('BREVO_TRIAL_TEMPLATE_ID') || '', 10)
+  const listId = parseInt(Deno.env.get('BREVO_TRIAL_LIST_ID') || '', 10)
+  const email = String(inserted.email)
+  const firstName = String(inserted.full_name || 'there')
+  const ccp = String(inserted.ccp || '')
+
+  // 1) Transactional welcome email
+  const emailPayload: Record<string, unknown> = Number.isFinite(templateId)
+    ? {
+        to: [{ email, name: firstName }],
+        templateId,
+        params: { FIRSTNAME: firstName, CCP: ccp, TRIAL_START: inserted.trial_start_at },
+      }
+    : {
+        sender: { email: senderEmail, name: senderName },
+        to: [{ email, name: firstName }],
+        subject: 'Your Case Clarity trial is active',
+        htmlContent: welcomeHtml(firstName, ccp),
+        replyTo: { email: senderEmail, name: senderName },
+      }
+  const emailRes = await brevoPost('/smtp/email', emailPayload, apiKey)
+  if (emailRes && !emailRes.ok) {
+    console.warn('trial-signup: Brevo email non-OK', emailRes.status, (await emailRes.text()).slice(0, 500))
+  }
+
+  // 2) Contact upsert so follow-up automations can run
+  const contactPayload: Record<string, unknown> = {
+    email,
+    updateEnabled: true,
+    attributes: {
+      FIRSTNAME: firstName,
+      TITLE: inserted.title,
+      CCP: ccp,
+      TRIAL_START: inserted.trial_start_at,
+      TRIAL_USER_ID: inserted.id,
+      SOURCE: 'case_clarity_trial',
+    },
+  }
+  if (Number.isFinite(listId)) contactPayload.listIds = [listId]
+  const contactRes = await brevoPost('/contacts', contactPayload, apiKey)
+  if (contactRes && !contactRes.ok && contactRes.status !== 400) {
+    // 400 with "Contact already exist" is fine when updateEnabled upserts
+    console.warn('trial-signup: Brevo contact non-OK', contactRes.status, (await contactRes.text()).slice(0, 500))
   }
 }
 
@@ -205,7 +270,7 @@ serve(async (req) => {
     })
   }
 
-  await sendGhlTrialWelcomeWebhook(inserted)
+  await sendBrevoTrialWelcome(inserted)
 
   return new Response(JSON.stringify({
     action: 'created',
