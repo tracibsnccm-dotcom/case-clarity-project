@@ -2297,16 +2297,17 @@ const RIGHTS = [
   },
   {
     number: "3", label: "Right #3", title: "Right Clinical Alignment (Evidence-Based Guidelines)",
-    desc: "For each documented diagnosis, an applicable nationally recognized evidence-based clinical guideline must be identifiable, and the treatment plan must be objectively consistent with that guideline's recommendations for type, frequency, duration, and sequencing of care.",
-    definition: "For each documented diagnosis, an applicable nationally recognized evidence-based clinical guideline must be identifiable, and the treatment plan must be objectively consistent with that guideline's recommendations for type, frequency, duration, and sequencing of care.",
+    desc: "Ensures treatment is appropriate, diagnosis-driven, evidence-based guideline aligned, and sequenced according to injury diagnosis, objective findings, and functional limitations.",
+    definition: "Ensures treatment is appropriate, diagnosis-driven, evidence-based guideline aligned, and sequenced according to injury diagnosis, objective findings, and functional limitations.",
     clarifications: [
-      "Guideline alignment does not require explicit citation within provider documentation. However, the treatment rendered — including modality, frequency, duration, and escalation — must reflect objective consistency with the applicable guideline for the documented diagnosis.",
-      "Deviations from guideline recommendations do not automatically violate Right #3, but must be supported by documented clinical rationale in the record."
+      "Clinical alignment requires that treatment reflects the confirmed diagnosis established by the treating MD/DO and progresses according to objective findings, functional limitations, and nationally recognized evidence-based guideline pathways (ODG, MCG, InterQual, or applicable state WC guidelines).",
+      "Escalation should only occur when conservative care fails, functional limitations persist, or specialty-driven justification is documented.",
+      "Guideline citation is not required in the record, but treatment progression must be consistent with guideline sequencing or supported by documented clinical rationale for deviation."
     ],
-    structuralStandard: "Right #3 is satisfied when the treatment plan aligns with an identifiable, recognized utilization review framework — such as ODG, MCG, InterQual, or applicable state workers' compensation standards — and any variance is supported by documented clinical justification.",
+    structuralStandard: "Right #3 is satisfied when treatment is clearly tied to the confirmed diagnosis, follows evidence-based guideline sequencing, and reflects appropriate escalation based on documented clinical need, objective findings, or guideline-aligned deviation.",
     examples: [
-      { label: "Does Not Satisfy", text: "A provider recommends lumbar surgery after two weeks of conservative care without documentation of failed conservative management. Applicable guideline criteria require documented failure of an appropriate conservative trial prior to surgical referral. No clinical justification for early escalation is present in the record. Right #3: Not Satisfied." },
-      { label: "Satisfies", text: "A client with documented cervical radiculopathy undergoes guideline-consistent conservative management including structured physical therapy, followed by specialty referral after documented failure to improve. The sequencing and duration of care align with recognized guideline criteria. Right #3: Satisfied." }
+      { label: "Does Not Satisfy", text: "Illustrative example: a client receives repeated chiropractic adjustments for eight weeks for a confirmed ligament sprain without progression to therapeutic exercise, imaging, or referral despite persistent functional limitations. Right #3: Not Satisfied." },
+      { label: "Satisfies", text: "Illustrative example: a client with a confirmed right knee MCL sprain begins with conservative care (RICE, NSAIDs, bracing), progresses to therapeutic exercise, and receives imaging or specialty referral when functional limitations persist or worsen. Right #3: Satisfied." }
     ],
     questions: [
       { text: "Has a recognized evidence-based guideline been identified for each diagnosis — such as ODG, MCG, InterQual, or the applicable state workers' compensation guideline?" },
