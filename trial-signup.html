@@ -167,8 +167,8 @@
 
             <form id="signup-form" onsubmit="event.preventDefault(); window.handleTrialSignup && window.handleTrialSignup()">
                 <div class="form-group">
-                    <label class="field-label" for="first-name">First name *</label>
-                    <input type="text" id="first-name" class="field-input" required autocomplete="given-name" maxlength="120">
+                    <label class="field-label" for="first-name">Full name *</label>
+                    <input type="text" id="first-name" class="field-input" required autocomplete="name" maxlength="120">
                     <div id="err-first-name" class="field-error"></div>
                 </div>
 
@@ -332,7 +332,7 @@
                 hideFormError();
 
                 if (!firstName) {
-                    showFieldError('err-first-name', 'First name is required.');
+                    showFieldError('err-first-name', 'Full name is required.');
                     return;
                 }
                 if (!email) {
