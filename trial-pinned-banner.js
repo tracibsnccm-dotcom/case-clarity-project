@@ -1,12 +1,12 @@
 (function () {
-    var TRIAL_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
+    var TRIAL_DURATION_MS = 30 * 24 * 60 * 60 * 1000;
 
     function getTrialEndTimeMs() {
         var raw = localStorage.getItem('trial_start_at');
         if (!raw) return null;
         var d = new Date(raw);
         d.setHours(0, 0, 0, 0);
-        d.setDate(d.getDate() + 7);
+        d.setDate(d.getDate() + 30);
         return d.getTime();
     }
 
@@ -79,7 +79,7 @@
                 '<span class="trial-global-pinned-sep">|</span>' +
                 '<span class="trial-global-pinned-label">Trial</span>' +
                 '<span class="trial-global-pinned-clock">' +
-                '<span class="trial-countdown-clock" id="trial-pinned-countdown-text" aria-live="polite">7d 00h 00m 00s</span>' +
+                '<span class="trial-countdown-clock" id="trial-pinned-countdown-text" aria-live="polite">30d 00h 00m 00s</span>' +
                 '<span class="trial-global-pinned-suffix">remaining</span>' +
                 '</span></div>';
             bar.querySelector('.trial-global-pinned-inner').appendChild(a);
