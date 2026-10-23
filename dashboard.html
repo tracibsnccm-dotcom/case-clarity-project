@@ -692,7 +692,7 @@
             <span class="app-header-title">Case Clarity Project</span>
             <div class="trial-timer" style="background:#f8f7f4; padding:8px 15px; border-radius:20px; border:1px solid #b09837; display:inline-block; margin-left:15px;">
                 <span style="font-weight:600;">Trial: </span>
-                <span id="trial-countdown" class="trial-countdown-clock" aria-live="polite">7d 00h 00m 00s</span> remaining
+                <span id="trial-countdown" class="trial-countdown-clock" aria-live="polite">30d 00h 00m 00s</span> remaining
             </div>
         </div>
         <div class="app-header-actions">
@@ -1464,12 +1464,12 @@
         }
         function computeTrialDaysRemaining() {
             var raw = localStorage.getItem('trial_start_at');
-            if (!raw) return 7;
+            if (!raw) return 30;
             var startDate = new Date(raw);
             startDate.setHours(0, 0, 0, 0);
             var now = new Date();
             now.setHours(0, 0, 0, 0);
-            var daysLeft = 7 - Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+            var daysLeft = 30 - Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
             return Math.max(0, daysLeft);
         }
 
@@ -1478,14 +1478,14 @@
             if (!el) return;
             var start = localStorage.getItem('trial_start_at');
             if (!start) {
-                el.innerHTML = '7 days';
+                el.innerHTML = '30 days';
                 return;
             }
             var startDate = new Date(start);
             startDate.setHours(0, 0, 0, 0);
             var now = new Date();
             now.setHours(0, 0, 0, 0);
-            var daysLeft = 7 - Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+            var daysLeft = 30 - Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
             var remaining = Math.max(0, daysLeft);
             el.innerHTML = remaining + (remaining === 1 ? ' day' : ' days');
         }
@@ -1576,12 +1576,12 @@
                     return;
                 }
 
-                // Check if trial expired (7 days from trial_start_at)
+                // Check if trial expired (30 days from trial_start_at)
                 const trialStart = new Date(user.trial_start_at);
                 const now = new Date();
                 const daysElapsed = Math.floor((now - trialStart) / (1000 * 60 * 60 * 24));
 
-                if (daysElapsed >= 7 && user.status === 'trial_active') {
+                if (daysElapsed >= 30 && user.status === 'trial_active') {
                     if (authed) {
                         await supabaseClient
                             .from('trial_users')
@@ -1597,7 +1597,7 @@
                         });
                     }
 
-                    alert('Your 7-day trial has ended. Please purchase a subscription to continue.');
+                    alert('Your 30-day trial has ended. Please purchase a subscription to continue.');
                     window.location.href = 'pricing.html';
                     return;
                 }
@@ -1780,11 +1780,11 @@
                 <div class="timer-card">
                     <div>
                         <span class="timer-label">${timerLabel}</span>
-                        <div style="font-size:12px;color:#6a7a8a;margin-top:8px;max-width:520px;line-height:1.5;">7-day trial from first login on this device. Portal session may differ; tools lock when the trial ends.</div>
+                        <div style="font-size:12px;color:#6a7a8a;margin-top:8px;max-width:520px;line-height:1.5;">30-day trial from first login on this device. Portal session may differ; tools lock when the trial ends.</div>
                     </div>
-                    <span id="trial-countdown-card" class="timer-value trial-countdown-clock ${timerClass}" aria-live="polite">7d 00h 00m 00s</span>
+                    <span id="trial-countdown-card" class="timer-value trial-countdown-clock ${timerClass}" aria-live="polite">30d 00h 00m 00s</span>
                 </div>
-                ${trialExpired ? '<div style="background:#fdf0f0;border:1px solid #e8b4b4;border-left:4px solid #c0392b;padding:16px 20px;margin-bottom:24px;font-size:14px;color:#5c2a2a;"><strong>Trial expired.</strong> Your 7-day instrument access from first login has ended. Launching assessments is disabled.</div>' : ''}
+                ${trialExpired ? '<div style="background:#fdf0f0;border:1px solid #e8b4b4;border-left:4px solid #c0392b;padding:16px 20px;margin-bottom:24px;font-size:14px;color:#5c2a2a;"><strong>Trial expired.</strong> Your 30-day instrument access from first login has ended. Launching assessments is disabled.</div>' : ''}
 
                 <!-- ORIENTATION SECTION -->
                 <div style="background: #f9f7f2; border: 1px solid #d6d0c4; border-left: 3px solid #b8922a; padding: 24px; margin-bottom: 32px;">
@@ -1798,7 +1798,7 @@
                     <li>Case information will be entered once and applied across all six instruments.</li>
                     <li>Each instrument typically requires approximately 10–15 minutes to complete.</li>
                     <li>Estimated total assessment time: approximately 60–90 minutes.</li>
-                    <li>Most attorneys complete the assessment over multiple sessions during the 7-day access period.</li>
+                    <li>Most attorneys complete the assessment over multiple sessions during the 30-day access period.</li>
                   </ul>
 
                   <div style="background: #1a2e3f; color: white; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: center;">
@@ -1807,7 +1807,7 @@
                   </div>
                   
                   <h4 style="margin: 20px 0 10px;">Access Window</h4>
-                  <p>Your 7-day assessment window is now active. Progress is automatically saved. You may log out and return at any time before expiration.</p>
+                  <p>Your 30-day assessment window is now active. Progress is automatically saved. You may log out and return at any time before expiration.</p>
                   
                   <h4 style="margin: 20px 0 10px;">Important Note</h4>
                   <p>The instruments do not function as simple calculators. Each tool evaluates structural elements of case progression, treatment sequencing, and recovery dynamics.</p>
@@ -1836,7 +1836,7 @@
                   <h2 style="font-size: 20px; margin-bottom: 16px;">Enter Your Case Information</h2>
                   <p style="margin-bottom: 20px;">Provide basic information for your case. This information will be used across all six assessment instruments — you will not be asked to re-enter it within each tool.</p>
                   <div style="margin-bottom: 20px; padding: 12px; background: #f1f0eb; border-left: 3px solid #b8922a;">
-                    <p style="font-size: 14px;"><strong>Data Storage Notice:</strong> Case information entered here is stored only during the active 7-day assessment window. All case data, instrument responses, and generated reports are automatically deleted when the assessment period expires.</p>
+                    <p style="font-size: 14px;"><strong>Data Storage Notice:</strong> Case information entered here is stored only during the active 30-day assessment window. All case data, instrument responses, and generated reports are automatically deleted when the assessment period expires.</p>
                   </div>
                   <div class="case-entry-two-col">
                     <div class="case-entry-panel">
@@ -2054,7 +2054,7 @@
 
         window.launchTool = function(toolKey, caseType) {
             if (localStorage.getItem('trial_start_at') && computeTrialDaysRemaining() <= 0) {
-                alert('Trial expired. Your 7-day access from first login on this device has ended.');
+                alert('Trial expired. Your 30-day access from first login on this device has ended.');
                 window.location.href = 'pricing.html';
                 return;
             }
@@ -2071,7 +2071,7 @@
             document.getElementById('dashboard-content').innerHTML = `
                 <div class="expired-message" style="max-width:640px;margin:60px auto;padding:44px 48px;background:#ffffff;border:1px solid #d6d0c4;border-top:4px solid #b09837;text-align:center;">
                     <p style="margin:0 0 12px;font-family:Georgia,'Times New Roman',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#b09837;">Trial Concluded</p>
-                    <h2 style="margin:0 0 16px;font-family:Georgia,'Times New Roman',serif;font-size:26px;font-weight:normal;color:#0c1c34;">Your 7-day trial has ended</h2>
+                    <h2 style="margin:0 0 16px;font-family:Georgia,'Times New Roman',serif;font-size:26px;font-weight:normal;color:#0c1c34;">Your 30-day trial has ended</h2>
                     <p style="margin:0 0 28px;font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#4a5568;line-height:1.7;">Continue using the C.A.S.E. Clarity System on every case you handle. Review available subscription options to keep your access open.</p>
                     <a href="pricing.html" style="display:inline-block;padding:13px 32px;background:#0c1c34;color:#ffffff;font-family:Georgia,'Times New Roman',serif;font-size:14px;letter-spacing:1px;text-decoration:none;font-weight:600;border-radius:4px;border:1.5px solid #b09837;">View Subscription Plans</a>
                     <div style="margin-top:24px;padding-top:20px;border-top:1px solid #e8e3d8;">
@@ -2111,4 +2111,3 @@
     </script>
 </body>
 </html>
-
