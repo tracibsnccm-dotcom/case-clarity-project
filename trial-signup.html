@@ -1,440 +1,393 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Case Clarity — Start Your Free Trial</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/supabase-client.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Georgia', 'Times New Roman', serif;
-            background: #fff;
-            color: #0e1c2e;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .signup-container {
-            background: #fff;
-            border: 1px solid #d6d0c4;
-            border-top: 3px solid #1a2e3f;
-            padding: 48px 40px;
-            width: 100%;
-            max-width: 560px;
-            box-shadow: 0 2px 12px rgba(12,28,52,0.06);
-        }
-        .brand {
-            font-size: 11px;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: #b09837;
-            margin-bottom: 20px;
-        }
-        h1 {
-            font-size: 28px;
-            font-weight: normal;
-            color: #1a2e3f;
-            margin: 0 0 12px;
-            letter-spacing: 0.02em;
-        }
-        .subtitle {
-            font-size: 15px;
-            color: #3a4a5a;
-            margin: 0 0 10px;
-            line-height: 1.7;
-        }
-        .support-line {
-            font-size: 13px;
-            color: #5a6a7a;
-            margin: 0 0 28px;
-            line-height: 1.6;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .field-label {
-            font-size: 11px;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            color: #6a7a8a;
-            display: block;
-            margin-bottom: 6px;
-        }
-        .field-input, .field-select {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid #d6d0c4;
-            background: #faf8f4;
-            font-size: 14px;
-            color: #0e1c2e;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            outline: none;
-        }
-        .field-input:focus, .field-select:focus {
-            border-color: #b09837;
-        }
-        .field-error {
-            color: #a93226;
-            font-size: 12px;
-            margin-top: 6px;
-            display: none;
-        }
-        .field-error.visible { display: block; }
-        .btn-primary {
-            width: 100%;
-            background: #1a2e3f;
-            color: #e8e2d4;
-            border: none;
-            padding: 14px 40px;
-            font-size: 11px;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            cursor: pointer;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            margin-top: 8px;
-        }
-        .btn-primary:hover { background: #2a3e4f; }
-        .btn-primary:disabled {
-            background: #9aabb8;
-            cursor: not-allowed;
-        }
-        .btn-secondary {
-            background: transparent;
-            color: #1a2e3f;
-            border: 1px solid #d6d0c4;
-            padding: 10px 20px;
-            font-size: 12px;
-            cursor: pointer;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            margin-top: 12px;
-        }
-        .btn-secondary:hover { border-color: #b09837; color: #b09837; }
-        .error-message {
-            color: #a93226;
-            font-size: 13px;
-            margin-top: 14px;
-            padding: 12px;
-            background: #fdf1f0;
-            border: 1px solid #f5c6cb;
-            display: none;
-        }
-        .success-panel {
-            display: none;
-            text-align: left;
-        }
-        .success-panel h2 {
-            font-size: 22px;
-            font-weight: normal;
-            color: #1a2e3f;
-            margin-bottom: 16px;
-        }
-        .success-panel p { font-size: 14px; color: #3a4a5a; line-height: 1.7; margin-bottom: 12px; }
-        .success-actions { margin-top: 20px; }
-        .info {
-            font-size: 11px;
-            color: #9aabb8;
-            margin-top: 24px;
-            line-height: 1.6;
-        }
-        .secondary-section {
-            margin-top: 40px;
-            padding-top: 28px;
-            border-top: 1px solid #e8e4dc;
-        }
-        .secondary-section h3 {
-            font-size: 13px;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: #6a7a8a;
-            margin-bottom: 8px;
-        }
-        .secondary-section p { font-size: 13px; color: #5a6a7a; margin-bottom: 12px; line-height: 1.6; }
-        .secondary-section a { color: #b09837; }
-    </style>
-</head>
-<body>
-    <div class="signup-container">
-        <div class="brand">Reconcile Care Management Services</div>
+import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
 
-        <div id="form-panel">
-            <h1>Start Your Free 30-Day Trial</h1>
-            <p class="subtitle">Run your first case in 5–15 minutes and identify gaps affecting recovery time, treatment coordination, and case stability.</p>
-            <p class="support-line">No credit card required. Access is available to professionals using a business email address.</p>
+const corsHeaders: Record<string, string> = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
-            <form id="signup-form" onsubmit="event.preventDefault(); window.handleTrialSignup && window.handleTrialSignup()">
-                <div class="form-group">
-                    <label class="field-label" for="first-name">Full name *</label>
-                    <input type="text" id="first-name" class="field-input" required autocomplete="name" maxlength="120">
-                    <div id="err-first-name" class="field-error"></div>
-                </div>
+// Trial length in days — change this one value to adjust the whole trial.
+const TRIAL_DAYS = 30
 
-                <div class="form-group">
-                    <label class="field-label" for="email">Business email *</label>
-                    <input type="email" id="email" class="field-input" required autocomplete="email">
-                    <div id="err-email" class="field-error"></div>
-                </div>
+// Fallback redirect if the signup page doesn't pass one.
+const DEFAULT_REDIRECT = 'https://trial.caseclarity.rcmspllc.com/auth-callback.html'
 
-                <div class="form-group">
-                    <label class="field-label" for="role">Role *</label>
-                    <select id="role" class="field-select" required>
-                        <option value="">Select…</option>
-                        <option value="Attorney">Attorney</option>
-                        <option value="Partner">Partner</option>
-                        <option value="Paralegal">Paralegal</option>
-                        <option value="Case Manager">Case Manager</option>
-                        <option value="Other">Other</option>
-                    </select>
-                    <div id="err-role" class="field-error"></div>
-                </div>
+const BLOCKED = new Set([
+  'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com',
+  'aol.com', 'me.com', 'live.com', 'msn.com', 'proton.me', 'protonmail.com',
+])
 
-                <button type="submit" class="btn-primary" id="submit-btn">Start Free Trial</button>
-            </form>
+function isPersonalDomain(email: string): boolean {
+  const m = String(email).trim().toLowerCase().match(/@([^@]+)$/)
+  if (!m) return true
+  return BLOCKED.has(m[1])
+}
 
-            <div id="error-message" class="error-message"></div>
+function generateCCP(): string {
+  const num = Math.floor(Math.random() * 900000) + 100000
+  return 'CCP-' + num.toString().padStart(6, '0')
+}
 
-            <p class="info">We will send a secure access link to your business email. Your internal trial record may include identifiers used for continuity with existing systems; you sign in with the email link, not a separate portal code.</p>
+function trialDaysElapsed(trialStartIso: string): number {
+  const trialStart = new Date(trialStartIso).getTime()
+  const now = Date.now()
+  return Math.floor((now - trialStart) / (1000 * 60 * 60 * 24))
+}
 
-            </div>
+// ── Email sending via Resend (same service that already delivers the login link) ─
+// Required secret:  RESEND_API_KEY        (starts with re_)
+// Optional secrets: RESEND_FROM_EMAIL     (default info@rcmspllc.com — must be a verified Resend sender)
+//                   RESEND_FROM_NAME      (default "Case Clarity")
 
-        <div id="success-panel" class="success-panel">
-            <h2>Check Your Email</h2>
-            <p>We just sent your secure trial access link to <strong id="success-email"></strong>. Use that link to enter the Case Clarity trial portal.</p>
-            <p>If you do not see it within a minute, check spam or promotions, then try again.</p>
-            <div class="success-actions">
-                <button type="button" class="btn-primary" id="resend-btn">Resend link</button>
-                <button type="button" class="btn-secondary" id="different-email-btn">Use a different email</button>
-            </div>
-        </div>
-    </div>
+async function resendSend(
+  apiKey: string, from: string, to: string, subject: string, html: string, replyTo: string,
+): Promise<Response | null> {
+  const ac = new AbortController()
+  const t = setTimeout(() => ac.abort(), 15_000)
+  try {
+    return await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from, to: [to], subject, html, reply_to: replyTo }),
+      signal: ac.signal,
+    })
+  } catch (e) {
+    console.warn('trial-signup: Resend request failed:', e)
+    return null
+  } finally {
+    clearTimeout(t)
+  }
+}
 
-    <script>
-        (function () {
-            var supabaseClient = window.supabaseClient;
+// Branded welcome email — includes the sign-in button and the CCP code.
+function welcomeHtml(firstName: string, ccp: string, loginUrl: string): string {
+  const signinBlock = loginUrl
+    ? `<p style="font-size:15px;color:#2a3344;line-height:1.62;margin:0 0 14px;">You're all set — just click below to sign in. No password, no PIN.</p>
+      <table role="presentation" cellpadding="0" cellspacing="0" style="margin:2px 0 6px;">
+        <tr><td align="center" bgcolor="#0F2A6A" style="border-radius:4px;">
+          <a href="${loginUrl}" style="display:inline-block;padding:14px 38px;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;color:#ffffff;text-decoration:none;border-radius:4px;">Sign in to Case Clarity &rarr;</a>
+        </td></tr>
+      </table>
+      <p style="font-size:13px;color:#5a6a7a;line-height:1.55;margin:0 0 20px;">This secure link signs you in automatically. If it has expired, just request a fresh link from the sign-in page.</p>`
+    : `<p style="font-size:15px;color:#2a3344;line-height:1.62;margin:0 0 16px;">A separate email with your <strong>secure sign-in link</strong> is on its way — just click it and you're in. No password, no PIN. Any time you come back, request a fresh link from the sign-in page.</p>`
 
-            /* GHL welcome automation: Edge Function trial-signup POSTs to GHL (secret GHL_TRIAL_WEBHOOK_URL). */
+  return `<!doctype html><html><head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#eef1f6;font-family:Arial,Helvetica,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#eef1f6;padding:32px 0;">
+<tr><td align="center">
+  <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:600px;background:#ffffff;border:1px solid #e2e6ee;border-radius:4px;overflow:hidden;">
 
-            var BLOCKED = new Set([
-                'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com', 'aol.com',
-                'me.com', 'live.com', 'msn.com', 'proton.me', 'protonmail.com'
-            ]);
+    <!-- Header -->
+    <tr><td style="background:#0F2A6A;padding:30px 40px 26px;border-bottom:4px solid #C8891B;">
+      <div style="color:#E7B65A;font-size:11px;letter-spacing:3px;text-transform:uppercase;font-weight:bold;">Reconcile Care Management Services</div>
+      <div style="color:#ffffff;font-size:30px;font-weight:normal;letter-spacing:.5px;margin-top:10px;font-family:Georgia,'Times New Roman',serif;">CASE <span style="color:#E7B65A;">Clarity</span></div>
+    </td></tr>
 
-            var lastSubmittedEmail = '';
+    <!-- Body -->
+    <tr><td style="padding:36px 40px 8px;">
+      <div style="font-family:Georgia,'Times New Roman',serif;font-size:25px;color:#0F2A6A;margin:0 0 6px;">Welcome, ${firstName}.</div>
+      <div style="font-size:15px;color:#C8891B;font-weight:bold;letter-spacing:.3px;margin:0 0 22px;">YOUR 30-DAY TRIAL IS ACTIVE</div>
 
-            function clearFieldErrors() {
-                ['err-first-name', 'err-email', 'err-role'].forEach(function (id) {
-                    var el = document.getElementById(id);
-                    if (el) {
-                        el.textContent = '';
-                        el.classList.remove('visible');
-                    }
-                });
-            }
+      ${signinBlock}
 
-            function showFieldError(fieldId, message) {
-                var el = document.getElementById(fieldId);
-                if (!el) return;
-                el.textContent = message;
-                el.classList.add('visible');
-            }
+      <!-- CCP box -->
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 20px;">
+        <tr><td style="background:#faf4e8;border:1px solid #ecd9b4;border-left:4px solid #C8891B;padding:16px 20px;border-radius:4px;">
+          <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#9a6a12;font-weight:bold;margin-bottom:5px;">Your Case Continuity Code</div>
+          <div style="font-family:Georgia,'Times New Roman',serif;font-size:22px;color:#0F2A6A;letter-spacing:1px;">${ccp}</div>
+          <div style="font-size:12px;color:#5a6a7a;margin-top:5px;">Keep this handy if you ever contact support.</div>
+        </td></tr>
+      </table>
 
-            function showFormError(message) {
-                var errorEl = document.getElementById('error-message');
-                errorEl.textContent = message;
-                errorEl.style.display = 'block';
-            }
+      <p style="font-size:15px;color:#2a3344;line-height:1.62;margin:0 0 16px;">Over the next 30 days, run a real matter through the platform — it's the fastest way to see what Case Clarity does for your case timelines and medical-record review. Your reports are yours to print or download; just save anything you want to keep before the trial ends.</p>
 
-            function showFormErrorHtml(html) {
-                var errorEl = document.getElementById('error-message');
-                errorEl.innerHTML = html;
-                errorEl.style.display = 'block';
-            }
+      <p style="font-size:15px;color:#2a3344;line-height:1.62;margin:0 0 4px;">Questions? Just reply to this email.</p>
+      <p style="font-size:15px;color:#2a3344;margin:0 0 2px;">— The Case Clarity Team</p>
+    </td></tr>
 
-            function hideFormError() {
-                var errorEl = document.getElementById('error-message');
-                errorEl.style.display = 'none';
-                errorEl.textContent = '';
-                errorEl.innerHTML = '';
-            }
+    <!-- Signature -->
+    <tr><td style="padding:0 40px 34px;">
+      <div style="border-top:1px solid #e8e4dc;margin-top:18px;padding-top:16px;">
+        <div style="font-size:14px;color:#0F2A6A;font-weight:bold;">Traci Johnson, BSN, RN</div>
+        <div style="font-size:12px;color:#5a6a7a;margin-top:2px;">Certified Care Manager &middot; Creator of the CARE, CASE &amp; CASE Clarity platforms</div>
+      </div>
+    </td></tr>
 
-            function isPersonalDomain(email) {
-                var m = String(email).trim().toLowerCase().match(/@([^@]+)$/);
-                if (!m) return true;
-                return BLOCKED.has(m[1]);
-            }
+    <!-- Footer -->
+    <tr><td style="background:#0a1f52;padding:18px 40px;">
+      <div style="color:#9fb6e8;font-size:11px;line-height:1.6;">
+        <span style="color:#E7B65A;font-weight:bold;letter-spacing:1px;">CASE CLARITY</span> &middot; Reconcile Care Management Services<br>
+        Clinical insight for personal injury, workers' compensation &amp; disability attorneys.
+      </div>
+    </td></tr>
 
-            async function runTrialSignupRequest(firstName, email, role) {
-                var base = window.CASE_CLARITY_SUPABASE_URL;
-                var key = window.CASE_CLARITY_SUPABASE_ANON_KEY;
-                if (!base || !key) {
-                    return { ok: false, clientConfigError: true };
-                }
-                var root = String(base).replace(/\/$/, '');
-                var res = await fetch(root + '/functions/v1/trial-signup', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: 'Bearer ' + key,
-                        apikey: key,
-                    },
-                    body: JSON.stringify({ first_name: firstName, email: email, title: role }),
-                });
-                var payload = {};
-                try {
-                    payload = await res.json();
-                } catch (e) {
-                    return { ok: false, parseError: true, status: res.status };
-                }
-                return { ok: res.ok, status: res.status, payload: payload };
-            }
+  </table>
+</td></tr>
+</table>
+</body></html>`
+}
 
-            async function sendMagicLink(email) {
-                var redirectTo = window.caseClarityGetAuthCallbackUrl
-                    ? window.caseClarityGetAuthCallbackUrl()
-                    : new URL('auth-callback.html', window.location.href).href;
-                return supabaseClient.auth.signInWithOtp({
-                    email: email,
-                    options: {
-                        emailRedirectTo: redirectTo,
-                        shouldCreateUser: true,
-                    },
-                });
-            }
+// Sends ONE branded email (welcome + CCP + sign-in button) via Resend.
+// Returns true only if the email actually went out, so the signup page knows
+// whether it still needs to send the fallback login link.
+async function sendTrialWelcome(
+  admin: ReturnType<typeof createClient>,
+  inserted: Record<string, unknown>,
+  redirectTo: string,
+): Promise<boolean> {
+  const apiKey = (Deno.env.get('RESEND_API_KEY') || '').trim()
+  if (!apiKey) {
+    console.warn('trial-signup: welcome skipped — set RESEND_API_KEY in Edge Function secrets')
+    return false
+  }
+  const fromEmail = (Deno.env.get('RESEND_FROM_EMAIL') || 'info@rcmspllc.com').trim()
+  const fromName = (Deno.env.get('RESEND_FROM_NAME') || 'Case Clarity').trim()
+  const from = `${fromName} <${fromEmail}>`
+  const email = String(inserted.email)
+  const firstName = String(inserted.full_name || 'there')
+  const ccp = String(inserted.ccp || '')
 
-            function showSuccess(email) {
-                document.getElementById('form-panel').style.display = 'none';
-                document.getElementById('success-panel').style.display = 'block';
-                document.getElementById('success-email').textContent = email;
-                lastSubmittedEmail = email;
-            }
+  // Make sure an auth user exists so a passwordless magic link can be generated.
+  try {
+    const { error: cuErr } = await admin.auth.admin.createUser({ email, email_confirm: true })
+    if (cuErr && !/already|exist|registered/i.test(cuErr.message || '')) {
+      console.warn('trial-signup: createUser:', cuErr.message)
+    }
+  } catch (e) {
+    console.warn('trial-signup: createUser threw:', e)
+  }
 
-            function resetToForm() {
-                document.getElementById('success-panel').style.display = 'none';
-                document.getElementById('form-panel').style.display = 'block';
-                hideFormError();
-            }
+  // Generate the sign-in link using the same redirect the browser flow uses.
+  let loginUrl = ''
+  try {
+    const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
+      type: 'magiclink',
+      email,
+      options: { redirectTo: redirectTo || DEFAULT_REDIRECT },
+    })
+    if (linkErr) console.warn('trial-signup: generateLink:', linkErr.message)
+    loginUrl = ((linkData as Record<string, any>)?.properties?.action_link as string) || ''
+  } catch (e) {
+    console.warn('trial-signup: generateLink threw:', e)
+  }
 
-            window.handleTrialSignup = async function () {
-                if (!supabaseClient) {
-                    showFormError('Configuration error. Please refresh and try again.');
-                    return;
-                }
+  // No link = don't claim success; the page will send the fallback login link.
+  if (!loginUrl) return false
 
-                var firstName = document.getElementById('first-name').value.trim();
-                var email = document.getElementById('email').value.trim().toLowerCase();
-                var role = document.getElementById('role').value.trim();
-                var submitBtn = document.getElementById('submit-btn');
+  const res = await resendSend(
+    apiKey, from, email,
+    'Welcome to Case Clarity — your 30-day trial is active',
+    welcomeHtml(firstName, ccp, loginUrl),
+    fromEmail,
+  )
+  if (!res) return false
+  if (!res.ok) {
+    console.warn('trial-signup: Resend non-OK', res.status, (await res.text()).slice(0, 500))
+    return false
+  }
+  return true
+}
 
-                clearFieldErrors();
-                hideFormError();
+// Optional, best-effort: keep syncing leads to Brevo for marketing follow-up.
+// Does nothing (silently) if BREVO_API_KEY isn't set. Never blocks the email.
+async function syncBrevoContact(inserted: Record<string, unknown>): Promise<void> {
+  const apiKey = (Deno.env.get('BREVO_API_KEY') || '').trim()
+  if (!apiKey) return
+  const listId = parseInt(Deno.env.get('BREVO_TRIAL_LIST_ID') || '', 10)
+  const contactPayload: Record<string, unknown> = {
+    email: String(inserted.email),
+    updateEnabled: true,
+    attributes: {
+      FIRSTNAME: inserted.full_name,
+      TITLE: inserted.title,
+      CCP: inserted.ccp,
+      TRIAL_START: inserted.trial_start_at,
+      TRIAL_USER_ID: inserted.id,
+      SOURCE: 'case_clarity_trial',
+    },
+  }
+  if (Number.isFinite(listId)) contactPayload.listIds = [listId]
+  const ac = new AbortController()
+  const t = setTimeout(() => ac.abort(), 15_000)
+  try {
+    const res = await fetch('https://api.brevo.com/v3/contacts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'api-key': apiKey, 'accept': 'application/json' },
+      body: JSON.stringify(contactPayload),
+      signal: ac.signal,
+    })
+    if (res && !res.ok && res.status !== 400) {
+      console.warn('trial-signup: Brevo contact non-OK', res.status, (await res.text()).slice(0, 300))
+    }
+  } catch (e) {
+    console.warn('trial-signup: Brevo contact failed:', e)
+  } finally {
+    clearTimeout(t)
+  }
+}
 
-                if (!firstName) {
-                    showFieldError('err-first-name', 'Full name is required.');
-                    return;
-                }
-                if (!email) {
-                    showFieldError('err-email', 'Business email is required.');
-                    return;
-                }
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                    showFieldError('err-email', 'Enter a valid email address.');
-                    return;
-                }
-                if (isPersonalDomain(email)) {
-                    showFieldError('err-email', 'Please use your business email address to request trial access.');
-                    return;
-                }
-                if (!role) {
-                    showFieldError('err-role', 'Please select your role.');
-                    return;
-                }
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
 
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Sending Access Link…';
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
 
-                try {
-                        var signupRes = await runTrialSignupRequest(firstName, email, role);
-                        if (signupRes.clientConfigError) {
-                            showFormError('Configuration error. Please refresh and try again.');
-                            submitBtn.disabled = false;
-                            submitBtn.textContent = 'Start Free Trial';
-                            return;
-                        }
-                        if (!signupRes.ok) {
-                            var p = signupRes.payload || {};
-                            if (signupRes.status === 403 && p.error === 'trial_expired') {
-                                showFormErrorHtml(
-                                    'This trial has ended. <a href="pricing.html" style="color:#1a2e3f;font-weight:600;">View plans</a> to continue using Case Clarity.'
-                                );
-                            } else if (signupRes.status === 404) {
-                                showFormError(
-                                    'Trial signup service is not available yet. Deploy the trial-signup Edge Function and retry.',
-                                );
-                            } else {
-                                showFormError(
-                                    typeof p.error === 'string'
-                                        ? p.error
-                                        : 'Registration failed. Please try again.',
-                                );
-                            }
-                            submitBtn.disabled = false;
-                            submitBtn.textContent = 'Start Free Trial';
-                            return;
-                        }
+  const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
+  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+  if (!supabaseUrl || !serviceKey) {
+    return new Response(JSON.stringify({ error: 'Server misconfigured' }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
 
-                        var otpResult = await sendMagicLink(email);
-                        if (otpResult.error) {
-                            console.error(otpResult.error);
-                            showFormError(otpResult.error.message || 'Could not send access link. Try again shortly.');
-                            submitBtn.disabled = false;
-                            submitBtn.textContent = 'Start Free Trial';
-                            return;
-                        }
+  const admin = createClient(supabaseUrl, serviceKey)
 
-                        showSuccess(email);
-                } catch (err) {
-                    console.error('Signup error:', err);
-                    showFormError('An error occurred. Please try again.');
-                }
+  let body: Record<string, unknown>
+  try {
+    body = await req.json()
+  } catch {
+    return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
 
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Start Free Trial';
-            };
+  const firstName = String(body.first_name ?? body.firstName ?? '').trim()
+  const emailRaw = String(body.email ?? '').trim().toLowerCase()
+  const role = String(body.title ?? body.role ?? '').trim()
+  const redirectTo = String(body.redirect_to ?? body.redirectTo ?? '').trim()
 
-            document.getElementById('resend-btn').addEventListener('click', function () {
-                var btn = document.getElementById('resend-btn');
-                btn.disabled = true;
-                btn.textContent = 'Sending…';
-                var em = lastSubmittedEmail;
-                sendMagicLink(em)
-                    .then(function (res) {
-                        if (res.error) {
-                            alert(res.error.message || 'Could not resend. Try again.');
-                        } else {
-                            alert('Another access link has been sent to ' + em + '.');
-                        }
-                    })
-                    .finally(function () {
-                        btn.disabled = false;
-                        btn.textContent = 'Resend link';
-                    });
-            });
+  if (!firstName) {
+    return new Response(JSON.stringify({ error: 'First name is required.' }), {
+      status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+  if (!emailRaw || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailRaw)) {
+    return new Response(JSON.stringify({ error: 'Enter a valid email address.' }), {
+      status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+  if (isPersonalDomain(emailRaw)) {
+    return new Response(JSON.stringify({ error: 'Please use your business email address to request trial access.' }), {
+      status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+  if (!role) {
+    return new Response(JSON.stringify({ error: 'Role is required.' }), {
+      status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
 
-            document.getElementById('different-email-btn').addEventListener('click', function () {
-                resetToForm();
-                document.getElementById('email').value = '';
-                document.getElementById('email').focus();
-            });
-        })();
-    </script>
-    <script src="js/auth-guard.js"></script>
-    <script>
-        if (typeof redirectIfLoggedIn === 'function') {
-            redirectIfLoggedIn();
-        }
-    </script>
-</body>
-</html>
+  // Check if already enrolled
+  const { data: existing, error: selErr } = await admin
+    .from('trial_users')
+    .select('*')
+    .eq('email', emailRaw)
+    .maybeSingle()
+
+  if (selErr) {
+    console.error('trial-signup select:', selErr)
+    return new Response(JSON.stringify({ error: 'Could not verify enrollment. Try again.' }), {
+      status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+
+  if (existing) {
+    const row = existing as Record<string, unknown>
+    const days = trialDaysElapsed(String(row.trial_start_at))
+    const expired = row.status === 'trial_expired' || (row.status === 'trial_active' && days >= TRIAL_DAYS)
+
+    if (expired) {
+      if (row.status === 'trial_active' && days >= TRIAL_DAYS) {
+        await admin.from('trial_users').update({ status: 'trial_expired' }).eq('id', row.id as string)
+      }
+      return new Response(JSON.stringify({ error: 'trial_expired' }), {
+        status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Returning user: update name/role. The browser sends a plain login link
+    // (welcome_sent:false), same as it always has — no second welcome email.
+    await admin.from('trial_users').update({ full_name: firstName, title: role }).eq('id', row.id as string)
+    return new Response(JSON.stringify({ action: 'existing_updated', welcome_sent: false, email: emailRaw }), {
+      status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+
+  // Create new trial record — CCP for case continuity, no PIN (magic link is the access method)
+  const trialStartAt = new Date().toISOString()
+  let inserted: Record<string, unknown> | null = null
+
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const ccp = generateCCP()
+    const { data, error } = await admin
+      .from('trial_users')
+      .insert({
+        full_name: firstName,
+        title: role,
+        email: emailRaw,
+        law_firm: '—',
+        phone: null,
+        ccp,
+        trial_start_at: trialStartAt,
+        status: 'trial_active',
+        completed_tools: {},
+      })
+      .select()
+      .single()
+
+    if (!error && data) {
+      inserted = data as Record<string, unknown>
+      break
+    }
+    const dupMsg = ((error?.message || '') + ' ' + (error?.details || '')).toLowerCase()
+    if (error?.code === '23505' && dupMsg.includes('ccp')) continue
+    if (error?.code === '23505') {
+      return new Response(JSON.stringify({ error: 'Could not complete signup. If you already have a trial, request a new access link.' }), {
+        status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+    console.error('trial-signup insert:', error)
+    return new Response(JSON.stringify({ error: 'Registration failed. Please try again.' }), {
+      status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+
+  if (!inserted) {
+    return new Response(JSON.stringify({ error: 'Registration failed (could not assign a unique record).' }), {
+      status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+
+  // Send the one branded email (welcome + CCP + sign-in button) via Resend.
+  let welcomeSent = false
+  try {
+    welcomeSent = await sendTrialWelcome(admin, inserted, redirectTo)
+  } catch (e) {
+    console.warn('trial-signup: welcome send threw:', e)
+    welcomeSent = false
+  }
+
+  // Best-effort marketing sync (silently skipped if BREVO_API_KEY isn't set).
+  try { await syncBrevoContact(inserted) } catch (_e) { /* non-blocking */ }
+
+  return new Response(JSON.stringify({
+    action: 'created',
+    welcome_sent: welcomeSent,
+    user: {
+      full_name: inserted.full_name,
+      title: inserted.title,
+      email: inserted.email,
+      ccp: inserted.ccp,
+      trial_start_at: inserted.trial_start_at,
+      id: inserted.id,
+    },
+  }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+})
