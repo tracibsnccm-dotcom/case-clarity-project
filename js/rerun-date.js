@@ -64,7 +64,7 @@
       ';margin-bottom:4px">Re-run this assessment by</div>' +
       '<div style="font-size:20px;font-weight:800;color:#0c1c34;line-height:1.2">' + esc(fmtDate(due)) + '</div>' +
       '<div style="font-size:12.5px;color:#3a3f4a;line-height:1.5;margin-top:4px">' + sub + '</div>' +
-      '<div style="font-size:11.5px;color:#6b7280;line-height:1.5;margin-top:4px">Re-run sooner if anything changes in treatment, providers, or the client’s condition.</div>' +
+      '<div style="font-size:12px;color:#3a3f4a;line-height:1.5;margin-top:6px;padding-top:6px;border-top:1px solid #e5e1d8">This date assumes the client’s condition and circumstances stay stable. <strong>If there is a significant change in condition or circumstances, re-run all six reports</strong> to see what has moved.</div>' +
       '</div>'
     );
   }

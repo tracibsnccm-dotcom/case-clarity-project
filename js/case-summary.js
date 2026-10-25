@@ -122,7 +122,7 @@
       (earliest ? '<div style="margin:10px 0;padding:8px 14px;background:#fdf8e8;border:2px solid #b09837;border-left:6px solid #b09837">' +
         '<div style="font-size:10.5px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#7a6a22">Next re-run due</div>' +
         '<div style="font-size:17px;font-weight:800;color:#0c1c34;margin-top:2px">' + esc(earliest.text) + ' — ' + esc(earliest.tool) + '</div>' +
-        '<div style="font-size:12.5px;color:#3a3f4a;margin-top:2px">Earliest re-run date across the completed assessments. Each tool’s own date is in the table below.</div></div>' : '') +
+        '<div style="font-size:12.5px;color:#3a3f4a;margin-top:2px">Earliest re-run date across the completed assessments. Each tool’s own date is in the table below. These dates assume stable results; if there is a significant change in the client’s condition or circumstances, re-run all six reports.</div></div>' : '') +
       '<table style="width:100%;border-collapse:collapse;font-size:12px;margin:4px 0 10px">' +
       '<thead><tr style="background:#f4f1ea"><th style="text-align:left;padding:5px 8px;font-size:11px;letter-spacing:0.08em;text-transform:uppercase">Tool</th>' +
       '<th style="text-align:left;padding:5px 8px;font-size:11px;letter-spacing:0.08em;text-transform:uppercase">Result</th>' +
