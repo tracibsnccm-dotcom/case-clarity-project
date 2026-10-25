@@ -708,6 +708,7 @@
     <script src="trial-pinned-banner.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-client.js"></script>
+  <script src="js/workspace-sync.js"></script>
     <script src="js/auth-guard.js"></script>
     <script>
         (function () {
@@ -886,10 +887,10 @@
             var capA = document.getElementById('report-active-capture');
             var capR = document.getElementById('report-retro-capture');
             if (capA) {
-                capA.textContent = localN === 6 ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localN + '/6. Reports include the instruments completed so far.');
+                capA.textContent = localN === 6 ? '✓ All 6 instruments saved to your account' : ('Saved: ' + localN + '/6. Reports include the instruments completed so far.');
             }
             if (capR) {
-                capR.textContent = localN === 6 ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localN + '/6. Reports include the instruments completed so far.');
+                capR.textContent = localN === 6 ? '✓ All 6 instruments saved to your account' : ('Saved: ' + localN + '/6. Reports include the instruments completed so far.');
             }
         }
 
@@ -1236,7 +1237,7 @@
             console.log('Tool6 exists:', !!localStorage.getItem('tool6_report_html'));
             var html = '<div class="comprehensive-report">';
             html += '<h2 style="font-size:22px;color:#0c1c34;margin:0 0 8px;padding:0;border:none;font-weight:600;">Case Clarity — Complete Assessment Report</h2>';
-            html += '<p style="font-size:13px;color:#6a7a8a;margin:0 0 24px;line-height:1.6;">Formatted output from each instrument (saved in this browser when you completed the tool). If a section is missing, re-open that tool once to refresh the capture.</p>';
+            html += '<p style="font-size:13px;color:#6a7a8a;margin:0 0 24px;line-height:1.6;">Formatted output from each instrument (saved to your account when you completed the tool). If a section is missing, re-open that tool once to refresh the capture.</p>';
             html += buildDashboardCasePrintHtml('active') + buildDashboardCasePrintHtml('retro');
             var toolNames = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
             var reportData = gatherTrialReportData();
@@ -1396,7 +1397,7 @@
             for (var i = 1; i <= 6; i++) {
                 if (localStorage.getItem('tool' + i + '_complete')) n++;
             }
-            prog.textContent = 'Instruments saved in this browser: ' + n + '/6';
+            prog.textContent = 'Instruments completed: ' + n + '/6';
             wrap.style.display = n >= 1 ? 'block' : 'none';
             
             // Sync to Supabase when UI updates
@@ -1589,6 +1590,9 @@
                     return;
                 }
 
+                // Trial clock runs from the account's start date, on every device.
+                if (user.trial_start_at) localStorage.setItem('trial_start_at', user.trial_start_at);
+
                 // Check if trial expired (30 days from trial_start_at)
                 const trialStart = new Date(user.trial_start_at);
                 const now = new Date();
@@ -1733,6 +1737,11 @@
 
         document.getElementById('btn-dashboard-logout').addEventListener('click', async function () {
             try {
+                if (window.caseClarityWorkspace) await window.caseClarityWorkspace.flush();
+            } catch (e0) {
+                /* ignore */
+            }
+            try {
                 await supabaseClient.auth.signOut();
             } catch (e) {
                 /* ignore */
@@ -1748,6 +1757,10 @@
         (async function initDashboard() {
             const ok = await bootstrapDashboardAccess();
             if (!ok) return;
+            // Restore this attorney's saved work from their account before rendering.
+            if (window.caseClarityWorkspace) {
+                try { await window.caseClarityWorkspace.pull(); } catch (e) { /* render from this browser */ }
+            }
             await checkTrialStatus();
         })();
 
@@ -1793,11 +1806,11 @@
                 <div class="timer-card">
                     <div>
                         <span class="timer-label">${timerLabel}</span>
-                        <div style="font-size:12px;color:#6a7a8a;margin-top:8px;max-width:520px;line-height:1.5;">30-day trial from first login on this device. Portal session may differ; tools lock when the trial ends.</div>
+                        <div style="font-size:12px;color:#6a7a8a;margin-top:8px;max-width:520px;line-height:1.5;">30-day trial from your signup date. Your work is saved to your account, so you can pick up on any device. Tools lock when the trial ends.</div>
                     </div>
                     <span id="trial-countdown-card" class="timer-value trial-countdown-clock ${timerClass}" aria-live="polite">30d 00h 00m 00s</span>
                 </div>
-                ${trialExpired ? '<div style="background:#fdf0f0;border:1px solid #e8b4b4;border-left:4px solid #c0392b;padding:16px 20px;margin-bottom:24px;font-size:14px;color:#5c2a2a;"><strong>Trial expired.</strong> Your 30-day instrument access from first login has ended. Launching assessments is disabled.</div>' : ''}
+                ${trialExpired ? '<div style="background:#fdf0f0;border:1px solid #e8b4b4;border-left:4px solid #c0392b;padding:16px 20px;margin-bottom:24px;font-size:14px;color:#5c2a2a;"><strong>Trial expired.</strong> Your 30-day instrument access from your signup date has ended. Launching assessments is disabled.</div>' : ''}
 
                 <!-- ORIENTATION SECTION -->
                 <div style="background: #f9f7f2; border: 1px solid #d6d0c4; border-left: 3px solid #b8922a; padding: 24px; margin-bottom: 32px;">
@@ -1830,8 +1843,8 @@
 
                 <div id="trial-complete-report-panel" class="trial-report-panel">
                     <h2>Complete trial report</h2>
-                    <p class="trial-report-lead">After you finish all six instruments in this browser, generate a single consolidated report from the data saved on your device (localStorage). Use <strong>Print Report</strong> to print or save as PDF.</p>
-                    <p class="trial-report-progress" id="trial-local-progress">Instruments saved in this browser: —/6</p>
+                    <p class="trial-report-lead">Generate a single consolidated report from the instruments you have completed. Use <strong>Print Report</strong> to print or save as PDF.</p>
+                    <p class="trial-report-progress" id="trial-local-progress">Instruments completed: —/6</p>
                     <div id="trial-generate-wrap" style="display:none;">
                         <button type="button" class="btn-generate-complete" id="btn-generate-complete-report">Generate Complete Report</button>
                     </div>
@@ -1921,7 +1934,7 @@
                       <h4 style="font-size: 15px; color: #0c1c34; margin-bottom: 12px;">Case Reports</h4>
                       <p style="font-size: 14px; color: #4a5568; margin-bottom: 10px; line-height: 1.5;">Print or download reports at any time. Each completed assessment is included.</p>
                       <p style="font-size: 14px; color: #b8922a; margin-bottom: 8px;">Progress: <span id="active-assessment-report-progress">${localN}</span>/6</p>
-                      <p id="report-active-capture" style="font-size: 12px; color: #6a7a8a; margin-bottom: 14px; line-height: 1.4;">${activePrintReady ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localN + '/6. Reports include the instruments completed so far.')}</p>
+                      <p id="report-active-capture" style="font-size: 12px; color: #6a7a8a; margin-bottom: 14px; line-height: 1.4;">${activePrintReady ? '✓ All 6 instruments saved to your account' : ('Saved: ' + localN + '/6. Reports include the instruments completed so far.')}</p>
                       <button type="button" class="btn-report" data-report-btn="active" id="btn-download-active-all" ${(localN >= 1 && !trialExpired) ? '' : 'disabled'} onclick="printActiveReports()">${localN === 6 ? 'Download All Reports' : 'Download Completed Reports'}</button>
                     </div>
                     ${(localN === 6 && !trialExpired) ? `
@@ -2089,7 +2102,7 @@
 
         window.launchTool = function(toolKey, caseType) {
             if (localStorage.getItem('trial_start_at') && computeTrialDaysRemaining() <= 0) {
-                alert('Trial expired. Your 30-day access from first login on this device has ended.');
+                alert('Trial expired. Your 30-day access from your signup date has ended.');
                 window.location.href = 'pricing.html';
                 return;
             }
@@ -2118,6 +2131,11 @@
         }
 
         window.handleLogout = async function () {
+            try {
+                if (window.caseClarityWorkspace) await window.caseClarityWorkspace.flush();
+            } catch (e0) {
+                /* ignore */
+            }
             try {
                 await supabaseClient.auth.signOut();
             } catch (e) {
