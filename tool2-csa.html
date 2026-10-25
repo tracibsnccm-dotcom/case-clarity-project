@@ -1423,6 +1423,7 @@
 <script src="js/portal-header-nav.js"></script>
 <script src="js/paid-portal-tool-run.js"></script>
 <script src="js/case-identity.js"></script>
+  <script src="js/rerun-date.js"></script>
 </head>
 <body class="with-portal-tool-header">
 
@@ -2955,6 +2956,7 @@ function buildCsaReportPage1Html(identityHtml) {
     assessmentComplete +
     titleCard +
     statusBadgeBlock +
+    (window.caseClarityRerun?window.caseClarityRerun.boxHtml(intervalConfig.label,{accent:'#0d2240'}):'') +
     interpretationBlock +
     operationalGuidance +
     (ctaBlock ? '<div style="margin-top:0;margin-bottom:10px">' + ctaBlock + '</div>' : '') +
