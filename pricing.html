@@ -108,6 +108,8 @@
             color: #6a7a8a;
         }
         @media (max-width: 700px) { .follow-up-table { display: block; overflow-x: auto; } }
+        .checkout-msg { max-width: 900px; margin: 22px auto 0; padding: 12px 16px; background: #fdf8e8; border: 1.5px solid #b09837; font-size: 15px; color: #1b2a3d; text-align: center; }
+        .checkout-msg a { color: #0c1c34; font-weight: 700; }
         .sample-cta { max-width: 900px; margin: 28px auto 0; display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; justify-content: center; text-align: center; font-size: 16px; color: #3a3f4a; }
         .sample-cta a { background: #0c1c34; color: #fff; padding: 11px 22px; text-decoration: none; font-weight: 600; letter-spacing: 0.04em; border-bottom: 3px solid #b09837; }
         .sample-cta a:hover { background: #13294a; }
@@ -262,6 +264,7 @@
             </div>
         </div>
 
+        <div id="checkout-msg" class="checkout-msg" style="display:none"></div>
         <div class="sample-cta">
             <span>See exactly what you get before you choose a plan.</span>
             <a href="sample-case.html" target="_blank" rel="noopener">See a sample case report</a>
@@ -365,39 +368,48 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
     <script>
-    /**
-     * PAYMENT INTEGRATION (replace initiateCheckout body before launch)
-     * ------------------------------------------------------------------
-     * Stripe:  Use Checkout Sessions (server endpoint returns session.url) or Payment Links.
-     *          Pass data-plan / price as metadata for fulfillment webhooks.
-     * GHL:     Use native order forms, payment links, or API — redirect user to the URL
-     *          for the selected plan or POST lead + plan to a GHL workflow.
-     * ------------------------------------------------------------------
-     * CONFIG:  Set window.CCP_STRIPE_CHECKOUT_BASE or window.CCP_GHL_ORDER_URLS below,
-     *          or implement fetch('/api/create-checkout', { method:'POST', body: JSON.stringify({ planId }) }).
-     */
-    window.CCP_STRIPE_CHECKOUT_BASE = ''; // e.g. 'https://buy.stripe.com/...' per plan, or leave empty if using API
-    window.CCP_GHL_ORDER_URLS = {
-        cases_4: '',
-        cases_12: '',
-        cases_unlimited: ''
-    };
-
+    /* Checkout: the Stripe session is created by the stripe-webhook Edge Function
+       for the signed-in trial account, so the subscription stays on the same account. */
     function initiateCheckout(planId, planLabel, priceCents) {
-        var ghl = window.CCP_GHL_ORDER_URLS && window.CCP_GHL_ORDER_URLS[planId];
-        if (ghl) {
-            window.location.href = ghl;
+        var PLAN = { cases_4: 'foundation', cases_12: 'professional', cases_unlimited: 'enterprise', single_client: 'single' }[planId];
+        var userId = localStorage.getItem('user_id');
+        var ccp = localStorage.getItem('ccp');
+        var msg = document.getElementById('checkout-msg');
+        function say(t) { if (msg) { msg.innerHTML = t; msg.style.display = 'block'; msg.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }
+        if (!PLAN) return;
+        if (!userId || !ccp || !window.supabaseClient) {
+            say('Please <a href="login.html">sign in to your trial account</a> first, so your cases and reports stay with your subscription. New here? <a href="trial-signup.html">Start a free trial</a>.');
             return;
         }
-        if (window.CCP_STRIPE_CHECKOUT_BASE) {
-            window.location.href = window.CCP_STRIPE_CHECKOUT_BASE + '?client_reference_id=' + encodeURIComponent(planId);
-            return;
-        }
-        console.info('[CCP Checkout placeholder]', planId, planLabel, priceCents);
-        alert('Online checkout is being connected. Plan: ' + planLabel + ' ($' + priceCents + '/mo). Replace initiateCheckout in pricing.html with Stripe or GHL.');
+        document.querySelectorAll('.btn-purchase').forEach(function (b) { b.disabled = true; });
+        say('Opening secure checkout for <strong>' + planLabel + '</strong>…');
+        window.supabaseClient.functions.invoke('stripe-webhook', {
+            body: { action: 'create_checkout', plan: PLAN, user_id: userId, ccp: ccp, return_base: window.location.origin }
+        }).then(function (r) {
+            var url = r && r.data && r.data.url;
+            if (url) { window.location.href = url; return; }
+            document.querySelectorAll('.btn-purchase').forEach(function (b) { b.disabled = false; });
+            var code = r && r.data && r.data.code;
+            say(code === 'signin'
+                ? 'Please <a href="login.html">sign in to your trial account</a> first.'
+                : 'Checkout could not be started. Please try again, or contact <a href="mailto:traci.johnson@rcmspllc.com">traci.johnson@rcmspllc.com</a>.');
+        }).catch(function () {
+            document.querySelectorAll('.btn-purchase').forEach(function (b) { b.disabled = false; });
+            say('Checkout could not be started. Please try again, or contact <a href="mailto:traci.johnson@rcmspllc.com">traci.johnson@rcmspllc.com</a>.');
+        });
     }
 
+
+    try {
+        if (new URLSearchParams(location.search).get('canceled')) {
+            var m = document.getElementById('checkout-msg');
+            m.innerHTML = 'Checkout was canceled. You have not been charged. Choose a plan whenever you are ready.';
+            m.style.display = 'block';
+        }
+    } catch (e) { /* ignore */ }
     document.querySelectorAll('.btn-purchase[data-plan]').forEach(function (btn) {
         btn.addEventListener('click', function () {
             initiateCheckout(

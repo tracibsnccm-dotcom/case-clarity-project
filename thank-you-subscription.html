@@ -261,23 +261,19 @@
 
       <div class="confirm-row">
         <div class="dot"></div>
-        <p><strong>Access recorded.</strong> Your subscription has been activated and your account is ready. You may log in to the portal below at any time.</p>
+        <p><strong>Access recorded.</strong> <span id="ty-access">Your account is now active. It may take a minute for your dashboard to show your plan.</span></p>
       </div>
 
       <div class="confirm-row">
         <div class="dot"></div>
-        <p><strong>Your credentials carry over.</strong></p>
-      </div>
-
-      <div class="pin-note">
-        Your current ID/PIN will still work in the new portal. No new credentials are required.
+        <p><strong>Your trial work carries over.</strong> Your cases, answers, and reports stay in the same account, with the same CCP number. Sign in with your email link as before.</p>
       </div>
     </div>
 
     <!-- PORTAL CTA -->
     <div class="portal-block">
-      <a href="#" class="portal-btn">Access the C.A.S.E. Clarity Portal</a>
-      <p class="portal-sub">Use your existing ID and PIN to log in.</p>
+      <a href="dashboard.html" class="portal-btn">Go to My Dashboard</a>
+      <p class="portal-sub">Same account, same email sign-in.</p>
     </div>
 
     <!-- SUPPORT NOTE -->
@@ -289,10 +285,18 @@
 
     <!-- FOOTER -->
     <div class="footer">
-      &copy; 2025 Reconcile Care Management Services &nbsp;|&nbsp; C.A.S.E. Clarity System™
+      &copy; 2026 Reconcile Care Management Services &nbsp;|&nbsp; C.A.S.E. Clarity System™
     </div>
 
   </main>
 
+<script>
+  try {
+    var plan = new URLSearchParams(location.search).get('plan');
+    if (plan === 'single') {
+      document.getElementById('ty-access').textContent = 'Your Single Client Review is active for 30 days. Each tool runs once; download or print your reports before the 30 days end.';
+    }
+  } catch (e) { /* ignore */ }
+</script>
 </body>
 </html>

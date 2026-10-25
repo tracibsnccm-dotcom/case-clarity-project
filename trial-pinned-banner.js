@@ -1,6 +1,15 @@
 (function () {
     var TRIAL_DURATION_MS = 30 * 24 * 60 * 60 * 1000;
 
+    /* Paid access (set by the dashboard from the account): {plan, label, until} */
+    function paidAccess() {
+        try {
+            var a = JSON.parse(localStorage.getItem('cc_access') || 'null');
+            if (a && a.until && new Date(a.until).getTime() > Date.now()) return a;
+        } catch (e) { /* ignore */ }
+        return null;
+    }
+
     function getTrialEndTimeMs() {
         var raw = localStorage.getItem('trial_start_at');
         if (!raw) return null;
@@ -31,7 +40,8 @@
         TRIAL_DURATION_MS: TRIAL_DURATION_MS,
         getEndTimeMs: getTrialEndTimeMs,
         getRemainingMs: getRemainingMs,
-        formatCountdown: formatCountdown
+        formatCountdown: formatCountdown,
+        paidAccess: paidAccess
     };
 
     function shouldShowToolBanner() {
@@ -41,7 +51,8 @@
     function tick() {
         var endMs = getTrialEndTimeMs();
         var ms = endMs == null ? TRIAL_DURATION_MS : Math.max(0, endMs - Date.now());
-        var text = formatCountdown(ms);
+        var paid = paidAccess();
+        var text = paid ? paid.label : formatCountdown(ms);
         var h = document.getElementById('trial-countdown');
         var c = document.getElementById('trial-countdown-card');
         var inj = document.getElementById('trial-pinned-countdown-text');
@@ -53,8 +64,10 @@
         if (injRoot) {
             var rem = getRemainingMs();
             var started = !!localStorage.getItem('trial_start_at');
-            injRoot.classList.toggle('trial-pinned--warning', started && rem > 0 && rem <= 2 * 86400000);
-            injRoot.classList.toggle('trial-pinned--expired', started && rem <= 0);
+            injRoot.classList.toggle('trial-pinned--warning', !paid && started && rem > 0 && rem <= 2 * 86400000);
+            injRoot.classList.toggle('trial-pinned--expired', !paid && started && rem <= 0);
+            var lab = injRoot.querySelector('.trial-global-pinned-label');
+            if (lab) lab.textContent = paid ? 'Subscriber' : 'Trial';
         }
     }
 

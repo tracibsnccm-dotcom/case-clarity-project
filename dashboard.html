@@ -1526,6 +1526,8 @@
             return !!localStorage.getItem('tool' + idx + '_complete');
         }
         function computeTrialDaysRemaining() {
+            var paid = window.CaseClarityTrial && window.CaseClarityTrial.paidAccess ? window.CaseClarityTrial.paidAccess() : null;
+            if (paid) return Math.max(1, Math.ceil((new Date(paid.until).getTime() - Date.now()) / 86400000));
             var raw = localStorage.getItem('trial_start_at');
             if (!raw) return 30;
             var startDate = new Date(raw);
@@ -1619,7 +1621,7 @@
                 if (authed) {
                     const r = await supabaseClient
                         .from('trial_users')
-                        .select('trial_start_at, status')
+                        .select('*')
                         .eq('id', userId)
                         .single();
                     user = r.data;
@@ -1641,6 +1643,24 @@
 
                 // Trial clock runs from the account's start date, on every device.
                 if (user.trial_start_at) localStorage.setItem('trial_start_at', user.trial_start_at);
+
+                // Paid accounts (same account as the trial) are never locked by the trial clock.
+                var PLAN_LABELS = { foundation: 'Foundation plan', professional: 'Professional plan', enterprise: 'Enterprise plan' };
+                var subOk = ['active', 'trialing', 'past_due'].indexOf(user.subscription_status) !== -1 && PLAN_LABELS[user.subscription_tier];
+                var singleOk = user.subscription_tier === 'single' && user.single_review_expires_at && new Date(user.single_review_expires_at) > new Date();
+                if (subOk || singleOk) {
+                    var until = singleOk ? user.single_review_expires_at
+                        : new Date(Math.max(Date.now() + 86400000, new Date(user.subscription_current_period_end || 0).getTime() + 3 * 86400000)).toISOString();
+                    var label = singleOk
+                        ? 'Single Client Review · through ' + new Date(user.single_review_expires_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                        : PLAN_LABELS[user.subscription_tier];
+                    localStorage.setItem('cc_access', JSON.stringify({ plan: user.subscription_tier, label: label, until: until }));
+                    renderDashboard();
+                    updateTrialReportUI();
+                    updateReportUI();
+                    return;
+                }
+                localStorage.removeItem('cc_access');
 
                 // Check if trial expired (30 days from trial_start_at)
                 const trialStart = new Date(user.trial_start_at);
@@ -1930,7 +1950,8 @@
             var trialExpired = !!localStorage.getItem('trial_start_at') && trialDaysRemaining <= 0;
             var localN = countLocalToolsComplete();
 
-            var timerLabel = trialExpired ? 'Trial access' : 'Trial time remaining';
+            var paidAcc = window.CaseClarityTrial && window.CaseClarityTrial.paidAccess ? window.CaseClarityTrial.paidAccess() : null;
+            var timerLabel = paidAcc ? 'Your plan' : (trialExpired ? 'Trial access' : 'Trial time remaining');
             var timerClass = trialExpired ? 'timer-warning' : (trialDaysRemaining <= 2 && trialDaysRemaining >= 0 ? 'timer-warning' : '');
             const locA = safeParseLocalStorage('dashboard_case_active') || {};
             const locR = safeParseLocalStorage('dashboard_case_retro') || {};
@@ -1952,9 +1973,9 @@
                 <div class="timer-card">
                     <div>
                         <span class="timer-label">${timerLabel}</span>
-                        <div style="font-size:12px;color:#6a7a8a;margin-top:8px;max-width:520px;line-height:1.5;">30-day trial from your signup date. Your work is saved to your account, so you can pick up on any device. Tools lock when the trial ends.</div>
+                        <div style="font-size:12px;color:#6a7a8a;margin-top:8px;max-width:520px;line-height:1.5;">${paidAcc ? 'Thank you for subscribing. Your cases and reports stay in your account, and you can pick up on any device.' : '30-day trial from your signup date. Your work is saved to your account, so you can pick up on any device. Tools lock when the trial ends.'}</div>
                     </div>
-                    <span id="trial-countdown-card" class="timer-value trial-countdown-clock ${timerClass}" aria-live="polite">30d 00h 00m 00s</span>
+                    <span id="trial-countdown-card" class="timer-value trial-countdown-clock ${paidAcc ? '' : timerClass}" aria-live="polite">${paidAcc ? escapeAttr(paidAcc.label) : '30d 00h 00m 00s'}</span>
                 </div>
                 ${trialExpired ? '<div style="background:#fdf0f0;border:1px solid #e8b4b4;border-left:4px solid #c0392b;padding:16px 20px;margin-bottom:24px;font-size:14px;color:#5c2a2a;"><strong>Trial expired.</strong> Your 30-day instrument access from your signup date has ended. Launching assessments is disabled.</div>' : ''}
 
@@ -2096,13 +2117,13 @@
                       <p id="report-active-capture" style="font-size: 12px; color: #6a7a8a; margin-bottom: 14px; line-height: 1.4;">${activePrintReady ? '✓ All 6 instruments saved to your account' : ('Saved: ' + localN + '/6. Reports include the instruments completed so far.')}</p>
                       <button type="button" class="btn-report" data-report-btn="active" id="btn-download-active-all" ${(localN >= 1 && !trialExpired) ? '' : 'disabled'} onclick="printActiveReports()">${localN === 6 ? 'Download All Reports' : 'Download Completed Reports'}</button>
                     </div>
-                    ${(localN === 6 && !trialExpired) ? `
+                    ${(localN === 6 && !trialExpired && !paidAcc) ? `
                     <div class="purchase-cta-card" style="margin-top:24px;padding:28px 32px;background:linear-gradient(135deg,#0c1c34 0%,#162d4a 100%);border:1px solid #b09837;border-radius:6px;color:#ffffff;text-align:center;">
                       <p style="margin:0 0 10px;font-family:Georgia,'Times New Roman',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#b09837;">Continue Beyond Your Trial</p>
                       <h3 style="margin:0 0 14px;font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:normal;color:#ffffff;line-height:1.35;">Ready to subscribe and continue beyond your trial?</h3>
                       <p style="margin:0 0 22px;font-family:Georgia,'Times New Roman',serif;font-size:14px;color:#c4ced8;line-height:1.6;max-width:560px;margin-left:auto;margin-right:auto;">Subscribe to keep using the C.A.S.E. Clarity System on every case you handle — run unlimited assessments and generate professional reports whenever you need them.</p>
                       <div style="display:inline-flex;gap:14px;flex-wrap:wrap;justify-content:center;">
-                        <a href="https://case-clarity-trial-active-purchase-l9vc0ylpl.vercel.app" target="_blank" rel="noopener" style="display:inline-block;padding:13px 32px;background:#b09837;color:#0c1c34;font-family:Georgia,\'Times New Roman\',serif;font-size:14px;letter-spacing:1px;text-decoration:none;font-weight:600;border-radius:4px;">View Subscription Plans</a>
+                         <a href="pricing.html" style="display:inline-block;padding:13px 32px;background:#b09837;color:#0c1c34;font-family:Georgia,\'Times New Roman\',serif;font-size:14px;letter-spacing:1px;text-decoration:none;font-weight:600;border-radius:4px;">View Subscription Plans</a>
                       </div>
                       <p style="margin:18px 0 0;font-family:Georgia,\'Times New Roman\',serif;font-size:11px;color:#8899aa;letter-spacing:1px;">No commitment required. Review plans at your own pace.</p>
                     </div>
