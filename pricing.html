@@ -107,6 +107,10 @@
             font-size: 16px;
             color: #6a7a8a;
         }
+        .offer-box { max-width: 900px; margin: 28px auto 28px; padding: 18px 22px; background: #fdf8e8; border: 2px solid #b09837; border-left: 6px solid #b09837; border-radius: 8px; }
+        .offer-box .offer-title { font-size: 20px; font-weight: 800; color: #0c1c34; margin-bottom: 6px; }
+        .offer-box p { margin: 6px 0 0; line-height: 1.55; color: #3a3f4a; }
+        .offer-box .offer-note { font-size: 14px; }
         .plan-cases {
             font-size: 14px;
             color: #6a7a8a;
@@ -219,27 +223,33 @@
     <div class="container">
         <p class="bundle-pill">Full platform bundle — all six instruments included</p>
         <h1>Subscription Plans</h1>
-        <p class="subtitle">Bundle-only access: every plan includes the complete Case Clarity assessment suite (CCI, CSA, CAF, HSI, FCI, RRF). Choose by case volume.</p>
+        <p class="subtitle">Bundle-only access: every plan includes the complete Case Clarity assessment suite (CCI, CSA, CAF, HSI, FCI, RRF). Choose by the number of clients you work with each month.</p>
 
         <div class="pricing-grid">
             <div class="pricing-card">
                 <div class="plan-name">4 Cases</div>
                 <div class="plan-price">$6,495<span class="period">/month</span></div>
-                <div class="plan-cases">4 cases per month · full bundle</div>
+                <div class="plan-cases">4 clients per month · unlimited reports per client</div>
                 <button type="button" class="btn-purchase" data-plan="cases_4" data-label="4 Cases" data-price="6495">SELECT PLAN</button>
             </div>
             <div class="pricing-card featured">
                 <div class="plan-name">12 Cases</div>
                 <div class="plan-price">$7,995<span class="period">/month</span></div>
-                <div class="plan-cases">12 cases per month · full bundle</div>
+                <div class="plan-cases">12 clients per month · unlimited reports per client</div>
                 <button type="button" class="btn-purchase" data-plan="cases_12" data-label="12 Cases" data-price="7995">SELECT PLAN</button>
             </div>
             <div class="pricing-card">
                 <div class="plan-name">Unlimited</div>
                 <div class="plan-price">$12,995<span class="period">/month</span></div>
-                <div class="plan-cases">Unlimited cases · full bundle</div>
+                <div class="plan-cases">Unlimited clients · unlimited reports per client</div>
                 <button type="button" class="btn-purchase" data-plan="cases_unlimited" data-label="Unlimited" data-price="12995">SELECT PLAN</button>
             </div>
+        </div>
+
+        <div class="offer-box">
+            <div class="offer-title">4 months for the price of 3</div>
+            <p>Make your first three monthly payments and your fourth month is free. After that, your plan continues month to month at its regular price. Cancel anytime.</p>
+            <p class="offer-note"><strong>What counts as a case:</strong> one case is one client. Run every tool as often as you need for each client in your plan; re-runs and reports never count as a new case.</p>
         </div>
 
         <div class="section">
@@ -252,7 +262,7 @@
                     <tr>
                         <th>Tool</th>
                         <th>Description</th>
-                        <th>Minimum Frequency</th>
+                        <th>First re-run (no later than)</th>
                         <th>Best Practice</th>
                     </tr>
                 </thead>
@@ -260,37 +270,37 @@
                     <tr>
                         <td class="tool-name">CCI (Case Complexity Index)</td>
                         <td>Assesses case complexity level and identifies key drivers</td>
-                        <td>Level 1–2: Minimum every 7 days<br>Level 3: Minimum every 30 days<br>Level 4: Minimum every 45 days<br>Level 5: Minimum every 60 days</td>
+                        <td>Level 1 (critical: coma, ICU, paralysis, severe brain injury): every 2–7 days<br>Level 2: weekly<br>Level 3: every 10–14 days<br>Levels 4–5: every 21–30 days</td>
                         <td>Higher complexity requires tighter monitoring. Catching complexity shifts early prevents case drift.</td>
                     </tr>
                     <tr>
                         <td class="tool-name">CSA (Clinical Sequencing Auditor)</td>
                         <td>Evaluates clinical sequencing and identifies gaps in care coordination</td>
-                        <td>Minimum every 30 days</td>
+                        <td>Within 30 days of the first report; the report gives the date</td>
                         <td>Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.</td>
                     </tr>
                     <tr>
                         <td class="tool-name">CAF (C.A.R.E. Access Friction Score)</td>
                         <td>Measures barriers to care and treatment access friction points</td>
-                        <td>Minimum every 30 days</td>
+                        <td>Within 30 days of the first report; the report gives the date</td>
                         <td>Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.</td>
                     </tr>
                     <tr>
                         <td class="tool-name">HSI (Holistic Stability Index)</td>
                         <td>Assesses overall case stability across intrinsic and extrinsic factors</td>
-                        <td>Minimum every 30 days</td>
+                        <td>Within 30 days of the first report; the report gives the date</td>
                         <td>Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.</td>
                     </tr>
                     <tr>
                         <td class="tool-name">FCI (Functional Capacity Index)</td>
                         <td>Evaluates functional capacity and vulnerability indicators</td>
-                        <td>Minimum every 30 days</td>
+                        <td>Within 30 days of the first report; the report gives the date</td>
                         <td>Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.</td>
                     </tr>
                     <tr>
                         <td class="tool-name">RRF (Recovery Risk Forecaster)</td>
                         <td>Identifies factors affecting recovery trajectory</td>
-                        <td>Minimum every 30 days</td>
+                        <td>Within 30 days of the first report; the report gives the date</td>
                         <td>Most effective when performed AFTER: a provider is added or removed, a treatment request is submitted, or any significant change occurs that may alter the trajectory of treatment.</td>
                     </tr>
                 </tbody>
@@ -298,7 +308,7 @@
 
             <div class="highlight-box">
                 <p><strong>Important Context:</strong></p>
-                <p>While the minimum is every 30 days, it should be expected that these reports would—and should—be run often during the early phases of injury, treatment, and care. Early and frequent assessments capture the trajectory of decline and recovery when it matters most.</p>
+                <p>Each report gives its own re-run date as a calendar date. After two reports in a row show the case is stable, the longer interval on the report applies. It should be expected that these reports would—and should—be run often during the early phases of injury, treatment, and care. Early and frequent assessments capture the trajectory of decline and recovery when it matters most.</p>
                 <p>You have to run them often enough when the client is at their most vulnerable so that you can catch declines in condition before they undermine the case and the evidence you need to prove how hindered the client was from returning to baseline physically and financially.</p>
             </div>
         </div>
