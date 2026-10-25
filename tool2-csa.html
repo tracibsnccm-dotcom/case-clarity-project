@@ -1424,6 +1424,8 @@
 <script src="js/portal-header-nav.js"></script>
 <script src="js/paid-portal-tool-run.js"></script>
 <script src="js/case-identity.js"></script>
+  <script src="js/print-frame.js"></script>
+  <script src="js/trial-print.js"></script>
   <script src="js/rerun-date.js"></script>
 </head>
 <body class="with-portal-tool-header">
@@ -1651,7 +1653,7 @@
         </div>
         <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 24px;">
           <button type="button" onclick="returnToDashboard()" class="btn-ghost-on-light">← Return to Dashboard</button>
-          <button type="button" onclick="csaOpenReportWindow()" class="btn-ghost-on-light">Print / Save PDF</button>
+          <button type="button" onclick="caseClarityPrintStoredReport('tool2_report_html', 'Clinical Sequencing Auditor Report')" class="btn-ghost-on-light">Print / Save PDF</button>
           <button type="button" onclick="goToNext()" class="btn-primary">Continue to Next Assessment →</button>
         </div>
       </div>
@@ -2320,6 +2322,7 @@ function buildAssessmentData() {
     providerSequence: JSON.parse(JSON.stringify(csaProviderSeq)),
     recordFlags: Object.keys(csaRecordFlags),
     caseFindings: csaCaseFindings(),
+    redFlagFindings: CSA_RECORD_FLAGS.filter(f => csaRecordFlags[f.k]).map(f => f.finding),
     reviewItems: csaReviewItems(),
     rightStatuses: r.rightStatuses,
     overallKey: r.overallKey,

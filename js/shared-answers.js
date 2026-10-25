@@ -142,6 +142,7 @@
    *   anchor()  element the note goes next to; pos 'before' | 'after' (default after)
    *   display(v) short readable text for the value
    *   accept(entry) optional; return false to ignore an answer (e.g. from this same tool)
+   *   include() optional; return false to leave this field off the report (e.g. a form section not used)
    */
   function fill(toolKey, spec) {
     var found = lookup(spec.key);
@@ -150,7 +151,7 @@
     if (e.source === toolKey) return;
     if (spec.accept && spec.accept(e) === false) return;
     if (spec.isEmpty && !spec.isEmpty()) return;
-    var r = { key: spec.key, entry: e, anchor: spec.anchor, pos: spec.pos, current: spec.current, label: spec.label || spec.key };
+    var r = { key: spec.key, entry: e, anchor: spec.anchor, pos: spec.pos, current: spec.current, include: spec.include, label: spec.label || spec.key };
     try { r.display = spec.display ? spec.display(e.value) : ''; } catch (x) { r.display = ''; }
     if (found.fresh) {
       var applied;
@@ -166,6 +167,7 @@
   /** Report block listing answers this tool carried over unchanged, with dates. */
   function provenanceHtml(toolKey) {
     var rows = (regs[toolKey] || []).filter(function (r) {
+      if (r.include) { try { if (!r.include()) return false; } catch (e) { return false; } }
       return r.applied !== undefined && sameValue(r.current ? r.current() : undefined, r.applied);
     });
     if (!rows.length) return '';

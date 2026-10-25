@@ -15,11 +15,6 @@
       alert('The report for this assessment is not available yet. Complete the assessment first.');
       return;
     }
-    var w = window.open('', '_blank');
-    if (!w) {
-      alert('Please allow pop-ups for this site to print the report.');
-      return;
-    }
     var styles = Array.prototype.map
       .call(document.querySelectorAll('style, link[rel="stylesheet"]'), function (n) {
         return n.outerHTML;
@@ -37,21 +32,34 @@
       '*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}' +
       '@media print{.cc-print-wrap{margin:0 auto;}}' +
       '</style>';
-    w.document.open();
-    w.document.write(
+    var doc =
       '<!DOCTYPE html><html><head><meta charset="utf-8">' + base +
       '<title>' + String(title || 'Report').replace(/</g, '&lt;') + '</title>' +
-      styles + fix + '</head><body><div class="cc-print-wrap">' + html + '</div></body></html>'
-    );
+      styles + fix + caseRunningHeaderCss() + '</head><body><div class="cc-print-wrap">' + html + '</div></body></html>';
+    if (typeof global.caseClarityPrintDocument === 'function') {
+      global.caseClarityPrintDocument(doc);
+      return;
+    }
+    var w = window.open('', '_blank');
+    if (!w) {
+      alert('Please allow pop-ups for this site to print the report.');
+      return;
+    }
+    w.document.open();
+    w.document.write(doc);
     w.document.close();
-    setTimeout(function () {
-      try {
-        w.focus();
-        w.print();
-      } catch (e) {
-        /* ignore */
-      }
-    }, 600);
+    setTimeout(function () { try { w.focus(); w.print(); } catch (e) { /* ignore */ } }, 600);
   }
+  /* Case name and date of injury at the top of every printed page. */
+  function caseRunningHeaderCss() {
+    var ci = global.caseClarityIdentity;
+    var row = ci && typeof ci.trialRow === 'function' ? ci.trialRow() : null;
+    if (!row || !row.case_title) return '';
+    var doi = ci.formatInjuryDate ? ci.formatInjuryDate(row.date_of_injury) : row.date_of_injury;
+    var txt = (row.case_title + (doi && doi !== '—' ? '  ·  DOI ' + doi : '')).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+    return '<style>@page{margin:0.6in 0.5in;@top-left{content:"' + txt + '";font:600 9pt system-ui,sans-serif;color:#555;}' +
+      '@bottom-right{content:"Page " counter(page) " of " counter(pages);font:9pt system-ui,sans-serif;color:#777;}}</style>';
+  }
+  global.caseClarityRunningHeaderCss = caseRunningHeaderCss;
   global.caseClarityPrintStoredReport = caseClarityPrintStoredReport;
 })(typeof window !== 'undefined' ? window : this);

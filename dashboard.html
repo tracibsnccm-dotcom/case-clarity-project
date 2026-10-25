@@ -709,6 +709,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-client.js"></script>
   <script src="js/workspace-sync.js"></script>
+  <script src="js/case-identity.js"></script>
+  <script src="js/print-frame.js"></script>
+  <script src="js/trial-print.js"></script>
+  <script src="js/case-summary.js"></script>
     <script src="js/auth-guard.js"></script>
     <script>
         (function () {
@@ -915,6 +919,17 @@
         };
 
         async function generateAndPrintReports(caseType, data) {
+            // One packet: case summary + every completed instrument, case name on every page.
+            var bodyEl = document.getElementById('trial-report-body');
+            if (bodyEl) {
+                bodyEl.innerHTML = buildComprehensiveReportHTML();
+                var outEl = document.getElementById('trial-report-output');
+                var metaEl = document.getElementById('trial-report-generated-at');
+                if (metaEl) metaEl.textContent = 'Generated: ' + new Date().toLocaleString();
+                if (outEl) outEl.style.display = 'block';
+                await printCompleteTrialReportPopup();
+                return;
+            }
             var printWindow = window.open('', '_blank');
             if (!printWindow) {
                 alert('Please allow pop-ups for this site to print reports.');
@@ -990,7 +1005,7 @@
             var printCss =
                 '*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}' +
                 'body{font-family:Georgia,\"Times New Roman\",serif;margin:0;color:#0e1c2e;font-size:14px;line-height:1.65;}' +
-                '.comprehensive-report{padding:48px 56px 80px;}' +
+                '.comprehensive-report{padding:12px 56px 40px;}' +
                 '.report-page-break{page-break-after:always;page-break-inside:avoid;border:none;margin:0;padding:0;}' +
                 '.report-page-break:last-of-type{page-break-after:auto;}' +
                 '.report-page-break--first{page-break-before:avoid;}' +
@@ -1002,12 +1017,6 @@
             var baseHref = getPrintDocumentBaseHref();
             var baseTag = baseHref ? '<base href="' + escPrintAttr(baseHref) + '">' : '';
 
-            var printWindow = window.open('', '_blank');
-            if (!printWindow) {
-                alert('Please allow pop-ups for this site to print reports.');
-                return;
-            }
-
             var bodyHtml = bodyEl.innerHTML;
             // buildComprehensiveReportHTML returns a wrapper <div class="comprehensive-report">...</div>.
             bodyHtml = bodyHtml.replace(/^<div class="comprehensive-report">/i, '').replace(/<\/div>\s*$/i, '');
@@ -1016,11 +1025,14 @@
                 '<!DOCTYPE html><html><head><meta charset="utf-8">' +
                 baseTag +
                 '<title>' + escPrintHtml(titleLabel) + '</title>' +
-                '<style>' + printCss + '</style></head><body>' +
-                '<h1 style="font-size:26px;font-weight:600;color:#0c1c34;border-bottom:3px solid #b8922a;padding-bottom:14px;margin:48px 56px 8px;letter-spacing:-0.02em;">' + escPrintHtml(titleLabel) + '</h1>' +
+                '<style>' + printCss + '</style>' + (window.caseClarityRunningHeaderCss ? window.caseClarityRunningHeaderCss() : '') + '</head><body>' +
+                '<h1 style="font-size:20px;font-weight:600;color:#0c1c34;border-bottom:3px solid #b8922a;padding-bottom:8px;margin:0 56px 8px;letter-spacing:-0.02em;">' + escPrintHtml(titleLabel) + '</h1>' +
                 '<div class="comprehensive-report">' + bodyHtml + '</div>' +
                 '</body></html>';
 
+            if (window.caseClarityPrintDocument) { window.caseClarityPrintDocument(html); return; }
+            var printWindow = window.open('', '_blank');
+            if (!printWindow) { alert('Please allow pop-ups for this site to print reports.'); return; }
             printWindow.document.write(html);
             printWindow.document.close();
             schedulePrintWhenReady(printWindow);
@@ -1236,15 +1248,18 @@
             console.log('Tool5 exists:', !!localStorage.getItem('tool5_report_html'));
             console.log('Tool6 exists:', !!localStorage.getItem('tool6_report_html'));
             var html = '<div class="comprehensive-report">';
-            html += '<h2 style="font-size:22px;color:#0c1c34;margin:0 0 8px;padding:0;border:none;font-weight:600;">Case Clarity — Complete Assessment Report</h2>';
-            html += '<p style="font-size:13px;color:#6a7a8a;margin:0 0 24px;line-height:1.6;">Formatted output from each instrument (saved to your account when you completed the tool). If a section is missing, re-open that tool once to refresh the capture.</p>';
-            html += buildDashboardCasePrintHtml('active') + buildDashboardCasePrintHtml('retro');
+            if (window.caseClaritySummary) {
+                html += window.caseClaritySummary.buildSummaryHtml();
+            } else {
+                html += '<h2 style="font-size:22px;color:#0c1c34;margin:0 0 8px;padding:0;border:none;font-weight:600;">Case Clarity — Complete Assessment Report</h2>';
+                html += buildDashboardCasePrintHtml('active') + buildDashboardCasePrintHtml('retro');
+            }
             var toolNames = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
             var reportData = gatherTrialReportData();
             var globalPageNumber = 1;
             for (var i = 1; i <= 6; i++) {
                 var toolName = toolNames[i - 1];
-                var breakClass = 'report-page-break' + (i === 1 ? ' report-page-break--first' : '');
+                var breakClass = 'report-page-break' + (i === 1 && !window.caseClaritySummary ? ' report-page-break--first' : '');
                 var content = getStoredToolReportSectionHtml(i, toolName, reportData);
                 if (!content && !localStorage.getItem('tool' + i + '_complete')) {
                     continue; // not started yet — reports can be printed with whatever is complete

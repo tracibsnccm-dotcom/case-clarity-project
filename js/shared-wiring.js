@@ -247,6 +247,7 @@
           },
           current: function () { return el.value; },
           anchor: function () { return fieldOf(id); },
+          include: function () { var f = el.closest('#piForm, #wcForm'); return f ? f.offsetParent !== null : true; },
           display: display
         });
       }
@@ -265,6 +266,7 @@
           apply: function (v) { var o = el.options[1 + three(v)]; if (!o) return undefined; el.value = o.value; fire(el); return o.value; },
           current: function () { return el.value; },
           anchor: function () { return fieldOf('wc_psych'); },
+          include: function () { var f = el.closest('#piForm, #wcForm'); return f ? f.offsetParent !== null : true; },
           display: function (v) { return W.pain[v] || v; }
         });
       })();
