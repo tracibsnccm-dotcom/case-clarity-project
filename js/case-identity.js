@@ -114,6 +114,37 @@
   }
 
   /**
+   * Trial portal: case info lives in localStorage (saved from the dashboard),
+   * not in case_cases. Build an identity row from it so headers and reports
+   * show the case instead of dashes. Returns null when nothing has been saved.
+   */
+  function trialRow() {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      if (params.get('case_ref')) return null;
+      var kind = params.get('caseType');
+      var key =
+        kind === 'retrospective' || kind === 'retro'
+          ? 'dashboard_case_retro'
+          : 'dashboard_case_active';
+      var c = JSON.parse(localStorage.getItem(key) || 'null');
+      if (!c || !(c.nameCaseId || c.dateOfInjury || c.caseType)) return null;
+      return {
+        case_ref: localStorage.getItem('ccp') || null,
+        case_title: c.nameCaseId || '',
+        client_name: c.nameCaseId || '',
+        date_of_injury: c.dateOfInjury || '',
+        case_type: c.caseType || '',
+        client_identifier: '',
+        case_status: 'trial',
+        created_at: '',
+      };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /**
    * @param {string|HTMLElement} mountId - element id or node to replace contents
    * @param {import('@supabase/supabase-js').SupabaseClient} client
    */
@@ -128,7 +159,7 @@
     el.innerHTML = cardHTML();
     var root = el.firstElementChild;
     if (!caseRef || !client) {
-      fillFields(root, null);
+      fillFields(root, trialRow());
       return;
     }
     var sessRes = await client.auth.getSession();
@@ -162,6 +193,7 @@
     TOOL_PAGE_CONTAINER_ID: TOOL_PAGE_CONTAINER_ID,
     cardHTML: cardHTML,
     fillFields: fillFields,
+    trialRow: trialRow,
     mount: mount,
     mountToolPage: mountToolPage,
     formatCaseType: formatCaseType,

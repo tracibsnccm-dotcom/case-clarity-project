@@ -310,6 +310,7 @@ body.caf-paid-mode #case-header-fields{display:none !important}
 <script src="js/portal-header-nav.js"></script>
 <script src="js/paid-portal-tool-run.js"></script>
 <script src="js/case-identity.js"></script>
+  <script src="js/trial-print.js"></script>
 </head>
 <body class="with-portal-tool-header">
 
@@ -411,7 +412,7 @@ body.caf-paid-mode #case-header-fields{display:none !important}
       <div class="byb-acc-body" id="byb-acc-bd-3">
       <p>Functional stability is expressed in <strong>whole-number levels</strong>, not decimals—small fractional differences do not change the interpreted level. Capability at one level versus the next can differ materially; the assessment avoids false precision.</p>
       <ul class="byb-points">
-        <li>Higher levels are not always achievable (e.g., MMI below “full” function applies to environments too).</li>
+        <li>Higher levels are not always achievable—some environments, like some recoveries, may stabilize below “full” function.</li>
         <li>The aim is an accurate stability picture for decisions—not inflating the score.</li>
       </ul>
       </div>
@@ -656,6 +657,7 @@ body.caf-paid-mode #case-header-fields{display:none !important}
       <p style="margin:0;font-size:14px;color:#555;line-height:1.6">Your responses have been recorded. Review the access friction summary below.</p>
       <div style="display:flex;gap:16px;justify-content:center;margin-top:28px;flex-wrap:wrap">
         <button type="button" class="btn-ghost" onclick="returnToDashboard()">← Return to Dashboard</button>
+        <button type="button" class="btn-ghost" onclick="caseClarityPrintStoredReport('tool3_report_html', 'C.A.R.E. Access Friction Score Report')">Print / Save PDF</button>
         <button type="button" class="btn-primary" onclick="goToNext()">Continue to Next Assessment →</button>
       </div>
     </div>
@@ -1397,8 +1399,11 @@ async function saveCafComplete(){
       console.warn('[CAF] case identity for report header',err);
     }
   }
+  if(!identityRow&&window.caseClarityIdentity&&typeof window.caseClarityIdentity.trialRow==='function'){
+    identityRow=window.caseClarityIdentity.trialRow();
+  }
   var snap=document.getElementById('caf-report-snapshot');
-  var reportOpts={includeIdentity:!!paidCafRef};
+  var reportOpts={includeIdentity:!!paidCafRef||!!identityRow};
   if(snap){
     snap.innerHTML=buildCafSnapshotHtml(toolData,minLvl,flags,identityRow,reportOpts);
     snap.className='caf-report findings results-display';

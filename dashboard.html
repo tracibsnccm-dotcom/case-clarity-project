@@ -886,40 +886,30 @@
             var capA = document.getElementById('report-active-capture');
             var capR = document.getElementById('report-retro-capture');
             if (capA) {
-                capA.textContent = localN === 6 ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localN + '/6. Complete all six to unlock downloads.');
+                capA.textContent = localN === 6 ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localN + '/6. Reports include the instruments completed so far.');
             }
             if (capR) {
-                capR.textContent = localN === 6 ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localN + '/6. Complete all six to unlock downloads.');
+                capR.textContent = localN === 6 ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localN + '/6. Reports include the instruments completed so far.');
             }
         }
 
         window.printActiveReports = async function() {
-            if (countLocalToolsComplete() < 6) {
-                alert('Download requires all 6 instruments to be completed in this browser. Saved: ' + countLocalToolsComplete() + '/6.');
+            if (!requireCaseIdentity('active', 'downloading reports')) return;
+            if (countLocalToolsComplete() < 1) {
+                alert('Complete at least one instrument to download reports.');
                 return;
             }
             var data = buildTrialPrintPayloadFromLocal();
-            var tools = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
-            var missing = tools.filter(function (t) { return !data[t]; });
-            if (missing.length) {
-                alert('Some instrument data is missing from this browser (' + missing.join(', ') + '). Re-open those tools from the dashboard and complete them again.');
-                return;
-            }
             await generateAndPrintReports('active', data);
         };
 
         window.printRetroReports = async function() {
-            if (countLocalToolsComplete() < 6) {
-                alert('Download requires all 6 instruments to be completed in this browser. Saved: ' + countLocalToolsComplete() + '/6.');
+            if (!requireCaseIdentity('retro', 'downloading reports')) return;
+            if (countLocalToolsComplete() < 1) {
+                alert('Complete at least one instrument to download reports.');
                 return;
             }
             var data = buildTrialPrintPayloadFromLocal();
-            var tools = ['CCI', 'CSA', 'CAF', 'HSI', 'FCI', 'RRF'];
-            var missing = tools.filter(function (t) { return !data[t]; });
-            if (missing.length) {
-                alert('Some instrument data is missing from this browser (' + missing.join(', ') + '). Re-open those tools from the dashboard and complete them again.');
-                return;
-            }
             await generateAndPrintReports('retro', data);
         };
 
@@ -1056,6 +1046,15 @@
             };
         }
 
+        function trialRrfBand(days) {
+            var d = Number(days);
+            if (days == null || !Number.isFinite(d)) return '—';
+            if (d < 90) return 'Short — under roughly 3 months';
+            if (d <= 180) return 'Moderate — roughly 3 to 6 months';
+            if (d <= 365) return 'Extended — roughly 6 to 12 months';
+            return 'Prolonged — roughly 12 months or longer';
+        }
+
         function escTrialHtml(s) {
             if (s == null || s === '') return '—';
             return String(s)
@@ -1086,6 +1085,9 @@
             }
             if (overallKey === 'misaligned' || overallKey === 'misaligned-r1') {
                 return 'Misaligned — corrective structural review is recommended prior to deposition, independent medical examination, or settlement positioning.';
+            }
+            if (overallKey === 'review') {
+                return 'Clinical review needed — no criteria confirmed as misaligned, but items answered "Not Sure" are flagged for clinical / RN review and excluded until confirmed.';
             }
             return 'See overall alignment label above.';
         }
@@ -1190,7 +1192,7 @@
             if (abbrev === 'RRF') {
                 parts.push('<p class="trial-lead"><strong>Recovery Risk Level:</strong> ' + escTrialHtml(inner.level || '—') + '</p>');
                 parts.push('<p class="trial-para"><strong>Composite score:</strong> ' + escTrialHtml(inner.total != null ? String(inner.total) + ' out of 100' : '—') + '</p>');
-                parts.push('<p class="trial-para"><strong>Predicted duration (illustrative):</strong> ' + escTrialHtml(inner.predictedDays != null ? String(inner.predictedDays) + ' days' : '—') + '</p>');
+                parts.push('<p class="trial-para"><strong>Expected treatment course:</strong> ' + escTrialHtml(trialRrfBand(inner.predictedDays)) + '</p>');
                 var br = inner.branch === 'WC' ? "Workers' Compensation" : (inner.branch === 'PI' ? 'Personal Injury' : (inner.branch || ''));
                 if (br) parts.push('<p class="trial-para"><strong>Matter branch:</strong> ' + escBodyHtml(br) + '</p>');
                 return parts.join('');
@@ -1244,6 +1246,9 @@
                 var toolName = toolNames[i - 1];
                 var breakClass = 'report-page-break' + (i === 1 ? ' report-page-break--first' : '');
                 var content = getStoredToolReportSectionHtml(i, toolName, reportData);
+                if (!content && !localStorage.getItem('tool' + i + '_complete')) {
+                    continue; // not started yet — reports can be printed with whatever is complete
+                }
                 if (!content) {
                     var markedDone = !!localStorage.getItem('tool' + i + '_complete');
                     var hasRaw = !!localStorage.getItem('tool' + i + '_data');
@@ -1386,7 +1391,7 @@
                 if (localStorage.getItem('tool' + i + '_complete')) n++;
             }
             prog.textContent = 'Instruments saved in this browser: ' + n + '/6';
-            wrap.style.display = allToolsComplete() ? 'block' : 'none';
+            wrap.style.display = n >= 1 ? 'block' : 'none';
             
             // Sync to Supabase when UI updates
             syncToolCompletionsToSupabase();
@@ -1397,6 +1402,7 @@
             var prt = document.getElementById('btn-print-trial-report');
             if (gen) {
                 gen.onclick = function () {
+                    if (!requireCaseIdentity('active', 'generating the report')) return;
                     var bodyEl = document.getElementById('trial-report-body');
                     var outEl = document.getElementById('trial-report-output');
                     var metaEl = document.getElementById('trial-report-generated-at');
@@ -1407,6 +1413,7 @@
             }
             if (prt) {
                 prt.onclick = function () {
+                    if (!requireCaseIdentity('active', 'printing the report')) return;
                     printCompleteTrialReportPopup();
                 };
             }
@@ -1877,7 +1884,7 @@
             html += `
                 <div class="case-section case-section-active">
                     <h2 style="font-size: 20px; margin: 32px 0 16px;">Case — Recommended Order</h2>
-                    <p style="margin-bottom: 20px; color: #4a5568; line-height: 1.6;">It is recommended that you complete in order, but you may choose any sequence. Reports will unlock for download once all assessments in this section are completed.</p>
+                    <p style="margin-bottom: 20px; color: #4a5568; line-height: 1.6;">It is recommended that you complete in order, but you may choose any sequence. Each report can be printed as soon as its assessment is complete.</p>
                     <p style="margin-bottom: 24px; color: #4a5568; line-height: 1.6; padding: 16px; background: #f4f6f8; border-left: 3px solid #0c1c34;">Consider beginning with a case that has stalled or where clinical direction is unclear. This process also provides a framework for new cases, offering guidance from the outset.</p>
                     <p style="margin-bottom: 12px; font-size: 15px; color: #0c1c34; font-weight: 600;">Start here with your case</p>
                     <div class="collapsible-section">
@@ -1906,10 +1913,10 @@
             html += `</div>
                     <div class="inline-reports-card">
                       <h4 style="font-size: 15px; color: #0c1c34; margin-bottom: 12px;">Case Reports</h4>
-                      <p style="font-size: 14px; color: #4a5568; margin-bottom: 10px; line-height: 1.5;">Reports available when all 6 assessments are complete.</p>
+                      <p style="font-size: 14px; color: #4a5568; margin-bottom: 10px; line-height: 1.5;">Print or download reports at any time. Each completed assessment is included.</p>
                       <p style="font-size: 14px; color: #b8922a; margin-bottom: 8px;">Progress: <span id="active-assessment-report-progress">${localN}</span>/6</p>
-                      <p id="report-active-capture" style="font-size: 12px; color: #6a7a8a; margin-bottom: 14px; line-height: 1.4;">${activePrintReady ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localN + '/6. Complete all six to unlock downloads.')}</p>
-                      <button type="button" class="btn-report" data-report-btn="active" id="btn-download-active-all" ${(localN === 6 && !trialExpired) ? '' : 'disabled'} onclick="printActiveReports()">Download All Reports</button>
+                      <p id="report-active-capture" style="font-size: 12px; color: #6a7a8a; margin-bottom: 14px; line-height: 1.4;">${activePrintReady ? '✓ All 6 instruments saved in this browser' : ('Saved locally: ' + localN + '/6. Reports include the instruments completed so far.')}</p>
+                      <button type="button" class="btn-report" data-report-btn="active" id="btn-download-active-all" ${(localN >= 1 && !trialExpired) ? '' : 'disabled'} onclick="printActiveReports()">${localN === 6 ? 'Download All Reports' : 'Download Completed Reports'}</button>
                     </div>
                     ${(localN === 6 && !trialExpired) ? `
                     <div class="purchase-cta-card" style="margin-top:24px;padding:28px 32px;background:linear-gradient(135deg,#0c1c34 0%,#162d4a 100%);border:1px solid #b09837;border-radius:6px;color:#ffffff;text-align:center;">
@@ -1956,6 +1963,28 @@
                     window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
                 }
             }
+        }
+
+        /* Case name, date of injury and case type must be filled before a tool
+           starts (so each instrument's report header carries them) and before
+           any report is generated or printed (no exports with blank identifiers). */
+        function missingCaseIdentity(kind) {
+            persistDashboardCaseToLocal();
+            var c = safeParseLocalStorage(kind === 'retro' ? 'dashboard_case_retro' : 'dashboard_case_active') || {};
+            var missing = [];
+            if (!c.nameCaseId) missing.push('Name / Case ID');
+            if (!c.dateOfInjury) missing.push('Date of Injury / Loss');
+            if (!c.caseType) missing.push('Case Type');
+            return missing;
+        }
+
+        function requireCaseIdentity(kind, action) {
+            var missing = missingCaseIdentity(kind);
+            if (!missing.length) return true;
+            alert('Please enter ' + missing.join(', ') + ' under "Enter Your Case Information" and click Save Case Information before ' + action + '.');
+            var f = document.getElementById(kind === 'retro' ? 'retro-name-case-id' : 'active-name-case-id');
+            if (f) { f.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+            return false;
         }
 
         function persistDashboardCaseToLocal() {
@@ -2058,6 +2087,7 @@
                 window.location.href = 'pricing.html';
                 return;
             }
+            if (!requireCaseIdentity(caseType === 'retrospective' ? 'retro' : 'active', 'starting an assessment')) return;
             const tool = TOOL_INFO[toolKey];
             const toolUrl = tool.url;
             const url = new URL(toolUrl, window.location.href);

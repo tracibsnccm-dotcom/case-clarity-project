@@ -1403,6 +1403,19 @@
     line-height: 1.75;
     margin-bottom: 8px;
   }
+  /* Inline plain-language help, provider sequence, record red flags */
+  .sub-q-help { margin: 6px 0 10px 34px; padding: 8px 12px; background: #f4f7fb; border-left: 3px solid #0d2240; border-radius: 4px; font-size: 12.5px; line-height: 1.5; color: #3a3f4a; }
+  .sub-q-help-label { font-weight: 700; color: #0d2240; }
+  .csa-seq-wrap { margin: 12px 0 4px 34px; padding: 10px 12px; background: #fffbf0; border: 1px solid #f0d9a8; border-radius: 6px; display: flex; flex-direction: column; gap: 6px; }
+  .csa-seq-label { font-size: 12px; font-weight: 700; color: #0d2240; }
+  .csa-seq-select { font: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 4px; background: #fff; max-width: 100%; }
+  .csa-recflag-card { background: #fff; border: 1.5px solid #e5e7eb; border-left: 5px solid #c0392b; border-radius: 10px; padding: 14px 18px; margin-bottom: 14px; }
+  .csa-recflag-title { font-size: 14px; font-weight: 800; color: #0d2240; }
+  .csa-recflag-opt { font-weight: 500; color: #6b7280; font-size: 12px; }
+  .csa-recflag-sub { font-size: 12px; color: #6b7280; margin: 4px 0 10px; }
+  .csa-recflag-item { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; line-height: 1.5; color: #3a3f4a; padding: 6px 0; border-top: 1px solid #f3f4f6; cursor: pointer; }
+  .csa-recflag-item input { margin-top: 3px; flex-shrink: 0; }
+  @media (max-width: 600px) { .sub-q-help, .csa-seq-wrap { margin-left: 0; } }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-client.js"></script>
@@ -1636,6 +1649,7 @@
         </div>
         <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 24px;">
           <button type="button" onclick="returnToDashboard()" class="btn-ghost-on-light">← Return to Dashboard</button>
+          <button type="button" onclick="csaOpenReportWindow()" class="btn-ghost-on-light">Print / Save PDF</button>
           <button type="button" onclick="goToNext()" class="btn-primary">Continue to Next Assessment →</button>
         </div>
       </div>
@@ -1669,6 +1683,54 @@
 // STATE
 // ─────────────────────────────────────────────────────────────────────────────
 let answers = {};
+/* Provider sequence (Right #1) and case-specific record flags. */
+let csaProviderSeq = { pattern: '', broadEntered: '' };
+let csaRecordFlags = {};
+const CSA_SEQ_OPTIONS = [
+  { v: '', t: '— Select provider sequence (optional) —' },
+  { v: 'broad-throughout', t: 'Broad-scope provider (MD, DO, NP, PA) directed care throughout' },
+  { v: 'narrow-then-broad', t: 'Narrow-scope provider directed early care; broad-scope provider entered later' },
+  { v: 'broad-then-narrow', t: 'Broad-scope provider early; narrow-scope provider took over' },
+  { v: 'narrow-throughout', t: 'Narrow-scope provider (chiropractor, PT) directed care throughout' }
+];
+const CSA_RECORD_FLAGS = [
+  { k: 'headStrike', label: 'Head strike or altered awareness reported (dazed, "saw stars"), but no concussion diagnosis or screening in the record',
+    finding: 'Head strike reported but no concussion diagnosis or screening — neurology referral indicated.' },
+  { k: 'degenerative', label: 'Imaging shows degenerative or pre-existing changes, and there were no prior complaints or treatment to that area',
+    finding: 'Degenerative findings on imaging with no prior complaints — record must address aggravation of a pre-existing condition.' },
+  { k: 'symptomMag', label: 'A note alleges symptom magnification, malingering, or non-compliance without citing objective testing',
+    finding: 'A provider note alleges symptom magnification or non-compliance without objective testing — get that addressed.' },
+  { k: 'gapReason', label: 'Gap in treatment, and the reason for the gap is not recorded in the chart',
+    finding: 'Treatment-gap reason not in the chart — document it now from the client and supporting records (for example transportation, financial, or work records).' },
+  { k: 'nerveTesting', label: 'Radiating or nerve symptoms (numbness, tingling, weakness into an arm or leg) without nerve testing (EMG/NCS) or specialist evaluation',
+    finding: 'Radiating nerve symptoms without nerve testing (EMG/NCS) or specialist evaluation — objective confirmation of nerve involvement is not documented.' }
+];
+
+function csaSetProviderSeq(field, value) {
+  csaProviderSeq[field] = value || '';
+  csaRefreshIfComplete();
+}
+function csaToggleRecordFlag(k, on) {
+  if (on) csaRecordFlags[k] = true; else delete csaRecordFlags[k];
+  csaRefreshIfComplete();
+}
+function csaRefreshIfComplete() {
+  scheduleCsaDraftSave();
+  const allAnswered = RIGHTS.every((r, i) => Object.keys(answers[i] || {}).length === r.questions.length);
+  if (allAnswered) void csaOnAllRightsComplete();
+}
+function csaSeqLabel(v) {
+  const o = CSA_SEQ_OPTIONS.find(x => x.v === v);
+  return o && o.v ? o.t : '';
+}
+function buildRecordFlagsCardHtml() {
+  const items = CSA_RECORD_FLAGS.map(f =>
+    '<label class="csa-recflag-item"><input type="checkbox" id="recflag-' + f.k + '" onchange="csaToggleRecordFlag(\'' + f.k + '\', this.checked)"' + (csaRecordFlags[f.k] ? ' checked' : '') + '> <span>' + f.label + '</span></label>'
+  ).join('');
+  return '<div class="csa-recflag-card">' +
+    '<div class="csa-recflag-title">Record red flags <span class="csa-recflag-opt">(check any that are in this file — optional)</span></div>' +
+    '<p class="csa-recflag-sub">These turn into case-specific findings on the report.</p>' + items + '</div>';
+}
 
 // ── Paid portal: case_tool_drafts (CSA) ─────────────────────────────────────
 var csaDraftSaveTimer = null;
@@ -1713,7 +1775,7 @@ function csaDraftHasMeaningfulState(d) {
 }
 
 function csaCollectDraftJson() {
-  return { v: 1, answers: JSON.parse(JSON.stringify(answers)) };
+  return { v: 1, answers: JSON.parse(JSON.stringify(answers)), providerSequence: JSON.parse(JSON.stringify(csaProviderSeq)), recordFlags: Object.keys(csaRecordFlags) };
 }
 
 async function saveCsaDraft() {
@@ -1763,6 +1825,13 @@ function csaMergeDraftJsonIntoAnswers(d) {
   if (!d || typeof d !== 'object') return;
   var src = d.answers !== undefined ? d.answers : d;
   if (!src || typeof src !== 'object') return;
+  if (d.providerSequence && typeof d.providerSequence === 'object') {
+    csaProviderSeq = { pattern: d.providerSequence.pattern || '', broadEntered: d.providerSequence.broadEntered || '' };
+  }
+  if (Array.isArray(d.recordFlags)) {
+    csaRecordFlags = {};
+    d.recordFlags.forEach(function (k) { csaRecordFlags[k] = true; });
+  }
   answers = {};
   for (var ri = 0; ri < 7; ri++) {
     var block = src[ri] !== undefined ? src[ri] : src[String(ri)];
@@ -1959,6 +2028,9 @@ function toggleDef(ri) {
 function buildCards() {
   const container = document.getElementById('cards-container');
   container.innerHTML = '';
+  const flagsWrap = document.createElement('div');
+  flagsWrap.innerHTML = buildRecordFlagsCardHtml();
+  container.appendChild(flagsWrap.firstElementChild);
   RIGHTS.forEach((right, ri) => {
     if (!answers[ri]) answers[ri] = {};
     const card = document.createElement('div');
@@ -1988,12 +2060,22 @@ function buildCards() {
             <span class="sub-q-num">${qi + 1}</span>
             <span>${q.text}</span>
           </div>
+          ${q.help ? `<div class="sub-q-help"><span class="sub-q-help-label">What this means:</span> ${q.help}</div>` : ''}
           <div class="sub-q-options">
             <button class="sub-opt" id="opt-${ri}-${qi}-yes"      onclick="selectSub(${ri},${qi},'yes')">✓ Yes</button>
-            <button class="sub-opt not-sure-btn" id="opt-${ri}-${qi}-not-sure" onclick="selectSub(${ri},${qi},'not-sure')" title="Select if this criterion may exist but is unconfirmed in the record">Not Sure?<span class="not-sure-hint">unconfirmed in record</span></button>
+            <button class="sub-opt not-sure-btn" id="opt-${ri}-${qi}-not-sure" onclick="selectSub(${ri},${qi},'not-sure')" title="Select if you cannot confirm this from the record. It is flagged for clinical / RN review and does not lower the result.">Not Sure?<span class="not-sure-hint">flag for RN review</span></button>
             <button class="sub-opt" id="opt-${ri}-${qi}-no"       onclick="selectSub(${ri},${qi},'no')">✗ No</button>
           </div>
           ${flagHTML}
+          ${q.sequence ? `
+          <div class="csa-seq-wrap">
+            <label class="csa-seq-label" for="csa-seq-pattern">Provider sequence — who directed care, and when?</label>
+            <select id="csa-seq-pattern" class="csa-seq-select" onchange="csaSetProviderSeq('pattern', this.value)">
+              ${CSA_SEQ_OPTIONS.map(o => `<option value="${o.v}"${csaProviderSeq.pattern === o.v ? ' selected' : ''}>${o.t}</option>`).join('')}
+            </select>
+            <label class="csa-seq-label" for="csa-seq-date">Date the broad-scope provider first saw the client (if known)</label>
+            <input type="date" id="csa-seq-date" class="csa-seq-select" value="${csaProviderSeq.broadEntered || ''}" onchange="csaSetProviderSeq('broadEntered', this.value)">
+          </div>` : ''}
         </div>`;
     }).join('');
 
@@ -2233,6 +2315,10 @@ function buildAssessmentData() {
   return {
     tool: 'CSA',
     answers: JSON.parse(JSON.stringify(answers)),
+    providerSequence: JSON.parse(JSON.stringify(csaProviderSeq)),
+    recordFlags: Object.keys(csaRecordFlags),
+    caseFindings: csaCaseFindings(),
+    reviewItems: csaReviewItems(),
     rightStatuses: r.rightStatuses,
     overallKey: r.overallKey,
     overallLabel: r.overall.label,
@@ -2259,11 +2345,14 @@ const RIGHTS = [
       { label: "Satisfies", text: "Following an emergency room visit, a client establishes care with an MD in occupational medicine who documents injury-specific findings, orders an MRI, prescribes a short-term medication protocol, and refers the client to an orthopedic spine specialist. The managing provider has full diagnostic, prescriptive, and referral authority consistent with the documented injury. Right #1 is satisfied." }
     ],
     questions: [
-      { text: "Has a specialist been identified that matches each documented injury — such as an orthopedist for musculoskeletal injury, neurologist for TBI, or pain management for chronic pain?" },
-      { text: "Has the client actually been seen by the specialist — not just received a referral that has not been followed through?" },
-      { text: "Has the specialist established or updated the diagnosis specific to their scope of practice — not carried over vague language from the referring provider?" },
+      { text: "Has a specialist been identified that matches each documented injury — such as an orthopedist for musculoskeletal injury, neurologist for TBI, or pain management for chronic pain?", finding: "No specialist has been identified to match each documented injury — specialty referral is not documented." },
+      { text: "Has the client actually been seen by the specialist — not just received a referral that has not been followed through?", finding: "The client has not been seen by a matching specialist — referral follow-through is not documented." },
+      { text: "Has the specialist established or updated the diagnosis specific to their scope of practice — not carried over vague language from the referring provider?", finding: "No specialist has established or updated the diagnosis — the diagnosis still rests on referring-provider language." },
       {
-        text: "Is the client's primary treating provider a licensed physician (MD or DO) with independent diagnostic, prescriptive, and referral authority — not a chiropractor serving as the sole managing provider?",
+        text: "Is the client's primary treating provider a licensed physician or equivalent (MD, DO, NP, or PA) with independent diagnostic, prescriptive, and referral authority — not a chiropractor serving as the sole managing provider?",
+        help: "Broad-scope providers (MD, DO, NP, PA) can diagnose, order imaging, manage medication, and refer. Narrow-scope (chiropractor, physical therapist) cannot.",
+        sequence: true,
+        finding: "Primary managing provider is not broad-scope (MD, DO, NP, or PA) — a narrow-scope provider is directing care.",
         flag: {
           triggerOn: ["no", "not-sure"],
           title: "⚠ Clinical Alert: Provider Authority Gap",
@@ -2289,10 +2378,10 @@ const RIGHTS = [
       { label: "Satisfies", text: "The treating orthopedist documents cervical disc herniation at C5-C6 with documented radiculopathy, supported by MRI findings and consistent dermatomal pattern on physical examination. The diagnosis is specific, named, and supported by objective findings. Right #2 is satisfied for that injury." }
     ],
     questions: [
-      { text: "Does each documented injury have its own specific, named clinical diagnosis — not a global descriptor such as 'pain,' 'injury,' or 'trauma'?" },
-      { text: "Does each diagnosis align with the mechanism of injury and is it supported by documented objective clinical findings?" },
-      { text: "Has the diagnosis been clarified and updated following specialty evaluation — not simply carried forward from an initial ED or urgent care visit?" },
-      { text: "Are diagnoses consistent across all treating providers, with no unreconciled conflicts in the record?" }
+      { text: "Does each documented injury have its own specific, named clinical diagnosis — not a global descriptor such as 'pain,' 'injury,' or 'trauma'?", finding: "One or more reported injuries has no specific named diagnosis (only a global descriptor such as 'pain' or 'strain', or not diagnosed at all)." },
+      { text: "Does each diagnosis align with the mechanism of injury and is it supported by documented objective clinical findings?", finding: "A diagnosis is not supported by documented objective findings, or does not fully account for the mechanism of injury.", help: "Objective findings are things measured or observed, not just reported by the client — for example exam tests (strength, reflexes, sensation, special tests), imaging results, or measured range of motion." },
+      { text: "Has the diagnosis been clarified and updated following specialty evaluation — not simply carried forward from an initial ED or urgent care visit?", finding: "The diagnosis has not been clarified since the initial ED or urgent care visit." },
+      { text: "Are diagnoses consistent across all treating providers, with no unreconciled conflicts in the record?", finding: "Diagnoses or descriptions of the client conflict across providers and have not been reconciled in the record." }
     ]
   },
   {
@@ -2300,7 +2389,7 @@ const RIGHTS = [
     desc: "Ensures treatment is appropriate, diagnosis-driven, evidence-based guideline aligned, and sequenced according to injury diagnosis, objective findings, and functional limitations.",
     definition: "Ensures treatment is appropriate, diagnosis-driven, evidence-based guideline aligned, and sequenced according to injury diagnosis, objective findings, and functional limitations.",
     clarifications: [
-      "Clinical alignment requires that treatment reflects the confirmed diagnosis established by the treating MD/DO and progresses according to objective findings, functional limitations, and nationally recognized evidence-based guideline pathways (ODG, MCG, InterQual, or applicable state WC guidelines).",
+      "Clinical alignment requires that treatment reflects the confirmed diagnosis established by the treating broad-scope provider (MD, DO, NP, or PA) and progresses according to objective findings, functional limitations, and nationally recognized evidence-based guideline pathways (ODG, MCG, InterQual, or applicable state WC guidelines).",
       "Escalation should only occur when conservative care fails, functional limitations persist, or specialty-driven justification is documented.",
       "Guideline citation is not required in the record, but treatment progression must be consistent with guideline sequencing or supported by documented clinical rationale for deviation."
     ],
@@ -2310,10 +2399,10 @@ const RIGHTS = [
       { label: "Satisfies", text: "Illustrative example: a client with a confirmed right knee MCL sprain begins with conservative care (RICE, NSAIDs, bracing), progresses to therapeutic exercise, and receives imaging or specialty referral when functional limitations persist or worsen. Right #3: Satisfied." }
     ],
     questions: [
-      { text: "Has a recognized evidence-based guideline been identified for each diagnosis — such as ODG, MCG, InterQual, or the applicable state workers' compensation guideline?" },
-      { text: "Is the treatment plan — including type of care, frequency, duration, and sequencing — objectively consistent with what the applicable guideline recommends for this diagnosis?" },
-      { text: "Where treatment has deviated from guideline recommendations, is there documented clinical justification in the record supporting that deviation?" },
-      { text: "Is the overall progression of care — from conservative management through escalation — consistent with guideline sequencing for the documented diagnosis?" }
+      { text: "Has a recognized evidence-based guideline been identified for each diagnosis — such as ODG, MCG, InterQual, or the applicable state workers' compensation guideline?", finding: "No evidence-based guideline pathway has been identified for the documented diagnoses.", help: "ODG, MCG and InterQual are the guideline sets insurers and reviewers use to judge whether treatment is reasonable for a diagnosis. The chart does not have to cite them. If you cannot tell, choose Not Sure — it will be flagged for clinical / RN review instead of lowering the result." },
+      { text: "Is the treatment plan — including type of care, frequency, duration, and sequencing — objectively consistent with what the applicable guideline recommends for this diagnosis?", finding: "Type, frequency, duration, or sequencing of care does not match guideline expectations for the diagnosis.", help: "In plain terms: is the client getting the kind of care, at the visit frequency and for the length of time, that is usual for this diagnosis — moving from basic care to more advanced care when the client is not improving? If you cannot tell, choose Not Sure." },
+      { text: "Where treatment has deviated from guideline recommendations, is there documented clinical justification in the record supporting that deviation?", finding: "Treatment departs from guideline expectations without documented clinical justification." },
+      { text: "Is the overall progression of care — from conservative management through escalation — consistent with guideline sequencing for the documented diagnosis?", finding: "Care has not progressed from conservative management to escalation in guideline sequence." }
     ]
   },
   {
@@ -2332,9 +2421,9 @@ const RIGHTS = [
       { label: "Satisfies", text: "Following persistent radicular symptoms after conservative care, a lumbar MRI is ordered with documented clinical rationale. Imaging findings are documented and explicitly referenced in a subsequent treatment plan update directing specialty referral. Right #4: Satisfied." }
     ],
     questions: [
-      { text: "Has appropriate diagnostic imaging been ordered and completed consistent with evidence-based guideline recommendations for the documented diagnosis?" },
-      { text: "Is each diagnostic study directly tied to documented clinical findings and guideline indications — not ordered generically or without documented clinical rationale?" },
-      { text: "Are all test results documented in the medical chart and explicitly referenced in subsequent treatment notes or plan updates?" }
+      { text: "Has appropriate diagnostic imaging been ordered and completed consistent with evidence-based guideline recommendations for the documented diagnosis?", finding: "Diagnostic testing indicated for the documented symptoms or diagnosis has not been ordered or completed (or was delayed).", help: "Examples: imaging such as MRI when symptoms persist or spread to an arm or leg, and nerve testing (EMG/NCS) when there is numbness, tingling or weakness. If you cannot tell whether a test was indicated, choose Not Sure." },
+      { text: "Is each diagnostic study directly tied to documented clinical findings and guideline indications — not ordered generically or without documented clinical rationale?", finding: "A diagnostic study was ordered without documented clinical rationale tied to the findings." },
+      { text: "Are all test results documented in the medical chart and explicitly referenced in subsequent treatment notes or plan updates?", finding: "Test results are not referenced in later treatment notes or plan updates." }
     ]
   },
   {
@@ -2353,32 +2442,32 @@ const RIGHTS = [
       { label: "Satisfies", text: "A client with a documented rotator cuff tear completes a structured course of physical therapy with consistent attendance. Limited improvement is documented. The treating physician formally documents conservative care failure and initiates appropriate specialty referral. Right #5: Satisfied." }
     ],
     questions: [
-      { text: "Is the client's treatment plan directly tied to each confirmed diagnosis — not generic or non-diagnosis-specific?" },
-      { text: "Is the treatment plan consistent with applicable evidence-based guideline recommendations for type, frequency, duration, and sequencing?" },
-      { text: "Is the client actively following the treatment plan — attending consistently and completing prescribed care without unexplained gaps?" },
-      { text: "Has treatment been appropriately escalated when conservative care has not produced measurable progress consistent with guideline expectations?" }
+      { text: "Is the client's treatment plan directly tied to each confirmed diagnosis — not generic or non-diagnosis-specific?", finding: "The treatment plan is not tied to each confirmed diagnosis." },
+      { text: "Is the treatment plan consistent with applicable evidence-based guideline recommendations for type, frequency, duration, and sequencing?", finding: "The treatment plan is not consistent with guideline type, frequency, duration, or sequencing.", help: "Same standard as Right #3 — is the care usual for this diagnosis in kind, frequency and length? If you cannot tell, choose Not Sure." },
+      { text: "Is the client actively following the treatment plan — attending consistently and completing prescribed care without unexplained gaps?", finding: "Gap in care or inconsistent attendance with no reason recorded in the chart — document the reason now before it is read as non-compliance." },
+      { text: "Has treatment been appropriately escalated when conservative care has not produced measurable progress consistent with guideline expectations?", finding: "Care was not escalated (imaging, specialist referral, or change in treatment) after conservative care failed to produce measurable progress." }
     ]
   },
   {
     number: "6", label: "Right #6", title: "Right Timing",
-    desc: "Care must be initiated within a clinically appropriate timeframe following injury, referrals must be completed without unreasonable delay, treatment frequency must align with applicable guideline recommendations, and MMI must be monitored and documented relative to case progression.",
-    definition: "Care must be initiated within a clinically appropriate timeframe following injury, referrals must be completed without unreasonable delay, treatment frequency must align with applicable guideline recommendations, and maximum medical improvement (MMI) must be monitored and documented relative to the case progression.",
+    desc: "Care must be initiated within a clinically appropriate timeframe following injury, referrals must be completed without unreasonable delay, treatment frequency must align with applicable guideline recommendations, and care must continue for as long as the documented condition requires, without premature closure or unexplained termination.",
+    definition: "Care must be initiated within a clinically appropriate timeframe following injury, referrals must be completed without unreasonable delay, treatment frequency must align with applicable guideline recommendations, and care must continue for as long as the documented condition requires, without premature closure or unexplained termination.",
     clarifications: [
       "Unexplained delays in initial treatment, gaps between referral and specialist evaluation, or treatment frequency below guideline standards do not satisfy Right #6.",
       "Timing gaps must be supported by documented clinical, logistical, or contextual explanation within the record.",
       "The absence of documentation explaining delay does not satisfy Right #6, even when an external explanation may exist.",
       "Clinically Significant Delay: A clinically significant delay is any lapse in care, referral completion, or treatment continuation that exceeds what would reasonably be expected for the injury severity and guideline-recommended progression. Examples include: delay in seeking initial evaluation beyond what is typical for acute injury; delay between referral and specialist evaluation exceeding ordinary scheduling windows; extended gaps in active treatment inconsistent with documented symptom severity. Any such delay must be accompanied by documented clinical, logistical, or contextual explanation within the record."
     ],
-    structuralStandard: "Right #6 is satisfied when the treatment timeline demonstrates prompt initiation of care, timely referral completion, guideline-consistent treatment frequency, and documented monitoring of MMI in relation to case status.",
+    structuralStandard: "Right #6 is satisfied when the treatment timeline demonstrates prompt initiation of care, timely referral completion, guideline-consistent treatment frequency, and care that continues for as long as the documented condition requires, without premature closure.",
     examples: [
       { label: "Does Not Satisfy", text: "A client does not seek treatment for 19 days following the reported injury. The record contains no documented explanation for the delay. No contextual notation is present. Right #6: Not Satisfied." },
-      { label: "Satisfies", text: "A client receives emergency evaluation on the date of injury, follows up with primary care within 72 hours, completes specialist referral within two weeks, and maintains consistent treatment frequency with documented monitoring of progress and MMI. Right #6: Satisfied." }
+      { label: "Satisfies", text: "A client receives emergency evaluation on the date of injury, follows up with primary care within 72 hours, completes specialist referral within two weeks, and maintains consistent treatment frequency with documented monitoring of progress. Right #6: Satisfied." }
     ],
     questions: [
-      { text: "Did the client initiate medical treatment within a clinically appropriate timeframe following the injury — ideally within 72 hours for acute presentations?" },
-      { text: "Have specialist referrals been followed through within a clinically appropriate window — without unreasonable gaps between referral and evaluation?" },
-      { text: "Is the frequency of treatment consistent with applicable evidence-based guideline recommendations — not undertreated or overtreated relative to the standard?" },
-      { text: "Has the client been monitored for maximum medical improvement (MMI) with documentation relative to case progression and resolution strategy?" }
+      { text: "Did the client initiate medical treatment within a clinically appropriate timeframe following the injury — ideally within 72 hours for acute presentations?", finding: "Treatment did not begin within a clinically appropriate timeframe, and the delay is not explained in the record." },
+      { text: "Have specialist referrals been followed through within a clinically appropriate window — without unreasonable gaps between referral and evaluation?", finding: "Specialist referral was delayed, never completed, or never made." },
+      { text: "Is the frequency of treatment consistent with applicable evidence-based guideline recommendations — not undertreated or overtreated relative to the standard?", finding: "Treatment frequency is above or below what is usual for the diagnosis.", help: "Too few visits can make the injury look minor; months of the same passive treatment can look like overtreatment. If you cannot tell, choose Not Sure." },
+      { text: "Is care continuing for as long as the documented condition requires, without premature closure or unexplained termination?", finding: "Care has stopped or stalled while the documented condition is still active, without a documented reason." }
     ]
   },
   {
@@ -2399,16 +2488,16 @@ const RIGHTS = [
       { label: "Satisfies", text: "Each visit note documents updated subjective complaints, measurable objective findings, and specific functional limitations — such as lifting capacity and sitting tolerance. Medical necessity for continued treatment is documented. A treating physician narrative links the injury to the accident with reference to mechanism of injury. Right #7: Satisfied." }
     ],
     questions: [
-      { text: "Does each provider visit note contain individualized subjective complaints, objective findings, and functional limitations — not copied-forward or templated text?",
+      { text: "Does each provider visit note contain individualized subjective complaints, objective findings, and functional limitations — not copied-forward or templated text?", finding: "Visit notes are templated or copied forward rather than individualized.",
         flag: {
           triggerOn: ["no", "not-sure"],
           title: "⚠ Clinical Alert: Copied-Forward Documentation Pattern",
           body: "Copied-forward documentation is among the most commonly cited deficiencies during Peer Review and Independent Medical Examination (IME) review. This pattern is difficult to correct retroactively and frequently used by opposing counsel to challenge medical necessity across the entire treatment record."
         }
       },
-      { text: "Are specific functional limitations documented at each visit — not just pain scores, but what the client cannot do in their daily life?" },
-      { text: "Is medical necessity language present that supports each level of care rendered and ties to the applicable evidence-based guideline?" },
-      { text: "Has a narrative summary or causation letter been requested and obtained from the treating physician linking each injury to the accident mechanism?" }
+      { text: "Are specific functional limitations documented at each visit — not just pain scores, but what the client cannot do in their daily life?", finding: "Functional limitations are not documented at each visit — only pain scores or symptoms." },
+      { text: "Is medical necessity language present that supports each level of care rendered and ties to the applicable evidence-based guideline?", finding: "Medical necessity language supporting the level of care is missing from the record.", help: "Medical necessity language is the provider explaining why this care is needed for this diagnosis now — for example, what limitation the treatment addresses and what improvement is expected." },
+      { text: "Has a narrative summary or causation letter been requested and obtained from the treating physician linking each injury to the accident mechanism?", finding: "No narrative summary or causation letter linking each injury to the accident has been requested or obtained." }
     ]
   }
 ];
@@ -2448,10 +2537,11 @@ function computeAlignmentIndicator() {
   RIGHTS.forEach((_, ri) => {
     const qs = answers[ri] || {};
     Object.values(qs).forEach(a => {
+      // Not Sure is routed to clinical / RN review and excluded from the score.
+      if (a.value === 'not-sure') return;
       maxPossible += ALIGNMENT_VALUES.YES;
-      if (a.value === 'yes')      total += ALIGNMENT_VALUES.YES;
-      else if (a.value === 'not-sure') total += ALIGNMENT_VALUES.NOT_SURE;
-      else                        total += ALIGNMENT_VALUES.NO;
+      if (a.value === 'yes') total += ALIGNMENT_VALUES.YES;
+      else                   total += ALIGNMENT_VALUES.NO;
     });
   });
   if (maxPossible === 0) return 0;
@@ -2465,25 +2555,59 @@ function getRightStatus(ri) {
   const qs = answers[ri];
   const vals = Object.values(qs).map(a => a.value);
   if (vals.includes('no')) return 'misaligned';
-  if (vals.includes('not-sure')) return 'partial';
+  if (vals.includes('not-sure')) return 'review';
   return 'aligned';
 }
 
+/* Not Sure answers no longer lower the status. A Right whose only open items
+   are Not Sure is 'review' (flagged for clinical / RN review). The overall
+   status is set by confirmed answers; when nothing is misaligned but items are
+   still unconfirmed, the overall status is 'review' rather than 'aligned'. */
 function getOverallStatus(rightStatuses) {
   const right1 = rightStatuses[0];
   if (right1 === 'misaligned') return 'misaligned-r1';
-  if (right1 === 'partial') return 'partial-r1';
 
   const misalignedCount = rightStatuses.filter(s => s === 'misaligned').length;
-  const partialCount = rightStatuses.filter(s => s === 'partial').length;
+  const reviewCount = rightStatuses.filter(s => s === 'review').length;
 
   if (misalignedCount >= 2) return 'misaligned';
-  if (partialCount >= 3) return 'misaligned';
-  if (misalignedCount === 1 || partialCount <= 2) {
-    if (misalignedCount === 0 && partialCount === 0) return 'aligned';
-    return 'partial';
-  }
+  if (misalignedCount === 1) return 'partial';
+  if (reviewCount > 0) return 'review';
   return 'aligned';
+}
+
+function csaReviewItems() {
+  const out = [];
+  RIGHTS.forEach((right, ri) => {
+    right.questions.forEach((q, qi) => {
+      const a = answers[ri] && answers[ri][qi];
+      if (a && a.value === 'not-sure') out.push({ right: right.label + ' — ' + right.title, text: q.text });
+    });
+  });
+  return out;
+}
+
+function csaCaseFindings() {
+  const out = [];
+  CSA_RECORD_FLAGS.forEach(f => { if (csaRecordFlags[f.k]) out.push(f.finding); });
+  if (csaProviderSeq.pattern === 'narrow-then-broad') {
+    out.push('A narrow-scope provider directed early care; a broad-scope provider entered later' +
+      (csaProviderSeq.broadEntered ? ' (first seen ' + new Date(csaProviderSeq.broadEntered + 'T12:00:00').toLocaleDateString() + ')' : '') +
+      ' — the period of narrow-scope management is the finding.');
+  } else if (csaProviderSeq.pattern === 'broad-then-narrow') {
+    out.push('A broad-scope provider was involved early, but a narrow-scope provider took over management of the case.');
+  } else if (csaProviderSeq.pattern === 'narrow-throughout') {
+    out.push('A narrow-scope provider has directed care throughout — no broad-scope provider is managing the case.');
+  }
+  RIGHTS.forEach((right, ri) => {
+    right.questions.forEach((q, qi) => {
+      const a = answers[ri] && answers[ri][qi];
+      if (!a || a.value !== 'no' || !q.finding) return;
+      if (ri === 0 && qi === 3 && csaProviderSeq.pattern === 'broad-throughout') return;
+      out.push(q.finding);
+    });
+  });
+  return [...new Set(out)];
 }
 
 const STATUS_CONFIG = {
@@ -2516,6 +2640,16 @@ const STATUS_CONFIG = {
     interpretation: 'One or more structural domains are misaligned with recognized injury management standards. Cases with this profile carry elevated IME vulnerability and increased risk of negotiation leverage erosion. Opposing counsel may exploit identified gaps in provider authority, documentation specificity, or care continuity. Corrective structural review is recommended prior to deposition, independent medical examination, or settlement positioning.',
     ctaHeadline: 'Structural Realignment Required Before Litigation Exposure',
     ctaBody: 'Structural correction should prioritize provider authority appropriate to injury complexity, evidence-based care sequencing, and documentation that clearly supports medical necessity and defensibility. Addressing these issues prospectively limits vulnerability when the record is examined under independent review or adversarial inquiry.'
+  },
+  review: {
+    label: 'Clinical Review Needed',
+    color: '#5b21b6',
+    bg: '#f5f3ff',
+    border: '#7c3aed',
+    icon: '?',
+    interpretation: 'No criteria are confirmed as misaligned, but one or more could not be confirmed from the record and are flagged for clinical / RN review. The status is not reported as aligned until those items are confirmed. The flagged items are listed in this report.',
+    ctaHeadline: 'Confirm Flagged Items Before Relying on This Status',
+    ctaBody: 'Have the flagged items reviewed against the medical record by a clinician or RN case manager, then re-run this assessment. Unconfirmed criteria are excluded from the result rather than counted for or against the case.'
   },
   'partial-r1': {
     label: 'Partially Aligned',
@@ -2560,23 +2694,27 @@ function buildCsaReportRightsHtml() {
   let rightsHtml = '';
   RIGHTS.forEach((right, ri) => {
     const st = r.rightStatuses[ri];
-    const rowBorder = st === 'aligned' ? '#2ecc71' : st === 'partial' ? '#f0a030' : '#c0392b';
-    const stLabel = st === 'aligned' ? 'Aligned' : st === 'partial' ? 'Partial' : 'Misaligned';
-    const stBg = st === 'aligned' ? '#edfaf4' : st === 'partial' ? '#fff8e6' : '#fdf0f0';
-    const stFg = st === 'aligned' ? '#1a5c3a' : st === 'partial' ? '#7a4a00' : '#7a1a1a';
+    const rowBorder = st === 'aligned' ? '#2ecc71' : st === 'review' ? '#7c3aed' : st === 'partial' ? '#f0a030' : '#c0392b';
+    const stLabel = st === 'aligned' ? 'Aligned' : st === 'review' ? 'RN review' : st === 'partial' ? 'Partial' : 'Misaligned';
+    const stBg = st === 'aligned' ? '#edfaf4' : st === 'review' ? '#f5f3ff' : st === 'partial' ? '#fff8e6' : '#fdf0f0';
+    const stFg = st === 'aligned' ? '#1a5c3a' : st === 'review' ? '#5b21b6' : st === 'partial' ? '#7a4a00' : '#7a1a1a';
     let qs = '';
     right.questions.forEach((q, qi) => {
       const ans = answers[ri] && answers[ri][qi] ? answers[ri][qi].value : '';
       const ic = ans === 'yes'
         ? { sym: '&#10003;', bg: '#edfaf4', bd: '#2ecc71', fg: '#1a5c3a', lab: 'Yes' }
         : ans === 'not-sure'
-        ? { sym: '?', bg: '#f5f3ff', bd: '#7c3aed', fg: '#5b21b6', lab: 'Not Sure' }
+        ? { sym: '?', bg: '#f5f3ff', bd: '#7c3aed', fg: '#5b21b6', lab: 'RN review' }
         : { sym: '&#10007;', bg: '#fdf0f0', bd: '#c0392b', fg: '#7a1a1a', lab: 'No' };
       qs += '<div style="display:flex;gap:12px;padding:12px 16px;border-bottom:1px solid #f3f4f6;align-items:flex-start">' +
         '<div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;background:' + ic.bg + ';color:' + ic.fg + ';border:1.5px solid ' + ic.bd + '">' + ic.sym + '</div>' +
         '<div style="flex:1;font-size:13px;color:#3a3f4a;line-height:1.55"><span style="font-weight:700;color:#0d2240">' + (qi + 1) + '.</span> ' + escCsaRep(q.text) + '</div>' +
         '<span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:' + ic.bg + ';color:' + ic.fg + ';border:1px solid ' + ic.bd + ';flex-shrink:0">' + ic.lab + '</span></div>';
     });
+    if (ri === 0 && csaProviderSeq.pattern) {
+      qs += '<div style="padding:10px 16px;font-size:12.5px;color:#3a3f4a;background:#fafbfc;border-top:1px solid #f3f4f6"><strong>Provider sequence:</strong> ' + escCsaRep(csaSeqLabel(csaProviderSeq.pattern)) +
+        (csaProviderSeq.broadEntered ? ' · broad-scope provider first saw the client ' + escCsaRep(new Date(csaProviderSeq.broadEntered + 'T12:00:00').toLocaleDateString()) : '') + '</div>';
+    }
     rightsHtml += '<div style="margin-bottom:18px;border:1.5px solid #e5e7eb;border-radius:10px;overflow:hidden;box-shadow:0 1px 6px rgba(13,34,64,0.06)">' +
       '<div style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:linear-gradient(135deg,#eef1f7 0%,#f8f9fb 100%);border-bottom:3px solid ' + rowBorder + '">' +
       '<span style="font-size:22px;font-weight:900;color:#0d2240;font-family:Georgia,serif;min-width:32px">' + escCsaRep(right.number) + '</span>' +
@@ -2594,7 +2732,7 @@ function buildCsaReportRightsHtml() {
 function resolveCsaIntervalConfig(overallKey) {
   var tier;
   if (overallKey === 'misaligned' || overallKey === 'misaligned-r1') tier = 'misaligned';
-  else if (overallKey === 'partial' || overallKey === 'partial-r1') tier = 'partial';
+  else if (overallKey === 'partial' || overallKey === 'partial-r1' || overallKey === 'review') tier = 'partial';
   else tier = 'aligned';
   return {
     misaligned: {
@@ -2626,7 +2764,7 @@ function resolveCsaIntervalConfig(overallKey) {
 function buildCsaOperationalGuidanceHtml(overallKey) {
   var tier;
   if (overallKey === 'misaligned' || overallKey === 'misaligned-r1') tier = 'misaligned';
-  else if (overallKey === 'partial' || overallKey === 'partial-r1') tier = 'partial';
+  else if (overallKey === 'partial' || overallKey === 'partial-r1' || overallKey === 'review') tier = 'partial';
   else tier = 'aligned';
 
   var actionsConfig = {
@@ -2666,6 +2804,22 @@ function buildCsaOperationalGuidanceHtml(overallKey) {
     'The case is approaching deposition, IME, or settlement positioning, where structural defensibility should be re-verified'
   ];
 
+  var caseFindings = csaCaseFindings();
+  var reviewItems = csaReviewItems();
+  var findingsBlock = caseFindings.length ? (
+    '<div style="background:#fff;border:1.5px solid #e5e7eb;border-left:5px solid #c0392b;border-radius:8px;padding:10px 12px;margin-bottom:10px">' +
+    '<div style="font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:#0d2240;margin-bottom:6px;padding-bottom:4px;border-bottom:1.5px solid #d4820a">Case-specific findings</div>' +
+    '<ul style="margin:0;padding-left:18px;font-size:12.5px;line-height:1.55;color:#3a3f4a">' +
+    caseFindings.map(function (f) { return '<li style="margin-bottom:5px">' + escCsaRep(f) + '</li>'; }).join('') +
+    '</ul></div>') : '';
+  var reviewBlock = reviewItems.length ? (
+    '<div style="background:#f5f3ff;border:1.5px solid #7c3aed;border-left:5px solid #7c3aed;border-radius:8px;padding:10px 12px;margin-bottom:10px">' +
+    '<div style="font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:#5b21b6;margin-bottom:6px">Flagged for clinical / RN review (' + reviewItems.length + ')</div>' +
+    '<p style="font-size:12px;line-height:1.5;color:#3a3f4a;margin:0 0 6px">Answered “Not Sure.” These items are excluded from the result until confirmed against the record.</p>' +
+    '<ul style="margin:0;padding-left:18px;font-size:12.5px;line-height:1.55;color:#3a3f4a">' +
+    reviewItems.map(function (it) { return '<li style="margin-bottom:5px"><strong>' + escCsaRep(it.right) + ':</strong> ' + escCsaRep(it.text) + '</li>'; }).join('') +
+    '</ul></div>') : '';
+
   var actionsListHtml = actionsConfig.map(function (item) {
     return '<li style="margin-bottom:5px">' + escCsaRep(item) + '</li>';
   }).join('');
@@ -2698,7 +2852,7 @@ function buildCsaOperationalGuidanceHtml(overallKey) {
     '<ul style="margin:0;padding-left:18px;font-size:12.5px;line-height:1.55;color:#3a3f4a">' + triggersListHtml + '</ul>' +
     '</div>';
 
-  return actionsBlock + triggersBlock;
+  return findingsBlock + reviewBlock + actionsBlock + triggersBlock;
 }
 
 /** Page 1 \u2014 summary (identity optional for standalone report window) */
@@ -2706,17 +2860,24 @@ function buildCsaReportPage1Html(identityHtml) {
   const r = computeResults();
   const d = buildAssessmentData();
   const overallKey = d.overallKey;
-  const borderColor = overallKey === 'aligned' ? '#2ecc71' : (overallKey === 'misaligned' || overallKey === 'misaligned-r1') ? '#c0392b' : '#f0a030';
-  const heroBg = overallKey === 'aligned' ? '#f2fbf6' : (overallKey === 'misaligned' || overallKey === 'misaligned-r1') ? '#fdf3f3' : '#fffbf0';
+  const borderColor = overallKey === 'aligned' ? '#2ecc71' : overallKey === 'review' ? '#7c3aed' : (overallKey === 'misaligned' || overallKey === 'misaligned-r1') ? '#c0392b' : '#f0a030';
+  const heroBg = overallKey === 'aligned' ? '#f2fbf6' : overallKey === 'review' ? '#f5f3ff' : (overallKey === 'misaligned' || overallKey === 'misaligned-r1') ? '#fdf3f3' : '#fffbf0';
   const badgeStyle = overallKey === 'aligned'
     ? 'background:#edfaf4;color:#1a5c3a;border:2px solid #2ecc71'
+    : overallKey === 'review'
+    ? 'background:#f5f3ff;color:#5b21b6;border:2px solid #7c3aed'
     : (overallKey === 'partial' || overallKey === 'partial-r1')
     ? 'background:#fff8e6;color:#7a4a00;border:2px solid #f0a030'
     : 'background:#fdf0f0;color:#7a1a1a;border:2px solid #c0392b';
 
   let interp = r.overall && r.overall.interpretation ? r.overall.interpretation : '';
   if (!interp && overallKey === 'misaligned-r1') {
-    interp = 'Right #1 (Provider Authority) is structurally misaligned. When the primary managing provider lacks scope consistent with injury complexity, downstream rights cannot compensate for that foundational gap. Corrective structural review of provider authority and care oversight is indicated.';
+    var r1q4 = answers[0] && answers[0][3] ? answers[0][3].value : '';
+    if (r1q4 === 'yes') {
+      interp = 'Right #1 (Provider Authority) is structurally misaligned. A broad-scope provider is managing care, but no specialist matching the documented injuries has evaluated the client or clarified the diagnosis. Until that specialty involvement occurs, downstream rights cannot compensate for the gap. Corrective referral and specialty review is indicated.';
+    } else {
+      interp = 'Right #1 (Provider Authority) is structurally misaligned. When the primary managing provider lacks scope consistent with injury complexity, downstream rights cannot compensate for that foundational gap. Corrective structural review of provider authority and care oversight is indicated.';
+    }
   }
   const ctaBlock = r.overall && (r.overall.ctaHeadline || r.overall.ctaBody) ? (
     '<div style="background:linear-gradient(135deg,#0d2240 0%,#163566 100%);border-radius:8px;padding:10px 14px;margin-bottom:0;color:#fff">' +
@@ -2784,6 +2945,7 @@ function buildCsaReportPage2Html() {
     '<div style="display:flex;flex-wrap:wrap;gap:18px;font-size:12px;color:#3a3f4a">' +
     '<span><strong style="color:#1a5c3a">●</strong> Aligned</span>' +
     '<span><strong style="color:#7a4a00">●</strong> Partial</span>' +
+    '<span><strong style="color:#5b21b6">●</strong> RN review (Not Sure — excluded from result)</span>' +
     '<span><strong style="color:#c0392b">●</strong> Misaligned</span></div></div>';
   return '<section id="csa-report-page-detail" class="results-summary alignment-report report-content csa-report-page csa-report-page--detail" style="font-family:\'DM Sans\',system-ui,sans-serif;max-width:900px;margin:0 auto;padding:0;color:#3a3f4a">' +
     '<div class="csa-report-page-label" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:#6b7280;margin-bottom:10px">Detailed findings · Page 2 of 2</div>' +
@@ -2794,8 +2956,19 @@ function buildCsaReportPage2Html() {
     '</section>';
 }
 
+function csaTrialIdentityHtml() {
+  var ci = window.caseClarityIdentity;
+  var row = ci && typeof ci.trialRow === 'function' ? ci.trialRow() : null;
+  if (!row) return '';
+  var doi = ci.formatInjuryDate ? ci.formatInjuryDate(row.date_of_injury) : row.date_of_injury;
+  var ct = ci.formatCaseType ? ci.formatCaseType(row.case_type) : row.case_type;
+  return '<div style="margin-top:8px;padding-top:8px;border-top:1px solid #e5e7eb;font-size:12px;color:#3a3f4a;line-height:1.5">' +
+    '<strong>Case:</strong> ' + escCsaRep(row.case_title || '—') + ' &nbsp;·&nbsp; <strong>Date of Injury:</strong> ' + escCsaRep(doi || '—') +
+    ' &nbsp;·&nbsp; <strong>Case Type:</strong> ' + escCsaRep(ct || '—') + '</div>';
+}
+
 function buildCsaFullReportHtml() {
-  return '<div class="csa-report-document">' + buildCsaReportPage1Html('') + buildCsaReportPage2Html() + '</div>';
+  return '<div class="csa-report-document">' + buildCsaReportPage1Html(csaTrialIdentityHtml()) + buildCsaReportPage2Html() + '</div>';
 }
 
 /* Sanitize injected HTML so embedded closing-script sequences cannot break the parent document when building strings. */

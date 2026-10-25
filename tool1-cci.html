@@ -392,6 +392,7 @@ body.cci-paid-mode .cci-tool-page-overview{display:none!important}
 })(window);
 </script>
 <script src="js/case-identity.js"></script>
+  <script src="js/trial-print.js"></script>
 </head>
 <body class="with-portal-tool-header">
 
@@ -862,6 +863,7 @@ body.cci-paid-mode .cci-tool-page-overview{display:none!important}
     <p style="color:#555;line-height:1.65;margin:0;font-size:15px">Your responses have been recorded. Review the summary below.</p>
     <div style="display:flex;gap:16px;justify-content:center;margin-top:40px;flex-wrap:wrap">
       <button type="button" onclick="returnToDashboard()" class="btn-ghost">← Return to Dashboard</button>
+      <button type="button" onclick="caseClarityPrintStoredReport('tool1_report_html', 'Case Complexity Index Report')" class="btn-ghost">Print / Save PDF</button>
       <button type="button" onclick="goToNext()" class="btn-primary">Continue to Next Assessment →</button>
     </div>
   </div>
@@ -1325,6 +1327,35 @@ function buildCciReportIdentityGridHtml(row){
     '</div>';
 }
 
+/* Case-specific findings: each selection that signals a gap becomes a line
+   naming that gap, so the report is not limited to level-based guidance. */
+function cciCaseFindings(td){
+  if(!td) return [];
+  var out=[];
+  var inj=td.specificInjury||'';
+  var spec=td.specialtySelections||[];
+  var rec=td.recoverySelections||[];
+  var align=td.alignmentSelections||[];
+  var pre=td.preExistingSelections||[];
+  var cog=rec.indexOf('Cognitive impairment present')>=0||(td.psSelections||[]).indexOf('Cognitive impairment')>=0;
+  if(inj&&spec.length===0) out.push('No specialty physician is involved for the documented '+inj.toLowerCase()+' — specialist referral is not documented.');
+  if(cog&&spec.indexOf('Neurology')<0) out.push('Cognitive symptoms are documented with no neurology involvement — neurology evaluation is indicated.');
+  var alignMap={
+    'Medically necessary treatment denied':'Medically necessary treatment was denied — document the request, the denial, and any appeal.',
+    'Diagnostic imaging delayed or denied':'Diagnostic imaging was delayed or denied — document when it was first indicated and when it was completed.',
+    'Surgery delayed or denied':'Surgery was delayed or denied — document the recommendation and the reason for delay.',
+    'Specialist referral delayed':'Specialist referral was delayed or not made — document when it was indicated and what happened.',
+    'Utilization review barriers':'Utilization review created barriers to care — keep the UR decisions and dates in the file.',
+    'Deviation from evidence-based pathway':'Care departed from the evidence-based pathway — the record needs documented clinical justification.',
+    'Repeated authorization barriers':'Repeated authorization barriers — track each request, decision, and delay.',
+    'Care altered due to payer restrictions':'Care was changed because of payer restrictions rather than clinical need — document the change and its effect.'
+  };
+  align.forEach(function(a){ if(alignMap[a]) out.push(alignMap[a]); });
+  if(pre.length) out.push('Pre-existing '+pre.join(', ').toLowerCase()+' — the record should document baseline control before the injury and any effect on recovery.');
+  if((td.soSelections||[]).length>=1) out.push('Psychosocial barriers are documented — confirm they are not interrupting care.');
+  return out;
+}
+
 /** Premium CCI report: uses page CSS (.rpt-header, .r-card, …). No weighted-composite / domain-tier snapshot strip. */
 function buildCciReportPremiumHtml(ad,toolData,level,cmg,identityRow){
   var d=ad.drivers||{};
@@ -1367,6 +1398,13 @@ function buildCciReportPremiumHtml(ad,toolData,level,cmg,identityRow){
       '</div>';
   }
   var arClass=ad.coord&&ad.coord.authRisk==='HIGH'?'risk-high':(ad.coord&&ad.coord.authRisk==='MODERATE'?'risk-mod':'risk-low');
+  var cf=cciCaseFindings(toolData);
+  var caseFindingsBlock=cf.length?(
+    '<div style="background:#fff;border:2px solid #c0392b;border-left:6px solid #c0392b;border-radius:8px;padding:1.1rem 1.35rem;margin-bottom:1.25rem">'+
+    '<div style="font-size:11.5px;font-weight:800;color:#7a1a1a;text-transform:uppercase;letter-spacing:0.13em;margin-bottom:0.65rem;padding-bottom:0.5rem;border-bottom:1.5px solid rgba(192,57,43,0.3)">Case-specific findings</div>'+
+    '<ul style="list-style:none;padding:0;margin:0">'+cf.map(function(f){
+      return '<li style="display:flex;align-items:flex-start;gap:10px;font-size:14px;color:#1a1a1a;line-height:1.65;margin-bottom:8px;font-weight:500"><span style="width:7px;height:7px;border-radius:50%;background:#c0392b;flex-shrink:0;margin-top:8px"></span><span>'+escSnap(f)+'</span></li>';
+    }).join('')+'</ul></div>'):'';
   return '<div class="report-wrap cci-premium-report" id="cci-premium-report-root">'+
     '<div class="rpt-header">'+
     '<div class="rpt-header-top">'+
@@ -1385,6 +1423,7 @@ function buildCciReportPremiumHtml(ad,toolData,level,cmg,identityRow){
     '<span class="rpt-banner-interval-label">Recommended review interval</span>'+
     '<span class="rpt-banner-interval-badge">'+escSnap(ad.interval)+'</span></div></div>'+
     '<div style="padding:0 1.5rem 1.25rem;background:#fff">'+
+    caseFindingsBlock+
     '<div style="background:#fdf8e8;border:2px solid #b09837;border-left:6px solid #b09837;border-radius:8px;padding:1.1rem 1.35rem;margin-bottom:1.25rem;box-shadow:0 1px 4px rgba(176,152,55,0.15)">'+
     '<div style="font-size:11.5px;font-weight:800;color:#7a6a22;text-transform:uppercase;letter-spacing:0.13em;margin-bottom:0.65rem;padding-bottom:0.5rem;border-bottom:1.5px solid rgba(176,152,55,0.35);display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:18px;height:18px;background:#b09837;color:#fff;border-radius:50%;text-align:center;line-height:18px;font-size:11px;font-weight:900">!</span>Recommended next actions</div>'+
     '<ul style="list-style:none;padding:0;margin:0">'+nextActionsItems+'</ul>'+
@@ -1525,7 +1564,37 @@ async function calculate(){
   let rawLevel;
   if(composite>=87) rawLevel=1; else if(composite>=65) rawLevel=2; else if(composite>=42) rawLevel=3; else if(composite>=20) rawLevel=4; else rawLevel=5;
   const tierCap={1:1,2:2,3:3,4:4,5:4}[d1Tier];
-  const level=d1Tier===1?1:Math.max(rawLevel,tierCap);
+  // Catastrophic pathway (unchanged): catastrophic triggers anchor Levels 1–2.
+  const catLevel=d1Tier===1?1:Math.max(rawLevel,tierCap);
+
+  // Accumulation pathway: a cluster of non-catastrophic drivers escalates the
+  // level on its own. It can reach Level 3 at most — Levels 1–2 stay reserved
+  // for the catastrophic pathway.
+  const cognitiveFlag=recAll.some(c=>c.value==='Cognitive impairment present')||psAll.some(c=>c.value==='Cognitive impairment');
+  const accSignals=[
+    !!specificVal,                      // specific structural / neurologic injury identified
+    cognitiveFlag,                      // cognitive impairment documented
+    !!specificVal&&specCount===0,       // specific injury with zero specialty physicians
+    alignCount>=3,                      // HIGH authorization / alignment barriers
+    durVal>=3,                          // extended rehab or longer
+    highCount>=1,                       // high-impact functional item (4Ps)
+    psAffected>=3,                      // three or more 4P domains disrupted
+    phPreExisting.length>=1             // pre-existing condition affecting recovery
+  ].filter(Boolean).length;
+  let accLevel=5;
+  if(accSignals>=4) accLevel=3; else if(accSignals>=2) accLevel=4;
+  const domainFloor=Math.max(3,Math.min(d2Tier,d3Tier));   // worst non-catastrophic domain, capped at 3
+  accLevel=Math.min(accLevel,domainFloor);
+
+  // Guardrail: the CCI can never report a level more favorable than its own
+  // worst listed driver (e.g. authorization risk HIGH cannot print as "stable").
+  const authRiskPre=alignCount>=3?'HIGH':alignCount>=1?'MODERATE':'LOW';
+  let guardLevel=5;
+  if(authRiskPre==='HIGH'||cognitiveFlag) guardLevel=3;
+  else if(authRiskPre==='MODERATE'||recAll.length>=1||highCount>=1) guardLevel=4;
+
+  // Final level = the most severe of the three.
+  const level=Math.min(catLevel,accLevel,guardLevel);
 
   const levelNames={1:'Extreme Case Complexity',2:'Severe Case Complexity',3:'Significant Case Complexity',4:'Moderate Case Complexity',5:'Stable Case Complexity'};
   const levelSubs={1:'Level 1 — Catastrophic injury and multi-system disruption identified.',2:'Level 2 — Severe injury with significant functional and coordination demands.',3:'Level 3 — Multiple interacting complexity factors identified across domains.',4:'Level 4 — Moderate complexity with manageable coordination requirements.',5:'Level 5 — Lower complexity profile identified. Standard monitoring indicated.'};
@@ -1559,6 +1628,10 @@ async function calculate(){
     d1Tier,d2Tier,d3Tier,
     composite,
     rawLevel,
+    catLevel,
+    accLevel,
+    accSignals,
+    guardLevel,
     primaryRegion:regionText,
     specificInjury:specificVal,
     catastrophicSelections:catAll.map(c=>c.value),
@@ -1568,6 +1641,7 @@ async function calculate(){
     alignmentSelections:alignAll.map(c=>c.value),
     preExistingSelections:phPreExisting.map(c=>c.value),
     soSelections:soAll.map(c=>c.value),
+    psSelections:psAll.map(c=>c.value),
     referralDepth:refVal,
     treatmentDuration:durVal,
     psAffected,
@@ -1600,6 +1674,9 @@ async function cciFinalizeReportAndUI(assessmentData,toolData,level,cmg,levelNam
     }catch(err){
       console.warn('[CCI] case identity for report header',err);
     }
+  }
+  if(!identityRow&&window.caseClarityIdentity&&typeof window.caseClarityIdentity.trialRow==='function'){
+    identityRow=window.caseClarityIdentity.trialRow();
   }
 
   var snapEl=document.getElementById('cci-report-snapshot');
