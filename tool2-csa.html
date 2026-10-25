@@ -1694,15 +1694,15 @@ const CSA_SEQ_OPTIONS = [
   { v: 'narrow-throughout', t: 'Narrow-scope provider (chiropractor, PT) directed care throughout' }
 ];
 const CSA_RECORD_FLAGS = [
-  { k: 'headStrike', label: 'Head strike or altered awareness reported (dazed, "saw stars"), but no concussion diagnosis or screening in the record',
+  { k: 'headStrike', ri: 1, label: 'Head strike or altered awareness reported (dazed, "saw stars"), but no concussion diagnosis or screening in the record',
     finding: 'Head strike reported but no concussion diagnosis or screening — neurology referral indicated.' },
-  { k: 'degenerative', label: 'Imaging shows degenerative or pre-existing changes, and there were no prior complaints or treatment to that area',
+  { k: 'degenerative', ri: 1, label: 'Imaging shows degenerative or pre-existing changes, and there were no prior complaints or treatment to that area',
     finding: 'Degenerative findings on imaging with no prior complaints — record must address aggravation of a pre-existing condition.' },
-  { k: 'symptomMag', label: 'A note alleges symptom magnification, malingering, or non-compliance without citing objective testing',
+  { k: 'symptomMag', ri: 6, label: 'A note alleges symptom magnification, malingering, or non-compliance without citing objective testing',
     finding: 'A provider note alleges symptom magnification or non-compliance without objective testing — get that addressed.' },
-  { k: 'gapReason', label: 'Gap in treatment, and the reason for the gap is not recorded in the chart',
+  { k: 'gapReason', ri: 4, label: 'Gap in treatment, and the reason for the gap is not recorded in the chart',
     finding: 'Treatment-gap reason not in the chart — document it now from the client and supporting records (for example transportation, financial, or work records).' },
-  { k: 'nerveTesting', label: 'Radiating or nerve symptoms (numbness, tingling, weakness into an arm or leg) without nerve testing (EMG/NCS) or specialist evaluation',
+  { k: 'nerveTesting', ri: 3, label: 'Radiating or nerve symptoms (numbness, tingling, weakness into an arm or leg) without nerve testing (EMG/NCS) or specialist evaluation',
     finding: 'Radiating nerve symptoms without nerve testing (EMG/NCS) or specialist evaluation — objective confirmation of nerve involvement is not documented.' }
 ];
 
@@ -2587,27 +2587,40 @@ function csaReviewItems() {
   return out;
 }
 
-function csaCaseFindings() {
-  const out = [];
-  CSA_RECORD_FLAGS.forEach(f => { if (csaRecordFlags[f.k]) out.push(f.finding); });
+/* Findings grouped under the seven Rights: each group holds the 'No' findings,
+   any record red flags and provider-sequence finding that belong to that Right,
+   and the 'Not Sure' items routed to RN review. */
+function csaFindingsByRight() {
+  const statuses = RIGHTS.map((_, ri) => getRightStatus(ri));
+  const groups = RIGHTS.map((right, ri) => ({ ri, label: right.label, title: right.title, status: statuses[ri], findings: [], review: [] }));
   if (csaProviderSeq.pattern === 'narrow-then-broad') {
-    out.push('A narrow-scope provider directed early care; a broad-scope provider entered later' +
+    groups[0].findings.push('A narrow-scope provider directed early care; a broad-scope provider entered later' +
       (csaProviderSeq.broadEntered ? ' (first seen ' + new Date(csaProviderSeq.broadEntered + 'T12:00:00').toLocaleDateString() + ')' : '') +
       ' — the period of narrow-scope management is the finding.');
   } else if (csaProviderSeq.pattern === 'broad-then-narrow') {
-    out.push('A broad-scope provider was involved early, but a narrow-scope provider took over management of the case.');
+    groups[0].findings.push('A broad-scope provider was involved early, but a narrow-scope provider took over management of the case.');
   } else if (csaProviderSeq.pattern === 'narrow-throughout') {
-    out.push('A narrow-scope provider has directed care throughout — no broad-scope provider is managing the case.');
+    groups[0].findings.push('A narrow-scope provider has directed care throughout — no broad-scope provider is managing the case.');
   }
+  CSA_RECORD_FLAGS.forEach(f => { if (csaRecordFlags[f.k]) groups[f.ri].findings.push(f.finding); });
   RIGHTS.forEach((right, ri) => {
     right.questions.forEach((q, qi) => {
       const a = answers[ri] && answers[ri][qi];
-      if (!a || a.value !== 'no' || !q.finding) return;
+      if (!a) return;
+      if (a.value === 'not-sure') { groups[ri].review.push(q.text); return; }
+      if (a.value !== 'no' || !q.finding) return;
       if (ri === 0 && qi === 3 && csaProviderSeq.pattern === 'broad-throughout') return;
-      out.push(q.finding);
+      groups[ri].findings.push(q.finding);
     });
   });
-  return [...new Set(out)];
+  groups.forEach(g => { g.findings = [...new Set(g.findings)]; });
+  return groups;
+}
+
+function csaCaseFindings() {
+  const out = [];
+  csaFindingsByRight().forEach(g => g.findings.forEach(f => out.push(f)));
+  return out;
 }
 
 const STATUS_CONFIG = {
@@ -2804,21 +2817,33 @@ function buildCsaOperationalGuidanceHtml(overallKey) {
     'The case is approaching deposition, IME, or settlement positioning, where structural defensibility should be re-verified'
   ];
 
-  var caseFindings = csaCaseFindings();
-  var reviewItems = csaReviewItems();
-  var findingsBlock = caseFindings.length ? (
+  var groups = csaFindingsByRight();
+  var reviewTotal = groups.reduce(function (n, g) { return n + g.review.length; }, 0);
+  var stLab = { aligned: 'Aligned', review: 'RN review', partial: 'Partial', misaligned: 'Misaligned' };
+  var stCol = { aligned: '#1a5c3a', review: '#5b21b6', partial: '#7a4a00', misaligned: '#c0392b' };
+  var clean = [];
+  var groupHtml = groups.map(function (g) {
+    var n = g.findings.length, r = g.review.length;
+    if (!n && !r) { clean.push(g.label); return ''; }
+    var countTxt = (n ? n + (n === 1 ? ' issue' : ' issues') : '') + (n && r ? ' · ' : '') + (r ? r + ' for RN review' : '');
+    return '<details open style="border-top:1px solid #eef0f3;padding:6px 0">' +
+      '<summary style="cursor:pointer;font-size:12.5px;font-weight:700;color:#0d2240;padding:4px 0;list-style-position:outside">' +
+      escCsaRep(g.label) + ' — ' + escCsaRep(g.title) +
+      ' <span style="font-weight:700;color:' + (stCol[g.status] || '#3a3f4a') + '">· ' + escCsaRep(stLab[g.status] || g.status) + '</span>' +
+      ' <span style="font-weight:600;color:#6b7280">· ' + escCsaRep(countTxt) + '</span></summary>' +
+      '<ul style="margin:4px 0 2px;padding-left:20px;font-size:12.5px;line-height:1.5;color:#3a3f4a">' +
+      g.findings.map(function (f) { return '<li style="margin-bottom:4px">' + escCsaRep(f) + '</li>'; }).join('') +
+      g.review.map(function (t) { return '<li style="margin-bottom:4px;color:#5b21b6"><strong>RN review (Not Sure):</strong> ' + escCsaRep(t) + '</li>'; }).join('') +
+      '</ul></details>';
+  }).join('');
+  var findingsBlock = groupHtml ? (
     '<div style="background:#fff;border:1.5px solid #e5e7eb;border-left:5px solid #c0392b;border-radius:8px;padding:10px 12px;margin-bottom:10px">' +
-    '<div style="font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:#0d2240;margin-bottom:6px;padding-bottom:4px;border-bottom:1.5px solid #d4820a">Case-specific findings</div>' +
-    '<ul style="margin:0;padding-left:18px;font-size:12.5px;line-height:1.55;color:#3a3f4a">' +
-    caseFindings.map(function (f) { return '<li style="margin-bottom:5px">' + escCsaRep(f) + '</li>'; }).join('') +
-    '</ul></div>') : '';
-  var reviewBlock = reviewItems.length ? (
-    '<div style="background:#f5f3ff;border:1.5px solid #7c3aed;border-left:5px solid #7c3aed;border-radius:8px;padding:10px 12px;margin-bottom:10px">' +
-    '<div style="font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:#5b21b6;margin-bottom:6px">Flagged for clinical / RN review (' + reviewItems.length + ')</div>' +
-    '<p style="font-size:12px;line-height:1.5;color:#3a3f4a;margin:0 0 6px">Answered “Not Sure.” These items are excluded from the result until confirmed against the record.</p>' +
-    '<ul style="margin:0;padding-left:18px;font-size:12.5px;line-height:1.55;color:#3a3f4a">' +
-    reviewItems.map(function (it) { return '<li style="margin-bottom:5px"><strong>' + escCsaRep(it.right) + ':</strong> ' + escCsaRep(it.text) + '</li>'; }).join('') +
-    '</ul></div>') : '';
+    '<div style="font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:#0d2240;margin-bottom:4px;padding-bottom:4px;border-bottom:1.5px solid #d4820a">Case-specific findings by Right</div>' +
+    (reviewTotal ? '<p style="font-size:12px;line-height:1.5;color:#5b21b6;margin:4px 0 2px">' + reviewTotal + ' item' + (reviewTotal === 1 ? '' : 's') + ' answered “Not Sure” — flagged for clinical / RN review and excluded from the result until confirmed.</p>' : '') +
+    groupHtml +
+    (clean.length ? '<p style="font-size:11.5px;color:#6b7280;margin:6px 0 0;border-top:1px solid #eef0f3;padding-top:6px">No flagged items: ' + escCsaRep(clean.join(', ')) + '</p>' : '') +
+    '</div>') : '';
+  var reviewBlock = '';
 
   var actionsListHtml = actionsConfig.map(function (item) {
     return '<li style="margin-bottom:5px">' + escCsaRep(item) + '</li>';

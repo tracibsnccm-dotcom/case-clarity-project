@@ -906,6 +906,7 @@
               <option value="3">$90,000 – $100,000</option>
               <option value="1">$100,000 – $130,000</option>
               <option value="0">$130,000+</option>
+              <option value="na">Prefer not to answer</option>
             </select>
           </div>
           <div class="field">
@@ -914,6 +915,7 @@
               <option value="">— Select one —</option>
               <option value="0">No</option>
               <option value="5">Yes</option>
+              <option value="na">Prefer not to answer</option>
             </select>
           </div>
           <div class="field">
@@ -922,6 +924,7 @@
               <option value="">— Select one —</option>
               <option value="0">No — salaried with benefits</option>
               <option value="5">Yes — hourly or gig-economy</option>
+              <option value="na">Prefer not to answer</option>
             </select>
           </div>
           <div class="field">
@@ -930,6 +933,7 @@
               <option value="">— Select one —</option>
               <option value="0">No — 12 months or more</option>
               <option value="10">Yes — less than 12 months</option>
+              <option value="na">Prefer not to answer</option>
             </select>
           </div>
         </div>
@@ -948,6 +952,7 @@
               <option value="">— Select one —</option>
               <option value="0">No</option>
               <option value="10">Yes</option>
+              <option value="na">Prefer not to answer</option>
             </select>
           </div>
           <div class="field">
@@ -2227,9 +2232,11 @@
       '<div style="font-size:11px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:' + st.head + '">Composite risk level</div>' +
       '<div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:16px;margin-top:8px">' +
       '<span style="font-size:32px;font-weight:900;color:' + st.pill + '">' + escRrf(toolData.level) + '</span>' +
-      '<span style="font-size:15px;font-weight:700;color:#333">Score ' + toolData.total + ' / 100</span></div>' +
+      '</div>' +
       '<p style="margin:12px 0 0;font-size:13px;color:#444;line-height:1.55"><strong>Expected treatment course:</strong> ' + escRrf(rrfDurationBand(toolData.predictedDays).label) + '</p>' +
-      '<p style="margin:6px 0 0;font-size:12px;color:#555;line-height:1.5">Based only on documented clinical severity and mechanism of injury. This is a planning band, not a prediction of when treatment will end.</p></div>' +
+      '<p style="margin:6px 0 0;font-size:12px;color:#555;line-height:1.5">Based only on documented clinical severity and mechanism of injury. This is a planning band, not a prediction of when treatment will end.</p>' +
+      (toolData.branch === 'PI' ? '<p style="margin:6px 0 0;font-size:12px;color:#555;line-height:1.5">Income and employment answers are recorded for context only and do not affect the risk level or treatment course.</p>' : '') +
+      '</div>' +
       '<div style="padding:20px 24px">' +
       '<div style="padding:18px 20px;background:#f5f9ff;border-radius:10px;border-left:4px solid #1e88e5">' +
       '<div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#1565c0;margin-bottom:8px">C.A.R.E. coordination focus</div>' +
@@ -2287,14 +2294,31 @@
     document.getElementById('piValidation').style.display = 'none';
 
     const v = id => Number(document.getElementById(id).value);
+    // "Prefer not to answer" ('na') is never scored: the field is dropped from
+    // both the raw total and the maximum, so no value is guessed for it.
+    const optMax = id => Math.max.apply(null, [...document.getElementById(id).options].map(o => Number(o.value)).filter(n => Number.isFinite(n)));
+    const answered = id => document.getElementById(id).value !== 'na';
+    const sumAnswered = ids => ids.filter(answered).reduce((a, id) => a + v(id), 0);
+    const maxAnswered = ids => ids.filter(answered).reduce((a, id) => a + optMax(id), 0);
 
-    // Extrinsic (60 pts)
-    const transportRaw  = v('pi_vehicleDamaged') + v('pi_liabilityOnly') + v('pi_waitingOtherInsurer') + v('pi_altTransport');
-    const incomeRaw     = v('pi_income') + v('pi_dependents') + v('pi_hourly') + v('pi_tenure');
-    const householdRaw  = v('pi_singleParent') + v('pi_caregiving');
+    // Income & employment answers are recorded for context only. They are not
+    // part of the score or the displayed risk level.
+    const incomeIds     = ['pi_income', 'pi_dependents', 'pi_hourly', 'pi_tenure'];
+    const incomeContext = {};
+    incomeIds.forEach(id => {
+      const el = document.getElementById(id);
+      incomeContext[id] = el.value === 'na' ? 'Prefer not to answer' : (el.options[el.selectedIndex] ? el.options[el.selectedIndex].text : '');
+    });
+
+    // Extrinsic (60 pts) — transportation, household, access friction
+    const transportIds  = ['pi_vehicleDamaged', 'pi_liabilityOnly', 'pi_waitingOtherInsurer', 'pi_altTransport'];
+    const householdIds  = ['pi_singleParent', 'pi_caregiving'];
+    const transportRaw  = sumAnswered(transportIds);
+    const incomeRaw     = null; // not scored
+    const householdRaw  = sumAnswered(householdIds);
     const frictionRaw   = v('pi_accessFriction');
-    const extrinsicRaw  = transportRaw + incomeRaw + householdRaw + frictionRaw;
-    const extrinsicMax  = 40 + 30 + 20 + 6; // 96
+    const extrinsicRaw  = transportRaw + householdRaw + frictionRaw;
+    const extrinsicMax  = maxAnswered(transportIds) + maxAnswered(householdIds) + 6;
     const extrinsicScore = norm(extrinsicRaw, extrinsicMax, 60);
 
     // Intrinsic (25 pts)
@@ -2318,8 +2342,9 @@
       timestamp: new Date().toISOString(),
       branch: 'PI',
       caseType,
-      total,
+      total,               // internal only — never displayed
       level,
+      incomeContext,
       predictedDays: predicted,
       durationMult,
       extrinsicRaw,

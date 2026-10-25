@@ -1191,7 +1191,6 @@
             }
             if (abbrev === 'RRF') {
                 parts.push('<p class="trial-lead"><strong>Recovery Risk Level:</strong> ' + escTrialHtml(inner.level || '—') + '</p>');
-                parts.push('<p class="trial-para"><strong>Composite score:</strong> ' + escTrialHtml(inner.total != null ? String(inner.total) + ' out of 100' : '—') + '</p>');
                 parts.push('<p class="trial-para"><strong>Expected treatment course:</strong> ' + escTrialHtml(trialRrfBand(inner.predictedDays)) + '</p>');
                 var br = inner.branch === 'WC' ? "Workers' Compensation" : (inner.branch === 'PI' ? 'Personal Injury' : (inner.branch || ''));
                 if (br) parts.push('<p class="trial-para"><strong>Matter branch:</strong> ' + escBodyHtml(br) + '</p>');
