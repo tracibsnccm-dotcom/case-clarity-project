@@ -388,14 +388,21 @@
         say('Opening secure checkout for <strong>' + planLabel + '</strong>…');
         window.supabaseClient.functions.invoke('stripe-webhook', {
             body: { action: 'create_checkout', plan: PLAN, user_id: userId, ccp: ccp, return_base: window.location.origin }
-        }).then(function (r) {
+        }).then(async function (r) {
             var url = r && r.data && r.data.url;
             if (url) { window.location.href = url; return; }
+            var info = (r && r.data) || {};
+            if (r && r.error && r.error.context && typeof r.error.context.json === 'function') {
+                try { info = await r.error.context.json(); } catch (e) { /* ignore */ }
+            }
             document.querySelectorAll('.btn-purchase').forEach(function (b) { b.disabled = false; });
-            var code = r && r.data && r.data.code;
-            say(code === 'signin'
-                ? 'Please <a href="login.html">sign in to your trial account</a> first.'
-                : 'Checkout could not be started. Please try again, or contact <a href="mailto:traci.johnson@rcmspllc.com">traci.johnson@rcmspllc.com</a>.');
+            if (info.code === 'signin') {
+                say('Please <a href="login.html">sign in to your trial account</a> first, so your cases and reports stay with your subscription.');
+                return;
+            }
+            var detail = info.detail || info.error || (r && r.error && r.error.message) || '';
+            say('Checkout could not be started. Please try again, or contact <a href="mailto:traci.johnson@rcmspllc.com">traci.johnson@rcmspllc.com</a>.' +
+                (detail ? '<div style="margin-top:8px;font-size:12px;color:#6b7280">Details: ' + String(detail).replace(/</g, '&lt;') + '</div>' : ''));
         }).catch(function () {
             document.querySelectorAll('.btn-purchase').forEach(function (b) { b.disabled = false; });
             say('Checkout could not be started. Please try again, or contact <a href="mailto:traci.johnson@rcmspllc.com">traci.johnson@rcmspllc.com</a>.');
