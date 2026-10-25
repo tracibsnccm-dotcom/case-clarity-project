@@ -196,12 +196,12 @@
   function reportBannerHtml() {
     return '<div class="' + BANNER_MARK + '" style="margin:0 0 14px;padding:10px 16px;background:#3a3f4a;color:#fff;border-left:6px solid #b09837;font-family:system-ui,Segoe UI,sans-serif">' +
       '<div style="font-size:13px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase">Closed Case — Retrospective Review</div>' +
-      '<div style="font-size:12px;opacity:0.9;margin-top:2px">This case has closed. Findings show where gaps occurred, as a guide for future cases of this type.</div></div>';
+      '<div style="font-size:12px;opacity:0.9;margin-top:2px">This review identifies clinical, access, and documentation gaps present in the record. Use these findings as a road map for what to watch for, and address early, in future cases of this type.</div></div>';
   }
   function closedBoxHtml() {
     return '<div class="cc-closed-box" style="margin:12px 0;padding:12px 16px;background:#fff;border:2px solid #3a3f4a;border-left:6px solid #3a3f4a;border-radius:8px;font-family:system-ui,Segoe UI,sans-serif">' +
       '<div style="font-size:10.5px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#3a3f4a;margin-bottom:4px">Closed case — re-run dates do not apply</div>' +
-      '<div style="font-size:12.5px;color:#3a3f4a;line-height:1.5">Read the Recommended Next Actions as what should have happened during the case. Use them as a checklist for the next case of this type.</div></div>';
+      '<div style="font-size:12.5px;color:#3a3f4a;line-height:1.5">The Recommended Next Actions show the steps that strengthen cases like this one. Use them as a checklist from intake forward on your next case of this type.</div></div>';
   }
 
   /* ── storage hooks ── */

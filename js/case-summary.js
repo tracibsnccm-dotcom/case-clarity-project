@@ -124,7 +124,7 @@
       '</div>' +
       (closed ? '<div style="margin:10px 0;padding:8px 14px;background:#f1f0eb;border:2px solid #3a3f4a;border-left:6px solid #3a3f4a">' +
         '<div style="font-size:10.5px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#3a3f4a">Closed case — re-run dates do not apply</div>' +
-        '<div style="font-size:12.5px;color:#3a3f4a;margin-top:2px">The findings below show where gaps occurred in this case. Use them as a map for the next case of this type.</div></div>' : '') +
+        '<div style="font-size:12.5px;color:#3a3f4a;margin-top:2px">This review identifies clinical, access, and documentation gaps present in the record. Use these findings as a road map for what to watch for, and address early, in future cases of this type.</div></div>' : '') +
       (earliest ? '<div style="margin:10px 0;padding:8px 14px;background:#fdf8e8;border:2px solid #b09837;border-left:6px solid #b09837">' +
         '<div style="font-size:10.5px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#7a6a22">Next re-run due</div>' +
         '<div style="font-size:17px;font-weight:800;color:#0c1c34;margin-top:2px">' + esc(earliest.text) + ' — ' + esc(earliest.tool) + '</div>' +
