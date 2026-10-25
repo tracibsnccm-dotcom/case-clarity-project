@@ -88,6 +88,34 @@
     });
   }
 
+  /* CSA: show timeline flags where the timing and follow-through questions are asked. */
+  if (page.indexOf('tool2-csa') === 0) {
+    ready(function () {
+      var TL = global.caseClarityTimeline;
+      if (!TL) return;
+      var orig = global.startAudit;
+      if (typeof orig !== 'function') return;
+      global.startAudit = function () {
+        var r = orig.apply(this, arguments);
+        try {
+          var fl = TL.flags();
+          if (!fl.length) return r;
+          var html = '<div class="cc-carry-note" style="margin:10px 0 12px;padding:8px 12px;background:#fff6e5;border-left:3px solid #c47a10;border-radius:4px;font-size:12.5px;line-height:1.5;color:#5a3a00">' +
+            '<strong>From your Case Timeline:</strong><ul style="margin:4px 0 0;padding-left:18px">' +
+            fl.map(function (f) { return '<li>' + String(f.text).replace(/</g, '&lt;') + '</li>'; }).join('') + '</ul></div>';
+          [4, 5].forEach(function (ri) {
+            var body = document.getElementById('card-body-' + ri);
+            var qs = body && body.querySelector('.sub-questions');
+            if (qs && !body.querySelector('.cc-tl-hint')) {
+              var w = document.createElement('div'); w.className = 'cc-tl-hint'; w.innerHTML = html; qs.parentNode.insertBefore(w, qs);
+            }
+          });
+        } catch (e) { /* ignore */ }
+        return r;
+      };
+    });
+  }
+
   /* ───────────── CAF ───────────── */
   if (page.indexOf('tool3-caf') === 0) {
     ready(function () {

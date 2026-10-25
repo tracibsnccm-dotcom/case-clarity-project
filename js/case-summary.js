@@ -69,6 +69,10 @@
     var out = [];
     var csa = json('tool2_data');
     var a = csa && (csa.data || csa);
+    if (global.caseClarityTimeline) {
+      global.caseClarityTimeline.flags().filter(function (f) { return f.level === 'high'; }).slice(0, 3)
+        .forEach(function (f) { out.push('Timeline: ' + f.text); });
+    }
     if (a && Array.isArray(a.redFlagFindings)) out = out.concat(a.redFlagFindings);
     if (a && Array.isArray(a.caseFindings)) out = out.concat(a.caseFindings.slice(0, 8));
     var doc = reportDoc(1);
