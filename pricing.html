@@ -107,6 +107,15 @@
             font-size: 16px;
             color: #6a7a8a;
         }
+        @media (max-width: 700px) { .follow-up-table { display: block; overflow-x: auto; } }
+        .single-box { max-width: 900px; margin: 28px auto 0; padding: 20px 24px; background: #fff; border: 1px solid #d8d2c4; border-top: 3px solid #1b2a3d; }
+        .single-box .single-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 20px; }
+        .single-box .single-title { font-size: 20px; font-weight: 700; color: #1b2a3d; }
+        .single-box .single-sub { font-size: 14px; color: #6b7280; margin-top: 2px; }
+        .single-box .single-price { font-size: 30px; color: #1b2a3d; }
+        .single-box .single-price .period { font-size: 14px; color: #6b7280; }
+        .single-box ul { margin: 14px 0 16px; padding-left: 20px; line-height: 1.6; color: #3a3f4a; font-size: 15px; }
+        .single-box .btn-purchase { max-width: 340px; }
         .offer-box { max-width: 900px; margin: 28px auto 28px; padding: 18px 22px; background: #fdf8e8; border: 2px solid #b09837; border-left: 6px solid #b09837; border-radius: 8px; }
         .offer-box .offer-title { font-size: 20px; font-weight: 800; color: #0c1c34; margin-bottom: 6px; }
         .offer-box p { margin: 6px 0 0; line-height: 1.55; color: #3a3f4a; }
@@ -244,6 +253,23 @@
                 <div class="plan-cases">Unlimited clients · unlimited reports per client</div>
                 <button type="button" class="btn-purchase" data-plan="cases_unlimited" data-label="Unlimited" data-price="12995">SELECT PLAN</button>
             </div>
+        </div>
+
+        <div class="single-box">
+            <div class="single-head">
+                <div>
+                    <div class="single-title">Single Client Review</div>
+                    <div class="single-sub">One client · one complete run of all six reports</div>
+                </div>
+                <div class="single-price">$1,995<span class="period"> one time</span></div>
+            </div>
+            <ul>
+                <li>30 days to complete all six tools and download or print your reports.</li>
+                <li>Each tool runs <strong>once</strong>. Review your answers before you generate each report. Running any tool again requires a new $1,995 purchase.</li>
+                <li>Print and download your reports as often as you like during the 30 days. After 30 days, all case information and reports are permanently deleted.</li>
+                <li>If a report fails to generate or comes out blank because of a technical problem, contact us and we will allow one replacement run.</li>
+            </ul>
+            <button type="button" class="btn-purchase" data-plan="single_client" data-label="Single Client Review" data-price="1995">SELECT SINGLE CLIENT REVIEW</button>
         </div>
 
         <div class="offer-box">
