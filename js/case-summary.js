@@ -49,6 +49,7 @@
   function resultFor(t) {
     var d = json('tool' + t.n + '_data');
     if (!d) return '';
+    if (global.caseClarityResults) return global.caseClarityResults.resultFor(t.n, d);
     try {
       if (t.key === 'CCI') return 'Level ' + d.level + ' — ' + ((d.assessmentData && d.assessmentData.levelName) || '') +
         (d.assessmentData && d.assessmentData.coord && d.assessmentData.coord.authRisk ? '; authorization risk ' + d.assessmentData.coord.authRisk : '');

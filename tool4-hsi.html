@@ -1422,6 +1422,7 @@ canvas{display:block}
 <script src="js/case-identity.js"></script>
   <script src="js/print-frame.js"></script>
   <script src="js/rerun-date.js"></script>
+  <script src="js/case-results.js"></script>
   <script src="js/trial-print.js"></script>
 </head>
 <body class="with-portal-tool-header tool-hsi">
@@ -3279,6 +3280,7 @@ function buildHsiReportSnapshotHtml(toolData) {
       : '') +
     idHtml +
     '</div>' +
+    '<div style="padding:0 22px">' + (window.caseClarityResults?window.caseClarityResults.compareHtml(4,toolData):'') + '</div>' +
     topSummary +
     alertsWrap +
     slabHtml +
@@ -3757,5 +3759,6 @@ function returnToDashboard() {
 </script>
 <script src="js/shared-answers.js"></script>
 <script src="js/shared-wiring.js"></script>
+<script src="js/trial-drafts.js"></script>
 </body>
 </html>

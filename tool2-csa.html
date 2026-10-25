@@ -1427,6 +1427,7 @@
   <script src="js/print-frame.js"></script>
   <script src="js/trial-print.js"></script>
   <script src="js/rerun-date.js"></script>
+  <script src="js/case-results.js"></script>
 </head>
 <body class="with-portal-tool-header">
 
@@ -2960,7 +2961,7 @@ function buildCsaReportPage1Html(identityHtml) {
     assessmentComplete +
     titleCard +
     statusBadgeBlock +
-    (window.caseClarityRerun?window.caseClarityRerun.boxHtml(intervalConfig.label,{accent:'#0d2240'}):'') + (window.caseClarityShared?window.caseClarityShared.provenanceHtml('CSA'):'') +
+    (window.caseClarityRerun?window.caseClarityRerun.boxHtml(intervalConfig.label,{accent:'#0d2240'}):'') + (window.caseClarityShared?window.caseClarityShared.provenanceHtml('CSA'):'') + (window.caseClarityResults?window.caseClarityResults.compareHtml(2):'') +
     interpretationBlock +
     operationalGuidance +
     (ctaBlock ? '<div style="margin-top:0;margin-bottom:10px">' + ctaBlock + '</div>' : '') +
@@ -3242,5 +3243,6 @@ function returnToDashboard() {
 <script src="js/case-timeline.js"></script>
 <script src="js/shared-answers.js"></script>
 <script src="js/shared-wiring.js"></script>
+<script src="js/trial-drafts.js"></script>
 </body>
 </html>

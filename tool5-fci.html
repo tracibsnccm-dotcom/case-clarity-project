@@ -530,6 +530,7 @@
   <script src="js/case-identity.js"></script>
   <script src="js/print-frame.js"></script>
   <script src="js/rerun-date.js"></script>
+  <script src="js/case-results.js"></script>
   <script src="js/trial-print.js"></script>
 </head>
 <body class="with-portal-tool-header">
@@ -1193,6 +1194,7 @@ function buildFciDashboardSnapshot(minS, weak, fvi, toolData) {
     '<div><strong>Status:</strong> <span id="fci-report-id-status">' + fciTrialId('case_status') + '</span></div>' +
     '</div>' +
     '<div style="font-size:12px;opacity:0.88;margin-top:6px">' + esc(new Date(toolData.timestamp).toLocaleString()) + '</div></div>' +
+    '<div style="padding:0 24px">' + (window.caseClarityResults?window.caseClarityResults.compareHtml(5,toolData):'') + '</div>' +
     '<div style="padding:20px 24px;background:' + fviSt.bg + ';border-bottom:2px solid ' + fviSt.border + '">' +
     '<div style="font-size:11px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:' + fviSt.text + '">Functional vulnerability indicator</div>' +
     '<div style="font-size:26px;font-weight:800;color:' + fviSt.text + ';margin-top:6px">' + esc(fvi) + '</div>' +
@@ -1843,5 +1845,6 @@ function returnToDashboard() {
 </script>
 <script src="js/shared-answers.js"></script>
 <script src="js/shared-wiring.js"></script>
+<script src="js/trial-drafts.js"></script>
 </body>
 </html>

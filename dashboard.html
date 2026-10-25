@@ -712,6 +712,7 @@
   <script src="js/case-identity.js"></script>
   <script src="js/print-frame.js"></script>
   <script src="js/trial-print.js"></script>
+  <script src="js/case-results.js"></script>
   <script src="js/case-timeline.js"></script>
   <script src="js/case-summary.js"></script>
     <script src="js/auth-guard.js"></script>
@@ -1771,6 +1772,30 @@
             window.location.href = 'trial-signup.html';
         });
 
+        // When the attorney comes back from a tool tab, refresh the cards and report state.
+        (function () {
+            function sig() {
+                var out = [];
+                for (var i = 1; i <= 6; i++) {
+                    out.push(localStorage.getItem('tool' + i + '_complete') || '', (localStorage.getItem('cc_draft_tool' + i) || '').slice(0, 40), ((localStorage.getItem('tool' + i + '_data') || '').match(/"timestamp":"[^"]+"/) || [''])[0]);
+                }
+                return out.join('|');
+            }
+            var last = null;
+            function check() {
+                var now = sig();
+                if (last !== null && now !== last && document.getElementById('dashboard-content') && typeof renderDashboard === 'function' && !(typeof computeTrialDaysRemaining === 'function' && localStorage.getItem('trial_start_at') && computeTrialDaysRemaining() <= 0)) {
+                    renderDashboard();
+                    if (typeof updateTrialReportUI === 'function') updateTrialReportUI();
+                    if (typeof updateReportUI === 'function') updateReportUI();
+                }
+                last = now;
+            }
+            window.addEventListener('focus', check);
+            document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') check(); });
+            setTimeout(check, 3000);
+        })();
+
         (async function initDashboard() {
             const ok = await bootstrapDashboardAccess();
             if (!ok) return;
@@ -1832,6 +1857,10 @@
                 <!-- ORIENTATION SECTION -->
                 <div style="background: #f9f7f2; border: 1px solid #d6d0c4; border-left: 3px solid #b8922a; padding: 24px; margin-bottom: 32px;">
                   <h2 style="font-size: 20px; margin-bottom: 16px;">Before You Begin</h2>
+                  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;background:#fdf8e8;border:1.5px solid #b09837;padding:12px 16px;margin:0 0 18px;">
+                    <span style="font-size:14px;color:#1a2e3f;flex:1;min-width:240px;"><strong>New here?</strong> See a fictional sample case run through all six tools, so you know what the reports look like before you enter your own case.</span>
+                    <a href="sample-case.html" target="_blank" rel="noopener" style="background:#0c1c34;color:#fff;padding:9px 18px;text-decoration:none;font-size:14px;font-weight:600;">View sample case report</a>
+                  </div>
                   <h3 style="font-size: 16px; margin-bottom: 12px;">Assessment Orientation</h3>
                   <p style="margin-bottom: 16px; line-height: 1.6;">This evaluation includes six forensic instruments designed to examine structural case factors affecting medical care progression, recovery trajectory, and litigation risk.</p>
                   
@@ -2084,14 +2113,25 @@
             const sessionDone = status === 'complete';
             const effectiveDone = localDone || sessionDone;
 
+            const toolNum = TOOL_ORDER.indexOf(toolKey) + 1;
+            const draft = safeParseLocalStorage('cc_draft_tool' + toolNum);
+            const lastRun = (safeParseLocalStorage('tool' + toolNum + '_data') || {}).timestamp;
+            const fmtWhen = function (iso) {
+                var d = new Date(iso);
+                return isNaN(d.getTime()) ? '' : d.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+            };
             let statusClass = 'status-not-started';
             let statusText = 'NOT STARTED';
-            if (effectiveDone) {
+            if (draft && draft.at) {
+                statusClass = 'status-in-progress';
+                statusText = 'IN PROGRESS · last worked on ' + fmtWhen(draft.at);
+            } else if (effectiveDone) {
                 statusClass = 'status-complete';
-                statusText = '✓ COMPLETED';
+                statusText = '✓ COMPLETED' + (lastRun ? ' · ' + fmtWhen(lastRun) : '');
             }
 
-            let launchDisabled = trialExpired || effectiveDone;
+            // Completed tools can be re-run; the new report compares itself with the last run.
+            let launchDisabled = trialExpired;
             if (caseType === 'retrospective' && opts.lockedBySequence && !effectiveDone) {
                 launchDisabled = true;
             }
@@ -2099,8 +2139,10 @@
             let btnLabel = 'Launch Assessment';
             if (trialExpired) {
                 btnLabel = 'Trial expired';
+            } else if (draft && draft.at) {
+                btnLabel = 'Resume Assessment';
             } else if (effectiveDone) {
-                btnLabel = 'Completed';
+                btnLabel = 'Re-run Assessment';
             } else if (opts.lockedBySequence) {
                 btnLabel = 'Complete previous step first';
             }
