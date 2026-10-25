@@ -2173,7 +2173,7 @@
     const bullets = a.actions.map(function(item) {
       return '<li style="margin-bottom:8px;line-height:1.6">' + escRrf(item) + '</li>';
     }).join('');
-    return (window.caseClarityRerun?window.caseClarityRerun.boxHtml(a.cadence,{accent:'#1a2744'}):'') + '<div class="rrf-rna" style="margin-top:20px;padding:18px 20px;background:#fff;border-radius:10px;border:1px solid #e6e6e6;border-left:4px solid ' + st.border + '">' +
+    return (window.caseClarityRerun?window.caseClarityRerun.boxHtml(a.cadence,{accent:'#1a2744'}):'') + (window.caseClarityShared?window.caseClarityShared.provenanceHtml('RRF'):'') + '<div class="rrf-rna" style="margin-top:20px;padding:18px 20px;background:#fff;border-radius:10px;border:1px solid #e6e6e6;border-left:4px solid ' + st.border + '">' +
       '<div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:' + st.head + ';margin-bottom:8px">Recommended Next Actions — ' + escRrf(tierLabel) + ' · Re-run RRF: ' + escRrf(a.cadence) + '</div>' +
       '<p style="margin:0 0 12px;font-size:13px;line-height:1.65;color:#333">' + escRrf(a.intro) + '</p>' +
       '<ul style="margin:0 0 14px;padding-left:20px;font-size:13px;color:#333">' + bullets + '</ul>' +
@@ -2648,5 +2648,7 @@ function rrfPrintPaidReport() {
   </div>
 </div>
 <div id="rrf-report-snapshot-host" style="position:absolute;left:-9999px;top:0;width:1px;height:1px;overflow:hidden" aria-hidden="true"></div>
+<script src="js/shared-answers.js"></script>
+<script src="js/shared-wiring.js"></script>
 </body>
 </html>

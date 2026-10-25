@@ -1202,7 +1202,7 @@ function cafBuildNextActionsHtml(minLvl){
   };
   var g = byLevel[minLvl] || byLevel[3];
   var actionItems = g.actions.map(function(a){ return '<li>'+escCaf(a)+'</li>'; }).join('');
-  return (window.caseClarityRerun?window.caseClarityRerun.boxHtml(g.cadence,{accent:'#0e1c2e'}):'')+'<div class="caf-na-wrap">'+
+  return (window.caseClarityRerun?window.caseClarityRerun.boxHtml(g.cadence,{accent:'#0e1c2e'}):'')+ (window.caseClarityShared?window.caseClarityShared.provenanceHtml('CAF'):'')+'<div class="caf-na-wrap">'+
     '<div class="caf-na-title"><span class="ico">!</span>Recommended Next Actions — Level '+minLvl+' '+escCaf(g.tierLabel)+' &middot; Follow-up: '+escCaf(g.cadence)+'</div>'+
     '<div class="caf-na-intro">'+escCaf(g.intro)+'</div>'+
     '<ul class="caf-na-list">'+actionItems+'</ul>'+
@@ -1598,5 +1598,7 @@ function returnToDashboard() {
     window.location.href = 'dashboard.html';
 }
 </script>
+<script src="js/shared-answers.js"></script>
+<script src="js/shared-wiring.js"></script>
 </body>
 </html>

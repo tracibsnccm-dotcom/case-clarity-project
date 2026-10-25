@@ -3130,7 +3130,7 @@ function hsiRecommendedNextActionsHtml(ds, destab) {
                 : '#1e5c3a';
   var actionItems = g.actions.map(function(a){ return '<li style="margin-bottom:6px;padding-left:4px">' + escHsi(a) + '</li>'; }).join('');
 
-  return '<div style="margin:14px 22px 0">' + (window.caseClarityRerun?window.caseClarityRerun.boxHtml(g.cadence,{accent:'#0e1c2e'}):'') + '</div>' +
+  return '<div style="margin:14px 22px 0">' + (window.caseClarityRerun?window.caseClarityRerun.boxHtml(g.cadence,{accent:'#0e1c2e'}):'') + (window.caseClarityShared?window.caseClarityShared.provenanceHtml('HSI'):'') + '</div>' +
     '<div style="margin:14px 22px 0;padding:16px 18px;background:#fdf8e8;border:2px solid #b09837;border-left:6px solid #b09837;border-radius:8px;box-shadow:0 1px 4px rgba(176,152,55,0.15)">' +
     '<div style="font-family:\'Jost\',sans-serif;font-size:11.5px;font-weight:800;color:#7a6a22;text-transform:uppercase;letter-spacing:0.13em;margin-bottom:10px;padding-bottom:7px;border-bottom:1.5px solid rgba(176,152,55,0.35);display:flex;align-items:center;gap:8px">' +
       '<span style="display:inline-block;width:18px;height:18px;background:' + tierColor + ';color:#fff;border-radius:50%;text-align:center;line-height:18px;font-size:11px;font-weight:900">!</span>' +
@@ -3754,5 +3754,7 @@ function returnToDashboard() {
     window.location.href = 'dashboard.html';
 }
 </script>
+<script src="js/shared-answers.js"></script>
+<script src="js/shared-wiring.js"></script>
 </body>
 </html>

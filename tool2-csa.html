@@ -2957,7 +2957,7 @@ function buildCsaReportPage1Html(identityHtml) {
     assessmentComplete +
     titleCard +
     statusBadgeBlock +
-    (window.caseClarityRerun?window.caseClarityRerun.boxHtml(intervalConfig.label,{accent:'#0d2240'}):'') +
+    (window.caseClarityRerun?window.caseClarityRerun.boxHtml(intervalConfig.label,{accent:'#0d2240'}):'') + (window.caseClarityShared?window.caseClarityShared.provenanceHtml('CSA'):'') +
     interpretationBlock +
     operationalGuidance +
     (ctaBlock ? '<div style="margin-top:0;margin-bottom:10px">' + ctaBlock + '</div>' : '') +
@@ -3236,5 +3236,7 @@ function returnToDashboard() {
   </div>
   <div class="csa-drawer-body" id="csa-drawer-body"></div>
 </aside>
+<script src="js/shared-answers.js"></script>
+<script src="js/shared-wiring.js"></script>
 </body>
 </html>
