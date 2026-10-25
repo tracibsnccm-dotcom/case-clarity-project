@@ -132,6 +132,35 @@
             border-left: 4px solid #0c1c34;
             border-radius: 2px;
         }
+        .cc-case-list { background: #fff; border: 1px solid #d6d0c4; border-top: 3px solid #b09837; padding: 20px 24px; margin-bottom: 24px; }
+        .cc-case-list.is-busy { opacity: 0.55; pointer-events: none; }
+        .cc-cl-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 10px 20px; margin-bottom: 12px; }
+        .cc-cl-head h2 { font-size: 20px; margin: 0 0 4px; }
+        .cc-cl-head p { margin: 0; font-size: 13.5px; color: #4a5568; }
+        .cc-cl-add { background: #0c1c34; color: #fff; border: none; border-bottom: 3px solid #b09837; padding: 10px 20px; font-weight: 600; cursor: pointer; }
+        .cc-cl-add:disabled { background: #9aa8b6; border-bottom-color: #9aa8b6; cursor: not-allowed; }
+        .cc-cl-full { margin: 0 0 10px; font-size: 13.5px; color: #7a1a1a; }
+        .cc-cl-rows { display: grid; gap: 8px; }
+        .cc-cl-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; padding: 10px 14px; border: 1px solid #e5e1d8; background: #faf9f6; }
+        .cc-cl-row.is-current { border-color: #b09837; background: #fdf8e8; box-shadow: inset 4px 0 0 #b09837; }
+        .cc-cl-name { font-weight: 700; color: #0c1c34; font-size: 15px; }
+        .cc-cl-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 12.5px; color: #4a5568; margin-top: 3px; }
+        .cc-chip { display: inline-block; padding: 2px 8px; border-radius: 10px; background: #e5e1d8; color: #3a3f4a; font-size: 11.5px; font-weight: 600; }
+        .cc-chip-active { background: #e3efe6; color: #1a5c3a; }
+        .cc-chip-closed { background: #3a3f4a; color: #fff; }
+        .cc-cl-actions { display: flex; gap: 8px; align-items: center; }
+        .cc-cl-btn { background: #fff; color: #0c1c34; border: 1px solid #0c1c34; padding: 6px 14px; cursor: pointer; font-weight: 600; }
+        .cc-cl-del { background: transparent; color: #7a1a1a; border: 1px solid #d9b3b3; padding: 6px 12px; cursor: pointer; }
+        .cc-cl-open-now { font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #7a6a22; }
+        .cc-cl-confirm { flex-basis: 100%; padding: 10px 12px; background: #fdf0f0; border: 1px solid #e8b4b4; font-size: 13.5px; color: #5c2a2a; }
+        .cc-cl-confirm label { display: flex; gap: 8px; align-items: flex-start; line-height: 1.45; }
+        .cc-cl-confirm > div { margin-top: 8px; display: flex; gap: 8px; }
+        .cc-cl-del-go { background: #7a1a1a; color: #fff; border: none; padding: 7px 14px; font-weight: 700; cursor: pointer; }
+        .cc-cl-del-go:disabled { background: #c9a3a3; cursor: not-allowed; }
+        .cc-status-field { border: 1.5px solid #b09837; background: #fdf8e8; padding: 12px 16px; margin: 0 0 18px; }
+        .cc-status-field legend { font-weight: 700; color: #0c1c34; font-size: 15px; padding: 0 6px; }
+        .cc-status-field label { display: flex; gap: 8px; align-items: center; margin: 6px 0; font-size: 14.5px; cursor: pointer; }
+        .cc-status-note { margin: 8px 0 0; font-size: 13px; color: #3a3f4a; line-height: 1.5; }
         .case-section-retro {
             padding: 28px 28px 8px;
             background: #f7f5f0;
@@ -709,6 +738,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-client.js"></script>
   <script src="js/workspace-sync.js"></script>
+  <script src="js/case-manager.js"></script>
   <script src="js/case-identity.js"></script>
   <script src="js/print-frame.js"></script>
   <script src="js/trial-print.js"></script>
@@ -1804,8 +1834,80 @@
             if (window.caseClarityWorkspace) {
                 try { await window.caseClarityWorkspace.pull(); } catch (e) { /* render from this browser */ }
             }
+            if (window.caseClarityCases) window.caseClarityCases.init();
             await checkTrialStatus();
         })();
+
+        function caseListHtml(trialExpired) {
+            return '<div id="cc-case-list" class="cc-case-list">' + caseListInner(trialExpired) + '</div>';
+        }
+        function caseListInner(trialExpired) {
+            var cm = window.caseClarityCases;
+            if (!cm) return '';
+            var rows = cm.list();
+            var max = cm.MAX;
+            var full = rows.length >= max;
+            var h = '<div class="cc-cl-head"><div><h2>Your Cases</h2>' +
+                '<p>' + rows.length + ' of ' + max + ' trial cases · active and closed. Each case keeps its own answers, reports, and timeline.</p></div>' +
+                '<button type="button" class="cc-cl-add" onclick="ccAddCase()"' + (full || trialExpired ? ' disabled' : '') + '>+ Add a case</button></div>';
+            if (full) h += '<p class="cc-cl-full">You have reached the ' + max + '-case trial limit. Delete a case to add another.</p>';
+            h += '<div class="cc-cl-rows">';
+            rows.forEach(function (r) {
+                var st = r.status === 'closed' ? '<span class="cc-chip cc-chip-closed">Closed · retrospective</span>' : (r.status === 'active' ? '<span class="cc-chip cc-chip-active">Active</span>' : '<span class="cc-chip">Status not set</span>');
+                h += '<div class="cc-cl-row' + (r.current ? ' is-current' : '') + '" data-case-id="' + escapeAttr(r.id) + '">' +
+                    '<div class="cc-cl-main"><div class="cc-cl-name">' + (r.name ? escapeAttr(r.name) : '<em>Untitled case</em>') + '</div>' +
+                    '<div class="cc-cl-meta">' + st + '<span>' + r.done + '/6 assessments</span></div></div>' +
+                    '<div class="cc-cl-actions">' +
+                    (r.current ? '<span class="cc-cl-open-now">Open now</span>' : '<button type="button" class="cc-cl-btn" onclick="ccOpenCase(\'' + escapeAttr(r.id) + '\')">Open</button>') +
+                    '<button type="button" class="cc-cl-del" onclick="ccAskDelete(\'' + escapeAttr(r.id) + '\')">Delete</button></div>' +
+                    '<div class="cc-cl-confirm" id="cc-del-' + escapeAttr(r.id) + '" hidden>' +
+                    '<label><input type="checkbox" onchange="this.closest(\'.cc-cl-confirm\').querySelector(\'button\').disabled=!this.checked"> I understand this permanently deletes all information and reports for <strong>' + (r.name ? escapeAttr(r.name) : 'this case') + '</strong>, and that they cannot be recovered.</label>' +
+                    '<div><button type="button" class="cc-cl-del-go" disabled onclick="ccDeleteCase(\'' + escapeAttr(r.id) + '\')">Delete permanently</button>' +
+                    '<button type="button" class="cc-cl-btn" onclick="ccAskDelete(\'' + escapeAttr(r.id) + '\', true)">Cancel</button></div></div>' +
+                    '</div>';
+            });
+            h += '</div>';
+            return h;
+        }
+        function renderCaseList() {
+            var el = document.getElementById('cc-case-list');
+            if (!el) return;
+            var expired = !!localStorage.getItem('trial_start_at') && computeTrialDaysRemaining() <= 0;
+            el.innerHTML = caseListInner(expired);
+        }
+        async function ccBusy(fn) {
+            var el = document.getElementById('cc-case-list');
+            if (el) el.classList.add('is-busy');
+            try { persistDashboardCaseToLocal(); return await fn(); }
+            catch (e) {
+                console.warn('[cases]', e);
+                alert('That could not be completed because this browser\'s storage is full. Download the reports you need, delete a case you no longer need, and try again.');
+                throw e;
+            }
+            finally { if (el) el.classList.remove('is-busy'); }
+        }
+        window.ccOpenCase = async function (id) {
+            await ccBusy(function () { return window.caseClarityCases.switchTo(id); });
+            window.location.reload();
+        };
+        window.ccAddCase = async function () {
+            var r = await ccBusy(function () { return window.caseClarityCases.add(); });
+            if (!r.ok) { alert(r.reason); return; }
+            if (r.reused) {
+                var f = document.getElementById('active-name-case-id');
+                if (f) { f.focus(); f.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+                return;
+            }
+            window.location.reload();
+        };
+        window.ccAskDelete = function (id, cancel) {
+            var box = document.getElementById('cc-del-' + id);
+            if (box) box.hidden = !!cancel;
+        };
+        window.ccDeleteCase = async function (id) {
+            await ccBusy(function () { return window.caseClarityCases.remove(id); });
+            window.location.reload();
+        };
 
         function escapeAttr(s) {
             if (!s) return '';
@@ -1835,6 +1937,7 @@
             const acName = escapeAttr(locA.nameCaseId || '');
             const acDate = escapeAttr(locA.dateOfInjury || '');
             const acMech = escapeAttr(locA.mechanism || '');
+            const acStatus = locA.caseStatus === 'active' || locA.caseStatus === 'closed' ? locA.caseStatus : '';
             const acType = locA.caseType === 'PI' || locA.caseType === 'WC' || locA.caseType === 'Disability' ? locA.caseType : '';
             const rcName = escapeAttr(locR.nameCaseId || '');
             const rcDate = escapeAttr(locR.dateOfInjury || '');
@@ -1904,6 +2007,8 @@
                     </div>
                 </div>
 
+                ${caseListHtml(trialExpired)}
+
                 <!-- CASE ENTRY SECTION (side by side) -->
                 <div style="background: #fff; border: 1px solid #d6d0c4; padding: 24px; margin-bottom: 32px;">
                   <h2 style="font-size: 20px; margin-bottom: 16px;">Enter Your Case Information</h2>
@@ -1915,6 +2020,12 @@
                     <div class="case-entry-panel">
                       <div class="case-entry-block">
                         <h3 style="font-size: 17px; color: #0c1c34; margin-bottom: 18px;">Case</h3>
+                        <fieldset class="cc-status-field" id="active-case-status">
+                          <legend>Is this a current case that is actively open, or a retrospective case that has closed?</legend>
+                          <label><input type="radio" name="active-case-status" value="active"${acStatus === 'active' ? ' checked' : ''}> Current case — actively open</label>
+                          <label><input type="radio" name="active-case-status" value="closed"${acStatus === 'closed' ? ' checked' : ''}> Retrospective case — closed</label>
+                          <p class="cc-status-note" id="cc-closed-note" style="display:${acStatus === 'closed' ? 'block' : 'none'}">Closed-case reports are labeled <strong>Closed Case — Retrospective Review</strong> and show where gaps occurred, as a map for the next case of this type. Re-run dates do not apply.</p>
+                        </fieldset>
                         <div class="case-entry-fields-grid">
                         <div class="case-entry-field">
                           <label for="active-name-case-id">Name / Case ID</label>
@@ -1950,7 +2061,7 @@
             // Active Case Section
             html += `
                 <div class="case-section case-section-active">
-                    <h2 style="font-size: 20px; margin: 32px 0 16px;">Case — Recommended Order</h2>
+                    <h2 style="font-size: 20px; margin: 32px 0 16px;">${acName ? acName + ' — ' : ''}Recommended Order${acStatus === 'closed' ? ' <span class="cc-chip cc-chip-closed" style="vertical-align:middle">Closed · retrospective</span>' : ''}</h2>
                     <p style="margin-bottom: 20px; color: #4a5568; line-height: 1.6;">It is recommended that you complete in order, but you may choose any sequence. Each report can be printed as soon as its assessment is complete.</p>
                     <p style="margin-bottom: 24px; color: #4a5568; line-height: 1.6; padding: 16px; background: #f4f6f8; border-left: 3px solid #0c1c34;">Consider beginning with a case that has stalled or where clinical direction is unclear. This process also provides a framework for new cases, offering guidance from the outset.</p>
                     <p style="margin-bottom: 12px; font-size: 15px; color: #0c1c34; font-weight: 600;">Start here with your case</p>
@@ -2043,6 +2154,7 @@
             if (!c.nameCaseId) missing.push('Name / Case ID');
             if (!c.dateOfInjury) missing.push('Date of Injury / Loss');
             if (!c.caseType) missing.push('Case Type');
+            if (kind !== 'retro' && !c.caseStatus) missing.push('whether the case is open or closed');
             return missing;
         }
 
@@ -2069,7 +2181,8 @@
                     nameCaseId: fieldTrim('active-name-case-id'),
                     dateOfInjury: fieldRaw('active-date-injury'),
                     mechanism: fieldTrim('active-mechanism'),
-                    caseType: fieldRaw('active-case-type')
+                    caseType: fieldRaw('active-case-type'),
+                    caseStatus: (document.querySelector('input[name="active-case-status"]:checked') || {}).value || ''
                 };
                 var retro = {
                     nameCaseId: fieldTrim('retro-name-case-id'),
@@ -2096,6 +2209,16 @@
                 node.addEventListener('input', schedule);
                 node.addEventListener('change', schedule);
             });
+            document.querySelectorAll('input[name="active-case-status"]').forEach(function (r) {
+                r.addEventListener('change', function () {
+                    var note = document.getElementById('cc-closed-note');
+                    if (note) note.style.display = r.value === 'closed' && r.checked ? 'block' : 'none';
+                    persistDashboardCaseToLocal();
+                    renderCaseList();
+                });
+            });
+            var nm = document.getElementById('active-name-case-id');
+            if (nm) nm.addEventListener('change', function () { persistDashboardCaseToLocal(); renderCaseList(); });
         }
 
         async function saveCaseInfo() {

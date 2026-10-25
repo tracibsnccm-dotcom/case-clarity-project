@@ -47,7 +47,7 @@ def expect(cond, msg):
     if not cond: fails.append(msg)
 with sync_playwright() as p:
     b,ctx,pg=setup(p); seed(pg)
-    pg.evaluate("""()=>{localStorage.setItem('dashboard_case_active', JSON.stringify({nameCaseId:'Danielle Harper (sample)',dateOfInjury:'2026-07-14',mechanism:'Rear-end MVC at red light, ~30 mph; head struck headrest',caseType:'PI'}));
+    pg.evaluate("""()=>{localStorage.setItem('dashboard_case_active', JSON.stringify({nameCaseId:'Danielle Harper (sample)',dateOfInjury:'2026-07-14',mechanism:'Rear-end MVC at red light, ~30 mph; head struck headrest',caseType:'PI',caseStatus:'active'}));
       const ev=[['2026-07-14','','er','ER — General Hospital','CT head negative; c-spine X-ray negative; dx cervical strain; head strike, "saw stars"'],
                 ['2026-07-21','2026-08-28','chiro','Chiropractor','Adjustments 2x/week; templated notes; no referral'],
                 ['2026-09-02','','primary','Primary care NP','Neck pain radiating to left arm; numbness/tingling thumb and index finger'],

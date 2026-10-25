@@ -136,7 +136,7 @@
         date_of_injury: c.dateOfInjury || '',
         case_type: c.caseType || '',
         client_identifier: '',
-        case_status: 'trial',
+        case_status: c.caseStatus === 'closed' ? 'closed (retrospective review)' : (c.caseStatus === 'active' ? 'active' : 'trial'),
         created_at: '',
       };
     } catch (e) {
