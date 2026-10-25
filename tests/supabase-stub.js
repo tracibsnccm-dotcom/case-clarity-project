@@ -2,6 +2,7 @@
   function q(table){
     var res={data:null,error:null};
     if(table==='trial_users') res.data={id:'u1',ccp:'CCP-TEST01',email:'tester@example.com',auth_user_id:'u1',trial_start_at:new Date().toISOString(),status:'trial_active'};
+    if(table==='tool_videos') res.data=[{tool:'CSA',title:'Why specialist referrals matter',url:'https://www.youtube.com/watch?v=abc',description:'Walkthrough of Right #5',sort_order:1},{tool:'ALL',title:'Getting started with C.A.S.E. Clarity',url:'https://youtu.be/xyz',sort_order:2},{tool:'CSA',title:'Bad link',url:'https://evil.example.com/x',sort_order:3}];
     var b={};
     ['select','eq','neq','in','order','limit','update','insert','upsert','delete','match','is','gte','lte','filter'].forEach(function(m){b[m]=function(){return b;};});
     b.single=function(){return Promise.resolve(res);};
