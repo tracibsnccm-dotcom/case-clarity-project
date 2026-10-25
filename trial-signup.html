@@ -77,6 +77,7 @@
         .field-input:focus, .field-select:focus {
             border-color: #b09837;
         }
+        .disability-soon { margin-top: 10px; padding: 12px 14px; background: #fdf8e8; border: 1.5px solid #b09837; border-left: 5px solid #b09837; font-size: 14px; line-height: 1.55; color: #3a3f4a; }
         .field-error {
             color: #a93226;
             font-size: 12px;
@@ -191,6 +192,21 @@
                     <div id="err-role" class="field-error"></div>
                 </div>
 
+                <div class="form-group">
+                    <label class="field-label" for="practice">Practice area *</label>
+                    <select id="practice" class="field-select" required>
+                        <option value="">Select…</option>
+                        <option value="PI">Personal Injury</option>
+                        <option value="WC">Workers' Compensation</option>
+                        <option value="PI_WC">Personal Injury and Workers' Compensation</option>
+                        <option value="Disability">Disability (SSDI/SSI, LTD/ERISA, VA)</option>
+                    </select>
+                    <div id="err-practice" class="field-error"></div>
+                    <div id="disability-soon" class="disability-soon" style="display:none">
+                        <strong>Disability tools are coming soon.</strong> The trial is built for personal injury and workers' compensation cases. The disability version is in its final stage of development and will open shortly. Please check back soon to start your disability trial.
+                    </div>
+                </div>
+
                 <button type="submit" class="btn-primary" id="submit-btn">Start Free Trial</button>
             </form>
 
@@ -213,6 +229,16 @@
 
     <script>
         (function () {
+            var pr = document.getElementById('practice');
+            if (pr) pr.addEventListener('change', function () {
+                var dis = pr.value === 'Disability';
+                document.getElementById('disability-soon').style.display = dis ? 'block' : 'none';
+                var b = document.getElementById('submit-btn');
+                b.disabled = dis;
+                b.textContent = dis ? 'Disability trial coming soon' : 'Start Free Trial';
+            });
+        })();
+        (function () {
             var supabaseClient = window.supabaseClient;
 
             /* GHL welcome automation: Edge Function trial-signup POSTs to GHL (secret GHL_TRIAL_WEBHOOK_URL). */
@@ -225,7 +251,7 @@
             var lastSubmittedEmail = '';
 
             function clearFieldErrors() {
-                ['err-first-name', 'err-email', 'err-role'].forEach(function (id) {
+                ['err-first-name', 'err-email', 'err-role', 'err-practice'].forEach(function (id) {
                     var el = document.getElementById(id);
                     if (el) {
                         el.textContent = '';
@@ -352,6 +378,15 @@
                 }
                 if (!role) {
                     showFieldError('err-role', 'Please select your role.');
+                    return;
+                }
+                var practice = document.getElementById('practice').value;
+                if (!practice) {
+                    showFieldError('err-practice', 'Please select your practice area.');
+                    return;
+                }
+                if (practice === 'Disability') {
+                    document.getElementById('disability-soon').style.display = 'block';
                     return;
                 }
 
