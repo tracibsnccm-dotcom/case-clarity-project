@@ -60,8 +60,15 @@
     return null;
   }
 
+  // Paid portal: history is kept per case (case_ref), since one browser holds many clients.
+  function ref() {
+    try { return new URLSearchParams(global.location.search).get('case_ref') || ''; } catch (e) { return ''; }
+  }
+  function histKey(n) { var r = ref(); return r ? 'cc_history_' + r + '_tool' + n : 'cc_history_tool' + n; }
+  function sameCase(n) { var r = ref(); return !r || global.localStorage.getItem('cc_data_ref_tool' + n) === r; }
+
   function history(n) {
-    var h = parse(global.localStorage.getItem('cc_history_tool' + n));
+    var h = parse(global.localStorage.getItem(histKey(n)));
     return Array.isArray(h) ? h : [];
   }
 
@@ -73,16 +80,17 @@
       try {
         var prev = parse(this.getItem(k));
         var next = parse(v);
-        if (prev && prev.timestamp && (!next || next.timestamp !== prev.timestamp)) {
+        if (prev && prev.timestamp && sameCase(m[1]) && (!next || next.timestamp !== prev.timestamp)) {
           var h = history(m[1]);
           if (!h.length || h[h.length - 1].at !== prev.timestamp) {
             h.push({ at: prev.timestamp, result: resultFor(m[1], prev), severity: severity(m[1], prev) });
-            orig.call(this, 'cc_history_tool' + m[1], JSON.stringify(h.slice(-5)));
+            orig.call(this, histKey(m[1]), JSON.stringify(h.slice(-5)));
           }
         }
       } catch (e) { /* ignore */ }
     }
     orig.call(this, k, v);
+    if (m && ref()) { try { orig.call(this, 'cc_data_ref_tool' + m[1], ref()); } catch (e) { /* ignore */ } }
   };
 
   /**
@@ -91,7 +99,7 @@
    * @param {object} [newData] the run the report is being built from
    */
   function compareHtml(n, newData) {
-    var stored = parse(global.localStorage.getItem('tool' + n + '_data'));
+    var stored = sameCase(n) ? parse(global.localStorage.getItem('tool' + n + '_data')) : null;
     var cur = newData || stored;
     if (!cur) return '';
     var prev = null;

@@ -25,7 +25,11 @@
       return 'active';
     }
   }
-  function storeKey() { return 'cc_shared_' + caseKind(); }
+  function paidRef() {
+    try { return new URLSearchParams(global.location.search).get('case_ref') || ''; } catch (e) { return ''; }
+  }
+  // Paid portal: one set of shared answers per case. Trial: the open case.
+  function storeKey() { var r = paidRef(); return r ? 'cc_shared_case_' + r : 'cc_shared_' + caseKind(); }
 
   function load() {
     try { return JSON.parse(localStorage.getItem(storeKey()) || '{}') || {}; } catch (e) { return {}; }

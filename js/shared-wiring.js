@@ -306,6 +306,7 @@
       // Mechanism of injury from the dashboard case information.
       try {
         var kind = new URLSearchParams(global.location.search).get('caseType');
+        if (new URLSearchParams(global.location.search).get('case_ref')) throw new Error('paid portal: no dashboard case text');
         var c = JSON.parse(localStorage.getItem(kind === 'retrospective' ? 'dashboard_case_retro' : 'dashboard_case_active') || 'null');
         var mech = c && c.mechanism ? String(c.mechanism) : '';
         if (/\b(mvc|mva|motor vehicle|car|auto|rear[- ]?end|collision|vehicle|truck|crash)\b/i.test(mech)) {

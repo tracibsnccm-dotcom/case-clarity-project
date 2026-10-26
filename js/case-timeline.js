@@ -29,7 +29,11 @@
   var CARE = { er: 1, primary: 1, specialist: 1, chiro: 1, pt: 1, imaging: 1, nerve: 1 };
   var mountedId = null;
 
-  function key() { return 'cc_timeline_active'; }
+  function key() {
+    var r = '';
+    try { r = new URLSearchParams(global.location.search).get('case_ref') || ''; } catch (e) { r = ''; }
+    return r ? 'cc_timeline_case_' + r : 'cc_timeline_active';
+  }
   function load() {
     try { var v = JSON.parse(localStorage.getItem(key()) || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; }
   }

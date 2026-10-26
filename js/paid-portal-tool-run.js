@@ -50,11 +50,43 @@
     }
   }
 
+  /* The finished report, exactly as the tool generated it on this page, is saved with the
+     run (result_json.report_html) so a saved report always shows what was issued. Only reports
+     written on this page are used, never a copy left in the browser by another case. */
+  var TOOL_NUM = { CCI: 1, CSA: 2, CAF: 3, HSI: 4, FCI: 5, RRF: 6 };
+  var pageReports = {};
+  (function () {
+    var prev = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (k, v) {
+      var m = this === global.localStorage && /^tool([1-6])_report_html$/.exec(k);
+      if (m) pageReports[m[1]] = { html: String(v), at: Date.now() };
+      return prev.call(this, k, v);
+    };
+  })();
+  function waitForPageReport(n, sinceMs, timeoutMs) {
+    return new Promise(function (resolve) {
+      var t0 = Date.now();
+      (function check() {
+        var r = pageReports[n];
+        if (r && r.at >= sinceMs - 15000) return resolve(r.html);
+        if (Date.now() - t0 > timeoutMs) return resolve('');
+        setTimeout(check, 150);
+      })();
+    });
+  }
+
   async function paidPortalRecordCaseToolRunAsync(opts) {
     var toolKey = opts.toolKey;
     var scoreSummary = opts.scoreSummary;
     var resultJson = opts.resultJson;
     try {
+      var n = TOOL_NUM[String(toolKey || '').toUpperCase()];
+      if (n) {
+        var html = await waitForPageReport(String(n), Date.now(), 3000);
+        if (html && html.length < 2000000) {
+          resultJson = Object.assign({}, cloneForJsonb(resultJson) || {}, { report_html: html, report_saved_at: new Date().toISOString() });
+        }
+      }
       var caseRef = caseClarityResolveCaseRef();
       if (!caseRef || !global.supabaseClient) return false;
 
