@@ -401,8 +401,8 @@
                 return;
             }
             var detail = info.detail || info.error || (r && r.error && r.error.message) || '';
-            say('Checkout could not be started. Please try again, or contact <a href="mailto:traci.johnson@rcmspllc.com">traci.johnson@rcmspllc.com</a>.' +
-                (detail ? '<div style="margin-top:8px;font-size:12px;color:#6b7280">Details: ' + String(detail).replace(/</g, '&lt;') + '</div>' : ''));
+            say('Online checkout is being finalized. To subscribe now, contact <a href="mailto:traci.johnson@rcmspllc.com">traci.johnson@rcmspllc.com</a> and we will set up your plan right away.' +
+                (detail && /[?&]debug=1/.test(location.search) ? '<div style="margin-top:8px;font-size:12px;color:#6b7280">Details: ' + String(detail).replace(/</g, '&lt;') + '</div>' : ''));
         }).catch(function () {
             document.querySelectorAll('.btn-purchase').forEach(function (b) { b.disabled = false; });
             say('Checkout could not be started. Please try again, or contact <a href="mailto:traci.johnson@rcmspllc.com">traci.johnson@rcmspllc.com</a>.');
