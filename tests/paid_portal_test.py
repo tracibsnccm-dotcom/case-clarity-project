@@ -11,6 +11,7 @@ src = open(os.path.join(HERE, 'standing_case_test.py')).read()
 PAID_ROWS = """
     if(table==='case_cases') res.data={id:'case-1',case_ref:'CC-0001',case_title:'Danielle Harper',client_name:'Danielle Harper',date_of_injury:'2026-07-14',case_type:'PI',client_identifier:null,case_status:'active',created_at:new Date().toISOString(),is_locked:false,attorney_user_id:'u1'};
     if(table==='case_attorney_profiles') res.data={id:'p1',user_id:'u1',is_portal_admin:false};
+    if(table==='trial_users' && localStorage.getItem('__stub_unsubscribed')!=='1') res.data=Object.assign({}, res.data, {subscription_status:'active', subscription_tier:'professional'});
     if(table==='case_tool_runs'){ var rr=localStorage.getItem('__stub_run_row'); if(rr) res.data=JSON.parse(rr); }
 """
 REC_INSERT = """    b.insert=function(x){ try{ var l=JSON.parse(localStorage.getItem('__stub_inserts')||'[]'); l.push({table:table,row:x}); localStorage.setItem('__stub_inserts', JSON.stringify(l)); }catch(e){} return b; };
@@ -53,6 +54,18 @@ src = src[:start] + """    # Paid checks
     txt = fr.locator('body').inner_text() if pg.locator('#cc-saved-report-frame').count() else ''
     expect('re-run this assessment by' in txt.lower() and 'case complexity' in txt.lower(), 'Saved-report viewer shows the report as generated')
     pg.screenshot(path=os.path.join(HERE, 'paid_viewer.png'), full_page=True)
+    hdr = pg.inner_text('#user-email') if pg.locator('#user-email').count() else ''
+    expect('CCP-TEST01' in hdr, 'Portal header shows the CCP number')
+    # Not a subscriber: sent to the subscription page
+    pg.evaluate("localStorage.setItem('__stub_unsubscribed','1'); sessionStorage.removeItem('cc_portal_access');")
+    pg.goto(BASE+'dashboard.html', wait_until='commit'); pg.wait_for_timeout(3000)
+    expect(pg.url.endswith('subscribe.html'), 'Non-subscriber is sent to the subscription page')
+    pg.evaluate("localStorage.removeItem('__stub_unsubscribed')")
+    # Sign-in page: email link only, no password
+    ctx.clear_cookies()
+    pg.goto(BASE+'login.html', wait_until='commit'); pg.wait_for_timeout(300)
+    pg.evaluate("window.redirectIfLoggedIn=async()=>false")
+    expect(pg.locator('#password').count() == 0, 'No password field on sign-in')
     tr = pg.evaluate("JSON.parse(localStorage.getItem('cc_shared_active')||'{}')")
     expect(list(tr.keys()) == ['pain'], 'Trial shared answers untouched by the paid case')
 """ + src[end:]

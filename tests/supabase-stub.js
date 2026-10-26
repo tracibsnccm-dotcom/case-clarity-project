@@ -15,7 +15,8 @@
     auth:{getSession:function(){return Promise.resolve({data:{session:sess},error:null});},
           getUser:function(){return Promise.resolve({data:{user:sess.user},error:null});},
           onAuthStateChange:function(){return {data:{subscription:{unsubscribe:function(){}}}};},
-          signOut:function(){return Promise.resolve({});}},
+          signOut:function(){return Promise.resolve({});},
+          signInWithOtp:function(a){ try{ localStorage.setItem('__stub_otp', JSON.stringify(a)); }catch(e){} return Promise.resolve({data:{},error:null}); }},
     from:q,
     rpc:function(name,args){
       if(name==='trial_workspace_save'){ const ts=new Date().toISOString(); sessionStorage.setItem('__stub_ws', JSON.stringify({data:args.p_data, updated_at:ts})); window.__stubSaves=(window.__stubSaves||0)+1; return Promise.resolve({data:ts,error:null}); }
