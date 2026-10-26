@@ -99,7 +99,7 @@
     var rows = '';
     var earliest = null;
     var done = 0;
-    var closedCase = !!(global.caseClarityCases && global.caseClarityCases.isClosed());
+    var closedCase = !!(global.caseClarityClosed && global.caseClarityClosed.isClosed());
     TOOLS.forEach(function (t) {
       var complete = !!localStorage.getItem('tool' + t.n + '_complete');
       var rr = complete ? rerunDate(reportDoc(t.n)) : null;
@@ -112,7 +112,7 @@
         '</tr>';
     });
     var findings = keyFindings();
-    var closed = !!(global.caseClarityCases && global.caseClarityCases.isClosed());
+    var closed = !!(global.caseClarityClosed && global.caseClarityClosed.isClosed());
     if (closed) earliest = null;
     return '<section class="cc-case-summary" style="font-family:system-ui,Segoe UI,sans-serif;color:#1a2e3f;margin-bottom:28px;page-break-after:always;break-after:page">' +
       '<div style="background:#0c1c34;color:#fff;padding:12px 18px;border-bottom:3px solid #b09837">' +

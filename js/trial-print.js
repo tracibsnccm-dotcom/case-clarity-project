@@ -56,7 +56,7 @@
     var row = ci && typeof ci.trialRow === 'function' ? ci.trialRow() : null;
     if (!row || !row.case_title) return '';
     var doi = ci.formatInjuryDate ? ci.formatInjuryDate(row.date_of_injury) : row.date_of_injury;
-    var closed = global.caseClarityCases && global.caseClarityCases.isClosed();
+    var closed = global.caseClarityClosed && global.caseClarityClosed.isClosed();
     var txt = ((closed ? 'CLOSED CASE — RETROSPECTIVE REVIEW  ·  ' : '') + row.case_title + (doi && doi !== '—' ? '  ·  DOI ' + doi : '')).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
     return '<style>@page{margin:0.6in 0.5in;@top-left{content:"' + txt + '";font:600 9pt system-ui,sans-serif;color:#555;}' +
       '@bottom-right{content:"Page " counter(page) " of " counter(pages);font:9pt system-ui,sans-serif;color:#777;}}</style>';

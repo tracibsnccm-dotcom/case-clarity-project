@@ -9,7 +9,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 src = open(os.path.join(HERE, 'standing_case_test.py')).read()
 
 PAID_ROWS = """
-    if(table==='case_cases') res.data={id:'case-1',case_ref:'CC-0001',case_title:'Danielle Harper',client_name:'Danielle Harper',date_of_injury:'2026-07-14',case_type:'PI',client_identifier:null,case_status:'active',created_at:new Date().toISOString(),is_locked:false,attorney_user_id:'u1'};
+    if(table==='case_cases') res.data={id:'case-1',case_ref:'CC-0001',case_title:'Danielle Harper',client_name:'Danielle Harper',date_of_injury:'2026-07-14',case_type:'PI',client_identifier:null,case_status:(localStorage.getItem('__stub_closed')==='1'?'closed':'active'),created_at:new Date().toISOString(),is_locked:false,attorney_user_id:'u1'};
     if(table==='case_attorney_profiles') res.data={id:'p1',user_id:'u1',is_portal_admin:false};
     if(table==='trial_users' && localStorage.getItem('__stub_unsubscribed')!=='1') res.data=Object.assign({}, res.data, {subscription_status:'active', subscription_tier:'professional'});
     if(table==='case_tool_runs'){ var rr=localStorage.getItem('__stub_run_row'); if(rr) res.data=JSON.parse(rr); }
@@ -56,6 +56,13 @@ src = src[:start] + """    # Paid checks
     pg.screenshot(path=os.path.join(HERE, 'paid_viewer.png'), full_page=True)
     hdr = pg.inner_text('#user-email') if pg.locator('#user-email').count() else ''
     expect('CCP-TEST01' in hdr, 'Portal header shows the CCP number')
+    # A case marked Closed in the portal gets the closed-case report treatment
+    pg.evaluate("localStorage.setItem('__stub_closed','1')")
+    pg.goto(BASE+'tool1-cci.html?case_ref=CC-0001&tool=CCI', wait_until='commit'); pg.wait_for_timeout(2500)
+    expect(pg.evaluate("caseClarityClosed.isClosed()") is True and 'do not apply' in pg.evaluate("caseClarityRerun.boxHtml('Every 10–14 days')"), 'Closed portal case: no re-run date')
+    pg.evaluate("localStorage.setItem('tool1_report_html','<div>x</div>')")
+    expect('Retrospective Review' in pg.evaluate("localStorage.getItem('tool1_report_html')"), 'Closed portal case: report banner')
+    pg.evaluate("localStorage.removeItem('__stub_closed')")
     # Not a subscriber: sent to the subscription page
     pg.evaluate("localStorage.setItem('__stub_unsubscribed','1'); sessionStorage.removeItem('cc_portal_access');")
     pg.goto(BASE+'dashboard.html', wait_until='commit'); pg.wait_for_timeout(3000)

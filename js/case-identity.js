@@ -85,6 +85,7 @@
   }
 
   function fillFields(root, row) {
+    if (row && row.case_status && new URLSearchParams(window.location.search).get('case_ref')) window.__ccCaseStatus = row.case_status;
     if (!root) return;
     row = row || {};
     root.querySelectorAll('[data-case-identity]').forEach(function (span) {

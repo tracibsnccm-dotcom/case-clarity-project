@@ -21,7 +21,7 @@ TOOLS = ['tool1-cci.html', 'tool2-csa.html', 'tool3-caf.html', 'tool4-hsi.html',
 TRIAL_ONLY = ['js/workspace-sync.js', 'js/case-manager.js', 'js/plan-guard.js', 'js/trial-drafts.js']
 SHARED_JS = ['print-frame.js', 'rerun-date.js', 'case-results.js', 'trial-print.js', 'shared-answers.js',
              'shared-wiring.js', 'tool-videos.js', 'case-timeline.js', 'paid-portal-tool-run.js',
-             'supabase-client.js', 'case-identity.js']
+             'supabase-client.js', 'case-identity.js', 'closed-case.js']
 TRIAL_LOGIN = "const ok = (function(){ if (!localStorage.getItem('user_logged_in')) { window.location.href='login.html'; return false; } return true; })();"
 PAID_LOGIN = "const ok = await requireAuth();"
 

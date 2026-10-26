@@ -266,14 +266,14 @@
 
       <div class="confirm-row">
         <div class="dot"></div>
-        <p><strong>Your trial work carries over.</strong> Your cases, answers, and reports stay in the same account, with the same CCP number. Sign in with your email link as before.</p>
+        <p><strong>Your trial work carries over.</strong> <span id="ty-carry">The first time you sign in to your portal, your trial cases and their reports are brought over automatically. Same account, same CCP number, same email sign-in.</span></p>
       </div>
     </div>
 
     <!-- PORTAL CTA -->
     <div class="portal-block">
-      <a href="dashboard.html" class="portal-btn">Go to My Dashboard</a>
-      <p class="portal-sub">Same account, same email sign-in.</p>
+      <a href="https://portal.caseclarity.rcmspllc.com/login.html" class="portal-btn" id="ty-go">Go to My Portal</a>
+      <p class="portal-sub" id="ty-go-sub">Sign in with your email link. Your trial cases and reports come with you.</p>
     </div>
 
     <!-- SUPPORT NOTE -->
@@ -295,6 +295,9 @@
     var plan = new URLSearchParams(location.search).get('plan');
     if (plan === 'single') {
       document.getElementById('ty-access').textContent = 'Your Single Client Review is active for 30 days. Each tool runs once; download or print your reports before the 30 days end.';
+      document.getElementById('ty-carry').textContent = 'Your Single Client Review runs in your C.A.S.E. Clarity dashboard, with the same account and email sign-in.';
+      var go = document.getElementById('ty-go'); go.href = 'dashboard.html'; go.textContent = 'Go to My Dashboard';
+      document.getElementById('ty-go-sub').textContent = 'Same account, same email sign-in.';
     }
   } catch (e) { /* ignore */ }
 </script>

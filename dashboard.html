@@ -750,6 +750,7 @@
   <script src="js/case-manager.js"></script>
   <script src="js/plan-guard.js"></script>
   <script src="js/case-identity.js"></script>
+  <script src="js/closed-case.js"></script>
   <script src="js/print-frame.js"></script>
   <script src="js/trial-print.js"></script>
   <script src="js/case-results.js"></script>
@@ -1667,7 +1668,11 @@
                     localStorage.setItem('cc_access', JSON.stringify({ plan: user.subscription_tier, label: label, until: until, periodEnd: user.subscription_current_period_end || null }));
                     if (singleOk && window.caseClarityPlan) { try { await window.caseClarityPlan.syncSingleRuns(); } catch (e) { /* use cached */ } }
                     else localStorage.removeItem('cc_single_runs');
-                    if (subOk && window.caseClarityCases) { try { await window.caseClarityCases.purgeDue(); } catch (e) { /* next visit */ } }
+                    if (subOk) {
+                        // Monthly subscribers work in the portal; their trial cases move there on first sign-in.
+                        showMovedToPortal(PLAN_LABELS[user.subscription_tier]);
+                        return;
+                    }
                     renderDashboard();
                     updateTrialReportUI();
                     updateReportUI();
@@ -2423,6 +2428,17 @@
 
             window.open(url.toString(), '_blank');
         };
+
+        function showMovedToPortal(planLabel) {
+            document.getElementById('dashboard-content').innerHTML = `
+                <div style="max-width:640px;margin:60px auto;padding:40px 44px;background:#ffffff;border:1px solid #d6d0c4;border-top:4px solid #b09837;text-align:center;">
+                    <p style="margin:0 0 12px;font-family:Georgia,'Times New Roman',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#b09837;">${escapeAttr(planLabel || 'Subscriber')}</p>
+                    <h2 style="margin:0 0 14px;font-family:Georgia,'Times New Roman',serif;font-size:26px;font-weight:normal;color:#0c1c34;">Your cases are in your portal</h2>
+                    <p style="margin:0 0 26px;font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#4a5568;line-height:1.7;">Thank you for subscribing. Sign in to your C.A.S.E. Clarity portal with your email link. The first time you sign in, your trial cases and their reports are brought over automatically.</p>
+                    <a href="https://portal.caseclarity.rcmspllc.com/login.html" style="display:inline-block;padding:13px 32px;background:#0c1c34;color:#ffffff;font-family:Georgia,'Times New Roman',serif;font-size:14px;letter-spacing:1px;text-decoration:none;font-weight:600;border-radius:4px;border:1.5px solid #b09837;">Go to My Portal</a>
+                    <p style="margin:22px 0 0;font-size:13px;color:#6b7280;">Questions: <a href="mailto:traci.johnson@rcmspllc.com">traci.johnson@rcmspllc.com</a></p>
+                </div>`;
+        }
 
         function showExpiredMessage() {
             document.getElementById('dashboard-content').innerHTML = `

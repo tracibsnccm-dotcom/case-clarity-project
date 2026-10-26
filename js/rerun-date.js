@@ -44,7 +44,7 @@
    */
   function boxHtml(intervalText, opts) {
     opts = opts || {};
-    if (global.caseClarityCases && global.caseClarityCases.isClosed()) return global.caseClarityCases.closedBoxHtml();
+    if (global.caseClarityClosed && global.caseClarityClosed.isClosed()) return global.caseClarityClosed.boxHtml();
     var days = parseUpperDays(intervalText);
     if (days == null) return '';
     var from = opts.from ? new Date(opts.from) : new Date();
