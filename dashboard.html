@@ -1541,12 +1541,10 @@
             if (paid) return Math.max(1, Math.ceil((new Date(paid.until).getTime() - Date.now()) / 86400000));
             var raw = localStorage.getItem('trial_start_at');
             if (!raw) return 30;
-            var startDate = new Date(raw);
-            startDate.setHours(0, 0, 0, 0);
-            var now = new Date();
-            now.setHours(0, 0, 0, 0);
-            var daysLeft = 30 - Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
-            return Math.max(0, daysLeft);
+            var end = window.CaseClarityTrial ? window.CaseClarityTrial.trialEndMs(raw) : null;
+            if (!end) return 30;
+            var ms = end - Date.now();
+            return ms <= 0 ? 0 : Math.max(1, Math.ceil(ms / 86400000));
         }
 
         function updateRealCountdown() {
@@ -1683,10 +1681,11 @@
                 // Check if trial expired (30 days from trial_start_at)
                 const trialStart = new Date(user.trial_start_at);
                 const now = new Date();
-                const daysElapsed = Math.floor((now - trialStart) / (1000 * 60 * 60 * 24));
+                const trialEnd = window.CaseClarityTrial ? window.CaseClarityTrial.trialEndMs(user.trial_start_at) : (trialStart.getTime() + 30 * 86400000);
+                const trialOver = Date.now() >= trialEnd;
 
                 // The trial clock alone decides; the status field is never trusted to extend access.
-                if (daysElapsed >= 30 && user.status !== 'trial_expired') {
+                if (trialOver && user.status !== 'trial_expired') {
                     if (authed) {
                         await supabaseClient
                             .from('trial_users')
@@ -1708,7 +1707,7 @@
                     return;
                 }
 
-                if (user.status === 'trial_expired' || daysElapsed >= 30) {
+                if (user.status === 'trial_expired' || trialOver) {
                     if (window.caseClarityCases) window.caseClarityCases.clearAll();
                     alert('Your trial has ended. As stated in the trial terms, all trial case information and reports have been permanently deleted. Choose a plan to continue.');
                     window.location.href = 'pricing.html';
@@ -1884,11 +1883,14 @@
             if (paidAcc || trialExpired) return '';
             var raw = localStorage.getItem('trial_start_at');
             if (!raw) return '';
-            var end = new Date(raw); end.setHours(0, 0, 0, 0); end.setDate(end.getDate() + 30);
-            var days = Math.ceil((end.getTime() - Date.now()) / 86400000);
+            var endMs = window.CaseClarityTrial ? window.CaseClarityTrial.trialEndMs(raw) : null;
+            if (!endMs) return '';
+            var days = Math.ceil((endMs - Date.now()) / 86400000);
             if (days > 7 || days < 0) return '';
-            var when = end.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-            var left = days <= 1 ? 'Your trial ends tomorrow' : 'Your trial ends in ' + days + ' days';
+            var when = new Date(endMs).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'America/Chicago' }) + ' at 11:59 PM Central';
+            var cday = function (ms) { return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Chicago' }).format(new Date(ms)); };
+            var calDays = Math.round((Date.parse(cday(endMs)) - Date.parse(cday(Date.now()))) / 86400000);
+            var left = calDays <= 0 ? 'Your trial ends tonight' : (calDays === 1 ? 'Your trial ends tomorrow' : 'Your trial ends in ' + calDays + ' days');
             return '<div class="cc-ending" role="alert">' +
                 '<div class="cc-ending-title">' + left + ' — ' + escapeAttr(when) + '</div>' +
                 '<p>If you do not subscribe, <strong>all case information, answers, and reports are permanently deleted</strong> when your trial ends, and RCMS cannot recover them. Download or print any reports you want to keep now.</p>' +

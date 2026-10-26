@@ -10,13 +10,29 @@
         return null;
     }
 
+    /* The trial ends at 11:59 PM Central time on day 30 (the signup day is day 1). */
+    function chicagoOffsetMin(ms) {
+        try {
+            var p = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', timeZoneName: 'shortOffset' }).formatToParts(new Date(ms));
+            var tz = (p.find(function (x) { return x.type === 'timeZoneName'; }) || {}).value || 'GMT-6';
+            var m = /GMT([+-])(\d+)(?::(\d+))?/.exec(tz);
+            return m ? (m[1] === '-' ? -1 : 1) * (Number(m[2]) * 60 + Number(m[3] || 0)) : -360;
+        } catch (e) { return -360; }
+    }
+    function trialEndMs(raw) {
+        var start = new Date(raw);
+        if (isNaN(start.getTime())) return null;
+        var ymd;
+        try { ymd = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Chicago' }).format(start).split('-').map(Number); }
+        catch (e) { ymd = [start.getFullYear(), start.getMonth() + 1, start.getDate()]; }
+        // 11:59 PM Central on (start date + 29 days)
+        var guess = Date.UTC(ymd[0], ymd[1] - 1, ymd[2] + 29, 23, 59);
+        return guess - chicagoOffsetMin(guess) * 60000;
+    }
     function getTrialEndTimeMs() {
         var raw = localStorage.getItem('trial_start_at');
         if (!raw) return null;
-        var d = new Date(raw);
-        d.setHours(0, 0, 0, 0);
-        d.setDate(d.getDate() + 30);
-        return d.getTime();
+        return trialEndMs(raw);
     }
 
     function getRemainingMs() {
@@ -41,6 +57,7 @@
         getEndTimeMs: getTrialEndTimeMs,
         getRemainingMs: getRemainingMs,
         formatCountdown: formatCountdown,
+        trialEndMs: trialEndMs,
         paidAccess: paidAccess
     };
 
