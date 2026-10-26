@@ -46,6 +46,8 @@ STUB = r"""
     from:q,
     rpc:function(name,args){
       if(name==='trial_workspace_get') return Promise.resolve({data:[{data:L('__ws',{}),updated_at:new Date().toISOString()}],error:null});
+      if(name==='cc_portal_client_limit'){ var lm=localStorage.getItem('__limit'); return Promise.resolve({data:{plan:'foundation',limit:lm?Number(lm):null,used:L('__cases',[]).length},error:null}); }
+      if(name==='trial_workspace_save'){ S('__ws', args.p_data); return Promise.resolve({data:new Date().toISOString(),error:null}); }
       if(name==='cc_mark_portal_import'){ localStorage.setItem('__imported', new Date().toISOString()); return Promise.resolve({data:new Date().toISOString(),error:null}); }
       return Promise.resolve({data:1,error:null});
     },
@@ -92,6 +94,7 @@ with sync_playwright() as p:
       let s=''; for (let i=0;i<buf.length;i++) s+=String.fromCharCode(buf[i]);
       const ws = Object.assign({}, open, { cc_current_case:'cAAA', cc_cases: JSON.stringify([{id:'cAAA'},{id:'cBBB'}]), cc_case_cBBB: 'g:'+btoa(s) });
       localStorage.setItem('__ws', JSON.stringify(ws));
+      localStorage.setItem('__ws_orig', JSON.stringify(ws));
     }""")
     pg.goto(BASE + 'dashboard.html', wait_until='commit'); pg.wait_for_timeout(4000)
     cases = pg.evaluate("JSON.parse(localStorage.getItem('__cases')||'[]')")
@@ -115,6 +118,24 @@ with sync_playwright() as p:
     pg.evaluate("localStorage.removeItem('__imported')")
     pg.reload(wait_until='commit'); pg.wait_for_timeout(3500)
     expect(len(pg.evaluate("JSON.parse(localStorage.getItem('__cases')||'[]')")) == 2 and len(pg.evaluate("JSON.parse(localStorage.getItem('__runs')||'[]')")) == 4, 'Per-case tag also prevents duplicates')
+    # ── More trial cases than the plan allows: the attorney chooses ──
+    ws = pg.evaluate("localStorage.getItem('__ws_backup')")
+    pg.evaluate("()=>{ const w=localStorage.getItem('__ws_orig'); localStorage.clear(); localStorage.setItem('__ws', w); localStorage.setItem('__limit','1'); sessionStorage.removeItem('cc_portal_access'); }")
+    pg.goto(BASE + 'dashboard.html', wait_until='commit'); pg.wait_for_timeout(4000)
+    expect(pg.locator('.cc-pick').count() == 2 and 'Your plan includes 1 client' in pg.inner_text('#trial-import-note'), 'Over the limit: attorney is asked to choose')
+    expect(len(pg.evaluate("JSON.parse(localStorage.getItem('__cases')||'[]')")) == 0, 'Nothing copied before choosing')
+    pg.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'portal_picker.png'), full_page=True)
+    pg.locator('.cc-pick').nth(1).check()
+    expect(pg.locator('.cc-pick').nth(0).is_disabled(), 'Cannot choose more than the plan allows')
+    pg.check('#cc-pick-ack')
+    expect(pg.is_disabled('#cc-pick-go'), 'Needs the CCP number too')
+    pg.fill('#cc-pick-ccp', 'ccp-test01'); pg.dispatch_event('#cc-pick-ccp', 'input')
+    expect(pg.is_enabled('#cc-pick-go'), 'Checkbox + CCP enables it')
+    pg.click('#cc-pick-go'); pg.wait_for_timeout(4500)
+    cases = pg.evaluate("JSON.parse(localStorage.getItem('__cases')||'[]')")
+    expect([c['client_name'] for c in cases] == ['M. Lopez'], 'Only the chosen case was brought over')
+    expect(pg.evaluate("localStorage.getItem('__ws')") == '{}', 'Trial copy (including cases not chosen) deleted')
+    expect(bool(pg.evaluate("localStorage.getItem('__imported')")), 'Move marked as done')
     expect(not errors, 'No page errors ' + str(errors[:2]))
     b.close()
 
