@@ -132,6 +132,12 @@
             border-left: 4px solid #0c1c34;
             border-radius: 2px;
         }
+        .cc-ending { background: #fdf0f0; border: 2px solid #c0392b; border-left: 8px solid #c0392b; padding: 16px 20px; margin-bottom: 24px; color: #5c2a2a; }
+        .cc-ending-title { font-size: 18px; font-weight: 800; color: #7a1a1a; margin-bottom: 6px; }
+        .cc-ending p { font-size: 14.5px; line-height: 1.6; margin: 0 0 12px; }
+        .cc-ending-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+        .cc-ending-actions a { background: #fff; color: #7a1a1a; border: 1.5px solid #7a1a1a; padding: 9px 16px; font-weight: 700; text-decoration: none; }
+        .cc-ending-actions a.cc-ending-plans { background: #0c1c34; color: #fff; border-color: #0c1c34; }
         .cc-case-list { background: #fff; border: 1px solid #d6d0c4; border-top: 3px solid #b09837; padding: 20px 24px; margin-bottom: 24px; }
         .cc-case-list.is-busy { opacity: 0.55; pointer-events: none; }
         .cc-cl-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 10px 20px; margin-bottom: 12px; }
@@ -148,6 +154,9 @@
         .cc-chip { display: inline-block; padding: 2px 8px; border-radius: 10px; background: #e5e1d8; color: #3a3f4a; font-size: 11.5px; font-weight: 600; }
         .cc-chip-active { background: #e3efe6; color: #1a5c3a; }
         .cc-chip-closed { background: #3a3f4a; color: #fff; }
+        .cc-chip-removing { background: #fdf0f0; color: #7a1a1a; border: 1px solid #e8b4b4; }
+        .cc-cl-ccp { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+        .cc-cl-ccp input { padding: 6px 10px; border: 1px solid #c9a3a3; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; width: 160px; }
         .cc-cl-actions { display: flex; gap: 8px; align-items: center; }
         .cc-cl-btn { background: #fff; color: #0c1c34; border: 1px solid #0c1c34; padding: 6px 14px; cursor: pointer; font-weight: 600; }
         .cc-cl-del { background: transparent; color: #7a1a1a; border: 1px solid #d9b3b3; padding: 6px 12px; cursor: pointer; }
@@ -739,6 +748,7 @@
     <script src="js/supabase-client.js"></script>
   <script src="js/workspace-sync.js"></script>
   <script src="js/case-manager.js"></script>
+  <script src="js/plan-guard.js"></script>
   <script src="js/case-identity.js"></script>
   <script src="js/print-frame.js"></script>
   <script src="js/trial-print.js"></script>
@@ -1654,7 +1664,10 @@
                     var label = singleOk
                         ? 'Single Client Review · through ' + new Date(user.single_review_expires_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
                         : PLAN_LABELS[user.subscription_tier];
-                    localStorage.setItem('cc_access', JSON.stringify({ plan: user.subscription_tier, label: label, until: until }));
+                    localStorage.setItem('cc_access', JSON.stringify({ plan: user.subscription_tier, label: label, until: until, periodEnd: user.subscription_current_period_end || null }));
+                    if (singleOk && window.caseClarityPlan) { try { await window.caseClarityPlan.syncSingleRuns(); } catch (e) { /* use cached */ } }
+                    else localStorage.removeItem('cc_single_runs');
+                    if (subOk && window.caseClarityCases) { try { await window.caseClarityCases.purgeDue(); } catch (e) { /* next visit */ } }
                     renderDashboard();
                     updateTrialReportUI();
                     updateReportUI();
@@ -1683,13 +1696,15 @@
                         });
                     }
 
-                    alert('Your 30-day trial has ended. Please purchase a subscription to continue.');
+                    if (window.caseClarityCases) window.caseClarityCases.clearAll();
+                    alert('Your 30-day trial has ended. As stated in the trial terms, all trial case information and reports have been permanently deleted. Choose a plan to continue.');
                     window.location.href = 'pricing.html';
                     return;
                 }
 
                 if (user.status === 'trial_expired') {
-                    alert('Your trial has ended. Please purchase a subscription to continue.');
+                    if (window.caseClarityCases) window.caseClarityCases.clearAll();
+                    alert('Your trial has ended. As stated in the trial terms, all trial case information and reports have been permanently deleted. Choose a plan to continue.');
                     window.location.href = 'pricing.html';
                     return;
                 }
@@ -1858,6 +1873,23 @@
             await checkTrialStatus();
         })();
 
+        /* Last 7 days of the trial: the date, and what happens to the data. */
+        function ccEndingBanner(paidAcc, trialExpired) {
+            if (paidAcc || trialExpired) return '';
+            var raw = localStorage.getItem('trial_start_at');
+            if (!raw) return '';
+            var end = new Date(raw); end.setHours(0, 0, 0, 0); end.setDate(end.getDate() + 30);
+            var days = Math.ceil((end.getTime() - Date.now()) / 86400000);
+            if (days > 7 || days < 0) return '';
+            var when = end.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+            var left = days <= 1 ? 'Your trial ends tomorrow' : 'Your trial ends in ' + days + ' days';
+            return '<div class="cc-ending" role="alert">' +
+                '<div class="cc-ending-title">' + left + ' — ' + escapeAttr(when) + '</div>' +
+                '<p>If you do not subscribe, <strong>all case information, answers, and reports are permanently deleted</strong> when your trial ends, and RCMS cannot recover them. Download or print any reports you want to keep now.</p>' +
+                '<div class="cc-ending-actions"><a href="#btn-download-active-all" onclick="var b=document.getElementById(\'btn-download-active-all\'); if(b){b.scrollIntoView({behavior:\'smooth\',block:\'center\'});} return false;">Download my reports</a>' +
+                '<a href="pricing.html" class="cc-ending-plans">View plans and keep my work</a></div></div>';
+        }
+
         function caseListHtml(trialExpired) {
             return '<div id="cc-case-list" class="cc-case-list">' + caseListInner(trialExpired) + '</div>';
         }
@@ -1865,25 +1897,39 @@
             var cm = window.caseClarityCases;
             if (!cm) return '';
             var rows = cm.list();
-            var max = cm.MAX;
+            var max = cm.max();
+            var plan = window.caseClarityPlan ? window.caseClarityPlan.access() : null;
             var full = rows.length >= max;
             var h = '<div class="cc-cl-head"><div><h2>Your Cases</h2>' +
-                '<p>' + rows.length + ' of ' + max + ' trial cases · active and closed. Each case keeps its own answers, reports, and timeline.</p></div>' +
+                '<p>' + rows.length + ' of ' + max + (plan ? (max === 1 ? ' client on your plan' : ' clients on your plan') : ' trial cases') + ' · active and closed. Each case keeps its own answers, reports, and timeline.</p></div>' +
                 '<button type="button" class="cc-cl-add" onclick="ccAddCase()"' + (full || trialExpired ? ' disabled' : '') + '>+ Add a case</button></div>';
-            if (full) h += '<p class="cc-cl-full">You have reached the ' + max + '-case trial limit. Delete a case to add another.</p>';
+            if (full) h += '<p class="cc-cl-full">' + (plan && plan.plan === 'single' ? 'A Single Client Review covers one client.' : (plan ? 'You have reached your plan’s ' + max + '-client limit.' : 'You have reached the ' + max + '-case trial limit. Delete a case to add another.')) + '</p>';
             h += '<div class="cc-cl-rows">';
             rows.forEach(function (r) {
                 var st = r.status === 'closed' ? '<span class="cc-chip cc-chip-closed">Closed · retrospective</span>' : (r.status === 'active' ? '<span class="cc-chip cc-chip-active">Active</span>' : '<span class="cc-chip">Status not set</span>');
-                h += '<div class="cc-cl-row' + (r.current ? ' is-current' : '') + '" data-case-id="' + escapeAttr(r.id) + '">' +
+                var monthly = !!(plan && plan.plan !== 'single');
+                var nm = r.name ? escapeAttr(r.name) : 'this case';
+                var rid = escapeAttr(r.id);
+                var removal = r.removeAt ? '<span class="cc-chip cc-chip-removing">Removal on ' + escapeAttr(ccFmtDate(r.removeAt)) + ' · download reports before then</span>' : '';
+                var delBtn = '';
+                if (plan && plan.plan === 'single') delBtn = '';
+                else if (r.removeAt) delBtn = '<button type="button" class="cc-cl-btn" onclick="ccKeepClient(\'' + rid + '\')">Keep this client</button>';
+                else delBtn = '<button type="button" class="cc-cl-del" onclick="ccAskDelete(\'' + rid + '\')">' + (monthly ? 'Remove client' : 'Delete') + '</button>';
+                var confirm = monthly
+                    ? '<label><input type="checkbox" onchange="ccCheckRemove(\'' + rid + '\')"> <span>I understand that removing <strong>' + nm + '</strong> permanently deletes all of their information and reports on <strong>' + escapeAttr(ccFmtDate(ccRenewalDate())) + '</strong>, and that RCMS cannot recover them.</span></label>' +
+                      '<div class="cc-cl-ccp"><span>Type your CCP number to confirm:</span> <input type="text" autocomplete="off" placeholder="CCP-000000" oninput="ccCheckRemove(\'' + rid + '\')"></div>' +
+                      '<div><button type="button" class="cc-cl-del-go" disabled onclick="ccRemoveClient(\'' + rid + '\')">Remove on renewal date</button>' +
+                      '<button type="button" class="cc-cl-btn" onclick="ccAskDelete(\'' + rid + '\', true)">Cancel</button></div>'
+                    : '<label><input type="checkbox" onchange="this.closest(\'.cc-cl-confirm\').querySelector(\'button\').disabled=!this.checked"> <span>I understand this permanently deletes all information and reports for <strong>' + nm + '</strong>, and that they cannot be recovered.</span></label>' +
+                      '<div><button type="button" class="cc-cl-del-go" disabled onclick="ccDeleteCase(\'' + rid + '\')">Delete permanently</button>' +
+                      '<button type="button" class="cc-cl-btn" onclick="ccAskDelete(\'' + rid + '\', true)">Cancel</button></div>';
+                h += '<div class="cc-cl-row' + (r.current ? ' is-current' : '') + '" data-case-id="' + rid + '">' +
                     '<div class="cc-cl-main"><div class="cc-cl-name">' + (r.name ? escapeAttr(r.name) : '<em>Untitled case</em>') + '</div>' +
-                    '<div class="cc-cl-meta">' + st + '<span>' + r.done + '/6 assessments</span></div></div>' +
+                    '<div class="cc-cl-meta">' + st + '<span>' + r.done + '/6 assessments</span>' + removal + '</div></div>' +
                     '<div class="cc-cl-actions">' +
-                    (r.current ? '<span class="cc-cl-open-now">Open now</span>' : '<button type="button" class="cc-cl-btn" onclick="ccOpenCase(\'' + escapeAttr(r.id) + '\')">Open</button>') +
-                    '<button type="button" class="cc-cl-del" onclick="ccAskDelete(\'' + escapeAttr(r.id) + '\')">Delete</button></div>' +
-                    '<div class="cc-cl-confirm" id="cc-del-' + escapeAttr(r.id) + '" hidden>' +
-                    '<label><input type="checkbox" onchange="this.closest(\'.cc-cl-confirm\').querySelector(\'button\').disabled=!this.checked"> I understand this permanently deletes all information and reports for <strong>' + (r.name ? escapeAttr(r.name) : 'this case') + '</strong>, and that they cannot be recovered.</label>' +
-                    '<div><button type="button" class="cc-cl-del-go" disabled onclick="ccDeleteCase(\'' + escapeAttr(r.id) + '\')">Delete permanently</button>' +
-                    '<button type="button" class="cc-cl-btn" onclick="ccAskDelete(\'' + escapeAttr(r.id) + '\', true)">Cancel</button></div></div>' +
+                    (r.current ? '<span class="cc-cl-open-now">Open now</span>' : '<button type="button" class="cc-cl-btn" onclick="ccOpenCase(\'' + rid + '\')">Open</button>') +
+                    delBtn + '</div>' +
+                    '<div class="cc-cl-confirm" id="cc-del-' + rid + '" hidden>' + confirm + '</div>' +
                     '</div>';
             });
             h += '</div>';
@@ -1919,6 +1965,44 @@
                 return;
             }
             window.location.reload();
+        };
+        function ccFmtDate(iso) {
+            var x = new Date(iso);
+            return isNaN(x.getTime()) ? '' : x.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+        function ccRenewalDate() {
+            var a = window.caseClarityPlan ? window.caseClarityPlan.access() : null;
+            return (a && (a.periodEnd || a.until)) || new Date(Date.now() + 30 * 86400000).toISOString();
+        }
+        window.ccCheckRemove = function (id) {
+            var box = document.getElementById('cc-del-' + id);
+            if (!box) return;
+            var ok = box.querySelector('input[type=checkbox]').checked &&
+                box.querySelector('.cc-cl-ccp input').value.trim().toUpperCase() === String(localStorage.getItem('ccp') || '').toUpperCase();
+            box.querySelector('.cc-cl-del-go').disabled = !ok;
+        };
+        window.ccRemoveClient = async function (id) {
+            var row = (window.caseClarityCases.list().filter(function (r) { return r.id === id; })[0]) || {};
+            var when = ccRenewalDate();
+            try {
+                var r = await supabaseClient.rpc('log_client_removal', {
+                    p_id: localStorage.getItem('user_id'), p_ccp: localStorage.getItem('ccp'),
+                    p_client: row.name || 'Untitled case', p_delete_on: when
+                });
+                if (r.error) throw r.error;
+            } catch (e) {
+                alert('The removal could not be recorded. Please check your connection and try again.');
+                return;
+            }
+            window.caseClarityCases.markRemoval(id, when);
+            renderCaseList();
+            if (row.current) window.location.reload();
+        };
+        window.ccKeepClient = function (id) {
+            var cm = window.caseClarityCases;
+            var cur = cm.currentId();
+            cm.unmarkRemoval(id);
+            if (id === cur) window.location.reload(); else renderCaseList();
         };
         window.ccAskDelete = function (id, cancel) {
             var box = document.getElementById('cc-del-' + id);
@@ -1977,6 +2061,7 @@
                     </div>
                     <span id="trial-countdown-card" class="timer-value trial-countdown-clock ${paidAcc ? '' : timerClass}" aria-live="polite">${paidAcc ? escapeAttr(paidAcc.label) : '30d 00h 00m 00s'}</span>
                 </div>
+                ${ccEndingBanner(paidAcc, trialExpired)}
                 ${trialExpired ? '<div style="background:#fdf0f0;border:1px solid #e8b4b4;border-left:4px solid #c0392b;padding:16px 20px;margin-bottom:24px;font-size:14px;color:#5c2a2a;"><strong>Trial expired.</strong> Your 30-day instrument access from your signup date has ended. Launching assessments is disabled.</div>' : ''}
 
                 <!-- ORIENTATION SECTION -->
@@ -2035,7 +2120,7 @@
                   <h2 style="font-size: 20px; margin-bottom: 16px;">Enter Your Case Information</h2>
                   <p style="margin-bottom: 20px;">Provide basic information for your case. This information will be used across all six assessment instruments — you will not be asked to re-enter it within each tool.</p>
                   <div style="margin-bottom: 20px; padding: 12px; background: #f1f0eb; border-left: 3px solid #b8922a;">
-                    <p style="font-size: 14px;"><strong>Data Storage Notice:</strong> Case information entered here is stored only during the active 30-day assessment window. All case data, instrument responses, and generated reports are automatically deleted when the assessment period expires.</p>
+                    ${paidAcc ? '<p style="font-size: 14px;"><strong>Your case data.</strong> Case information, answers, and reports are saved privately to your account so you can work across devices. Only you can see them.</p>' : '<p style="font-size: 14px; line-height: 1.6;"><strong>Your trial data.</strong> Case information you enter during the trial is saved privately to your account so you can work across devices. <strong>If you do not subscribe, all case information, answers, and reports are permanently deleted when your trial ends. They are removed from all system backups within 7 days, and RCMS cannot recover them.</strong> To keep any report, download or print it before your trial ends. During the trial, use initials or a case number instead of the client’s full name.</p>'}
                   </div>
                   <div class="case-entry-two-col">
                     <div class="case-entry-panel">
@@ -2275,14 +2360,30 @@
                 statusText = '✓ COMPLETED' + (lastRun ? ' · ' + fmtWhen(lastRun) : '');
             }
 
+            // Single Client Review: each tool runs once.
+            var plan = window.caseClarityPlan;
+            var singleLocked = !!(plan && plan.isSingle() && plan.hasRun(toolNum));
+            var singleReplacement = !!(plan && plan.isSingle() && Number(plan.replacementTool()) === toolNum && plan.runs()[String(toolNum)]);
+            if (singleLocked) {
+                statusClass = 'status-complete';
+                statusText = '✓ RUN ONCE · ' + fmtWhen(plan.runs()[String(toolNum)]) + ' · report available below';
+            }
+
             // Completed tools can be re-run; the new report compares itself with the last run.
-            let launchDisabled = trialExpired;
+            var removingOn = window.caseClarityCases && window.caseClarityCases.currentRemoval();
+            let launchDisabled = trialExpired || singleLocked || !!removingOn;
             if (caseType === 'retrospective' && opts.lockedBySequence && !effectiveDone) {
                 launchDisabled = true;
             }
 
             let btnLabel = 'Launch Assessment';
-            if (trialExpired) {
+            if (removingOn) {
+                btnLabel = 'Client being removed';
+            } else if (singleLocked) {
+                btnLabel = 'Already run';
+            } else if (singleReplacement) {
+                btnLabel = 'Replacement run allowed';
+            } else if (trialExpired) {
                 btnLabel = 'Trial expired';
             } else if (draft && draft.at) {
                 btnLabel = 'Resume Assessment';

@@ -15,7 +15,8 @@
  * never land in the wrong case.
  */
 (function (global) {
-  var MAX = 10;
+  var MAX = 10; // trial; plans set their own limit (caseClarityPlan.maxCases)
+  function max() { return global.caseClarityPlan && global.caseClarityPlan.maxCases ? global.caseClarityPlan.maxCases() : MAX; }
   var INDEX = 'cc_cases';
   var CURRENT = 'cc_current_case';
   var SNAP = 'cc_case_';
@@ -110,7 +111,7 @@
     var cur = currentId();
     return index().map(function (e) {
       var m = e.id === cur ? liveMeta() : e;
-      return { id: e.id, name: m.name || '', status: m.status || '', doi: m.doi || '', done: m.done || 0, updated: m.updated || e.created || '', current: e.id === cur };
+      return { id: e.id, name: m.name || '', status: m.status || '', doi: m.doi || '', done: m.done || 0, updated: m.updated || e.created || '', current: e.id === cur, removeAt: e.removeAt || null };
     });
   }
 
@@ -119,7 +120,7 @@
     if (!cur) return;
     var meta = liveMeta();
     ls.setItem(SNAP + cur, await pack(snapshotWorking()));
-    saveIndex(index().map(function (e) { return e.id === cur ? Object.assign({ id: e.id, created: e.created }, meta) : e; }));
+    saveIndex(index().map(function (e) { return e.id === cur ? Object.assign({ id: e.id, created: e.created, removeAt: e.removeAt || null }, meta) : e; }));
     clearWorking();
   }
 
@@ -155,7 +156,7 @@
   async function add() {
     init();
     if (isBlank()) return { ok: true, reused: true };
-    if (index().length >= MAX) return { ok: false, reason: 'The trial allows up to ' + MAX + ' cases. Delete a case to add another.' };
+    if (index().length >= max()) return { ok: false, reason: (global.caseClarityPlan && global.caseClarityPlan.access() ? 'Your plan allows up to ' : 'The trial allows up to ') + max() + (max() === 1 ? ' client.' : ' cases. Delete a case to add another.') };
     await stashCurrent();
     var id = newId();
     var idx = index();
@@ -187,6 +188,36 @@
     try { sessionStorage.removeItem('reportData'); } catch (e) { /* ignore */ }
     await settle();
     return { ok: true };
+  }
+
+  /* Monthly plans: a removed client stays (downloads only) until the renewal date, then is deleted. */
+  function markRemoval(id, removeAt) {
+    saveIndex(index().map(function (e) { return e.id === id ? Object.assign({}, e, { removeAt: removeAt }) : e; }));
+  }
+  function unmarkRemoval(id) {
+    saveIndex(index().map(function (e) { if (e.id !== id) return e; var c = Object.assign({}, e); delete c.removeAt; return c; }));
+  }
+  function currentRemoval() {
+    var cur = currentId();
+    var e = index().filter(function (x) { return x.id === cur; })[0];
+    return e && e.removeAt ? e.removeAt : null;
+  }
+  async function purgeDue() {
+    var due = index().filter(function (e) { return e.removeAt && new Date(e.removeAt).getTime() <= Date.now(); });
+    for (var i = 0; i < due.length; i++) await remove(due[i].id);
+    return due.length;
+  }
+
+  /* Trial ended without a plan: remove every case from this browser. */
+  function clearAll() {
+    var keys = [];
+    for (var i = 0; i < ls.length; i++) {
+      var k = ls.key(i);
+      if (k && (CASE_KEY_RE.test(k) || k.indexOf(SNAP) === 0 || k === INDEX || k === CURRENT || k === 'dashboard_case_retro' || k === 'cc_shared_retro' || k === 'cc_access' || k === 'cc_single_runs')) keys.push(k);
+    }
+    keys.forEach(function (k) { ls.removeItem(k); });
+    try { sessionStorage.removeItem('reportData'); } catch (e) { /* ignore */ }
+    return keys.length;
   }
 
   /* ── closed (retrospective) cases ── */
@@ -231,12 +262,18 @@
 
   global.caseClarityCases = {
     MAX: MAX,
+    max: max,
     init: init,
     list: list,
     currentId: currentId,
     switchTo: switchTo,
     add: add,
     remove: remove,
+    clearAll: clearAll,
+    markRemoval: markRemoval,
+    unmarkRemoval: unmarkRemoval,
+    currentRemoval: currentRemoval,
+    purgeDue: purgeDue,
     isClosed: isClosed,
     closedBoxHtml: closedBoxHtml,
     reportBannerHtml: reportBannerHtml,
